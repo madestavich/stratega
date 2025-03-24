@@ -22,6 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
       this.centerY = document.getElementById("centerY");
       this.saveConfigBtn = document.getElementById("saveConfig");
       this.logConfigBtn = document.getElementById("logConfig");
+      this.frameSelectionToggle = document.getElementById(
+        "frameSelectionToggle"
+      );
       this.canvasRenderer = new CanvasRenderer(
         document.getElementById("canvas")
       );
@@ -64,6 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setupEventListeners() {
+      this.frameSelectionToggle.addEventListener("change", (e) => {
+        this.canvasRenderer.enableFrameSelection(e.target.checked);
+      });
       this.sheetSelect.addEventListener("change", () => {
         this.currentSpritesheetKey = this.sheetSelect.value;
         this.updateAnimationSelect();
@@ -114,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         this.centerX,
         this.centerY,
       ].forEach((input) => {
-        input.addEventListener("input", () => {
+        input.addEventListener("change", () => {
           if (!this.currentSpritesheetKey || !this.currentAnimation) return;
 
           const selectedSpritesheet =
@@ -366,6 +372,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
       this.canvasRenderer.setFrame(selectedFrame);
     }
+
+    applyFrameSelection(frame) {
+      if (!this.currentSpritesheetKey || !this.currentAnimation) return;
+
+      const selectedSpritesheet = this.spritesheets[this.currentSpritesheetKey];
+      const selectedAnimation =
+        selectedSpritesheet.animations[this.currentAnimation];
+
+      const frameIndex = parseInt(this.frameSlider.value, 10);
+      if (
+        isNaN(frameIndex) ||
+        frameIndex < 0 ||
+        frameIndex >= selectedAnimation.frames.length
+      )
+        return;
+
+      selectedAnimation.frames[frameIndex] = frame;
+
+      this.updateFrameInputs(frame);
+      this.updateUIState();
+    }
+
+    updateFrameInputs(frame) {
+      this.frameX.value = frame.x;
+      this.frameY.value = frame.y;
+      this.frameWidth.value = frame.width;
+      this.frameHeight.value = frame.height;
+    }
   }
 
   class Spritesheet {
@@ -471,14 +505,46 @@ document.addEventListener("DOMContentLoaded", () => {
       this.ctx.fill();
     }
 
+    enableFrameSelection(enable) {
+      this.isFrameSelectionMode = enable;
+    }
+
     initCanvasEvents() {
       this.canvas.addEventListener("mousedown", (e) => {
+        if (this.isFrameSelectionMode) {
+          if (!editor.currentSpritesheetKey || !editor.currentAnimation) return;
+
+          this.isSelectingFrame = true;
+          this.startFrameX = e.offsetX - this.imageOffsetX;
+          this.startFrameY = e.offsetY - this.imageOffsetY;
+          this.currentFrame = new Frame(
+            this.startFrameX,
+            this.startFrameY,
+            0,
+            0,
+            0,
+            0
+          );
+          return;
+        }
+
         this.isDragging = true;
         this.startX = e.clientX;
         this.startY = e.clientY;
       });
 
       this.canvas.addEventListener("mousemove", (e) => {
+        if (this.isSelectingFrame) {
+          const width = e.offsetX - this.imageOffsetX - this.startFrameX;
+          const height = e.offsetY - this.imageOffsetY - this.startFrameY;
+
+          this.currentFrame.width = width;
+          this.currentFrame.height = height;
+
+          this.redrawCanvas();
+          return;
+        }
+
         if (!this.isDragging || !this.image) return;
 
         const dx = e.clientX - this.startX;
@@ -494,13 +560,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       this.canvas.addEventListener("mouseup", () => {
-        this.isDragging = false;
-        // Зберігаємо позицію, коли користувач відпустив мишу
-        this.lastOffsetX = this.imageOffsetX;
-        this.lastOffsetY = this.imageOffsetY;
-      });
+        if (this.isSelectingFrame) {
+          this.isSelectingFrame = false;
 
-      this.canvas.addEventListener("mouseleave", () => {
+          if (this.currentFrame) {
+            editor.applyFrameSelection(this.currentFrame);
+          }
+          return;
+        }
+
         this.isDragging = false;
         this.lastOffsetX = this.imageOffsetX;
         this.lastOffsetY = this.imageOffsetY;
