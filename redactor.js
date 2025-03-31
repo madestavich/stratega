@@ -535,11 +535,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       this.canvas.addEventListener("mousemove", (e) => {
         if (this.isSelectingFrame) {
-          const width = e.offsetX - this.imageOffsetX - this.startFrameX;
-          const height = e.offsetY - this.imageOffsetY - this.startFrameY;
+          const currentX = e.offsetX - this.imageOffsetX;
+          const currentY = e.offsetY - this.imageOffsetY;
 
+          // Нормалізуємо координати
+          const x = Math.min(this.startFrameX, currentX);
+          const y = Math.min(this.startFrameY, currentY);
+          const width = Math.abs(currentX - this.startFrameX);
+          const height = Math.abs(currentY - this.startFrameY);
+
+          this.currentFrame.x = x;
+          this.currentFrame.y = y;
           this.currentFrame.width = width;
           this.currentFrame.height = height;
+
+          // Оновлюємо центр фрейму
+          this.currentFrame.frameCenter.x = x + width / 2;
+          this.currentFrame.frameCenter.y = y + height / 2;
 
           this.redrawCanvas();
           return;
