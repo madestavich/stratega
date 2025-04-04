@@ -165,8 +165,11 @@ document.addEventListener("DOMContentLoaded", () => {
         image.src = e.target.result;
 
         image.onload = () => {
+          // Store relative path instead of full data URL
+          const relativePath = file.name;
+
           this.spritesheets[name] = new Spritesheet(name, {
-            link: e.target.result,
+            link: relativePath,
             width: image.width,
             height: image.height,
           });
@@ -279,6 +282,8 @@ document.addEventListener("DOMContentLoaded", () => {
       this.frameSlider.max = selectedAnimation.frames.length - 1;
       this.frameSlider.value = selectedAnimation.frames.length - 1;
 
+      this.drawSelectedFrame();
+      this.updateFrameInputs(frame);
       this.updateUIState();
     }
 
@@ -399,6 +404,8 @@ document.addEventListener("DOMContentLoaded", () => {
       this.frameY.value = frame.y;
       this.frameWidth.value = frame.width;
       this.frameHeight.value = frame.height;
+      this.centerX.value = frame.frameCenter.x;
+      this.centerY.value = frame.frameCenter.y;
     }
   }
 
