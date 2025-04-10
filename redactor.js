@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     logConfig() {
-      console.log(this);
+      console.log(this.spritesheets);
     }
 
     newAnimation() {
