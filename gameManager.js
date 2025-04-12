@@ -1,5 +1,5 @@
 import { ConfigLoader } from "./configLoader.js";
-import { ObjectManager } from "./objectManager.js";
+import { ObjectManager } from "./game_objects/objectManager.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
