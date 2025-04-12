@@ -1,12 +1,11 @@
-import { Animator } from "./animator.js";
-import { Renderer } from "./renderer.js";
+import { ConfigLoader } from "./configLoader.js";
+import { ObjectManager } from "./objectManager.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -16,47 +15,83 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 20; // 60 FPS
+    this.fixedTimeStep = 1000 / 20;
     this.accumulator = 0;
-    this.animator = null; // Додано аніматор
-    this.renderer = null; // Додано рендерер
-    this.config = null; // Додано для конфігурації
+
+    this.configLoader = new ConfigLoader();
+    this.objectManager = new ObjectManager(ctx);
+
     this.start();
   }
 
   async start() {
-    try {
-      // Завантажуємо конфігурацію з JSON файлу
-      const response = await fetch("config.json"); // шлях до вашого JSON файлу
-      this.config = await response.json();
+    const configList = {
+      hero: "config.json",
+      // інші
+    };
 
-      // Завантажуємо спрайтшит
-      const spritesheet = new Image();
-      spritesheet.src = this.config["111111111"].sourceImage.link;
+    await this.configLoader.load(configList);
 
-      spritesheet.onload = () => {
-        // Ініціалізація аніматора після завантаження спрайтшита
-        this.config["111111111"].sourceImage.link = spritesheet; // Додаємо спрайтшит в конфігурацію
+    // створення об'єктів
+    this.objectManager.createMultiple(this.configLoader.getConfig("hero"), 10, [
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+      {
+        x: Math.floor(Math.random() * 1000),
+        y: Math.floor(Math.random() * 1000),
+      },
+    ]);
 
-        this.animator = new Animator(this.config);
-        this.animator.setSpritesheet("111111111");
-        this.animator.setAnimation("22222", true, "22222"); // запускаємо анімацію
+    requestAnimationFrame((t) => this.loop(t));
+  }
 
-        this.renderer = new Renderer(ctx, this.animator);
+  update(dt) {
+    this.objectManager.updateAll();
+  }
 
-        requestAnimationFrame((timestamp) => this.loop(timestamp));
-      };
-    } catch (error) {
-      console.error("Error loading configuration:", error);
-    }
+  render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.objectManager.renderAll();
   }
 
   loop(timestamp) {
     if (this.lastTime === 0) this.lastTime = timestamp;
-
     this.deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
-
     this.accumulator += this.deltaTime;
 
     while (this.accumulator >= this.fixedTimeStep) {
@@ -65,20 +100,7 @@ class GameManager {
     }
 
     this.render();
-    requestAnimationFrame((timestamp) => this.loop(timestamp));
-  }
-
-  update(dt) {
-    if (this.animator && !this.animator.hasFinished) {
-      this.animator.nextFrame();
-    }
-  }
-
-  render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (this.renderer) {
-      this.renderer.draw(100, 100); // Малювання анімації на canvas
-    }
+    requestAnimationFrame((t) => this.loop(t));
   }
 }
 
