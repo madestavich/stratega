@@ -158,28 +158,22 @@ document.addEventListener("DOMContentLoaded", () => {
         return alert("Invalid or duplicate name");
 
       const file = fileInput.files[0];
-      const reader = new FileReader();
+      const fileName = file.name;
+      const relativeToEditor = "../sprites/" + fileName;
 
-      reader.onload = (e) => {
-        const image = new Image();
-        image.src = e.target.result;
+      const image = new Image();
+      image.src = relativeToEditor;
 
-        image.onload = () => {
-          // Store relative path instead of full data URL
-          const relativePath = file.name;
-
-          this.spritesheets[name] = new Spritesheet(name, {
-            link: relativePath,
-            width: image.width,
-            height: image.height,
-          });
-          this.currentSpritesheetKey = name;
-          this.updateUIState();
-          this.updateSheetSelect();
-        };
+      image.onload = () => {
+        this.spritesheets[name] = new Spritesheet(name, {
+          link: relativeToEditor,
+          width: image.width,
+          height: image.height,
+        });
+        this.currentSpritesheetKey = name;
+        this.updateUIState();
+        this.updateSheetSelect();
       };
-
-      reader.readAsDataURL(file);
     }
 
     updateSheetSelect() {
