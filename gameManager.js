@@ -1,4 +1,4 @@
-import { ConfigLoader } from "./configLoader.js";
+import { ConfigLoader } from "./game_configs/configLoader.js";
 import { ObjectManager } from "./game_objects/objectManager.js";
 
 const canvas = document.getElementById("gameCanvas");
