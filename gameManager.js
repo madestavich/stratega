@@ -1,14 +1,17 @@
 import { ConfigLoader } from "./game_configs/configLoader.js";
 import { ObjectManager } from "./game_objects/objectManager.js";
+import { GridManager } from "./game_map/gridManager.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  this.gridManager.updateSize(canvas.width, canvas.height);
 });
 
 class GameManager {
@@ -20,6 +23,12 @@ class GameManager {
 
     this.configLoader = new ConfigLoader();
     this.objectManager = new ObjectManager(ctx);
+    this.gridManager = new GridManager(ctx, {
+      pixelWidth: canvas.width,
+      pixelHeight: canvas.height,
+      rows: 20,
+      cols: 40,
+    });
 
     this.start();
   }
@@ -85,6 +94,7 @@ class GameManager {
 
   render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.gridManager.debugDrawGrid();
     this.objectManager.renderAll();
   }
 
