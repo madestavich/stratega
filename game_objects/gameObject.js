@@ -1,5 +1,5 @@
-import { Animator } from "../animator.js";
-import { Renderer } from "../renderer.js";
+import { Animator } from "./animator.js";
+import { Renderer } from "./renderer.js";
 
 export class GameObject {
   constructor(ctx, config, x, y) {
