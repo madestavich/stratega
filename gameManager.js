@@ -26,7 +26,7 @@ class GameManager {
 
   async start() {
     const configList = {
-      hero: "config.json",
+      hero: "/game_configs/units/config.json",
       // інші
     };
 
