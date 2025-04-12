@@ -27,6 +27,21 @@ export class GridManager {
     this.cellHeight = this.pixelHeight / this.rows;
   }
 
+  updateGridObjects(objectManager) {
+    // Clear the grid first
+    this.grid = this.createEmptyGrid();
+
+    // Iterate over each object and mark its position in the grid
+    for (const obj of objectManager.objects) {
+      const gridX = Math.floor(obj.x / this.cellWidth);
+      const gridY = Math.floor(obj.y / this.cellHeight);
+
+      if (gridX >= 0 && gridX < this.cols && gridY >= 0 && gridY < this.rows) {
+        this.grid[gridY][gridX] = 1; // Mark the cell as occupied
+      }
+    }
+  }
+
   debugDrawGrid() {
     this.ctx.strokeStyle = "#888";
     this.ctx.lineWidth = 0.5;
@@ -43,6 +58,23 @@ export class GridManager {
       this.ctx.moveTo(0, y * this.cellHeight);
       this.ctx.lineTo(this.pixelWidth, y * this.cellHeight);
       this.ctx.stroke();
+    }
+  }
+
+  debugColorOccupiedCells() {
+    this.ctx.fillStyle = "rgba(255, 0, 0, 0.5)"; // Semi-transparent red
+
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        if (this.grid[y][x] === 1) {
+          this.ctx.fillRect(
+            x * this.cellWidth,
+            y * this.cellHeight,
+            this.cellWidth,
+            this.cellHeight
+          );
+        }
+      }
     }
   }
 }

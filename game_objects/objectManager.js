@@ -1,13 +1,14 @@
 import { GameObject } from "./gameObject.js";
 
 export class ObjectManager {
-  constructor(ctx) {
+  constructor(ctx, gridManager) {
     this.ctx = ctx;
+    this.gridManager = gridManager;
     this.objects = [];
   }
 
   createObject(config, x, y) {
-    const obj = new GameObject(this.ctx, config, x, y);
+    const obj = new GameObject(this.ctx, config, x, y, this.gridManager);
     this.objects.push(obj);
     return obj;
   }
