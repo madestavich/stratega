@@ -35,7 +35,8 @@ class GameManager {
 
   async start() {
     const configList = {
-      hero: "/game_configs/units/config.json",
+      hero: "/game_configs/units/config1.json",
+      archer: "/game_configs/units/config2.json",
       // інші
     };
 
@@ -56,6 +57,24 @@ class GameManager {
         y: Math.floor(Math.random() * canvas.height),
       },
     ]);
+    this.objectManager.createMultiple(
+      this.configLoader.getConfig("archer"),
+      3,
+      [
+        {
+          x: Math.floor(Math.random() * canvas.width),
+          y: Math.floor(Math.random() * canvas.height),
+        },
+        {
+          x: Math.floor(Math.random() * canvas.width),
+          y: Math.floor(Math.random() * canvas.height),
+        },
+        {
+          x: Math.floor(Math.random() * canvas.width),
+          y: Math.floor(Math.random() * canvas.height),
+        },
+      ]
+    );
 
     requestAnimationFrame((t) => this.loop(t));
   }

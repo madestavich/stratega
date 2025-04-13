@@ -1,0 +1,57 @@
+{
+  "test": {
+    "name": "test",
+    "sourceImage": {
+      "link": "../sprites/41773.png",
+      "width": 1212,
+      "height": 419
+    },
+    "animations": {
+      "first": {
+        "name": "first",
+        "frames": [
+          {
+            "x": 10,
+            "y": 9,
+            "width": 40,
+            "height": 70,
+            "frameCenter": {
+              "x": 30,
+              "y": 44
+            }
+          },
+          {
+            "x": 85,
+            "y": 8,
+            "width": 44,
+            "height": 69,
+            "frameCenter": {
+              "x": 107,
+              "y": 42.5
+            }
+          },
+          {
+            "x": 163,
+            "y": 8,
+            "width": 40,
+            "height": 71,
+            "frameCenter": {
+              "x": 183,
+              "y": 43.5
+            }
+          },
+          {
+            "x": 239,
+            "y": 8,
+            "width": 42,
+            "height": 72,
+            "frameCenter": {
+              "x": 260,
+              "y": 44
+            }
+          }
+        ]
+      }
+    }
+  }
+}
