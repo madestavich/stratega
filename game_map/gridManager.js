@@ -20,13 +20,6 @@ export class GridManager {
     return grid;
   }
 
-  updateSize(pixelWidth, pixelHeight) {
-    this.pixelWidth = pixelWidth;
-    this.pixelHeight = pixelHeight;
-    this.cellWidth = this.pixelWidth / this.cols;
-    this.cellHeight = this.pixelHeight / this.rows;
-  }
-
   updateGridObjects(objectManager) {
     // Clear the grid first
     this.grid = this.createEmptyGrid();
