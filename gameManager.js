@@ -42,7 +42,7 @@ class GameManager {
     await this.configLoader.load(configList);
 
     // створення об'єктів
-    this.objectManager.createMultiple(this.configLoader.getConfig("hero"), 10, [
+    this.objectManager.createMultiple(this.configLoader.getConfig("hero"), 3, [
       {
         x: Math.floor(Math.random() * canvas.width),
         y: Math.floor(Math.random() * canvas.height),

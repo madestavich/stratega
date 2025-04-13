@@ -15,7 +15,7 @@ export class ObjectManager {
 
   createMultiple(config, count, positions) {
     for (let i = 0; i < count; i++) {
-      const { x, y } = positions[i] || { x: 0, y: 0 };
+      const { x, y } = positions[i];
       this.createObject(config, x, y);
     }
   }

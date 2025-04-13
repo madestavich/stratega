@@ -20,8 +20,8 @@ export class GameObject {
     this.renderer = new Renderer(ctx, this.animator);
 
     // Initialize cellX and cellY
-    this.cellX = 0;
-    this.cellY = 0;
+    this.cellX = undefined;
+    this.cellY = undefined;
   }
 
   update() {
@@ -32,7 +32,13 @@ export class GameObject {
   }
 
   render() {
-    this.renderer.draw(this.cellX, this.cellY);
+    // Retrieve the current frame's dimensions and center offsets
+    const currentFrame = this.animator.activeFrame;
+    const offsetX = currentFrame.frameCenter.x - currentFrame.x;
+    const offsetY = currentFrame.frameCenter.y - currentFrame.y;
+
+    // Adjust the drawing position by the calculated offsets
+    this.renderer.draw(this.cellX - offsetX, this.cellY - offsetY);
   }
 
   updateCellPosition() {
