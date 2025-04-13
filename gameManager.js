@@ -5,13 +5,8 @@ import { GridManager } from "./game_map/gridManager.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
+canvas.width = 1500;
+canvas.height = 800;
 
 class GameManager {
   constructor() {
