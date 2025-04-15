@@ -51,12 +51,48 @@ export class GridManager {
 
     // Iterate over each object and mark its position in the grid
     for (const obj of objectManager.objects) {
-      // Use the object's grid row and column indices
-      const gridX = obj.gridCol;
-      const gridY = obj.gridRow;
+      // Calculate all cells the object occupies based on its size and expansion direction
+      let startCol, startRow;
 
-      if (gridX >= 0 && gridX < this.cols && gridY >= 0 && gridY < this.rows) {
-        this.grid[gridY][gridX].occupied = true;
+      switch (obj.expansionDirection) {
+        case "topLeft":
+          // Base cell is at bottom-right
+          startCol = obj.gridCol - (obj.gridWidth - 1);
+          startRow = obj.gridRow - (obj.gridHeight - 1);
+          break;
+        case "topRight":
+          // Base cell is at bottom-left
+          startCol = obj.gridCol;
+          startRow = obj.gridRow - (obj.gridHeight - 1);
+          break;
+        case "bottomLeft":
+          // Base cell is at top-right
+          startCol = obj.gridCol - (obj.gridWidth - 1);
+          startRow = obj.gridRow;
+          break;
+        case "bottomRight":
+        default:
+          // Base cell is at top-left (default)
+          startCol = obj.gridCol;
+          startRow = obj.gridRow;
+          break;
+      }
+
+      // Mark all cells the object occupies as occupied
+      for (let y = 0; y < obj.gridHeight; y++) {
+        for (let x = 0; x < obj.gridWidth; x++) {
+          const gridX = startCol + x;
+          const gridY = startRow + y;
+
+          if (
+            gridX >= 0 &&
+            gridX < this.cols &&
+            gridY >= 0 &&
+            gridY < this.rows
+          ) {
+            this.grid[gridY][gridX].occupied = true;
+          }
+        }
       }
     }
   }

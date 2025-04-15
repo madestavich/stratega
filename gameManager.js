@@ -39,7 +39,7 @@ class GameManager {
     // створення об'єктів
     this.objectManager.createMultiple(
       this.configLoader.getConfig("hero"),
-      { gridWidth: 2, gridHeight: 2, expansionDirection: "bottomRight" },
+      { gridWidth: 2, gridHeight: 1, expansionDirection: "bottomRight" },
       3,
       [
         {
