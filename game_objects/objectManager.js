@@ -7,16 +7,22 @@ export class ObjectManager {
     this.objects = [];
   }
 
-  createObject(config, x, y) {
-    const obj = new GameObject(this.ctx, config, x, y, this.gridManager);
+  createObject(config, gridCol, gridRow) {
+    const obj = new GameObject(
+      this.ctx,
+      config,
+      gridCol,
+      gridRow,
+      this.gridManager
+    );
     this.objects.push(obj);
     return obj;
   }
 
   createMultiple(config, count, positions) {
     for (let i = 0; i < count; i++) {
-      const { x, y } = positions[i];
-      this.createObject(config, x, y);
+      const { col, row } = positions[i];
+      this.createObject(config, col, row);
     }
   }
 

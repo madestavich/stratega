@@ -39,16 +39,16 @@ class GameManager {
     // створення об'єктів
     this.objectManager.createMultiple(this.configLoader.getConfig("hero"), 3, [
       {
-        x: Math.floor(Math.random() * canvas.width),
-        y: Math.floor(Math.random() * canvas.height),
+        col: 1,
+        row: 1,
       },
       {
-        x: Math.floor(Math.random() * canvas.width),
-        y: Math.floor(Math.random() * canvas.height),
+        col: 1,
+        row: 2,
       },
       {
-        x: Math.floor(Math.random() * canvas.width),
-        y: Math.floor(Math.random() * canvas.height),
+        col: 1,
+        row: 3,
       },
     ]);
     this.objectManager.createMultiple(
@@ -56,16 +56,16 @@ class GameManager {
       3,
       [
         {
-          x: Math.floor(Math.random() * canvas.width),
-          y: Math.floor(Math.random() * canvas.height),
+          col: 1,
+          row: 4,
         },
         {
-          x: Math.floor(Math.random() * canvas.width),
-          y: Math.floor(Math.random() * canvas.height),
+          col: 1,
+          row: 5,
         },
         {
-          x: Math.floor(Math.random() * canvas.width),
-          y: Math.floor(Math.random() * canvas.height),
+          col: 1,
+          row: 6,
         },
       ]
     );

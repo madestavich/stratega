@@ -2,12 +2,17 @@ import { Animator } from "./animator.js";
 import { Renderer } from "./renderer.js";
 
 export class GameObject {
-  constructor(ctx, config, x, y, gridManager) {
+  constructor(ctx, config, gridCol, gridRow, gridManager) {
     this.ctx = ctx;
     this.config = config;
-    this.x = x;
-    this.y = y;
+    this.gridCol = gridCol;
+    this.gridRow = gridRow;
     this.gridManager = gridManager;
+    this.x = undefined;
+    this.y = undefined;
+
+    // Initialize x and y based on grid coordinates
+    this.updatePositionFromGrid();
 
     const defaultId = Object.keys(config)[0];
 
@@ -18,17 +23,13 @@ export class GameObject {
     this.animator.setAnimation(defaultAnim, true, defaultAnim);
 
     this.renderer = new Renderer(ctx, this.animator);
-
-    // Initialize cellX and cellY
-    this.cellX = undefined;
-    this.cellY = undefined;
   }
 
   update() {
     if (!this.animator.hasFinished) {
       this.animator.nextFrame();
     }
-    this.updateCellPosition();
+    this.updatePositionFromGrid();
   }
 
   render() {
@@ -38,12 +39,13 @@ export class GameObject {
     const offsetY = currentFrame.frameCenter.y - currentFrame.y;
 
     // Adjust the drawing position by the calculated offsets
-    this.renderer.draw(this.cellX - offsetX, this.cellY - offsetY);
+    this.renderer.draw(this.x - offsetX, this.y - offsetY);
   }
 
-  updateCellPosition() {
+  updatePositionFromGrid() {
     const { cellWidth, cellHeight } = this.gridManager;
-    this.cellX = Math.floor(this.x / cellWidth) * cellWidth + cellWidth / 2;
-    this.cellY = Math.floor(this.y / cellHeight) * cellHeight + cellHeight / 2;
+    // Calculate pixel coordinates from grid coordinates
+    this.x = this.gridCol * cellWidth + cellWidth / 2;
+    this.y = this.gridRow * cellHeight + cellHeight / 2;
   }
 }
