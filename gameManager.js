@@ -53,7 +53,7 @@ class GameManager {
     ]);
     this.objectManager.createMultiple(
       this.configLoader.getConfig("archer"),
-      3,
+      4,
       [
         {
           col: 1,
@@ -66,6 +66,10 @@ class GameManager {
         {
           col: 1,
           row: 6,
+        },
+        {
+          col: 1,
+          row: 0,
         },
       ]
     );
