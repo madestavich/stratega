@@ -9,6 +9,7 @@ export class GridManager {
     this.cellHeight = this.pixelHeight / this.rows;
 
     this.grid = this.createEmptyGrid();
+    this.coordinatesGrid = this.createCellCoordinatesGrid();
   }
 
   createEmptyGrid() {
@@ -18,6 +19,25 @@ export class GridManager {
       grid.push(row);
     }
     return grid;
+  }
+
+  // New method to create a 2D array with center-bottom coordinates
+  createCellCoordinatesGrid() {
+    const coordinatesGrid = [];
+
+    for (let y = 0; y < this.rows; y++) {
+      const row = [];
+      for (let x = 0; x < this.cols; x++) {
+        // Calculate center-bottom point of each cell
+        const centerX = x * this.cellWidth + this.cellWidth / 2;
+        const bottomY = (y + 1) * this.cellHeight;
+
+        row.push({ x: centerX, y: bottomY });
+      }
+      coordinatesGrid.push(row);
+    }
+
+    return coordinatesGrid;
   }
 
   updateGridObjects(objectManager) {
