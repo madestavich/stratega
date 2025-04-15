@@ -7,10 +7,11 @@ export class ObjectManager {
     this.objects = [];
   }
 
-  createObject(config, gridCol, gridRow) {
+  createObject(spriteConfig, unitConfig, gridCol, gridRow) {
     const obj = new GameObject(
       this.ctx,
-      config,
+      spriteConfig,
+      unitConfig,
       gridCol,
       gridRow,
       this.gridManager
@@ -19,10 +20,10 @@ export class ObjectManager {
     return obj;
   }
 
-  createMultiple(config, count, positions) {
+  createMultiple(spriteConfig, unitConfig, count, positions) {
     for (let i = 0; i < count; i++) {
       const { col, row } = positions[i];
-      this.createObject(config, col, row);
+      this.createObject(spriteConfig, unitConfig, col, row);
     }
   }
 

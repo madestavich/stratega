@@ -37,22 +37,28 @@ class GameManager {
     await this.configLoader.load(configList);
 
     // створення об'єктів
-    this.objectManager.createMultiple(this.configLoader.getConfig("hero"), 3, [
-      {
-        col: 1,
-        row: 1,
-      },
-      {
-        col: 1,
-        row: 2,
-      },
-      {
-        col: 1,
-        row: 3,
-      },
-    ]);
+    this.objectManager.createMultiple(
+      this.configLoader.getConfig("hero"),
+      { gridWidth: 2, gridHeight: 2, expansionDirection: "bottomRight" },
+      3,
+      [
+        {
+          col: 1,
+          row: 1,
+        },
+        {
+          col: 1,
+          row: 2,
+        },
+        {
+          col: 1,
+          row: 3,
+        },
+      ]
+    );
     this.objectManager.createMultiple(
       this.configLoader.getConfig("archer"),
+      { gridWidth: 1, gridHeight: 1, expansionDirection: "bottomRight" },
       4,
       [
         {
