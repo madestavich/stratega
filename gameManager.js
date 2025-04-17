@@ -12,7 +12,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 10;
+    this.fixedTimeStep = 1000 / 8;
     this.accumulator = 0;
 
     this.configLoader = new ConfigLoader();
@@ -44,23 +44,8 @@ class GameManager {
       [
         {
           col: 1,
-          row: 1,
-        },
-        {
-          col: 1,
-          row: 2,
-        },
-        {
-          col: 1,
           row: 3,
         },
-      ]
-    );
-    this.objectManager.createMultiple(
-      this.configLoader.getConfig("archer"),
-      { gridWidth: 1, gridHeight: 1, expansionDirection: "bottomRight" },
-      4,
-      [
         {
           col: 1,
           row: 4,
@@ -69,13 +54,52 @@ class GameManager {
           col: 1,
           row: 5,
         },
+      ]
+    );
+    this.objectManager.createMultiple(
+      this.configLoader.getConfig("archer"),
+      { gridWidth: 1, gridHeight: 1, expansionDirection: "bottomRight" },
+      10,
+      [
         {
-          col: 1,
+          col: 0,
+          row: 1,
+        },
+        {
+          col: 0,
+          row: 2,
+        },
+        {
+          col: 0,
+          row: 3,
+        },
+        {
+          col: 0,
+          row: 4,
+        },
+        {
+          col: 0,
+          row: 5,
+        },
+        {
+          col: 0,
           row: 6,
         },
         {
-          col: 1,
-          row: 0,
+          col: 0,
+          row: 7,
+        },
+        {
+          col: 0,
+          row: 8,
+        },
+        {
+          col: 0,
+          row: 9,
+        },
+        {
+          col: 0,
+          row: 10,
         },
       ]
     );

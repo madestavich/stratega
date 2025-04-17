@@ -552,7 +552,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Оновлюємо центр фрейму
           this.currentFrame.frameCenter.x = x + width / 2;
-          this.currentFrame.frameCenter.y = y + height / 2;
+          this.currentFrame.frameCenter.y = y + height;
 
           this.redrawCanvas();
           return;

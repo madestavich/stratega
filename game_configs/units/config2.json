@@ -1,53 +1,53 @@
 {
-  "test": {
-    "name": "test",
+  "nnnnnn": {
+    "name": "nnnnnn",
     "sourceImage": {
       "link": "../sprites/41773.png",
       "width": 1212,
       "height": 419
     },
     "animations": {
-      "first": {
-        "name": "first",
+      "nnn": {
+        "name": "nnn",
         "frames": [
           {
-            "x": 10,
-            "y": 9,
+            "x": 11,
+            "y": 8.5,
+            "width": 37,
+            "height": 68,
+            "frameCenter": {
+              "x": 29.5,
+              "y": 76.5
+            }
+          },
+          {
+            "x": 87,
+            "y": 7.5,
+            "width": 39,
+            "height": 70,
+            "frameCenter": {
+              "x": 106.5,
+              "y": 77.5
+            }
+          },
+          {
+            "x": 164,
+            "y": 6.5,
             "width": 40,
             "height": 70,
             "frameCenter": {
-              "x": 30,
-              "y": 44
+              "x": 184,
+              "y": 76.5
             }
           },
           {
-            "x": 85,
-            "y": 8,
-            "width": 44,
-            "height": 69,
+            "x": 243,
+            "y": 6.5,
+            "width": 36,
+            "height": 70,
             "frameCenter": {
-              "x": 107,
-              "y": 42.5
-            }
-          },
-          {
-            "x": 163,
-            "y": 8,
-            "width": 40,
-            "height": 71,
-            "frameCenter": {
-              "x": 183,
-              "y": 43.5
-            }
-          },
-          {
-            "x": 239,
-            "y": 8,
-            "width": 42,
-            "height": 72,
-            "frameCenter": {
-              "x": 260,
-              "y": 44
+              "x": 261,
+              "y": 76.5
             }
           }
         ]
