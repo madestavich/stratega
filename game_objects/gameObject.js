@@ -20,8 +20,6 @@ export class GameObject {
 
     // Initialize x, y and z based on grid coordinates
     this.updatePositionFromGrid();
-    // Mark occupied cells in the grid
-    this.occupyGridCells();
 
     const defaultId = Object.keys(spriteConfig)[0];
 
@@ -88,85 +86,5 @@ export class GameObject {
     // Make z always equal to y
     this.z = this.y;
     return this.z;
-  }
-
-  occupyGridCells() {
-    // Mark all cells that this object occupies as occupied
-    if (!this.gridManager || !this.gridManager.grid) return;
-
-    let startCol = this.gridCol;
-    let startRow = this.gridRow;
-
-    // Adjust start position based on expansion direction
-    switch (this.expansionDirection) {
-      case "topLeft":
-        startCol = this.gridCol - (this.gridWidth - 1);
-        startRow = this.gridRow - (this.gridHeight - 1);
-        break;
-      case "topRight":
-        startRow = this.gridRow - (this.gridHeight - 1);
-        break;
-      case "bottomLeft":
-        startCol = this.gridCol - (this.gridWidth - 1);
-        break;
-      case "bottomRight":
-      default:
-        // No adjustment needed
-        break;
-    }
-
-    // Mark cells as occupied
-    for (let row = startRow; row < startRow + this.gridHeight; row++) {
-      for (let col = startCol; col < startCol + this.gridWidth; col++) {
-        if (
-          row >= 0 &&
-          row < this.gridManager.rows &&
-          col >= 0 &&
-          col < this.gridManager.cols
-        ) {
-          this.gridManager.grid[row][col].occupied = true;
-        }
-      }
-    }
-  }
-
-  canPlaceAt(gridCol, gridRow) {
-    let startCol = gridCol;
-    let startRow = gridRow;
-
-    // Adjust start position based on expansion direction
-    switch (this.expansionDirection) {
-      case "topLeft":
-        startCol = gridCol - (this.gridWidth - 1);
-        startRow = gridRow - (this.gridHeight - 1);
-        break;
-      case "topRight":
-        startRow = gridRow - (this.gridHeight - 1);
-        break;
-      case "bottomLeft":
-        startCol = gridCol - (this.gridWidth - 1);
-        break;
-      case "bottomRight":
-      default:
-        // No adjustment needed
-        break;
-    }
-
-    // Check if all needed cells are available
-    for (let row = startRow; row < startRow + this.gridHeight; row++) {
-      for (let col = startCol; col < startCol + this.gridWidth; col++) {
-        if (
-          row < 0 ||
-          row >= this.gridManager.rows ||
-          col < 0 ||
-          col >= this.gridManager.cols ||
-          this.gridManager.grid[row][col].occupied
-        ) {
-          return false;
-        }
-      }
-    }
-
-    return true;
   }
 }

@@ -51,50 +51,88 @@ export class GridManager {
 
     // Iterate over each object and mark its position in the grid
     for (const obj of objectManager.objects) {
-      // Calculate all cells the object occupies based on its size and expansion direction
-      let startCol, startRow;
+      this.occupyGridCells(obj);
+    }
+  }
 
-      switch (obj.expansionDirection) {
-        case "topLeft":
-          // Base cell is at bottom-right
-          startCol = obj.gridCol - (obj.gridWidth - 1);
-          startRow = obj.gridRow - (obj.gridHeight - 1);
-          break;
-        case "topRight":
-          // Base cell is at bottom-left
-          startCol = obj.gridCol;
-          startRow = obj.gridRow - (obj.gridHeight - 1);
-          break;
-        case "bottomLeft":
-          // Base cell is at top-right
-          startCol = obj.gridCol - (obj.gridWidth - 1);
-          startRow = obj.gridRow;
-          break;
-        case "bottomRight":
-        default:
-          // Base cell is at top-left (default)
-          startCol = obj.gridCol;
-          startRow = obj.gridRow;
-          break;
-      }
+  occupyGridCells(gameObject) {
+    // Mark all cells that this object occupies as occupied
+    if (!this.grid) return;
 
-      // Mark all cells the object occupies as occupied
-      for (let y = 0; y < obj.gridHeight; y++) {
-        for (let x = 0; x < obj.gridWidth; x++) {
-          const gridX = startCol + x;
-          const gridY = startRow + y;
+    const { gridCol, gridRow, gridWidth, gridHeight, expansionDirection } =
+      gameObject;
 
-          if (
-            gridX >= 0 &&
-            gridX < this.cols &&
-            gridY >= 0 &&
-            gridY < this.rows
-          ) {
-            this.grid[gridY][gridX].occupied = true;
-          }
+    let startCol = gridCol;
+    let startRow = gridRow;
+
+    // Adjust start position based on expansion direction
+    switch (expansionDirection) {
+      case "topLeft":
+        startCol = gridCol - (gridWidth - 1);
+        startRow = gridRow - (gridHeight - 1);
+        break;
+      case "topRight":
+        startRow = gridRow - (gridHeight - 1);
+        break;
+      case "bottomLeft":
+        startCol = gridCol - (gridWidth - 1);
+        break;
+      case "bottomRight":
+      default:
+        // No adjustment needed
+        break;
+    }
+
+    // Mark cells as occupied
+    for (let row = startRow; row < startRow + gridHeight; row++) {
+      for (let col = startCol; col < startCol + gridWidth; col++) {
+        if (row >= 0 && row < this.rows && col >= 0 && col < this.cols) {
+          this.grid[row][col].occupied = true;
         }
       }
     }
+  }
+
+  canPlaceAt(gameObject, gridCol, gridRow) {
+    const { gridWidth, gridHeight, expansionDirection } = gameObject;
+
+    let startCol = gridCol;
+    let startRow = gridRow;
+
+    // Adjust start position based on expansion direction
+    switch (expansionDirection) {
+      case "topLeft":
+        startCol = gridCol - (gridWidth - 1);
+        startRow = gridRow - (gridHeight - 1);
+        break;
+      case "topRight":
+        startRow = gridRow - (gridHeight - 1);
+        break;
+      case "bottomLeft":
+        startCol = gridCol - (gridWidth - 1);
+        break;
+      case "bottomRight":
+      default:
+        // No adjustment needed
+        break;
+    }
+
+    // Check if all needed cells are available
+    for (let row = startRow; row < startRow + gridHeight; row++) {
+      for (let col = startCol; col < startCol + gridWidth; col++) {
+        if (
+          row < 0 ||
+          row >= this.rows ||
+          col < 0 ||
+          col >= this.cols ||
+          this.grid[row][col].occupied
+        ) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   debugDrawGrid() {

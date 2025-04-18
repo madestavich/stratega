@@ -43,7 +43,7 @@ class GameManager {
       3,
       [
         {
-          col: 3,
+          col: 2,
           row: 1,
         },
         {
