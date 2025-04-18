@@ -12,6 +12,7 @@ export class GameObject {
     this.x = undefined;
     this.y = undefined;
     this.z = undefined;
+    this.isMoving = false; // Flag to prevent grid position updating when moving
 
     // Extract size and expansion parameters from unitConfig
     this.gridWidth = unitConfig.gridWidth || 1;
@@ -36,7 +37,13 @@ export class GameObject {
     if (!this.animator.hasFinished) {
       this.animator.nextFrame();
     }
-    this.updatePositionFromGrid();
+
+    // Only update from grid when not moving
+    if (!this.isMoving) {
+      this.updatePositionFromGrid();
+    } else {
+      this.updateZCoordinate();
+    }
   }
 
   render() {
@@ -47,6 +54,13 @@ export class GameObject {
 
     // Adjust the drawing position by the calculated offsets
     this.renderer.draw(this.x - offsetX, this.y - offsetY);
+  }
+
+  // Only method needed for direct position control
+  setPosition(x, y) {
+    this.x = x;
+    this.y = y;
+    this.updateZCoordinate();
   }
 
   updatePositionFromGrid() {
