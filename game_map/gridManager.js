@@ -135,6 +135,82 @@ export class GridManager {
     return true;
   }
 
+  updateObjectGridPosition(gameObject) {
+    const { cellWidth, cellHeight } = this;
+
+    // Calculate the grid position based on pixel coordinates
+    let baseCol, baseRow;
+
+    // Calculate the base col and row (top-left corner of the object)
+    baseCol = Math.round(gameObject.x / cellWidth - gameObject.gridWidth / 2);
+    baseRow = Math.round(gameObject.y / cellHeight - gameObject.gridHeight / 2);
+
+    // Adjust based on expansion direction
+    switch (gameObject.expansionDirection) {
+      case "topLeft":
+        // For topLeft, the object expands to the left and up from the base point
+        baseCol =
+          Math.round(gameObject.x / cellWidth + gameObject.gridWidth / 2) -
+          gameObject.gridWidth;
+        baseRow =
+          Math.round(gameObject.y / cellHeight + gameObject.gridHeight / 2) -
+          gameObject.gridHeight;
+        break;
+      case "topRight":
+        // For topRight, the object expands up from the base point
+        baseRow =
+          Math.round(gameObject.y / cellHeight + gameObject.gridHeight / 2) -
+          gameObject.gridHeight;
+        break;
+      case "bottomLeft":
+        // For bottomLeft, the object expands to the left from the base point
+        baseCol =
+          Math.round(gameObject.x / cellWidth + gameObject.gridWidth / 2) -
+          gameObject.gridWidth;
+        break;
+      case "bottomRight":
+      default:
+        // This is already handled by the default calculation
+        break;
+    }
+
+    // Calculate the grid position for the reference cell based on expansion direction
+    switch (gameObject.expansionDirection) {
+      case "topLeft":
+        gameObject.gridCol = baseCol + (gameObject.gridWidth - 1);
+        gameObject.gridRow = baseRow + (gameObject.gridHeight - 1);
+        break;
+      case "topRight":
+        gameObject.gridCol = baseCol;
+        gameObject.gridRow = baseRow + (gameObject.gridHeight - 1);
+        break;
+      case "bottomLeft":
+        gameObject.gridCol = baseCol + (gameObject.gridWidth - 1);
+        gameObject.gridRow = baseRow;
+        break;
+      case "bottomRight":
+      default:
+        gameObject.gridCol = baseCol;
+        gameObject.gridRow = baseRow;
+        break;
+    }
+
+    // Make sure the object is within grid boundaries
+    gameObject.gridCol = Math.max(
+      0,
+      Math.min(this.cols - 1, gameObject.gridCol)
+    );
+    gameObject.gridRow = Math.max(
+      0,
+      Math.min(this.rows - 1, gameObject.gridRow)
+    );
+
+    // Re-occupy the grid cells with the new position
+    this.occupyGridCells(gameObject);
+
+    return { col: gameObject.gridCol, row: gameObject.gridRow };
+  }
+
   debugDrawGrid() {
     this.ctx.strokeStyle = "#888";
     this.ctx.lineWidth = 0.5;

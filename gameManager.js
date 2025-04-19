@@ -1,6 +1,8 @@
 import { ConfigLoader } from "./game_configs/configLoader.js";
 import { ObjectManager } from "./game_objects/objectManager.js";
 import { GridManager } from "./game_map/gridManager.js";
+// import { MovementManager } from "./game_objects/movementManager.js";
+// import { InputManager } from "./input/inputManager.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -39,7 +41,12 @@ class GameManager {
     // створення об'єктів
     this.objectManager.createMultiple(
       this.configLoader.getConfig("hero"),
-      { gridWidth: 2, gridHeight: 1, expansionDirection: "topRight" },
+      {
+        gridWidth: 2,
+        gridHeight: 1,
+        expansionDirection: "topRight",
+        type: "cavalry",
+      },
       3,
       [
         {
@@ -58,7 +65,12 @@ class GameManager {
     );
     this.objectManager.createMultiple(
       this.configLoader.getConfig("archer"),
-      { gridWidth: 1, gridHeight: 1, expansionDirection: "bottomRight" },
+      {
+        gridWidth: 1,
+        gridHeight: 1,
+        expansionDirection: "bottomRight",
+        type: "archer",
+      },
       10,
       [
         {
