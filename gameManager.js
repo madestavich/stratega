@@ -30,13 +30,13 @@ class GameManager {
         moveSpeed: 2,
         attackRange: 1,
         attackDamage: 10,
-        availableActions: ["move", "attack", "defend"],
+        availableActions: ["move"],
       },
       archer: {
         moveSpeed: 1,
         attackRange: 4,
         attackDamage: 7,
-        availableActions: ["attack", "move", "retreat"],
+        availableActions: ["move"],
       },
       // Інші типи об'єктів...
     };
@@ -65,7 +65,7 @@ class GameManager {
         gridHeight: 1,
         expansionDirection: "topRight",
         objectType: "cavalry",
-        actionPriorities: ["attack", "move", "defend"], // Пріоритет дій для цього об'єкта
+        actionPriorities: ["move"], // Пріоритет дій для цього об'єкта
       },
       3,
       [
@@ -90,6 +90,7 @@ class GameManager {
         gridHeight: 1,
         expansionDirection: "bottomRight",
         objectType: "archer",
+        actionPriorities: ["move"], // Пріоритет дій для цього об'єкта
       },
       10,
       [
