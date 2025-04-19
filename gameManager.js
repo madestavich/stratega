@@ -1,7 +1,7 @@
 import { ConfigLoader } from "./game_configs/configLoader.js";
 import { ObjectManager } from "./game_objects/objectManager.js";
 import { GridManager } from "./game_map/gridManager.js";
-// import { MovementManager } from "./game_objects/movementManager.js";
+import { ActionManager } from "./game_objects/actionManager.js";
 // import { InputManager } from "./input/inputManager.js";
 
 const canvas = document.getElementById("gameCanvas");
@@ -25,13 +25,32 @@ class GameManager {
       cols: 40,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
+    this.objectTypesConfig = {
+      cavalry: {
+        moveSpeed: 2,
+        attackRange: 1,
+        attackDamage: 10,
+        availableActions: ["move", "attack", "defend"],
+      },
+      archer: {
+        moveSpeed: 1,
+        attackRange: 4,
+        attackDamage: 7,
+        availableActions: ["attack", "move", "retreat"],
+      },
+      // Інші типи об'єктів...
+    };
+    this.actionManager = new ActionManager(
+      this.objectManager,
+      this.objectTypesConfig
+    );
 
     this.start();
   }
 
   async start() {
     const configList = {
-      hero: "/game_configs/units/config1.json",
+      cavalry: "/game_configs/units/config1.json",
       archer: "/game_configs/units/config2.json",
       // інші
     };
@@ -40,12 +59,13 @@ class GameManager {
 
     // створення об'єктів
     this.objectManager.createMultiple(
-      this.configLoader.getConfig("hero"),
+      this.configLoader.getConfig("cavalry"),
       {
         gridWidth: 2,
         gridHeight: 1,
         expansionDirection: "topRight",
-        type: "cavalry",
+        objectType: "cavalry",
+        actionPriorities: ["attack", "move", "defend"], // Пріоритет дій для цього об'єкта
       },
       3,
       [
@@ -69,7 +89,7 @@ class GameManager {
         gridWidth: 1,
         gridHeight: 1,
         expansionDirection: "bottomRight",
-        type: "archer",
+        objectType: "archer",
       },
       10,
       [

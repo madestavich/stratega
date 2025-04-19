@@ -12,7 +12,9 @@ export class GameObject {
     this.x = undefined;
     this.y = undefined;
     this.z = undefined;
-    this.isMoving = false; // Flag to prevent grid position updating when moving
+    this.objectType = unitConfig.objectType || "default"; // Тип об'єкта
+    this.actionPriorities = unitConfig.actionPriorities || []; // Масив типів дій у порядку пріоритету
+    this.canAct = true; // Чи може об'єкт виконувати дії
 
     // Extract size and expansion parameters from unitConfig
     this.gridWidth = unitConfig.gridWidth || 1;
