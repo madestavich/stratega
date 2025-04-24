@@ -16,6 +16,9 @@ export class GameObject {
     this.actionPriorities = objectConfig.actionPriorities || []; // Масив типів дій у порядку пріоритету
     this.canAct = true; // Чи може об'єкт виконувати дії
     this.isMoving = false; // Чи об'єкт рухається
+    this.moveDirection = null; // Напрямок руху
+    this.moveTarget = null; // Ціль для руху
+    this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;

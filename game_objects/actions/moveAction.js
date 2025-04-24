@@ -8,6 +8,7 @@ export class MoveAction {
   }
 
   // Перевірка, чи може бути виконана дія переміщення
+  // Перевірка, чи може бути виконана дія переміщення
   canExecute(gameObject) {
     // Get the type config directly from the object type
     const typeConfig = this.objectTypesConfig[gameObject.objectType];
@@ -29,7 +30,6 @@ export class MoveAction {
     }
 
     // Знаходимо ціль для руху (наприклад, найближчий ресурс або ворог)
-    // Це залежить від логіки гри, тому тут просто як приклад
     const target = this.findTarget(gameObject);
 
     if (!target) {
@@ -52,6 +52,10 @@ export class MoveAction {
 
     // Зберігаємо напрямок руху для використання в execute
     gameObject.moveDirection = nextStep;
+
+    // Позначаємо об'єкт як рухомий вже тут, щоб запобігти повторним викликам
+    gameObject.isMoving = true;
+
     return true;
   }
 
@@ -105,11 +109,11 @@ export class MoveAction {
       // Оновлюємо фізичні координати на основі нової позиції на сітці
       gameObject.updatePositionFromGrid();
 
-      // Відмітка об'єкта як рухомого
-      gameObject.isMoving = true;
-
       // Скидаємо напрямок руху
       gameObject.moveDirection = null;
+
+      // Скидаємо флаг руху після завершення переміщення
+      gameObject.isMoving = false;
     }
   }
 }
