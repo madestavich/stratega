@@ -66,9 +66,9 @@ export class ActionManager {
         typeConfig.availableActions.includes(actionType)
       ) {
         // Перевірка, чи може бути виконана ця дія
-        if (this.actions[actionType].canExecute(gameObject, typeConfig)) {
+        if (this.actions[actionType].canExecute(gameObject)) {
           // Виконання дії
-          this.actions[actionType].execute(gameObject, typeConfig);
+          this.actions[actionType].execute(gameObject);
           // Після успішного виконання однієї дії припиняємо перевірку інших
           break;
         }
