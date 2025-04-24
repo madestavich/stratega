@@ -18,7 +18,7 @@ export class GameObject {
     this.isMoving = false; // Чи об'єкт рухається
     this.moveDirection = null; // Напрямок руху
     this.moveTarget = null; // Ціль для руху
-    this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
+    this.moveSpeed = objectConfig.moveSpeed || 0; // Швидкість руху
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;

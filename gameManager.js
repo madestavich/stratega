@@ -14,12 +14,12 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 8;
+    this.fixedTimeStep = 1000 / 10;
     this.accumulator = 0;
 
     this.objectTypesConfig = {
       cavalry: {
-        moveSpeed: 2,
+        moveSpeed: 1,
         attackRange: 1,
         attackDamage: 10,
         availableActions: ["move"],
@@ -146,6 +146,14 @@ class GameManager {
   update(dt) {
     this.objectManager.updateAll();
     this.gridManager.updateGridObjects(this.objectManager);
+    // Process actions for all objects
+    for (const obj of this.objectManager.objects) {
+      // Check if the object can move
+      if (!obj.isMoving && this.actionManager.actions.move.canExecute(obj)) {
+        // Execute the move action
+        this.actionManager.actions.move.execute(obj);
+      }
+    }
   }
 
   render() {
