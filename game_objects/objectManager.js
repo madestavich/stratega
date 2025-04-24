@@ -1,4 +1,4 @@
-import { GameObject } from "./gameObject.js";
+import { GameObject } from "../import.js";
 
 export class ObjectManager {
   constructor(ctx, gridManager) {

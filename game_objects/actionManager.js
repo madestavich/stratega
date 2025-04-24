@@ -1,8 +1,8 @@
-import { MoveAction } from "./actions/moveAction.js";
-// import { AttackAction } from "./actions/attackAction.js";
-// import { DefendAction } from "./actions/defendAction.js";
-// import { PatrolAction } from "./actions/patrolAction.js";
-// import { RetreatAction } from "./actions/retreatAction.js";
+import { MoveAction } from "../import.js";
+// import { AttackAction } from "../import.js";
+// import { DefendAction } from "../import.js";
+// import { PatrolAction } from "../import.js";
+// import { RetreatAction } from "../import.js";
 
 // В GameManager.js
 const actionsClasses = {

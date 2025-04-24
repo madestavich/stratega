@@ -1,5 +1,5 @@
-import { Animator } from "./animator.js";
-import { Renderer } from "./renderer.js";
+import { Animator } from "../import.js";
+import { Renderer } from "../import.js";
 
 export class GameObject {
   constructor(ctx, spriteConfig, objectConfig, gridCol, gridRow, gridManager) {

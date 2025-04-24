@@ -1,8 +1,8 @@
-import { ConfigLoader } from "./game_configs/configLoader.js";
-import { ObjectManager } from "./game_objects/objectManager.js";
-import { GridManager } from "./game_map/gridManager.js";
-import { ActionManager } from "./game_objects/actionManager.js";
-// import { InputManager } from "./input/inputManager.js";
+import { ConfigLoader } from "./import.js";
+import { ObjectManager } from "./import.js";
+import { GridManager } from "./import.js";
+import { ActionManager } from "./import.js";
+import { InputManager } from "./import.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
