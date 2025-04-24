@@ -17,14 +17,6 @@ class GameManager {
     this.fixedTimeStep = 1000 / 8;
     this.accumulator = 0;
 
-    this.configLoader = new ConfigLoader();
-    this.gridManager = new GridManager(ctx, {
-      pixelWidth: canvas.width,
-      pixelHeight: canvas.height,
-      rows: 20,
-      cols: 40,
-    });
-    this.objectManager = new ObjectManager(ctx, this.gridManager);
     this.objectTypesConfig = {
       cavalry: {
         moveSpeed: 2,
@@ -40,6 +32,17 @@ class GameManager {
       },
       // Інші типи об'єктів...
     };
+
+    //! ініціалізація об'єктів і інших менеджерів
+
+    this.configLoader = new ConfigLoader();
+    this.gridManager = new GridManager(ctx, {
+      pixelWidth: canvas.width,
+      pixelHeight: canvas.height,
+      rows: 20,
+      cols: 40,
+    });
+    this.objectManager = new ObjectManager(ctx, this.gridManager);
     this.actionManager = new ActionManager(
       this.objectManager,
       this.objectTypesConfig

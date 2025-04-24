@@ -2,24 +2,24 @@ import { Animator } from "./animator.js";
 import { Renderer } from "./renderer.js";
 
 export class GameObject {
-  constructor(ctx, spriteConfig, unitConfig, gridCol, gridRow, gridManager) {
+  constructor(ctx, spriteConfig, objectConfig, gridCol, gridRow, gridManager) {
     this.ctx = ctx;
     this.spriteConfig = spriteConfig;
-    this.unitConfig = unitConfig;
+    this.objectConfig = objectConfig;
     this.gridCol = gridCol;
     this.gridRow = gridRow;
     this.gridManager = gridManager;
     this.x = undefined;
     this.y = undefined;
     this.z = undefined;
-    this.objectType = unitConfig.objectType || "default"; // Тип об'єкта
-    this.actionPriorities = unitConfig.actionPriorities || []; // Масив типів дій у порядку пріоритету
+    this.objectType = objectConfig.objectType || "default"; // Тип об'єкта
+    this.actionPriorities = objectConfig.actionPriorities || []; // Масив типів дій у порядку пріоритету
     this.canAct = true; // Чи може об'єкт виконувати дії
 
-    // Extract size and expansion parameters from unitConfig
-    this.gridWidth = unitConfig.gridWidth || 1;
-    this.gridHeight = unitConfig.gridHeight || 1;
-    this.expansionDirection = unitConfig.expansionDirection || "bottomRight";
+    // Extract size and expansion parameters from objectConfig
+    this.gridWidth = objectConfig.gridWidth || 1;
+    this.gridHeight = objectConfig.gridHeight || 1;
+    this.expansionDirection = objectConfig.expansionDirection || "bottomRight";
 
     // Initialize x, y and z based on grid coordinates
     this.updatePositionFromGrid();
