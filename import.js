@@ -1,6 +1,6 @@
 //! funcionality
 
-import { Pathfinder } from "./game_map/pathFinder.js";
+import { Pathfinder } from "./game_map/pathfinder.js";
 import { ConfigLoader } from "./game_configs/configLoader.js";
 
 //! objects actions
