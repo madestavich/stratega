@@ -64,6 +64,7 @@ export class MoveAction {
       gameObject.gridWidth,
       gameObject.gridHeight,
       gameObject.expansionDirection,
+      gameObject, // Передаємо сам об'єкт
       allowedObstacleTypes
     );
 

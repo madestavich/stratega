@@ -23,6 +23,7 @@ export class Pathfinder {
     objectWidth,
     objectHeight,
     expansionDirection,
+    gameObject,
     allowedObstacleTypes = [0] // Default: only allow empty cells (type 0)
   ) {
     // Using A* algorithm for better path finding
@@ -82,12 +83,13 @@ export class Pathfinder {
 
         // Check if we can move to this position considering obstacle types
         if (
-          this.canOccupy(
+          this.canOccupyExcludingSelf(
             nextCol,
             nextRow,
             objectWidth,
             objectHeight,
             expansionDirection,
+            gameObject,
             allowedObstacleTypes
           )
         ) {
@@ -126,13 +128,14 @@ export class Pathfinder {
     return Math.abs(col1 - col2) + Math.abs(row1 - row2);
   }
 
-  // Check if an object can occupy the specified position
-  canOccupy(
+  // Check if an object can occupy the specified position, excluding cells occupied by itself
+  canOccupyExcludingSelf(
     col,
     row,
     width,
     height,
     expansionDirection,
+    gameObject,
     allowedObstacleTypes = [0]
   ) {
     if (!this.gridManager || !this.gridManager.grid) {
@@ -160,11 +163,42 @@ export class Pathfinder {
         break;
     }
 
+    // Determine cells occupied by the game object itself
+    let selfOccupiedCells = new Set();
+    if (gameObject) {
+      let selfStartCol = gameObject.gridCol;
+      let selfStartRow = gameObject.gridRow;
+
+      switch (gameObject.expansionDirection) {
+        case "topLeft":
+          selfStartCol = gameObject.gridCol - (gameObject.gridWidth - 1);
+          selfStartRow = gameObject.gridRow - (gameObject.gridHeight - 1);
+          break;
+        case "topRight":
+          selfStartRow = gameObject.gridRow - (gameObject.gridHeight - 1);
+          break;
+        case "bottomLeft":
+          selfStartCol = gameObject.gridCol - (gameObject.gridWidth - 1);
+          break;
+        case "bottomRight":
+          // Default, no need to change
+          break;
+      }
+
+      for (let y = 0; y < gameObject.gridHeight; y++) {
+        for (let x = 0; x < gameObject.gridWidth; x++) {
+          const cellKey = `${selfStartCol + x},${selfStartRow + y}`;
+          selfOccupiedCells.add(cellKey);
+        }
+      }
+    }
+
     // Check all cells the object will occupy
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const checkCol = startCol + x;
         const checkRow = startRow + y;
+        const cellKey = `${checkCol},${checkRow}`;
 
         // Check if cell is within grid bounds
         if (
@@ -182,10 +216,10 @@ export class Pathfinder {
           return false;
         }
 
-        // Check if cell is occupied (unless it's an allowed obstacle type that can be occupied)
+        // Check if cell is occupied by another object (not self)
         if (
           this.gridManager.grid[checkRow][checkCol].occupied &&
-          !allowedObstacleTypes.includes(cellType)
+          !selfOccupiedCells.has(cellKey)
         ) {
           return false;
         }
@@ -223,6 +257,7 @@ export class Pathfinder {
       gameObject.gridWidth,
       gameObject.gridHeight,
       gameObject.expansionDirection,
+      gameObject,
       allowedObstacleTypes
     );
 
@@ -253,12 +288,13 @@ export class Pathfinder {
 
       // Check if this step is still valid
       if (
-        !this.canOccupy(
+        !this.canOccupyExcludingSelf(
           nextStep.col,
           nextStep.row,
           gameObject.gridWidth,
           gameObject.gridHeight,
           gameObject.expansionDirection,
+          gameObject,
           allowedObstacleTypes
         )
       ) {
@@ -280,12 +316,13 @@ export class Pathfinder {
 
     // Check if we can still move to the next position
     if (
-      !this.canOccupy(
+      !this.canOccupyExcludingSelf(
         nextPosition.col,
         nextPosition.row,
         gameObject.gridWidth,
         gameObject.gridHeight,
         gameObject.expansionDirection,
+        gameObject,
         allowedObstacleTypes
       )
     ) {
