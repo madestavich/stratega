@@ -1,9 +1,20 @@
 export class Pathfinder {
   constructor(gridManager) {
     this.gridManager = gridManager;
+    // Directions including diagonals (8 directions)
+    this.directions = [
+      { dx: 0, dy: -1 }, // up
+      { dx: 1, dy: -1 }, // up-right
+      { dx: 1, dy: 0 }, // right
+      { dx: 1, dy: 1 }, // down-right
+      { dx: 0, dy: 1 }, // down
+      { dx: -1, dy: 1 }, // down-left
+      { dx: -1, dy: 0 }, // left
+      { dx: -1, dy: -1 }, // up-left
+    ];
   }
 
-  // Метод для пошуку найкоротшого шляху від початкової позиції до цілі
+  // Find path with A* algorithm, considering obstacle types
   findPath(
     startCol,
     startRow,
@@ -11,21 +22,41 @@ export class Pathfinder {
     targetRow,
     objectWidth,
     objectHeight,
-    expansionDirection
+    expansionDirection,
+    allowedObstacleTypes = [0] // Default: only allow empty cells (type 0)
   ) {
-    // Використовуємо алгоритм пошуку в ширину (BFS)
-    const queue = [];
-    const visited = new Set();
+    // Using A* algorithm for better path finding
+    const openSet = [];
+    const closedSet = new Set();
+    const gScore = new Map();
+    const fScore = new Map();
     const parent = new Map();
 
-    // Додаємо початкову позицію в чергу
-    queue.push({ col: startCol, row: startRow });
-    visited.add(`${startCol},${startRow}`);
+    const startKey = `${startCol},${startRow}`;
 
-    while (queue.length > 0) {
-      const current = queue.shift();
+    // Initialize start node
+    openSet.push({ col: startCol, row: startRow });
+    gScore.set(startKey, 0);
+    fScore.set(
+      startKey,
+      this.heuristic(startCol, startRow, targetCol, targetRow)
+    );
 
-      // Якщо досягли цілі, відновлюємо шлях
+    while (openSet.length > 0) {
+      // Find node with lowest fScore
+      let currentIndex = 0;
+      for (let i = 1; i < openSet.length; i++) {
+        const currentKey = `${openSet[currentIndex].col},${openSet[currentIndex].row}`;
+        const iKey = `${openSet[i].col},${openSet[i].row}`;
+        if (fScore.get(iKey) < fScore.get(currentKey)) {
+          currentIndex = i;
+        }
+      }
+
+      const current = openSet[currentIndex];
+      const currentKey = `${current.col},${current.row}`;
+
+      // If we reached the target
       if (current.col === targetCol && current.row === targetRow) {
         return this.reconstructPath(
           parent,
@@ -36,54 +67,83 @@ export class Pathfinder {
         );
       }
 
-      // Перевіряємо сусідні клітинки
-      const directions = [
-        { dx: 0, dy: -1 }, // вгору
-        { dx: 1, dy: 0 }, // вправо
-        { dx: 0, dy: 1 }, // вниз
-        { dx: -1, dy: 0 }, // вліво
-      ];
+      // Remove current from openSet and add to closedSet
+      openSet.splice(currentIndex, 1);
+      closedSet.add(currentKey);
 
-      for (const dir of directions) {
+      // Check all neighbors (8 directions)
+      for (const dir of this.directions) {
         const nextCol = current.col + dir.dx;
         const nextRow = current.row + dir.dy;
-        const key = `${nextCol},${nextRow}`;
+        const nextKey = `${nextCol},${nextRow}`;
 
-        // Перевіряємо, чи не відвідували цю клітинку раніше
-        if (visited.has(key)) continue;
+        // Skip if already evaluated
+        if (closedSet.has(nextKey)) continue;
 
-        // Перевіряємо, чи може об'єкт переміститися в цю позицію
+        // Check if we can move to this position considering obstacle types
         if (
           this.canOccupy(
             nextCol,
             nextRow,
             objectWidth,
             objectHeight,
-            expansionDirection
+            expansionDirection,
+            allowedObstacleTypes
           )
         ) {
-          queue.push({ col: nextCol, row: nextRow });
-          visited.add(key);
-          parent.set(key, { col: current.col, row: current.row });
+          // Calculate movement cost (diagonal movement costs more)
+          const movementCost = dir.dx !== 0 && dir.dy !== 0 ? 1.414 : 1;
+          const tentativeGScore = gScore.get(currentKey) + movementCost;
+
+          const neighborInOpenSet = openSet.some(
+            (node) => node.col === nextCol && node.row === nextRow
+          );
+
+          if (!neighborInOpenSet || tentativeGScore < gScore.get(nextKey)) {
+            // This path is better, record it
+            parent.set(nextKey, { col: current.col, row: current.row });
+            gScore.set(nextKey, tentativeGScore);
+            fScore.set(
+              nextKey,
+              tentativeGScore +
+                this.heuristic(nextCol, nextRow, targetCol, targetRow)
+            );
+
+            if (!neighborInOpenSet) {
+              openSet.push({ col: nextCol, row: nextRow });
+            }
+          }
         }
       }
     }
 
-    // Якщо шлях не знайдено
+    // No path found
     return null;
   }
 
-  // Перевірка, чи може об'єкт зайняти вказану позицію
-  canOccupy(col, row, width, height, expansionDirection) {
+  // Heuristic function for A* (Manhattan distance)
+  heuristic(col1, row1, col2, row2) {
+    return Math.abs(col1 - col2) + Math.abs(row1 - row2);
+  }
+
+  // Check if an object can occupy the specified position
+  canOccupy(
+    col,
+    row,
+    width,
+    height,
+    expansionDirection,
+    allowedObstacleTypes = [0]
+  ) {
     if (!this.gridManager || !this.gridManager.grid) {
       return false;
     }
 
-    // Визначаємо початкові координати для перевірки в залежності від напрямку розширення
+    // Determine starting coordinates based on expansion direction
     let startCol = col;
     let startRow = row;
 
-    // Корегуємо початкові координати в залежності від expansionDirection
+    // Adjust starting coordinates based on expansionDirection
     switch (expansionDirection) {
       case "topLeft":
         startCol = col - (width - 1);
@@ -96,17 +156,17 @@ export class Pathfinder {
         startCol = col - (width - 1);
         break;
       case "bottomRight":
-        // За замовчуванням, не потрібно змінювати
+        // Default, no need to change
         break;
     }
 
-    // Перевіряємо всі клітинки, які займе об'єкт
+    // Check all cells the object will occupy
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const checkCol = startCol + x;
         const checkRow = startRow + y;
 
-        // Перевіряємо, чи клітинка в межах сітки
+        // Check if cell is within grid bounds
         if (
           checkCol < 0 ||
           checkCol >= this.gridManager.cols ||
@@ -116,8 +176,17 @@ export class Pathfinder {
           return false;
         }
 
-        // Перевіряємо, чи клітинка вільна
-        if (this.gridManager.grid[checkRow][checkCol].occupied) {
+        // Check if cell is of an allowed type
+        const cellType = this.gridManager.grid[checkRow][checkCol].type || 0;
+        if (!allowedObstacleTypes.includes(cellType)) {
+          return false;
+        }
+
+        // Check if cell is occupied (unless it's an allowed obstacle type that can be occupied)
+        if (
+          this.gridManager.grid[checkRow][checkCol].occupied &&
+          !allowedObstacleTypes.includes(cellType)
+        ) {
           return false;
         }
       }
@@ -126,23 +195,26 @@ export class Pathfinder {
     return true;
   }
 
-  // Відновлення шляху від цілі до початкової позиції
+  // Reconstruct path from target to start position
   reconstructPath(parent, startCol, startRow, targetCol, targetRow) {
     const path = [];
     let current = { col: targetCol, row: targetRow };
 
-    // Відновлюємо шлях від цілі до початку
+    // Reconstruct path from target to start
     while (current.col !== startCol || current.row !== startRow) {
       path.unshift(current);
       const key = `${current.col},${current.row}`;
       current = parent.get(key);
+
+      // Safety check in case of broken path
+      if (!current) break;
     }
 
     return path;
   }
 
-  // Метод для отримання наступного кроку на шляху до цілі
-  getNextStep(gameObject, targetCol, targetRow) {
+  // Get next step on the path to the target
+  getNextStep(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
     const path = this.findPath(
       gameObject.gridCol,
       gameObject.gridRow,
@@ -150,18 +222,119 @@ export class Pathfinder {
       targetRow,
       gameObject.gridWidth,
       gameObject.gridHeight,
-      gameObject.expansionDirection
+      gameObject.expansionDirection,
+      allowedObstacleTypes
     );
 
     if (!path || path.length === 0) {
       return null;
     }
 
-    // Повертаємо перший крок шляху
+    // Return the first step of the path
     const nextStep = path[0];
     return {
       dx: nextStep.col - gameObject.gridCol,
       dy: nextStep.row - gameObject.gridRow,
+      path: path, // Return the full path for future reference
+    };
+  }
+
+  // Check if the current path is still valid by checking adjacent cells
+  isPathStillValid(gameObject, currentPath, allowedObstacleTypes = [0]) {
+    if (!currentPath || currentPath.length === 0) {
+      return false;
+    }
+
+    // Check only the next few steps in the path (e.g., next 3 steps)
+    const stepsToCheck = Math.min(3, currentPath.length);
+
+    for (let i = 0; i < stepsToCheck; i++) {
+      const nextStep = currentPath[i];
+
+      // Check if this step is still valid
+      if (
+        !this.canOccupy(
+          nextStep.col,
+          nextStep.row,
+          gameObject.gridWidth,
+          gameObject.gridHeight,
+          gameObject.expansionDirection,
+          allowedObstacleTypes
+        )
+      ) {
+        return false; // Path is blocked
+      }
+    }
+
+    return true; // Path is still valid
+  }
+
+  // Check adjacent cells to see if the path needs recalculation
+  checkAdjacentCells(gameObject, currentPath, allowedObstacleTypes = [0]) {
+    if (!currentPath || currentPath.length === 0) {
+      return { needsRecalculation: true };
+    }
+
+    // Get the next position in the path
+    const nextPosition = currentPath[0];
+
+    // Check if we can still move to the next position
+    if (
+      !this.canOccupy(
+        nextPosition.col,
+        nextPosition.row,
+        gameObject.gridWidth,
+        gameObject.gridHeight,
+        gameObject.expansionDirection,
+        allowedObstacleTypes
+      )
+    ) {
+      return { needsRecalculation: true };
+    }
+
+    // Check surrounding cells for any changes that might affect the path
+    for (const dir of this.directions) {
+      const checkCol = gameObject.gridCol + dir.dx;
+      const checkRow = gameObject.gridRow + dir.dy;
+
+      // Skip if out of bounds
+      if (
+        checkCol < 0 ||
+        checkCol >= this.gridManager.cols ||
+        checkRow < 0 ||
+        checkRow >= this.gridManager.rows
+      ) {
+        continue;
+      }
+
+      // Check if a cell that was previously passable is now blocked
+      const cellType = this.gridManager.grid[checkRow][checkCol].type || 0;
+      const wasAllowed = allowedObstacleTypes.includes(cellType);
+      const isOccupied = this.gridManager.grid[checkRow][checkCol].occupied;
+
+      // If a previously passable cell is now blocked, we might need to recalculate
+      if (
+        wasAllowed &&
+        isOccupied &&
+        !allowedObstacleTypes.includes(cellType)
+      ) {
+        // Check if this cell is part of our path
+        const isInPath = currentPath.some(
+          (step) => step.col === checkCol && step.row === checkRow
+        );
+
+        if (isInPath) {
+          return { needsRecalculation: true };
+        }
+      }
+    }
+
+    return {
+      needsRecalculation: false,
+      nextStep: {
+        dx: nextPosition.col - gameObject.gridCol,
+        dy: nextPosition.row - gameObject.gridRow,
+      },
     };
   }
 }

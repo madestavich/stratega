@@ -14,18 +14,18 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 10;
+    this.fixedTimeStep = 1000 / 30;
     this.accumulator = 0;
 
     this.objectTypesConfig = {
       cavalry: {
-        moveSpeed: 1,
+        moveSpeed: 10,
         attackRange: 1,
         attackDamage: 10,
         availableActions: ["move"],
       },
       archer: {
-        moveSpeed: 1,
+        moveSpeed: 5,
         attackRange: 4,
         attackDamage: 7,
         availableActions: ["move"],
@@ -144,16 +144,21 @@ class GameManager {
   }
 
   update(dt) {
+    // Оновлюємо всі об'єкти
     this.objectManager.updateAll();
-    this.gridManager.updateGridObjects(this.objectManager);
-    // Process actions for all objects
+
+    // Оновлюємо рух для всіх об'єктів
     for (const obj of this.objectManager.objects) {
-      // Check if the object can move
-      if (!obj.isMoving && this.actionManager.actions.move.canExecute(obj)) {
-        // Execute the move action
+      if (obj.isMoving) {
+        this.actionManager.actions.move.execute(obj);
+      } else if (this.actionManager.actions.move.canExecute(obj)) {
+        // Якщо об'єкт не рухається, перевіряємо, чи може він почати рух
         this.actionManager.actions.move.execute(obj);
       }
     }
+
+    // Оновлюємо стан сітки після руху
+    this.gridManager.updateGridObjects(this.objectManager);
   }
 
   render() {
