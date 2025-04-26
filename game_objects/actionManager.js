@@ -32,15 +32,15 @@ export class ActionManager {
     }
   }
 
-  // Виконання дій для всіх об'єктів
-  update() {
+  // Виконання дій для всіх об'єктів з урахуванням deltaTime
+  update(deltaTime) {
     for (const gameObject of this.objectManager.objects) {
-      this.processObjectActions(gameObject);
+      this.processObjectActions(gameObject, deltaTime);
     }
   }
 
-  // Обробка дій для конкретного об'єкта
-  processObjectActions(gameObject) {
+  // Обробка дій для конкретного об'єкта з урахуванням deltaTime
+  processObjectActions(gameObject, deltaTime) {
     // Перевірка, чи має об'єкт тип і чи може він діяти
     if (!gameObject.objectType || !gameObject.canAct || gameObject.isMoving) {
       return;
@@ -67,8 +67,8 @@ export class ActionManager {
       ) {
         // Перевірка, чи може бути виконана ця дія
         if (this.actions[actionType].canExecute(gameObject)) {
-          // Виконання дії
-          this.actions[actionType].execute(gameObject);
+          // Виконання дії з передачею deltaTime
+          this.actions[actionType].execute(gameObject, deltaTime);
           // Після успішного виконання однієї дії припиняємо перевірку інших
           break;
         }
