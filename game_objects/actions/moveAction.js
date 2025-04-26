@@ -138,12 +138,15 @@ export class MoveAction {
 
     // Calculate distance to move this frame based on speed and deltaTime
     const moveSpeed = typeConfig.moveSpeed;
-    const moveDistance = (moveSpeed * deltaTime) / 1000; // Convert to units per second
+    const moveDistance = (moveSpeed * deltaTime) / 100; // Convert to units per second
 
     // Calculate direction vector to target
     const dx = targetX - gameObject.x;
     const dy = targetY - gameObject.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
+
+    console.log("Distance:", distance);
+    console.log("Move Distance:", moveDistance);
 
     // If we're close enough to the target, snap to it and move to the next step in the path
     if (distance <= moveDistance) {

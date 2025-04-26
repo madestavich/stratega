@@ -42,7 +42,7 @@ export class ActionManager {
   // Обробка дій для конкретного об'єкта з урахуванням deltaTime
   processObjectActions(gameObject, deltaTime) {
     // Перевірка, чи має об'єкт тип і чи може він діяти
-    if (!gameObject.objectType || !gameObject.canAct || gameObject.isMoving) {
+    if (!gameObject.objectType || !gameObject.canAct) {
       return;
     }
 
