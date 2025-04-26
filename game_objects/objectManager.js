@@ -32,6 +32,8 @@ export class ObjectManager {
   }
 
   renderAll() {
-    for (const obj of this.objects) obj.render();
+    // Сортуємо об'єкти за Z-координатою перед відображенням
+    const sortedObjects = [...this.objects].sort((a, b) => a.z - b.z);
+    for (const obj of sortedObjects) obj.render();
   }
 }

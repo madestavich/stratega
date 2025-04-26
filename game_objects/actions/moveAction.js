@@ -138,21 +138,18 @@ export class MoveAction {
 
     // Calculate distance to move this frame based on speed and deltaTime
     const moveSpeed = typeConfig.moveSpeed;
-    const moveDistance = (moveSpeed * deltaTime) / 100; // Convert to units per second
+    const speedMultiplier = 5; // Додатковий множник швидкості
+    const moveDistance = (moveSpeed * deltaTime * speedMultiplier) / 1000;
 
     // Calculate direction vector to target
     const dx = targetX - gameObject.x;
     const dy = targetY - gameObject.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    console.log("Distance:", distance);
-    console.log("Move Distance:", moveDistance);
-
     // If we're close enough to the target, snap to it and move to the next step in the path
     if (distance <= moveDistance) {
-      // Snap to the target position
-      gameObject.x = targetX;
-      gameObject.y = targetY;
+      // Snap to the target position using setPosition
+      gameObject.setPosition(targetX, targetY);
 
       // Update grid position
       gameObject.gridCol = gameObject.nextGridPosition.col;
@@ -185,18 +182,21 @@ export class MoveAction {
         dy: gameObject.currentPath[0].row - gameObject.gridRow,
       };
     } else {
-      // Move towards the target
+      // Move towards the target using setPosition
       if (distance > 0) {
         const normalizedDx = dx / distance;
         const normalizedDy = dy / distance;
 
-        gameObject.x += normalizedDx * moveDistance;
-        gameObject.y += normalizedDy * moveDistance;
+        const newX = gameObject.x + normalizedDx * moveDistance;
+        const newY = gameObject.y + normalizedDy * moveDistance;
+
+        // Use setPosition to update the object's position
+        gameObject.setPosition(newX, newY);
+
+        // Update grid position based on new pixel coordinates
+        gameObject.gridManager.updateObjectGridPosition(gameObject);
       }
     }
-
-    // Update Z coordinate for proper rendering order
-    gameObject.updateZCoordinate();
   }
 
   // Set a new movement target for the object
