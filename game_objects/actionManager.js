@@ -66,7 +66,14 @@ export class ActionManager {
         typeConfig.availableActions.includes(actionType)
       ) {
         // Перевірка, чи може бути виконана ця дія
-        if (this.actions[actionType].canExecute(gameObject)) {
+        if (
+          this.actions[actionType].canExecute(
+            gameObject,
+            gameObject.moveTarget?.col,
+            gameObject.moveTarget?.row,
+            [0]
+          )
+        ) {
           // Виконання дії з передачею deltaTime
           this.actions[actionType].execute(gameObject, deltaTime);
           // Після успішного виконання однієї дії припиняємо перевірку інших

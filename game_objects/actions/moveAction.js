@@ -156,7 +156,7 @@ export class MoveAction {
       gameObject.gridRow = gameObject.nextGridPosition.row;
 
       // Update grid occupation
-      gameObject.gridManager.updateObjectPosition(gameObject);
+      gameObject.gridManager.updateObjectGridPosition(gameObject);
 
       // Remove the first step from the path
       gameObject.currentPath.shift();
