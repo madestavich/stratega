@@ -47,6 +47,7 @@ class GameManager {
       this.objectManager,
       this.objectTypesConfig
     );
+    this.inputManager = new InputManager();
 
     this.start();
   }
@@ -140,22 +141,33 @@ class GameManager {
       ]
     );
 
+    // Assign random movement targets to all objects
+    this.assignRandomMovementToAllObjects();
+    console.log(this.objectManager.objects);
+
     requestAnimationFrame((t) => this.loop(t));
+  }
+
+  assignRandomMovementToAllObjects() {
+    const moveAction = this.actionManager.actions.move;
+    if (!moveAction) return;
+
+    for (const obj of this.objectManager.objects) {
+      // Generate random target within grid bounds
+      const targetCol = Math.floor(Math.random() * this.gridManager.cols);
+      const targetRow = Math.floor(Math.random() * this.gridManager.rows);
+
+      // Use the setMoveTarget method from MoveAction
+      moveAction.setMoveTarget(obj, targetCol, targetRow, [0]);
+    }
   }
 
   update(dt) {
     // Оновлюємо всі об'єкти
     this.objectManager.updateAll();
 
-    // Оновлюємо рух для всіх об'єктів
-    for (const obj of this.objectManager.objects) {
-      if (obj.isMoving) {
-        this.actionManager.actions.move.execute(obj);
-      } else if (this.actionManager.actions.move.canExecute(obj)) {
-        // Якщо об'єкт не рухається, перевіряємо, чи може він почати рух
-        this.actionManager.actions.move.execute(obj);
-      }
-    }
+    // Оновлюємо дії для всіх об'єктів через ActionManager
+    this.actionManager.update(dt);
 
     // Оновлюємо стан сітки після руху
     this.gridManager.updateGridObjects(this.objectManager);
