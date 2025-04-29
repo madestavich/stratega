@@ -72,7 +72,7 @@ export class ActionManager {
           )
         ) {
           // Виконання дії з передачею deltaTime
-          this.actions[actionType].execute(gameObject, deltaTime);
+          this.actions[actionType].execute(gameObject, deltaTime, [0]);
           // Після успішного виконання однієї дії припиняємо перевірку інших
           break;
         }

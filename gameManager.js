@@ -92,19 +92,31 @@ class GameManager {
         moveSpeed: 22,
         availableActions: ["move"],
       },
-      3,
+      6,
       [
         {
           col: 25,
           row: 1,
         },
         {
-          col: 3,
-          row: 5,
+          col: 13,
+          row: 15,
         },
         {
           col: 3,
           row: 10,
+        },
+        {
+          col: 15,
+          row: 1,
+        },
+        {
+          col: 6,
+          row: 12,
+        },
+        {
+          col: 3,
+          row: 13,
         },
       ]
     );

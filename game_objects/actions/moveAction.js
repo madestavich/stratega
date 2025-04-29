@@ -54,16 +54,49 @@ export class MoveAction {
       }
     }
 
+    // Check if target is occupied and find nearest free cell if needed
+    let finalTargetCol = targetCol;
+    let finalTargetRow = targetRow;
+
+    // Check if the target position is occupied
+    const canOccupy = this.pathfinder.canOccupyExcludingSelf(
+      finalTargetCol,
+      finalTargetRow,
+      gameObject.gridWidth,
+      gameObject.gridHeight,
+      gameObject.expansionDirection,
+      gameObject,
+      allowedObstacleTypes
+    );
+
+    if (!canOccupy) {
+      // Find nearest free cell around the target
+      const nearestFree = this.findNearestFreeCell(
+        gameObject,
+        finalTargetCol,
+        finalTargetRow,
+        allowedObstacleTypes
+      );
+
+      if (nearestFree) {
+        finalTargetCol = nearestFree.col;
+        finalTargetRow = nearestFree.row;
+      } else {
+        // No free cells found near target
+        return false;
+      }
+    }
+
     // Find a path to the target
     const path = this.pathfinder.findPath(
       gameObject.gridCol,
       gameObject.gridRow,
-      targetCol,
-      targetRow,
+      finalTargetCol,
+      finalTargetRow,
       gameObject.gridWidth,
       gameObject.gridHeight,
       gameObject.expansionDirection,
-      gameObject, // Передаємо сам об'єкт
+      gameObject,
       allowedObstacleTypes
     );
 
@@ -74,7 +107,7 @@ export class MoveAction {
 
     // Store the path and target for future use
     gameObject.currentPath = path;
-    gameObject.moveTarget = { col: targetCol, row: targetRow };
+    gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
 
     // Set the next step from the path
     gameObject.nextGridPosition = {
@@ -89,6 +122,43 @@ export class MoveAction {
     };
 
     return true;
+  }
+
+  // Find the nearest free cell around a target position
+  findNearestFreeCell(gameObject, targetCol, targetRow, allowedObstacleTypes) {
+    // Search in expanding rings around the target
+    for (let radius = 1; radius <= 5; radius++) {
+      // Limit search radius to 5 cells
+      // Check all cells in the current radius
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          // Only check cells at the current radius (on the perimeter)
+          if (Math.abs(dx) === radius || Math.abs(dy) === radius) {
+            const checkCol = targetCol + dx;
+            const checkRow = targetRow + dy;
+
+            // Check if this position can be occupied
+            if (
+              this.pathfinder.canOccupyExcludingSelf(
+                checkCol,
+                checkRow,
+                gameObject.gridWidth,
+                gameObject.gridHeight,
+                gameObject.expansionDirection,
+                gameObject,
+                allowedObstacleTypes
+              )
+            ) {
+              // Found a free cell
+              return { col: checkCol, row: checkRow };
+            }
+          }
+        }
+      }
+    }
+
+    // No free cells found within the search radius
+    return null;
   }
 
   // Execute the move action
