@@ -47,7 +47,7 @@ class GameManager {
       `%c ${timestamp} `,
       "background: #000; color:rgb(212, 194, 27); font-size: 14px;"
     );
-    console.dir(this.objectManager.objects);
+    console.log(this.objectManager.objects);
   }
 
   toggleDebugMode() {
@@ -59,7 +59,7 @@ class GameManager {
         "background: #222; color:rgb(47, 201, 9); font-size: 14px;"
       );
       console.log("Scroll down to see detailed object information.");
-      this.debugInterval = setInterval(() => this.logGameObjects(), 1000);
+      this.debugInterval = setInterval(() => this.logGameObjects(), 2000);
 
       this.logGameObjects();
     } else {
