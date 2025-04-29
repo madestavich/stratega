@@ -16,6 +16,8 @@ class GameManager {
     this.deltaTime = 0;
     this.fixedTimeStep = 1000 / 30;
     this.accumulator = 0;
+    this.debugMode = false;
+    this.debugInterval = null;
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -30,7 +32,43 @@ class GameManager {
     this.actionManager = new ActionManager(this.objectManager);
     this.inputManager = new InputManager();
 
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "`") {
+        this.toggleDebugMode();
+      }
+    });
+
     this.start();
+  }
+
+  logGameObjects() {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(
+      `%c ${timestamp} `,
+      "background: #000; color:rgb(212, 194, 27); font-size: 14px;"
+    );
+    console.dir(this.objectManager.objects);
+  }
+
+  toggleDebugMode() {
+    this.debugMode = !this.debugMode;
+
+    if (this.debugMode) {
+      console.log(
+        "%c Debug mode enabled. Objects will be logged every second.",
+        "background: #222; color:rgb(47, 201, 9); font-size: 14px;"
+      );
+      console.log("Scroll down to see detailed object information.");
+      this.debugInterval = setInterval(() => this.logGameObjects(), 1000);
+
+      this.logGameObjects();
+    } else {
+      console.log(
+        "%c Debug mode disabled.",
+        "background: #222; color:rgb(255, 38, 0); font-size: 14px;"
+      );
+      clearInterval(this.debugInterval);
+    }
   }
 
   async start() {
@@ -128,7 +166,7 @@ class GameManager {
 
     // Assign random movement targets to all objects
     this.assignRandomMovementToAllObjects();
-    console.log(this.objectManager.objects);
+    this.toggleDebugMode();
 
     requestAnimationFrame((t) => this.loop(t));
   }
