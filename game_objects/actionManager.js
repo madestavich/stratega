@@ -14,9 +14,8 @@ const actionsClasses = {
 };
 
 export class ActionManager {
-  constructor(objectManager, objectTypesConfig) {
+  constructor(objectManager) {
     this.objectManager = objectManager;
-    this.objectTypesConfig = objectTypesConfig; // Конфіг з типами об'єктів і їх параметрами
     this.actions = {}; // Зберігатиме екземпляри класів дій
     this.initializeActions(actionsClasses);
   }
@@ -25,10 +24,7 @@ export class ActionManager {
   initializeActions(actionsClasses) {
     // actionsClasses має бути об'єктом, де ключі - назви дій, а значення - класи дій
     for (const [actionType, ActionClass] of Object.entries(actionsClasses)) {
-      this.actions[actionType] = new ActionClass(
-        this.objectManager,
-        this.objectTypesConfig
-      );
+      this.actions[actionType] = new ActionClass(this.objectManager);
     }
   }
 
@@ -46,8 +42,8 @@ export class ActionManager {
       return;
     }
 
-    // Отримання конфігурації типу об'єкта
-    const typeConfig = this.objectTypesConfig[gameObject.objectType];
+    // Отримання конфігурації типу об'єкта безпосередньо з об'єкта
+    const typeConfig = gameObject.objectConfig;
     if (!typeConfig) {
       return;
     }
@@ -63,6 +59,7 @@ export class ActionManager {
       // Перевірка, чи існує такий тип дії і чи доступний він для цього типу об'єкта
       if (
         this.actions[actionType] &&
+        typeConfig.availableActions &&
         typeConfig.availableActions.includes(actionType)
       ) {
         // Перевірка, чи може бути виконана ця дія

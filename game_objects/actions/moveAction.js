@@ -1,9 +1,8 @@
 import { Pathfinder } from "../../import.js";
 
 export class MoveAction {
-  constructor(objectManager, objectTypesConfig) {
+  constructor(objectManager) {
     this.objectManager = objectManager;
-    this.objectTypesConfig = objectTypesConfig;
     this.pathfinder = null;
   }
 
@@ -17,8 +16,8 @@ export class MoveAction {
 
   // Check if the move action can be executed
   canExecute(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
-    // Get the type config directly from the object type
-    const typeConfig = this.objectTypesConfig[gameObject.objectType];
+    // Get the type config directly from the object's configuration
+    const typeConfig = gameObject.objectConfig;
 
     // Check basic conditions
     if (!typeConfig || typeConfig.moveSpeed <= 0) {
@@ -94,8 +93,8 @@ export class MoveAction {
 
   // Execute the move action
   execute(gameObject, deltaTime) {
-    // Get the type config directly from the object type
-    const typeConfig = this.objectTypesConfig[gameObject.objectType];
+    // Get the type config directly from the object's configuration
+    const typeConfig = gameObject.objectConfig;
 
     // If we don't have a path or next position, we can't move
     if (!gameObject.currentPath || !gameObject.nextGridPosition) {

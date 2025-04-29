@@ -1,53 +1,73 @@
 {
-  "hhhh": {
-    "name": "hhhh",
+  "cavalry": {
+    "name": "cavalry",
     "sourceImage": {
       "link": "../sprites/29264.png",
       "width": 578,
       "height": 759
     },
     "animations": {
-      "ghgh": {
-        "name": "ghgh",
+      "run": {
+        "name": "run",
         "frames": [
           {
-            "x": 158,
-            "y": 18,
-            "width": 83,
-            "height": 90,
-            "frameCenter": {
-              "x": 199.5,
-              "y": 108
-            }
-          },
-          {
-            "x": 248,
-            "y": 13,
-            "width": 93,
-            "height": 95,
-            "frameCenter": {
-              "x": 288,
-              "y": 108
-            }
-          },
-          {
-            "x": 347,
-            "y": 18,
-            "width": 83,
-            "height": 89,
-            "frameCenter": {
-              "x": 388.5,
-              "y": 107
-            }
-          },
-          {
-            "x": 439,
-            "y": 16,
+            "x": 8,
+            "y": 114.5,
             "width": 86,
+            "height": 93,
+            "frameCenter": {
+              "x": 51,
+              "y": 207.5
+            }
+          },
+          {
+            "x": 100,
+            "y": 116.5,
+            "width": 78,
+            "height": 92,
+            "frameCenter": {
+              "x": 139,
+              "y": 208.5
+            }
+          },
+          {
+            "x": 187,
+            "y": 117.5,
+            "width": 84,
             "height": 91,
             "frameCenter": {
-              "x": 482,
-              "y": 107
+              "x": 229,
+              "y": 208.5
+            }
+          },
+          {
+            "x": 278,
+            "y": 110.5,
+            "width": 84,
+            "height": 98,
+            "frameCenter": {
+              "x": 320,
+              "y": 208.5
+            }
+          },
+          {
+            "x": 368,
+            "y": 113.5,
+            "width": 81,
+            "height": 92,
+            "frameCenter": {
+              "x": 408.5,
+              "y": 205.5
+            }
+          },
+          {
+            "x": 454,
+            "y": 114.5,
+            "width": 81,
+            "height": 92,
+            "frameCenter": {
+              "x": 494.5,
+              "y": 206.5
             }
           }
         ]

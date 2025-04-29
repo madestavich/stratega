@@ -17,22 +17,6 @@ class GameManager {
     this.fixedTimeStep = 1000 / 30;
     this.accumulator = 0;
 
-    this.objectTypesConfig = {
-      cavalry: {
-        moveSpeed: 10,
-        attackRange: 1,
-        attackDamage: 10,
-        availableActions: ["move"],
-      },
-      archer: {
-        moveSpeed: 5,
-        attackRange: 4,
-        attackDamage: 7,
-        availableActions: ["move"],
-      },
-      // Інші типи об'єктів...
-    };
-
     //! ініціалізація об'єктів і інших менеджерів
 
     this.configLoader = new ConfigLoader();
@@ -43,10 +27,7 @@ class GameManager {
       cols: 40,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
-    this.actionManager = new ActionManager(
-      this.objectManager,
-      this.objectTypesConfig
-    );
+    this.actionManager = new ActionManager(this.objectManager);
     this.inputManager = new InputManager();
 
     this.start();
@@ -70,11 +51,13 @@ class GameManager {
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 22,
+        availableActions: ["move"],
       },
       3,
       [
         {
-          col: 2,
+          col: 25,
           row: 1,
         },
         {
@@ -95,15 +78,17 @@ class GameManager {
         expansionDirection: "bottomRight",
         objectType: "archer",
         actionPriorities: ["move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 8,
+        availableActions: ["move"],
       },
       10,
       [
         {
-          col: 0,
+          col: 10,
           row: 1,
         },
         {
-          col: 0,
+          col: 20,
           row: 2,
         },
         {
