@@ -7,67 +7,112 @@
       "height": 759
     },
     "animations": {
-      "run": {
-        "name": "run",
+      "idle": {
+        "name": "idle",
+        "frames": [
+          {
+            "x": 156,
+            "y": 15.5,
+            "width": 81,
+            "height": 93,
+            "frameCenter": {
+              "x": 196.5,
+              "y": 108.5
+            }
+          },
+          {
+            "x": 242,
+            "y": 8,
+            "width": 98,
+            "height": 99,
+            "frameCenter": {
+              "x": 285,
+              "y": 107
+            }
+          },
+          {
+            "x": 346,
+            "y": 14.5,
+            "width": 85,
+            "height": 94,
+            "frameCenter": {
+              "x": 388.5,
+              "y": 108.5
+            }
+          },
+          {
+            "x": 435,
+            "y": 16.5,
+            "width": 85,
+            "height": 92,
+            "frameCenter": {
+              "x": 477.5,
+              "y": 108.5
+            }
+          }
+        ]
+      },
+      "move": {
+        "name": "move",
         "frames": [
           {
             "x": 8,
-            "y": 114.5,
-            "width": 86,
-            "height": 93,
+            "y": 116.5,
+            "width": 82,
+            "height": 91,
             "frameCenter": {
-              "x": 51,
+              "x": 49,
               "y": 207.5
             }
           },
           {
-            "x": 100,
-            "y": 116.5,
-            "width": 78,
-            "height": 92,
+            "x": 98,
+            "y": 118.5,
+            "width": 80,
+            "height": 87,
             "frameCenter": {
-              "x": 139,
-              "y": 208.5
-            }
-          },
-          {
-            "x": 187,
-            "y": 117.5,
-            "width": 84,
-            "height": 91,
-            "frameCenter": {
-              "x": 229,
-              "y": 208.5
-            }
-          },
-          {
-            "x": 278,
-            "y": 110.5,
-            "width": 84,
-            "height": 98,
-            "frameCenter": {
-              "x": 320,
-              "y": 208.5
-            }
-          },
-          {
-            "x": 368,
-            "y": 113.5,
-            "width": 81,
-            "height": 92,
-            "frameCenter": {
-              "x": 408.5,
+              "x": 138,
               "y": 205.5
             }
           },
           {
-            "x": 454,
-            "y": 114.5,
+            "x": 186,
+            "y": 116.5,
+            "width": 82,
+            "height": 89,
+            "frameCenter": {
+              "x": 227,
+              "y": 205.5
+            }
+          },
+          {
+            "x": 280,
+            "y": 110.5,
             "width": 81,
-            "height": 92,
+            "height": 97,
+            "frameCenter": {
+              "x": 320.5,
+              "y": 207.5
+            }
+          },
+          {
+            "x": 365,
+            "y": 112.5,
+            "width": 82,
+            "height": 94,
+            "frameCenter": {
+              "x": 406,
+              "y": 206.5
+            }
+          },
+          {
+            "x": 455,
+            "y": 112.5,
+            "width": 79,
+            "height": 96,
             "frameCenter": {
               "x": 494.5,
-              "y": 206.5
+              "y": 208.5
             }
           }
         ]
