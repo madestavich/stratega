@@ -1,16 +1,12 @@
 import { MoveAction } from "../import.js";
 // import { AttackAction } from "../import.js";
 // import { DefendAction } from "../import.js";
-// import { PatrolAction } from "../import.js";
-// import { RetreatAction } from "../import.js";
 
 // В GameManager.js
 const actionsClasses = {
   move: MoveAction,
   //   attack: AttackAction,
   //   defend: DefendAction,
-  //   patrol: PatrolAction,
-  //   retreat: RetreatAction,
 };
 
 export class ActionManager {
