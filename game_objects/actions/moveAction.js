@@ -240,6 +240,7 @@ export class MoveAction {
         gameObject.isMoving = false;
         gameObject.currentPath = null;
         gameObject.nextGridPosition = null;
+        gameObject.lookDirection = gameObject.moveDirection;
         gameObject.moveDirection = null;
         gameObject.animator.setAnimation("idle", true);
         return;
@@ -304,6 +305,7 @@ export class MoveAction {
     gameObject.isMoving = false;
     gameObject.currentPath = null;
     gameObject.nextGridPosition = null;
+    gameObject.lookDirection = gameObject.moveDirection;
     gameObject.moveDirection = null;
     gameObject.moveTarget = null;
   }

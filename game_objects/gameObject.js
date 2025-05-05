@@ -18,6 +18,7 @@ export class GameObject {
     this.isMoving = false; // Чи об'єкт рухається
     this.moveDirection = null; // Напрямок руху
     this.moveTarget = null; // Ціль для руху
+    this.lookDirection = null; // Напрямок огляду
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;
@@ -58,8 +59,19 @@ export class GameObject {
     const offsetY = currentFrame.frameCenter.y - currentFrame.y;
 
     // Adjust the drawing position by the calculated offsets
-
-    this.renderer.draw(this.x - offsetX, this.y - offsetY, this.moveDirection);
+    if (this.moveDirection) {
+      this.renderer.draw(
+        this.x - offsetX,
+        this.y - offsetY,
+        this.moveDirection
+      );
+    } else {
+      this.renderer.draw(
+        this.x - offsetX,
+        this.y - offsetY,
+        this.lookDirection
+      );
+    }
   }
 
   // Only method needed for direct position control
