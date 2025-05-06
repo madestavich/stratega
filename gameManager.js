@@ -72,13 +72,13 @@ class GameManager {
   }
 
   async start() {
-    const configList = {
+    const spriteConfigList = {
       cavalry: "/game_configs/units/config1.json",
       archer: "/game_configs/units/config2.json",
       // інші
     };
 
-    await this.configLoader.load(configList);
+    await this.configLoader.load(spriteConfigList);
 
     // створення об'єктів
     this.objectManager.createMultiple(

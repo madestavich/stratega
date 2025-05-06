@@ -5,7 +5,6 @@ export class GameObject {
   constructor(ctx, spriteConfig, objectConfig, gridCol, gridRow, gridManager) {
     this.ctx = ctx;
     this.spriteConfig = spriteConfig;
-    this.objectConfig = objectConfig;
     this.gridCol = gridCol;
     this.gridRow = gridRow;
     this.gridManager = gridManager;
@@ -19,6 +18,8 @@ export class GameObject {
     this.moveDirection = null; // Напрямок руху
     this.moveTarget = null; // Ціль для руху
     this.lookDirection = null; // Напрямок огляду
+    this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
+    this.availableActions = objectConfig.availableActions || []; // Доступні дії
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;

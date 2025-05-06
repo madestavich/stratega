@@ -38,12 +38,6 @@ export class ActionManager {
       return;
     }
 
-    // Отримання конфігурації типу об'єкта безпосередньо з об'єкта
-    const typeConfig = gameObject.objectConfig;
-    if (!typeConfig) {
-      return;
-    }
-
     // Отримання пріоритетів дій об'єкта
     const actionPriorities = gameObject.actionPriorities;
     if (!actionPriorities || actionPriorities.length === 0) {
@@ -55,8 +49,8 @@ export class ActionManager {
       // Перевірка, чи існує такий тип дії і чи доступний він для цього типу об'єкта
       if (
         this.actions[actionType] &&
-        typeConfig.availableActions &&
-        typeConfig.availableActions.includes(actionType)
+        gameObject.availableActions &&
+        gameObject.availableActions.includes(actionType)
       ) {
         // Перевірка, чи може бути виконана ця дія
         if (

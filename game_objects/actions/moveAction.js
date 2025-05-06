@@ -16,11 +16,8 @@ export class MoveAction {
 
   // Check if the move action can be executed
   canExecute(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
-    // Get the type config directly from the object's configuration
-    const typeConfig = gameObject.objectConfig;
-
     // Check basic conditions
-    if (!typeConfig || typeConfig.moveSpeed <= 0) {
+    if (gameObject.moveSpeed <= 0) {
       return false;
     }
 
@@ -163,9 +160,6 @@ export class MoveAction {
 
   // Execute the move action
   execute(gameObject, deltaTime) {
-    // Get the type config directly from the object's configuration
-    const typeConfig = gameObject.objectConfig;
-
     // If we don't have a path or next position, we can't move
     if (!gameObject.currentPath || !gameObject.nextGridPosition) {
       gameObject.isMoving = false;
@@ -211,9 +205,9 @@ export class MoveAction {
     const targetY = (anchorRow + gameObject.gridHeight / 2) * cellHeight;
 
     // Calculate distance to move this frame based on speed and deltaTime
-    const moveSpeed = typeConfig.moveSpeed;
     const speedMultiplier = 5; // Додатковий множник швидкості
-    const moveDistance = (moveSpeed * deltaTime * speedMultiplier) / 1000;
+    const moveDistance =
+      (gameObject.moveSpeed * deltaTime * speedMultiplier) / 1000;
 
     // Calculate direction vector to target
     const dx = targetX - gameObject.x;
