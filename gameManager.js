@@ -88,9 +88,10 @@ class GameManager {
         gridHeight: 1,
         expansionDirection: "topRight",
         objectType: "cavalry",
-        actionPriorities: ["move"], // Пріоритет дій для цього об'єкта
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
         moveSpeed: 22,
-        availableActions: ["move"],
+        availableActions: ["move", "attack"],
+        team: 1,
       },
       6,
       [
@@ -127,9 +128,10 @@ class GameManager {
         gridHeight: 1,
         expansionDirection: "bottomRight",
         objectType: "archer",
-        actionPriorities: ["move"], // Пріоритет дій для цього об'єкта
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
         moveSpeed: 8,
-        availableActions: ["move"],
+        availableActions: ["move", "attack"],
+        team: 2,
       },
       10,
       [
