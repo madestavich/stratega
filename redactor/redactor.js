@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
       this.canvasRenderer = new CanvasRenderer(
         document.getElementById("canvas")
       );
+      this.loadConfigBtn = document.getElementById("loadConfig");
     }
 
     updateUIState() {
@@ -147,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         this.updateUIState();
         this.drawSelectedFrame(); // Оновлюємо фрейм при зміні анімації
       });
+      this.loadConfigBtn.addEventListener("click", () => this.loadConfig());
     }
 
     addSpritesheet() {
@@ -207,6 +209,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
     logConfig() {
       console.log(this.spritesheets);
+    }
+
+    loadConfig() {
+      // Create a file input element
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = ".json";
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const config = JSON.parse(event.target.result);
+
+            // Clear existing spritesheets
+            this.spritesheets = {};
+
+            // Load each spritesheet from the config
+            Object.entries(config).forEach(([key, spritesheet]) => {
+              // Create a new Spritesheet object
+              this.spritesheets[key] = new Spritesheet(
+                spritesheet.name,
+                spritesheet.sourceImage
+              );
+
+              // Load animations
+              Object.entries(spritesheet.animations).forEach(
+                ([animKey, anim]) => {
+                  this.spritesheets[key].animations[animKey] = new Animation(
+                    anim.name
+                  );
+
+                  // Load frames
+                  anim.frames.forEach((frameData) => {
+                    const frame = new Frame(
+                      frameData.x,
+                      frameData.y,
+                      frameData.width,
+                      frameData.height,
+                      frameData.frameCenter.x,
+                      frameData.frameCenter.y
+                    );
+                    this.spritesheets[key].animations[animKey].frames.push(
+                      frame
+                    );
+                  });
+                }
+              );
+            });
+
+            // Update UI
+            this.updateSheetSelect();
+            this.updateAnimationSelect();
+            this.updateUIState();
+
+            alert("Configuration loaded successfully!");
+          } catch (error) {
+            console.error("Error loading config:", error);
+            alert(
+              "Failed to load configuration file. Check console for details."
+            );
+          }
+        };
+
+        reader.readAsText(file);
+      });
+
+      // Trigger the file input click
+      fileInput.click();
     }
 
     newAnimation() {
