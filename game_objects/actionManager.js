@@ -1,11 +1,11 @@
 import { MoveAction } from "../import.js";
-import { AttackAction } from "../import.js";
+// import { AttackAction } from "../import.js";
 // import { DefendAction } from "../import.js";
 
 // В GameManager.js
 const actionsClasses = {
   move: MoveAction,
-  attack: AttackAction,
+  // attack: AttackAction,
   //   defend: DefendAction,
 };
 
@@ -26,11 +26,6 @@ export class ActionManager {
 
   // Виконання дій для всіх об'єктів з урахуванням deltaTime
   update(deltaTime) {
-    // Update action-specific timers and states
-    if (this.actions.attack) {
-      this.actions.attack.update(deltaTime);
-    }
-
     // Process actions for all objects
     for (const gameObject of this.objectManager.objects) {
       this.processObjectActions(gameObject, deltaTime);
