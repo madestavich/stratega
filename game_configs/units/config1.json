@@ -106,6 +106,51 @@
             }
           }
         ]
+      },
+      "attack": {
+        "name": "attack",
+        "frames": [
+          {
+            "x": 6,
+            "y": 214,
+            "width": 95,
+            "height": 87,
+            "frameCenter": {
+              "x": 53.5,
+              "y": 301
+            }
+          },
+          {
+            "x": 102,
+            "y": 212,
+            "width": 106,
+            "height": 88,
+            "frameCenter": {
+              "x": 155,
+              "y": 300
+            }
+          },
+          {
+            "x": 205,
+            "y": 212,
+            "width": 135,
+            "height": 87,
+            "frameCenter": {
+              "x": 272.5,
+              "y": 299
+            }
+          },
+          {
+            "x": 345,
+            "y": 217,
+            "width": 141,
+            "height": 86,
+            "frameCenter": {
+              "x": 415.5,
+              "y": 303
+            }
+          }
+        ]
       }
     }
   }

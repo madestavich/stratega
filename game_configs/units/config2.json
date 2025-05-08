@@ -11,13 +11,13 @@
         "name": "idle",
         "frames": [
           {
-            "x": 12,
-            "y": 8.5,
-            "width": 35,
-            "height": 68,
+            "x": 11,
+            "y": 11,
+            "width": 37,
+            "height": 66,
             "frameCenter": {
               "x": 29.5,
-              "y": 76.5
+              "y": 77
             }
           },
           {
@@ -57,12 +57,12 @@
         "frames": [
           {
             "x": 319,
-            "y": 7.5,
+            "y": 9,
             "width": 38,
-            "height": 69,
+            "height": 67,
             "frameCenter": {
               "x": 338,
-              "y": 76.5
+              "y": 76
             }
           },
           {
@@ -133,6 +133,41 @@
             "frameCenter": {
               "x": 918,
               "y": 77.5
+            }
+          }
+        ]
+      },
+      "attack": {
+        "name": "attack",
+        "frames": [
+          {
+            "x": 540,
+            "y": 286,
+            "width": 39,
+            "height": 68,
+            "frameCenter": {
+              "x": 559.5,
+              "y": 354
+            }
+          },
+          {
+            "x": 618,
+            "y": 286,
+            "width": 53,
+            "height": 69,
+            "frameCenter": {
+              "x": 644.5,
+              "y": 355
+            }
+          },
+          {
+            "x": 699,
+            "y": 288,
+            "width": 58,
+            "height": 68,
+            "frameCenter": {
+              "x": 728,
+              "y": 356
             }
           }
         ]

@@ -20,6 +20,13 @@ export class GameObject {
     this.lookDirection = null; // Напрямок огляду
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
     this.availableActions = objectConfig.availableActions || []; // Доступні дії
+    this.team = objectConfig.team || 1; // Команда об'єкта
+    this.isAttacking = false; // Чи об'єкт атакує
+    this.attackTarget = null; // Ціль для атаки
+    this.attackRange = objectConfig.attackRange || 1; // Діапазон атаки
+    this.attackDamage = objectConfig.attackDamage || 1; // Шкода атаки
+    this.attackCooldown = 0; // Затримка між атаками
+    this.health = objectConfig.health || 100; // Здоров'я об'єкта
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;
