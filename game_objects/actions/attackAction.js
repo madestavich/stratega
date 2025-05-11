@@ -39,7 +39,7 @@ export class AttackAction {
     }
   }
 
-  execute(gameObject, deltaTime, allowedObstacleTypes) {
+  execute(gameObject) {
     // If already attacking and on last frame
     if (gameObject.isAttacking && gameObject.animator.hasFinished) {
       // Deal damage to the target
@@ -52,7 +52,12 @@ export class AttackAction {
       gameObject.attackCooldown = gameObject.attackSpeed || 1000; // Default 1 second cooldown
 
       // Return to idle animation
-      gameObject.animator.setAnimation("idle", true, "idle");
+      if (!gameObject.isMoving) {
+        gameObject.animator.setAnimation("idle", true);
+      } else {
+        // If moving, set move animation
+        gameObject.animator.setAnimation("move", true);
+      }
 
       return true;
     }
@@ -134,25 +139,22 @@ export class AttackAction {
   }
 
   calculateDistance(col1, row1, col2, row2) {
-    // Manhattan distance for grid-based movement
-    return Math.abs(col1 - col2) + Math.abs(row1 - row2);
+    // Use Chebyshev distance for grid-based movement with diagonals
+    // This allows diagonal movement to count as 1 distance unit
+    return Math.max(Math.abs(col1 - col2), Math.abs(row1 - row2));
   }
 
   setLookDirection(gameObject, target) {
-    // Set look direction based on target position as a vector
-    if (target.gridCol > gameObject.gridCol) {
-      gameObject.lookDirection = { x: 1, y: 0 }; // Right direction
-    } else if (target.gridCol < gameObject.gridCol) {
-      gameObject.lookDirection = { x: -1, y: 0 }; // Left direction
-    } else if (target.gridRow > gameObject.gridRow) {
-      gameObject.lookDirection = { x: 0, y: 1 }; // Down direction
-    } else if (target.gridRow < gameObject.gridRow) {
-      gameObject.lookDirection = { x: 0, y: -1 }; // Up direction
-    } else {
-      // If they're in the same position, keep current look direction
-      // or set a default if none exists
-      gameObject.lookDirection = gameObject.lookDirection || { x: 1, y: 0 };
-    }
+    // Calculate direction vector
+    const dx = target.gridCol - gameObject.gridCol;
+    const dy = target.gridRow - gameObject.gridRow;
+
+    // Normalize to -1, 0, or 1 while preserving direction
+    const dirX = dx === 0 ? 0 : dx > 0 ? 1 : -1;
+    const dirY = dy === 0 ? 0 : dy > 0 ? 1 : -1;
+
+    // Set look direction including diagonals
+    gameObject.lookDirection = { x: dirX, y: dirY };
   }
 
   dealDamage(attacker, target) {
@@ -165,8 +167,26 @@ export class AttackAction {
 
       // Check if target is defeated
       if (target.health <= 0) {
+        // Clear the move target so unit doesn't move to the defeated target's position
+        if (
+          attacker.moveTarget &&
+          attacker.moveTarget.col === target.gridCol &&
+          attacker.moveTarget.row === target.gridRow
+        ) {
+          attacker.moveTarget = null;
+        }
+
         // Handle unit defeat (could be handled by the object manager)
         this.objectManager.removeObject(target);
+
+        // Immediately look for a new target
+        const newTarget = this.findNearestEnemy(attacker);
+        if (newTarget) {
+          attacker.moveTarget = {
+            col: newTarget.gridCol,
+            row: newTarget.gridRow,
+          };
+        }
       }
     }
   }
