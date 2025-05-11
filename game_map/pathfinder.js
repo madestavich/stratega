@@ -212,6 +212,7 @@ export class Pathfinder {
 
         // Check if cell is of an allowed type
         const cellType = this.gridManager.grid[checkRow][checkCol].type || 0;
+
         if (!allowedObstacleTypes.includes(cellType)) {
           return false;
         }
