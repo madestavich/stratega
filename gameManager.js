@@ -92,6 +92,7 @@ class GameManager {
         moveSpeed: 22,
         availableActions: ["move", "attack"],
         team: 1,
+        attackDamage: 100,
       },
       6,
       [
@@ -128,10 +129,11 @@ class GameManager {
         gridHeight: 1,
         expansionDirection: "bottomRight",
         objectType: "archer",
-        actionPriorities: ["move", "attack"], // Пріоритет дій для цього об'єкта
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
         moveSpeed: 8,
         availableActions: ["move", "attack"],
         team: 2,
+        attackDamage: 20,
       },
       10,
       [
@@ -179,7 +181,7 @@ class GameManager {
     );
 
     // Assign random movement targets to all objects
-    this.assignRandomMovementToAllObjects();
+    // this.assignRandomMovementToAllObjects();
     this.toggleDebugMode();
 
     requestAnimationFrame((t) => this.loop(t));

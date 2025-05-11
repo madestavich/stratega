@@ -27,6 +27,15 @@ export class ObjectManager {
     }
   }
 
+  removeObject(object) {
+    const index = this.objects.indexOf(object);
+    if (index !== -1) {
+      this.objects.splice(index, 1);
+      // Update the grid to reflect that cells are no longer occupied by this object
+      this.gridManager.updateGridObjects(this);
+    }
+  }
+
   updateAll() {
     for (const obj of this.objects) obj.update();
   }
