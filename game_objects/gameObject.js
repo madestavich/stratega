@@ -28,6 +28,7 @@ export class GameObject {
     this.attackSpeed = objectConfig.attackSpeed || 1; // Швидкість атаки
     this.attackCooldown = 0; // Затримка між атаками
     this.health = objectConfig.health || 100; // Здоров'я об'єкта
+    this.isDead = false; // Чи об'єкт мертвий
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;

@@ -90,7 +90,7 @@ export class AttackAction {
   findNearestEnemyInRange(gameObject) {
     const attackRange = gameObject.attackRange || 1; // Default range is 1 cell
     const enemies = this.objectManager.objects.filter(
-      (obj) => obj.team && obj.team !== gameObject.team
+      (obj) => obj.team && obj.team !== gameObject.team && !obj.isDead
     );
 
     let nearestEnemy = null;
@@ -115,7 +115,7 @@ export class AttackAction {
 
   findNearestEnemy(gameObject) {
     const enemies = this.objectManager.objects.filter(
-      (obj) => obj.team && obj.team !== gameObject.team
+      (obj) => obj.team && obj.team !== gameObject.team && !obj.isDead
     );
 
     let nearestEnemy = null;
@@ -166,7 +166,19 @@ export class AttackAction {
       target.health -= damage;
 
       // Check if target is defeated
-      if (target.health <= 0) {
+      if (target.health <= 0 && !target.isDead) {
+        // Set the isDead flag instead of removing the object
+        target.isDead = true;
+        target.canAct = false;
+
+        // Play death animation without looping
+        if (
+          target.animator &&
+          target.animator.activeSpritesheet.animations.death
+        ) {
+          target.animator.setAnimation("death", false);
+        }
+
         // Clear the move target so unit doesn't move to the defeated target's position
         if (
           attacker.moveTarget &&
@@ -175,9 +187,6 @@ export class AttackAction {
         ) {
           attacker.moveTarget = null;
         }
-
-        // Handle unit defeat (could be handled by the object manager)
-        this.objectManager.removeObject(target);
 
         // Immediately look for a new target
         const newTarget = this.findNearestEnemy(attacker);
