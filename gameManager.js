@@ -128,7 +128,7 @@ class GameManager {
         gridHeight: 1,
         expansionDirection: "bottomRight",
         objectType: "archer",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+        actionPriorities: ["move", "attack"], // Пріоритет дій для цього об'єкта
         moveSpeed: 8,
         availableActions: ["move", "attack"],
         team: 2,
