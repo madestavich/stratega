@@ -93,6 +93,7 @@ class GameManager {
         availableActions: ["move", "attack"],
         team: 1,
         attackDamage: 100,
+        attackSpeed: 2,
       },
       6,
       [
@@ -134,6 +135,7 @@ class GameManager {
         availableActions: ["move", "attack"],
         team: 2,
         attackDamage: 20,
+        attackSpeed: 1.5,
       },
       10,
       [

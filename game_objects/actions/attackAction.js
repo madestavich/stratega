@@ -49,7 +49,7 @@ export class AttackAction {
       gameObject.isAttacking = false;
 
       // Set attack cooldown based on attack speed
-      gameObject.attackCooldown = gameObject.attackSpeed || 1000; // Default 1 second cooldown
+      gameObject.attackCooldown = gameObject.attackSpeed * 1000; // Default 1 second cooldown
 
       // Return to idle animation
       if (!gameObject.isMoving) {

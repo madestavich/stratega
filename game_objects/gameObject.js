@@ -25,6 +25,7 @@ export class GameObject {
     this.attackTarget = null; // Ціль для атаки
     this.attackRange = objectConfig.attackRange || 1; // Діапазон атаки
     this.attackDamage = objectConfig.attackDamage || 1; // Шкода атаки
+    this.attackSpeed = objectConfig.attackSpeed || 1; // Швидкість атаки
     this.attackCooldown = 0; // Затримка між атаками
     this.health = objectConfig.health || 100; // Здоров'я об'єкта
 
