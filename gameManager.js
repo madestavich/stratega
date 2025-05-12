@@ -14,10 +14,11 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 10;
+    this.fixedTimeStep = 1000 / 112;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
+    this.isRunning = true;
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -184,7 +185,7 @@ class GameManager {
 
     // Assign random movement targets to all objects
     // this.assignRandomMovementToAllObjects();
-    this.toggleDebugMode();
+    // this.toggleDebugMode();
 
     requestAnimationFrame((t) => this.loop(t));
   }
@@ -204,14 +205,33 @@ class GameManager {
   }
 
   update(dt) {
-    // Оновлюємо всі об'єкти
-    this.objectManager.updateAll();
+    try {
+      // Оновлюємо всі об'єкти
+      this.objectManager.updateAll();
 
-    // Оновлюємо дії для всіх об'єктів через ActionManager
-    this.actionManager.update(dt);
+      // Оновлюємо дії для всіх об'єктів через ActionManager
+      this.actionManager.update(dt);
 
-    // Оновлюємо стан сітки після руху
-    this.gridManager.updateGridObjects(this.objectManager);
+      // Оновлюємо стан сітки після руху
+      this.gridManager.updateGridObjects(this.objectManager);
+    } catch (error) {
+      console.error("Error in update:", error);
+      // Логування стану гри для відлагодження
+      console.log("Game state:", {
+        objects: this.objectManager.objects.map((obj) => ({
+          gridCol: obj.gridCol,
+          gridRow: obj.gridRow,
+          gridWidth: obj.gridWidth,
+          gridHeight: obj.gridHeight,
+          expansionDirection: obj.expansionDirection,
+        })),
+      });
+      // Зупиняємо цикл оновлення, щоб уникнути спаму помилками
+      this.isRunning = false;
+      console.warn(
+        "Game loop stopped due to error. Check console for details."
+      );
+    }
   }
 
   render() {
@@ -222,6 +242,7 @@ class GameManager {
   }
 
   loop(timestamp) {
+    if (!this.isRunning) return; // Не продовжуємо цикл, якщо гра зупинена
     if (this.lastTime === 0) this.lastTime = timestamp;
     this.deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
@@ -230,6 +251,8 @@ class GameManager {
     while (this.accumulator >= this.fixedTimeStep) {
       this.update(this.fixedTimeStep);
       this.accumulator -= this.fixedTimeStep;
+      // Якщо гра зупинена через помилку, виходимо з циклу
+      if (!this.isRunning) break;
     }
 
     this.render();

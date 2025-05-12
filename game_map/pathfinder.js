@@ -142,6 +142,26 @@ export class Pathfinder {
       return false;
     }
 
+    // Перевірка вхідних параметрів
+    if (
+      col === undefined ||
+      row === undefined ||
+      width === undefined ||
+      height === undefined ||
+      isNaN(col) ||
+      isNaN(row) ||
+      isNaN(width) ||
+      isNaN(height)
+    ) {
+      console.warn("Invalid parameters in canOccupyExcludingSelf", {
+        col,
+        row,
+        width,
+        height,
+      });
+      // return false;
+    }
+
     // Determine starting coordinates based on expansion direction
     let startCol = col;
     let startRow = row;

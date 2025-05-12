@@ -16,109 +16,134 @@ export class MoveAction {
 
   // Check if the move action can be executed
   canExecute(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
-    // Check basic conditions
-    if (gameObject.moveSpeed <= 0) {
-      return false;
-    }
+    try {
+      // Check basic conditions
+      if (!gameObject || gameObject.isDead || gameObject.moveSpeed <= 0) {
+        return false;
+      }
 
-    // Ensure we have a pathfinder
-    if (!this.ensurePathfinder(gameObject)) {
-      return false;
-    }
+      // Ensure we have a pathfinder
+      if (!this.ensurePathfinder(gameObject)) {
+        return false;
+      }
 
-    // If the object is already moving, check if we need to recalculate the path
-    if (gameObject.isMoving && gameObject.currentPath) {
-      // Check if the target has changed
-      if (
-        gameObject.moveTarget &&
-        (gameObject.moveTarget.col !== targetCol ||
-          gameObject.moveTarget.row !== targetRow)
-      ) {
-        // Target changed, need to recalculate
-        gameObject.currentPath = null;
-      } else {
-        // Check if the current path is still valid
-        const pathStatus = this.pathfinder.checkAdjacentCells(
-          gameObject,
-          gameObject.currentPath,
-          allowedObstacleTypes
-        );
-
-        if (!pathStatus.needsRecalculation) {
-          // Path is still valid, continue using it
-          return true;
+      // If the object is already moving, check if we need to recalculate the path
+      if (gameObject.isMoving && gameObject.currentPath) {
+        // Check if the target has changed
+        if (
+          gameObject.moveTarget &&
+          (gameObject.moveTarget.col !== targetCol ||
+            gameObject.moveTarget.row !== targetRow)
+        ) {
+          // Target changed, need to recalculate
+          gameObject.currentPath = null;
+        } else {
+          // Check if the current path is still valid
+          const pathStatus = this.pathfinder.checkAdjacentCells(
+            gameObject,
+            gameObject.currentPath,
+            allowedObstacleTypes
+          );
+          if (!pathStatus.needsRecalculation) {
+            // Path is still valid, continue using it
+            return true;
+          }
         }
       }
-    }
 
-    // Check if target is occupied and find nearest free cell if needed
-    let finalTargetCol = targetCol;
-    let finalTargetRow = targetRow;
+      // Check if target is occupied and find nearest free cell if needed
+      let finalTargetCol = targetCol;
+      let finalTargetRow = targetRow;
 
-    // Check if the target position is occupied
-    const canOccupy = this.pathfinder.canOccupyExcludingSelf(
-      finalTargetCol,
-      finalTargetRow,
-      gameObject.gridWidth,
-      gameObject.gridHeight,
-      gameObject.expansionDirection,
-      gameObject,
-      allowedObstacleTypes
-    );
+      // Безпечна перевірка перед викликом canOccupyExcludingSelf
+      if (finalTargetCol === undefined || finalTargetRow === undefined) {
+        if (gameObject.moveTarget) {
+          // Використовуємо збережену ціль, якщо вона є
+          finalTargetCol = gameObject.moveTarget.col;
+          finalTargetRow = gameObject.moveTarget.row;
+        } else {
+          // Немає цілі для руху
+          return false;
+        }
+      }
 
-    if (!canOccupy) {
-      // Find nearest free cell around the target
-      const nearestFree = this.findNearestFreeCell(
-        gameObject,
+      // Check if the target position is occupied
+      const canOccupy = this.pathfinder.canOccupyExcludingSelf(
         finalTargetCol,
         finalTargetRow,
+        gameObject.gridWidth,
+        gameObject.gridHeight,
+        gameObject.expansionDirection,
+        gameObject,
         allowedObstacleTypes
       );
 
-      if (nearestFree) {
-        finalTargetCol = nearestFree.col;
-        finalTargetRow = nearestFree.row;
-      } else {
-        // No free cells found near target
+      if (!canOccupy) {
+        // Find nearest free cell around the target
+        const nearestFree = this.findNearestFreeCell(
+          gameObject,
+          finalTargetCol,
+          finalTargetRow,
+          allowedObstacleTypes
+        );
+        if (nearestFree) {
+          finalTargetCol = nearestFree.col;
+          finalTargetRow = nearestFree.row;
+        } else {
+          // No free cells found near target
+          return false;
+        }
+      }
+
+      // Find a path to the target
+      const path = this.pathfinder.findPath(
+        gameObject.gridCol,
+        gameObject.gridRow,
+        finalTargetCol,
+        finalTargetRow,
+        gameObject.gridWidth,
+        gameObject.gridHeight,
+        gameObject.expansionDirection,
+        gameObject,
+        allowedObstacleTypes
+      );
+
+      // If no path found, we can't execute the action
+      if (!path || path.length === 0) {
         return false;
       }
-    }
 
-    // Find a path to the target
-    const path = this.pathfinder.findPath(
-      gameObject.gridCol,
-      gameObject.gridRow,
-      finalTargetCol,
-      finalTargetRow,
-      gameObject.gridWidth,
-      gameObject.gridHeight,
-      gameObject.expansionDirection,
-      gameObject,
-      allowedObstacleTypes
-    );
+      // Store the path and target for future use
+      gameObject.currentPath = path;
+      gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
 
-    // If no path found, we can't execute the action
-    if (!path || path.length === 0) {
+      // Set the next step from the path
+      gameObject.nextGridPosition = {
+        col: path[0].col,
+        row: path[0].row,
+      };
+
+      // Calculate movement direction
+      gameObject.moveDirection = {
+        dx: path[0].col - gameObject.gridCol,
+        dy: path[0].row - gameObject.gridRow,
+      };
+
+      return true;
+    } catch (error) {
+      console.error("Error in MoveAction.canExecute:", error, {
+        gameObject: gameObject
+          ? {
+              type: gameObject.objectType,
+              col: gameObject.gridCol,
+              row: gameObject.gridRow,
+            }
+          : null,
+        targetCol,
+        targetRow,
+      });
       return false;
     }
-
-    // Store the path and target for future use
-    gameObject.currentPath = path;
-    gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
-
-    // Set the next step from the path
-    gameObject.nextGridPosition = {
-      col: path[0].col,
-      row: path[0].row,
-    };
-
-    // Calculate movement direction
-    gameObject.moveDirection = {
-      dx: path[0].col - gameObject.gridCol,
-      dy: path[0].row - gameObject.gridRow,
-    };
-
-    return true;
   }
 
   // Find the nearest free cell around a target position
