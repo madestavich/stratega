@@ -48,10 +48,11 @@ export class GridManager {
         this.grid[y][x].occupied = false;
       }
     }
+    for (const gameObject of objectManager.objects) {
+      // Пропускаємо мертві об'єкти при оновленні сітки
+      if (gameObject.isDead) continue;
 
-    // Iterate over each object and mark its position in the grid
-    for (const obj of objectManager.objects) {
-      this.occupyGridCells(obj);
+      this.occupyGridCells(gameObject);
     }
   }
 
