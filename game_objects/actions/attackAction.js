@@ -20,7 +20,7 @@ export class AttackAction {
     }
 
     // Find the nearest enemy (in range or not)
-    const result = this.findNearestEnemy(gameObject);
+    let result = this.findNearestEnemy(gameObject);
 
     if (result.inRangeEnemy) {
       // Set the target for attack if enemy is in range
@@ -35,7 +35,8 @@ export class AttackAction {
       };
       return false;
     } else {
-      // No enemies found at all
+      gameObject.canAct = false;
+      gameObject.animator.setAnimation("idle", true, "idle");
       return false;
     }
   }
