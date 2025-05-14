@@ -321,10 +321,10 @@ export class MoveAction {
 
   // Cancel the current movement
   cancelMovement(gameObject) {
-    gameObject.isMoving = false;
+    // gameObject.isMoving = false;
     gameObject.currentPath = null;
     gameObject.nextGridPosition = null;
-    gameObject.lookDirection = gameObject.moveDirection;
+    // gameObject.lookDirection = gameObject.moveDirection;
     gameObject.moveDirection = null;
     gameObject.moveTarget = null;
   }

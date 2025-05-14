@@ -1,6 +1,9 @@
+import { MoveAction } from "../../import.js";
+
 export class AttackAction {
   constructor(objectManager) {
     this.objectManager = objectManager;
+    this.moveAction = new MoveAction();
   }
 
   canExecute(gameObject) {
@@ -17,6 +20,9 @@ export class AttackAction {
     // Check if attack is on cooldown
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
       return false;
+    }
+    if (gameObject.attackTarget && gameObject.attackTarget.isDead) {
+      this.moveAction.cancelMovement(gameObject);
     }
 
     // Find the nearest enemy (in range or not)
@@ -176,18 +182,10 @@ export class AttackAction {
           target.animator.setAnimation("death", false);
         }
 
-        // Clear the move target so unit doesn't move to the defeated target's position
-        if (
-          attacker.moveTarget &&
-          attacker.moveTarget.col === target.gridCol &&
-          attacker.moveTarget.row === target.gridRow
-        ) {
-          attacker.moveTarget = null;
-        }
-
-        // Immediately look for a new target
+        // Immediately look for a new target for the attacker
         const result = this.findNearestEnemy(attacker);
         if (result.anyEnemy) {
+          attacker.attackTarget = result.anyEnemy;
           attacker.moveTarget = {
             col: result.anyEnemy.gridCol,
             row: result.anyEnemy.gridRow,
