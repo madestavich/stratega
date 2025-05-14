@@ -30,6 +30,7 @@ export class AttackAction {
       // If no target in range, find any enemy and set as move target
       const anyEnemy = this.findNearestEnemy(gameObject);
       if (anyEnemy) {
+        gameObject.attackTarget = anyEnemy;
         gameObject.moveTarget = {
           col: anyEnemy.gridCol,
           row: anyEnemy.gridRow,
