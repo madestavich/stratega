@@ -73,10 +73,9 @@ export class AttackAction {
       this.setLookDirection(gameObject, gameObject.attackTarget);
 
       // Play attack animation
-      setTimeout(() => {
-        // Play attack animation
-        gameObject.animator.setAnimation("attack", false, "idle");
-      }, 0);
+
+      // Play attack animation
+      gameObject.animator.setAnimation("attack", false, "idle");
 
       return true;
     }
