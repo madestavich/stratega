@@ -19,32 +19,10 @@ export class AttackAction {
 
     // Check if attack is on cooldown
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
-      return false;
+      this.checkIfTargetIsDead(gameObject);
+      return this.setNewTarget(gameObject);
     }
-    if (gameObject.attackTarget && gameObject.attackTarget.isDead) {
-      this.moveAction.cancelMovement(gameObject);
-    }
-
-    // Find the nearest enemy (in range or not)
-    let result = this.findNearestEnemy(gameObject);
-
-    if (result.inRangeEnemy) {
-      // Set the target for attack if enemy is in range
-      gameObject.attackTarget = result.inRangeEnemy;
-      return true;
-    } else if (result.anyEnemy) {
-      // If no target in range, set any enemy as move target
-      gameObject.attackTarget = result.anyEnemy;
-      gameObject.moveTarget = {
-        col: result.anyEnemy.gridCol,
-        row: result.anyEnemy.gridRow,
-      };
-      return false;
-    } else {
-      gameObject.canAct = false;
-      gameObject.animator.setAnimation("idle", true, "idle");
-      return false;
-    }
+    return this.setNewTarget(gameObject);
   }
 
   execute(gameObject) {
@@ -141,6 +119,31 @@ export class AttackAction {
     };
   }
 
+  setNewTarget(gameObject) {
+    this.checkIfTargetIsDead(gameObject);
+
+    // Find the nearest enemy (in range or not)
+    let result = this.findNearestEnemy(gameObject);
+
+    if (result.inRangeEnemy) {
+      // Set the target for attack if enemy is in range
+      gameObject.attackTarget = result.inRangeEnemy;
+      return true;
+    } else if (result.anyEnemy) {
+      // If no target in range, set any enemy as move target
+      gameObject.attackTarget = result.anyEnemy;
+      gameObject.moveTarget = {
+        col: result.anyEnemy.gridCol,
+        row: result.anyEnemy.gridRow,
+      };
+      return false;
+    } else {
+      gameObject.canAct = false;
+      gameObject.animator.setAnimation("idle", true, "idle");
+      return false;
+    }
+  }
+
   calculateDistance(col1, row1, col2, row2) {
     // Use Chebyshev distance for grid-based movement with diagonals
     // This allows diagonal movement to count as 1 distance unit
@@ -192,6 +195,12 @@ export class AttackAction {
           };
         }
       }
+    }
+  }
+
+  checkIfTargetIsDead(gameObject) {
+    if (gameObject.attackTarget && gameObject.attackTarget.isDead) {
+      this.moveAction.cancelMovement(gameObject);
     }
   }
 }
