@@ -94,7 +94,7 @@ class GameManager {
         availableActions: ["move", "attack"],
         team: 1,
         attackDamage: 100,
-        attackSpeed: 2,
+        attackSpeed: 1,
       },
       6,
       [

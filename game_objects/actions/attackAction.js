@@ -20,8 +20,10 @@ export class AttackAction {
     // Check if attack is on cooldown
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
       this.checkIfTargetIsDead(gameObject);
-      return this.setNewTarget(gameObject);
+      this.setNewTarget(gameObject);
+      return false;
     }
+    this.checkIfTargetIsDead(gameObject);
     return this.setNewTarget(gameObject);
   }
 
@@ -120,8 +122,6 @@ export class AttackAction {
   }
 
   setNewTarget(gameObject) {
-    this.checkIfTargetIsDead(gameObject);
-
     // Find the nearest enemy (in range or not)
     let result = this.findNearestEnemy(gameObject);
 
@@ -186,14 +186,16 @@ export class AttackAction {
         }
 
         // Immediately look for a new target for the attacker
-        const result = this.findNearestEnemy(attacker);
-        if (result.anyEnemy) {
-          attacker.attackTarget = result.anyEnemy;
-          attacker.moveTarget = {
-            col: result.anyEnemy.gridCol,
-            row: result.anyEnemy.gridRow,
-          };
-        }
+        this.checkIfTargetIsDead(attacker);
+        this.setNewTarget(attacker);
+        // const result = this.findNearestEnemy(attacker);
+        // if (result.anyEnemy) {
+        //   attacker.attackTarget = result.anyEnemy;
+        //   attacker.moveTarget = {
+        //     col: result.anyEnemy.gridCol,
+        //     row: result.anyEnemy.gridRow,
+        //   };
+        // }
       }
     }
   }
