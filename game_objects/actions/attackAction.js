@@ -19,23 +19,23 @@ export class AttackAction {
       return false;
     }
 
-    // Find the nearest enemy unit in attack range
-    const target = this.findNearestEnemyInRange(gameObject);
+    // Find the nearest enemy (in range or not)
+    const result = this.findNearestEnemy(gameObject);
 
-    if (target) {
-      // Set the target for attack
-      gameObject.attackTarget = target;
+    if (result.inRangeEnemy) {
+      // Set the target for attack if enemy is in range
+      gameObject.attackTarget = result.inRangeEnemy;
       return true;
+    } else if (result.anyEnemy) {
+      // If no target in range, set any enemy as move target
+      gameObject.attackTarget = result.anyEnemy;
+      gameObject.moveTarget = {
+        col: result.anyEnemy.gridCol,
+        row: result.anyEnemy.gridRow,
+      };
+      return false;
     } else {
-      // If no target in range, find any enemy and set as move target
-      const anyEnemy = this.findNearestEnemy(gameObject);
-      if (anyEnemy) {
-        gameObject.attackTarget = anyEnemy;
-        gameObject.moveTarget = {
-          col: anyEnemy.gridCol,
-          row: anyEnemy.gridRow,
-        };
-      }
+      // No enemies found at all
       return false;
     }
   }
@@ -91,36 +91,19 @@ export class AttackAction {
     }
   }
 
-  findNearestEnemyInRange(gameObject) {
+  findNearestEnemy(gameObject) {
     const attackRange = gameObject.attackRange || 1; // Default range is 1 cell
     const enemies = this.objectManager.objects.filter(
       (obj) => obj.team && obj.team !== gameObject.team && !obj.isDead
     );
 
-    let nearestEnemy = null;
-    let minDistance = Infinity;
-
-    for (const enemy of enemies) {
-      const distance = this.calculateDistance(
-        gameObject.gridCol,
-        gameObject.gridRow,
-        enemy.gridCol,
-        enemy.gridRow
-      );
-
-      if (distance <= attackRange && distance < minDistance) {
-        minDistance = distance;
-        nearestEnemy = enemy;
-      }
+    // If no enemies found, return false
+    if (enemies.length === 0) {
+      return { inRangeEnemy: null, anyEnemy: null };
     }
 
-    return nearestEnemy;
-  }
-
-  findNearestEnemy(gameObject) {
-    const enemies = this.objectManager.objects.filter(
-      (obj) => obj.team && obj.team !== gameObject.team && !obj.isDead
-    );
+    let nearestEnemyInRange = null;
+    let minDistanceInRange = Infinity;
 
     let nearestEnemy = null;
     let minDistance = Infinity;
@@ -133,13 +116,23 @@ export class AttackAction {
         enemy.gridRow
       );
 
+      // Update nearest enemy in range
+      if (distance <= attackRange && distance < minDistanceInRange) {
+        minDistanceInRange = distance;
+        nearestEnemyInRange = enemy;
+      }
+
+      // Update nearest enemy overall
       if (distance < minDistance) {
         minDistance = distance;
         nearestEnemy = enemy;
       }
     }
 
-    return nearestEnemy;
+    return {
+      inRangeEnemy: nearestEnemyInRange,
+      anyEnemy: nearestEnemy,
+    };
   }
 
   calculateDistance(col1, row1, col2, row2) {
@@ -193,11 +186,11 @@ export class AttackAction {
         }
 
         // Immediately look for a new target
-        const newTarget = this.findNearestEnemy(attacker);
-        if (newTarget) {
+        const result = this.findNearestEnemy(attacker);
+        if (result.anyEnemy) {
           attacker.moveTarget = {
-            col: newTarget.gridCol,
-            row: newTarget.gridRow,
+            col: result.anyEnemy.gridCol,
+            row: result.anyEnemy.gridRow,
           };
         }
       }
