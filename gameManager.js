@@ -90,17 +90,17 @@ class GameManager {
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 25,
+        moveSpeed: 30,
         availableActions: ["move", "attack"],
         team: 1,
-        attackDamage: 50,
+        attackDamage: 100,
         attackSpeed: 1,
-        health: 300,
+        health: 200,
       },
       57,
-      0,
+      20,
       60,
-      60
+      40
     );
     this.objectManager.fillArea(
       this.configLoader.getConfig("archer"),
@@ -118,7 +118,7 @@ class GameManager {
       },
       0,
       0,
-      1,
+      0,
       60
     );
 
