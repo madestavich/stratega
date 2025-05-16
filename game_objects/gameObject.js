@@ -35,12 +35,14 @@ export class GameObject {
     this.gridHeight = objectConfig.gridHeight || 1;
     this.expansionDirection = objectConfig.expansionDirection || "bottomRight";
 
-    const defaultId = Object.keys(spriteConfig)[0];
+    const defaultSpritesheetId = Object.keys(spriteConfig)[0];
 
     this.animator = new Animator(spriteConfig);
-    this.animator.setSpritesheet(defaultId);
+    this.animator.setSpritesheet(defaultSpritesheetId);
 
-    const defaultAnim = Object.keys(spriteConfig[defaultId].animations)[0];
+    const defaultAnim = Object.keys(
+      spriteConfig[defaultSpritesheetId].animations
+    )[0];
     this.animator.setAnimation(defaultAnim);
 
     this.renderer = new Renderer(ctx, this.animator);
