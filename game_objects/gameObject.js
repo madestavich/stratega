@@ -122,7 +122,7 @@ export class GameObject {
   updateZCoordinate() {
     // Make z always equal to y
     if (this.isDead) {
-      // this.z = 0;
+      this.z = this.y - this.y / 80;
     } else {
       this.z = this.y;
     }
