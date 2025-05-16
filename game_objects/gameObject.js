@@ -44,6 +44,7 @@ export class GameObject {
     this.animator.setAnimation(defaultAnim);
 
     this.renderer = new Renderer(ctx, this.animator);
+    this.updatePositionFromGrid();
   }
 
   update() {
@@ -51,12 +52,7 @@ export class GameObject {
       this.animator.nextFrame();
     }
 
-    // Only update from grid when not moving
-    if (!this.isMoving) {
-      this.updatePositionFromGrid();
-    } else {
-      this.updateZCoordinate();
-    }
+    this.updateZCoordinate();
   }
 
   render() {
