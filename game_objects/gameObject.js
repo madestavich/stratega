@@ -35,9 +35,6 @@ export class GameObject {
     this.gridHeight = objectConfig.gridHeight || 1;
     this.expansionDirection = objectConfig.expansionDirection || "bottomRight";
 
-    // Initialize x, y and z based on grid coordinates
-    this.updatePositionFromGrid();
-
     const defaultId = Object.keys(spriteConfig)[0];
 
     this.animator = new Animator(spriteConfig);

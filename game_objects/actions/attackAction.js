@@ -147,7 +147,9 @@ export class AttackAction {
       return false;
     } else {
       // gameObject.canAct = false;
-      gameObject.animator.setAnimation("idle");
+      if (gameObject.animator.activeAnimation.name !== "idle") {
+        gameObject.animator.setAnimation("idle");
+      }
       return false;
     }
   }
