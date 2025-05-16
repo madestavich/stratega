@@ -326,4 +326,56 @@ export class MoveAction {
     gameObject.nextGridPosition = null;
     gameObject.moveTarget = null;
   }
+
+  // Debug method to draw a direct line from object to movement target
+  debugDrawPath(gameObject) {
+    if (!gameObject || !gameObject.moveTarget) return;
+
+    const ctx = gameObject.gridManager.ctx;
+    const { cellWidth, cellHeight } = gameObject.gridManager;
+
+    // Save current context state
+    ctx.save();
+
+    // Determine line color based on team
+    let lineColor, targetColor;
+
+    switch (gameObject.team) {
+      case 1:
+        lineColor = "rgba(0, 100, 255, 0.7)"; // Blue for team 1
+        targetColor = "rgba(0, 50, 255, 0.7)";
+        break;
+      case 2:
+        lineColor = "rgba(255, 50, 0, 0.7)"; // Red for team 2
+        targetColor = "rgba(255, 100, 0, 0.7)";
+        break;
+      default:
+        lineColor = "rgba(0, 255, 0, 0.7)"; // Green for any other team
+        targetColor = "rgba(255, 165, 0, 0.7)";
+    }
+
+    // Draw direct line from object to target
+    ctx.beginPath();
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2;
+
+    // Start from object's center
+    ctx.moveTo(gameObject.x, gameObject.y);
+
+    // Draw direct line to target
+    const targetCenterX = (gameObject.moveTarget.col + 0.5) * cellWidth;
+    const targetCenterY = (gameObject.moveTarget.row + 0.5) * cellHeight;
+    ctx.lineTo(targetCenterX, targetCenterY);
+
+    ctx.stroke();
+
+    // Draw a circle at the target location
+    ctx.fillStyle = targetColor;
+    ctx.beginPath();
+    ctx.arc(targetCenterX, targetCenterY, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Restore context state
+    ctx.restore();
+  }
 }

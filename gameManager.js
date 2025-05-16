@@ -278,6 +278,20 @@ class GameManager {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     this.gridManager.debugDrawGrid();
     this.gridManager.debugColorOccupiedCells();
+
+    // Draw debug paths when debug mode is enabled
+    if (this.debugMode) {
+      const moveAction = this.actionManager.actions.move;
+      if (moveAction) {
+        for (const obj of this.objectManager.objects) {
+          // Only draw paths for objects that are alive and have a move target
+          if (obj.moveTarget && !obj.isDead) {
+            moveAction.debugDrawPath(obj);
+          }
+        }
+      }
+    }
+
     this.objectManager.renderAll();
   }
 
