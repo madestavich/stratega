@@ -146,7 +146,7 @@ export class AttackAction {
       };
       return false;
     } else {
-      // gameObject.canAct = false;
+      gameObject.canAct = false;
       if (gameObject.animator.activeAnimation.name !== "idle") {
         gameObject.animator.setAnimation("idle");
       }

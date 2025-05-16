@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 14;
+    this.fixedTimeStep = 1000 / 16;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -90,7 +90,7 @@ class GameManager {
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 22,
+        moveSpeed: 15,
         availableActions: ["move", "attack"],
         team: 1,
         attackDamage: 100,
@@ -100,27 +100,27 @@ class GameManager {
       [
         {
           col: 25,
-          row: 1,
-        },
-        {
-          col: 13,
-          row: 15,
-        },
-        {
-          col: 3,
           row: 10,
         },
         {
-          col: 15,
-          row: 1,
+          col: 25,
+          row: 11,
         },
         {
-          col: 6,
+          col: 25,
           row: 12,
         },
         {
-          col: 3,
+          col: 25,
           row: 13,
+        },
+        {
+          col: 25,
+          row: 14,
+        },
+        {
+          col: 25,
+          row: 15,
         },
       ]
     );
@@ -138,14 +138,14 @@ class GameManager {
         attackDamage: 20,
         attackSpeed: 1.5,
       },
-      10,
+      20,
       [
         {
-          col: 10,
+          col: 0,
           row: 1,
         },
         {
-          col: 20,
+          col: 0,
           row: 2,
         },
         {
@@ -178,6 +178,46 @@ class GameManager {
         },
         {
           col: 0,
+          row: 10,
+        },
+        {
+          col: 2,
+          row: 1,
+        },
+        {
+          col: 2,
+          row: 2,
+        },
+        {
+          col: 2,
+          row: 3,
+        },
+        {
+          col: 2,
+          row: 4,
+        },
+        {
+          col: 2,
+          row: 5,
+        },
+        {
+          col: 2,
+          row: 6,
+        },
+        {
+          col: 2,
+          row: 7,
+        },
+        {
+          col: 2,
+          row: 8,
+        },
+        {
+          col: 2,
+          row: 9,
+        },
+        {
+          col: 2,
           row: 10,
         },
       ]
