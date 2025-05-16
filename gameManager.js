@@ -82,7 +82,7 @@ class GameManager {
     await this.configLoader.load(spriteConfigList);
 
     // створення об'єктів
-    this.objectManager.createMultiple(
+    this.objectManager.fillArea(
       this.configLoader.getConfig("cavalry"),
       {
         gridWidth: 3,
@@ -97,35 +97,12 @@ class GameManager {
         attackSpeed: 1,
         health: 300,
       },
-      6,
-      [
-        {
-          col: 25,
-          row: 40,
-        },
-        {
-          col: 25,
-          row: 41,
-        },
-        {
-          col: 25,
-          row: 42,
-        },
-        {
-          col: 25,
-          row: 43,
-        },
-        {
-          col: 25,
-          row: 44,
-        },
-        {
-          col: 25,
-          row: 45,
-        },
-      ]
+      57,
+      0,
+      60,
+      60
     );
-    this.objectManager.createMultiple(
+    this.objectManager.fillArea(
       this.configLoader.getConfig("archer"),
       {
         gridWidth: 1,
@@ -139,89 +116,10 @@ class GameManager {
         attackDamage: 30,
         attackSpeed: 1.5,
       },
-      20,
-      [
-        {
-          col: 0,
-          row: 40,
-        },
-        {
-          col: 0,
-          row: 41,
-        },
-        {
-          col: 0,
-          row: 42,
-        },
-        {
-          col: 0,
-          row: 43,
-        },
-        {
-          col: 0,
-          row: 44,
-        },
-        {
-          col: 0,
-          row: 45,
-        },
-        {
-          col: 0,
-          row: 46,
-        },
-        {
-          col: 0,
-          row: 47,
-        },
-        {
-          col: 0,
-          row: 48,
-        },
-        {
-          col: 0,
-          row: 49,
-        },
-        {
-          col: 1,
-          row: 40,
-        },
-        {
-          col: 1,
-          row: 41,
-        },
-        {
-          col: 1,
-          row: 42,
-        },
-        {
-          col: 1,
-          row: 43,
-        },
-        {
-          col: 1,
-          row: 44,
-        },
-        {
-          col: 1,
-          row: 45,
-        },
-        {
-          col: 1,
-          row: 46,
-        },
-        {
-          col: 1,
-          row: 47,
-        },
-        {
-          col: 1,
-          row: 48,
-        },
-        {
-          col: 1,
-          row: 49,
-        },
-      ]
+      0,
+      0,
+      1,
+      60
     );
 
     // Assign random movement targets to all objects
