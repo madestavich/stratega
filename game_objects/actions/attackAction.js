@@ -28,41 +28,49 @@ export class AttackAction {
   }
 
   execute(gameObject) {
-    // If already attacking and on last frame
-    if (gameObject.isAttacking && gameObject.animator.hasFinished) {
-      // Deal damage to the target
-      this.dealDamage(gameObject, gameObject.attackTarget);
-
-      // Reset attack state
+    // Перевірка на існування цілі
+    if (
+      gameObject.isAttacking &&
+      (!gameObject.attackTarget || gameObject.attackTarget.isDead)
+    ) {
       gameObject.isAttacking = false;
+      gameObject.animator.setAnimation("idle", true);
+      return false;
+    }
 
-      // Set attack cooldown based on attack speed
-      gameObject.attackCooldown = gameObject.attackSpeed * 1000; // Default 1 second cooldown
+    // Якщо атакуємо і анімація на останньому кадрі
+    if (gameObject.isAttacking) {
+      const animator = gameObject.animator;
+      const isLastFrame =
+        animator.frameIndex === animator.activeAnimation.frames.length - 1;
 
-      // Return to idle animation
-      if (!gameObject.isMoving) {
-        gameObject.animator.setAnimation("idle", true);
-      } else {
-        // If moving, set move animation
-        gameObject.animator.setAnimation("move", true);
+      if (isLastFrame) {
+        // Deal damage to the target
+        this.dealDamage(gameObject, gameObject.attackTarget);
+        // Reset attack state
+        gameObject.isAttacking = false;
+        // Set attack cooldown
+        gameObject.attackCooldown = gameObject.attackSpeed * 1000;
+
+        // Return to idle animation
+        if (!gameObject.isMoving) {
+          gameObject.animator.setAnimation("idle", true);
+        } else {
+          gameObject.animator.setAnimation("move", true);
+        }
+        return true;
       }
-
-      return true;
     }
 
     // Start a new attack
-    if (!gameObject.isAttacking) {
-      // Set attacking state
+    if (
+      !gameObject.isAttacking &&
+      gameObject.attackTarget &&
+      !gameObject.attackTarget.isDead
+    ) {
       gameObject.isAttacking = true;
-
-      // Look at the target
       this.setLookDirection(gameObject, gameObject.attackTarget);
-
-      // Play attack animation
-
-      // Play attack animation
       gameObject.animator.setAnimation("attack", false, "idle");
-
       return true;
     }
 

@@ -35,13 +35,19 @@ export class Animator {
       this.frameIndex++;
     } else if (this.isLooping) {
       this.frameIndex = 0;
+      this.hasFinished = false;
     } else {
+      // Встановлюємо hasFinished = true, але не змінюємо анімацію тут
       this.hasFinished = true;
-      if (this.defaultAnimation) {
-        // Якщо є дефолтна анімація, то встановлюємо її
-        this.setAnimation(this.defaultAnimation, false); // Без loop для дефолтної анімації
-      }
+      // Не встановлюємо defaultAnimation тут, це має робити клієнтський код
     }
     this.setFrame();
+  }
+
+  // Додати новий метод для явного переходу до дефолтної анімації
+  switchToDefaultAnimation() {
+    if (this.defaultAnimation && this.hasFinished) {
+      this.setAnimation(this.defaultAnimation, true);
+    }
   }
 }
