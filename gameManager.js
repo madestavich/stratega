@@ -14,9 +14,9 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 26;
+    this.fixedTimeStep = 1000 / 20;
     this.accumulator = 0;
-    this.debugMode = false;
+    this.debugMode = true;
     this.debugInterval = null;
     this.isRunning = true;
 
@@ -26,8 +26,8 @@ class GameManager {
     this.gridManager = new GridManager(ctx, {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
-      rows: 20,
-      cols: 40,
+      rows: 60,
+      cols: 60,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
     this.actionManager = new ActionManager(this.objectManager);
@@ -85,42 +85,43 @@ class GameManager {
     this.objectManager.createMultiple(
       this.configLoader.getConfig("cavalry"),
       {
-        gridWidth: 2,
+        gridWidth: 3,
         gridHeight: 1,
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 15,
+        moveSpeed: 25,
         availableActions: ["move", "attack"],
         team: 1,
-        attackDamage: 100,
+        attackDamage: 50,
         attackSpeed: 1,
+        health: 300,
       },
       6,
       [
         {
           col: 25,
-          row: 10,
+          row: 40,
         },
         {
           col: 25,
-          row: 11,
+          row: 41,
         },
         {
           col: 25,
-          row: 12,
+          row: 42,
         },
         {
           col: 25,
-          row: 13,
+          row: 43,
         },
         {
           col: 25,
-          row: 14,
+          row: 44,
         },
         {
           col: 25,
-          row: 15,
+          row: 45,
         },
       ]
     );
@@ -135,90 +136,90 @@ class GameManager {
         moveSpeed: 8,
         availableActions: ["move", "attack"],
         team: 2,
-        attackDamage: 20,
+        attackDamage: 30,
         attackSpeed: 1.5,
       },
       20,
       [
         {
           col: 0,
-          row: 1,
+          row: 40,
         },
         {
           col: 0,
-          row: 2,
+          row: 41,
         },
         {
           col: 0,
-          row: 3,
+          row: 42,
         },
         {
           col: 0,
-          row: 4,
+          row: 43,
         },
         {
           col: 0,
-          row: 5,
+          row: 44,
         },
         {
           col: 0,
-          row: 6,
+          row: 45,
         },
         {
           col: 0,
-          row: 7,
+          row: 46,
         },
         {
           col: 0,
-          row: 8,
+          row: 47,
         },
         {
           col: 0,
-          row: 9,
+          row: 48,
         },
         {
           col: 0,
-          row: 10,
+          row: 49,
         },
         {
-          col: 2,
-          row: 1,
+          col: 1,
+          row: 40,
         },
         {
-          col: 2,
-          row: 2,
+          col: 1,
+          row: 41,
         },
         {
-          col: 2,
-          row: 3,
+          col: 1,
+          row: 42,
         },
         {
-          col: 2,
-          row: 4,
+          col: 1,
+          row: 43,
         },
         {
-          col: 2,
-          row: 5,
+          col: 1,
+          row: 44,
         },
         {
-          col: 2,
-          row: 6,
+          col: 1,
+          row: 45,
         },
         {
-          col: 2,
-          row: 7,
+          col: 1,
+          row: 46,
         },
         {
-          col: 2,
-          row: 8,
+          col: 1,
+          row: 47,
         },
         {
-          col: 2,
-          row: 9,
+          col: 1,
+          row: 48,
         },
         {
-          col: 2,
-          row: 10,
+          col: 1,
+          row: 49,
         },
       ]
     );
