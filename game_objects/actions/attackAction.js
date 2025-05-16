@@ -176,6 +176,7 @@ export class AttackAction {
         // Set the isDead flag instead of removing the object
         target.isDead = true;
         target.canAct = false;
+        attacker.isAttacking = false;
 
         // Play death animation without looping
         if (
@@ -188,14 +189,6 @@ export class AttackAction {
         // Immediately look for a new target for the attacker
         this.checkIfTargetIsDead(attacker);
         this.setNewTarget(attacker);
-        // const result = this.findNearestEnemy(attacker);
-        // if (result.anyEnemy) {
-        //   attacker.attackTarget = result.anyEnemy;
-        //   attacker.moveTarget = {
-        //     col: result.anyEnemy.gridCol,
-        //     row: result.anyEnemy.gridRow,
-        //   };
-        // }
       }
     }
   }
