@@ -86,7 +86,7 @@ class GameManager {
       this.configLoader.getConfig("cavalry"),
       {
         gridWidth: 3,
-        gridHeight: 1,
+        gridHeight: 2,
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
