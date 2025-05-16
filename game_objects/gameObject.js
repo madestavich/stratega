@@ -44,7 +44,7 @@ export class GameObject {
     this.animator.setSpritesheet(defaultId);
 
     const defaultAnim = Object.keys(spriteConfig[defaultId].animations)[0];
-    this.animator.setAnimation(defaultAnim, true, defaultAnim);
+    this.animator.setAnimation(defaultAnim);
 
     this.renderer = new Renderer(ctx, this.animator);
   }

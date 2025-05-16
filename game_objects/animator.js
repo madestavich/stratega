@@ -7,7 +7,7 @@ export class Animator {
     this.isLooping = false;
     this.frameIndex = 0;
     this.hasFinished = false;
-    this.defaultAnimation = null; // Додаємо параметр для дефолтної анімації
+    this.defaultAnimation = "idle"; // Додаємо параметр для дефолтної анімації
   }
 
   setSpritesheet(spritesheet) {
@@ -15,7 +15,11 @@ export class Animator {
   }
 
   // Встановлення анімації і параметра loop
-  setAnimation(animation, isLooping = false, defaultAnimation = null) {
+  setAnimation(
+    animation,
+    isLooping = true,
+    defaultAnimation = this.defaultAnimation
+  ) {
     this.activeAnimation = this.activeSpritesheet.animations[animation];
     this.isLooping = isLooping;
     this.frameIndex = 0;
@@ -47,7 +51,7 @@ export class Animator {
   // Додати новий метод для явного переходу до дефолтної анімації
   switchToDefaultAnimation() {
     if (this.defaultAnimation && this.hasFinished) {
-      this.setAnimation(this.defaultAnimation, true);
+      this.setAnimation(this.defaultAnimation);
     }
   }
 }

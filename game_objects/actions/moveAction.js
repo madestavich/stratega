@@ -188,12 +188,12 @@ export class MoveAction {
     // If we don't have a path or next position, we can't move
     if (!gameObject.currentPath || !gameObject.nextGridPosition) {
       gameObject.isMoving = false;
-      gameObject.animator.setAnimation("idle", true);
+      gameObject.animator.setAnimation("idle");
       return;
     }
 
     if (!gameObject.isMoving) {
-      gameObject.animator.setAnimation("move", true);
+      gameObject.animator.setAnimation("move");
     }
     // Set the moving flag
     gameObject.isMoving = true;
@@ -261,7 +261,7 @@ export class MoveAction {
         gameObject.nextGridPosition = null;
         gameObject.lookDirection = gameObject.moveDirection;
         gameObject.moveDirection = null;
-        gameObject.animator.setAnimation("idle", true);
+        gameObject.animator.setAnimation("idle");
         return;
       }
 

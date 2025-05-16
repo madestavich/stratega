@@ -34,7 +34,7 @@ export class AttackAction {
       (!gameObject.attackTarget || gameObject.attackTarget.isDead)
     ) {
       gameObject.isAttacking = false;
-      gameObject.animator.setAnimation("idle", true);
+      gameObject.animator.setAnimation("idle");
       return false;
     }
 
@@ -54,9 +54,9 @@ export class AttackAction {
 
         // Return to idle animation
         if (!gameObject.isMoving) {
-          gameObject.animator.setAnimation("idle", true);
+          gameObject.animator.setAnimation("idle");
         } else {
-          gameObject.animator.setAnimation("move", true);
+          gameObject.animator.setAnimation("move");
         }
         return true;
       }
@@ -146,8 +146,8 @@ export class AttackAction {
       };
       return false;
     } else {
-      gameObject.canAct = false;
-      gameObject.animator.setAnimation("idle", true, "idle");
+      // gameObject.canAct = false;
+      gameObject.animator.setAnimation("idle");
       return false;
     }
   }
