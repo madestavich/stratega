@@ -103,22 +103,43 @@ export class AttackAction {
     let minDistance = Infinity;
 
     for (const enemy of enemies) {
-      const distance = this.calculateDistance(
-        gameObject.gridCol,
-        gameObject.gridRow,
-        enemy.gridCol,
-        enemy.gridRow
-      );
+      // Calculate the minimum distance between any cell of the attacker and any cell of the enemy
+      let minCellDistance = Infinity;
+
+      // Get attacker's occupied cells based on expansion direction
+      let attackerCells = this.getOccupiedCells(gameObject);
+
+      // Get enemy's occupied cells based on expansion direction
+      let enemyCells = this.getOccupiedCells(enemy);
+
+      // Find minimum distance between any pair of cells
+      for (const attackerCell of attackerCells) {
+        for (const enemyCell of enemyCells) {
+          const distance = this.calculateDistance(
+            attackerCell.col,
+            attackerCell.row,
+            enemyCell.col,
+            enemyCell.row
+          );
+
+          if (distance < minCellDistance) {
+            minCellDistance = distance;
+          }
+        }
+      }
 
       // Update nearest enemy in range
-      if (distance <= attackRange && distance < minDistanceInRange) {
-        minDistanceInRange = distance;
+      if (
+        minCellDistance <= attackRange &&
+        minCellDistance < minDistanceInRange
+      ) {
+        minDistanceInRange = minCellDistance;
         nearestEnemyInRange = enemy;
       }
 
       // Update nearest enemy overall
-      if (distance < minDistance) {
-        minDistance = distance;
+      if (minCellDistance < minDistance) {
+        minDistance = minCellDistance;
         nearestEnemy = enemy;
       }
     }
@@ -127,6 +148,41 @@ export class AttackAction {
       inRangeEnemy: nearestEnemyInRange,
       anyEnemy: nearestEnemy,
     };
+  }
+
+  getOccupiedCells(gameObject) {
+    const cells = [];
+    let startCol = gameObject.gridCol;
+    let startRow = gameObject.gridRow;
+
+    // Adjust start position based on expansion direction
+    switch (gameObject.expansionDirection) {
+      case "topLeft":
+        startCol = gameObject.gridCol - (gameObject.gridWidth - 1);
+        startRow = gameObject.gridRow - (gameObject.gridHeight - 1);
+        break;
+      case "topRight":
+        startRow = gameObject.gridRow - (gameObject.gridHeight - 1);
+        break;
+      case "bottomLeft":
+        startCol = gameObject.gridCol - (gameObject.gridWidth - 1);
+        break;
+      case "bottomRight":
+        // Default, no need to change
+        break;
+    }
+
+    // Add all cells occupied by the object
+    for (let y = 0; y < gameObject.gridHeight; y++) {
+      for (let x = 0; x < gameObject.gridWidth; x++) {
+        cells.push({
+          col: startCol + x,
+          row: startRow + y,
+        });
+      }
+    }
+
+    return cells;
   }
 
   setNewTarget(gameObject) {
@@ -138,12 +194,21 @@ export class AttackAction {
       gameObject.attackTarget = result.inRangeEnemy;
       return true;
     } else if (result.anyEnemy) {
-      // If no target in range, set any enemy as move target
-      gameObject.attackTarget = result.anyEnemy;
-      gameObject.moveTarget = {
-        col: result.anyEnemy.gridCol,
-        row: result.anyEnemy.gridRow,
-      };
+      // Check if the unit can move at all by checking surrounding cells
+      const canMove = this.hasFreeCellsAround(gameObject);
+
+      if (canMove) {
+        // If no target in range and unit can move, set any enemy as move target
+        gameObject.attackTarget = result.anyEnemy;
+        gameObject.moveTarget = {
+          col: result.anyEnemy.gridCol,
+          row: result.anyEnemy.gridRow,
+        };
+      } else {
+        // Unit is surrounded and can't move, but still has an attack target
+        gameObject.attackTarget = result.anyEnemy;
+        // Don't set moveTarget to avoid pathfinding
+      }
       return false;
     } else {
       gameObject.canAct = false;
@@ -152,6 +217,51 @@ export class AttackAction {
       }
       return false;
     }
+  }
+
+  // Helper method to check if there are any free cells around the unit
+  hasFreeCellsAround(gameObject) {
+    // Get grid manager reference - it should be accessible through the objectManager
+    const gridManager = this.objectManager.gridManager;
+    if (!gridManager) return true; // If we can't check, assume unit can move
+
+    // Directions to check (including diagonals)
+    const directions = [
+      { dx: -1, dy: -1 },
+      { dx: 0, dy: -1 },
+      { dx: 1, dy: -1 },
+      { dx: -1, dy: 0 },
+      { dx: 1, dy: 0 },
+      { dx: -1, dy: 1 },
+      { dx: 0, dy: 1 },
+      { dx: 1, dy: 1 },
+    ];
+
+    // Check each direction
+    for (const dir of directions) {
+      const checkCol = gameObject.gridCol + dir.dx;
+      const checkRow = gameObject.gridRow + dir.dy;
+
+      // Skip if out of bounds
+      if (
+        checkCol < 0 ||
+        checkCol >= gridManager.cols ||
+        checkRow < 0 ||
+        checkRow >= gridManager.rows
+      ) {
+        continue;
+      }
+
+      // Check if the cell is not occupied (except by the current object)
+      if (
+        !gridManager.grid[checkRow][checkCol].occupied ||
+        gridManager.grid[checkRow][checkCol].object === gameObject
+      ) {
+        return true; // Found at least one free cell
+      }
+    }
+
+    return false; // No free cells found
   }
 
   calculateDistance(col1, row1, col2, row2) {

@@ -4,17 +4,154 @@ export class Pathfinder {
     // Directions including diagonals (8 directions)
     this.directions = [
       { dx: 0, dy: -1 }, // up
-      { dx: 1, dy: -1 }, // up-right
       { dx: 1, dy: 0 }, // right
-      { dx: 1, dy: 1 }, // down-right
       { dx: 0, dy: 1 }, // down
-      { dx: -1, dy: 1 }, // down-left
       { dx: -1, dy: 0 }, // left
+      { dx: 1, dy: -1 }, // up-right
+      { dx: 1, dy: 1 }, // down-right
+      { dx: -1, dy: 1 }, // down-left
       { dx: -1, dy: -1 }, // up-left
     ];
   }
 
-  // Find path with A* algorithm, considering obstacle types
+  // Binary Heap implementation for priority queue
+  createMinHeap() {
+    return {
+      elements: [],
+      size: 0,
+
+      // Get index of parent node
+      getParentIndex(index) {
+        return Math.floor((index - 1) / 2);
+      },
+
+      // Get index of left child
+      getLeftChildIndex(index) {
+        return 2 * index + 1;
+      },
+
+      // Get index of right child
+      getRightChildIndex(index) {
+        return 2 * index + 2;
+      },
+
+      // Swap two elements
+      swap(i, j) {
+        const temp = this.elements[i];
+        this.elements[i] = this.elements[j];
+        this.elements[j] = temp;
+      },
+
+      // Insert element into heap
+      insert(node, fScore) {
+        node.fScore = fScore;
+        this.elements.push(node);
+        this.size++;
+        this.siftUp(this.size - 1);
+      },
+
+      // Move element up to maintain heap property
+      siftUp(index) {
+        let currentIndex = index;
+        let parentIndex = this.getParentIndex(currentIndex);
+
+        while (
+          currentIndex > 0 &&
+          this.elements[currentIndex].fScore < this.elements[parentIndex].fScore
+        ) {
+          this.swap(currentIndex, parentIndex);
+          currentIndex = parentIndex;
+          parentIndex = this.getParentIndex(currentIndex);
+        }
+      },
+
+      // Extract minimum element
+      extractMin() {
+        if (this.size === 0) return null;
+
+        const min = this.elements[0];
+        this.elements[0] = this.elements[this.size - 1];
+        this.elements.pop();
+        this.size--;
+
+        if (this.size > 0) {
+          this.siftDown(0);
+        }
+
+        return min;
+      },
+
+      // Move element down to maintain heap property
+      siftDown(index) {
+        let currentIndex = index;
+        let minIndex = index;
+
+        while (true) {
+          const leftChildIndex = this.getLeftChildIndex(currentIndex);
+          const rightChildIndex = this.getRightChildIndex(currentIndex);
+
+          if (
+            leftChildIndex < this.size &&
+            this.elements[leftChildIndex].fScore <
+              this.elements[minIndex].fScore
+          ) {
+            minIndex = leftChildIndex;
+          }
+
+          if (
+            rightChildIndex < this.size &&
+            this.elements[rightChildIndex].fScore <
+              this.elements[minIndex].fScore
+          ) {
+            minIndex = rightChildIndex;
+          }
+
+          if (minIndex === currentIndex) break;
+
+          this.swap(currentIndex, minIndex);
+          currentIndex = minIndex;
+        }
+      },
+
+      // Check if heap is empty
+      isEmpty() {
+        return this.size === 0;
+      },
+
+      // Update priority of a node
+      updatePriority(node, newFScore) {
+        for (let i = 0; i < this.size; i++) {
+          if (
+            this.elements[i].col === node.col &&
+            this.elements[i].row === node.row
+          ) {
+            const oldFScore = this.elements[i].fScore;
+            this.elements[i].fScore = newFScore;
+
+            if (newFScore < oldFScore) {
+              this.siftUp(i);
+            } else {
+              this.siftDown(i);
+            }
+            return true;
+          }
+        }
+        return false;
+      },
+
+      // Check if node exists in heap
+      contains(col, row) {
+        for (let i = 0; i < this.size; i++) {
+          if (this.elements[i].col === col && this.elements[i].row === row) {
+            return true;
+          }
+        }
+        return false;
+      },
+    };
+  }
+
+  // Find path with A* algorithm using Binary Heap
   findPath(
     startCol,
     startRow,
@@ -24,10 +161,10 @@ export class Pathfinder {
     objectHeight,
     expansionDirection,
     gameObject,
-    allowedObstacleTypes = [0] // Default: only allow empty cells (type 0)
+    allowedObstacleTypes = [0]
   ) {
-    // Using A* algorithm for better path finding
-    const openSet = [];
+    // Using A* algorithm with Binary Heap for better performance
+    const openSet = this.createMinHeap();
     const closedSet = new Set();
     const gScore = new Map();
     const fScore = new Map();
@@ -36,25 +173,20 @@ export class Pathfinder {
     const startKey = `${startCol},${startRow}`;
 
     // Initialize start node
-    openSet.push({ col: startCol, row: startRow });
+    const startNode = { col: startCol, row: startRow };
     gScore.set(startKey, 0);
-    fScore.set(
-      startKey,
-      this.heuristic(startCol, startRow, targetCol, targetRow)
+    const startFScore = this.heuristic(
+      startCol,
+      startRow,
+      targetCol,
+      targetRow
     );
+    fScore.set(startKey, startFScore);
+    openSet.insert(startNode, startFScore);
 
-    while (openSet.length > 0) {
-      // Find node with lowest fScore
-      let currentIndex = 0;
-      for (let i = 1; i < openSet.length; i++) {
-        const currentKey = `${openSet[currentIndex].col},${openSet[currentIndex].row}`;
-        const iKey = `${openSet[i].col},${openSet[i].row}`;
-        if (fScore.get(iKey) < fScore.get(currentKey)) {
-          currentIndex = i;
-        }
-      }
-
-      const current = openSet[currentIndex];
+    while (!openSet.isEmpty()) {
+      // Extract node with lowest fScore
+      const current = openSet.extractMin();
       const currentKey = `${current.col},${current.row}`;
 
       // If we reached the target
@@ -68,8 +200,7 @@ export class Pathfinder {
         );
       }
 
-      // Remove current from openSet and add to closedSet
-      openSet.splice(currentIndex, 1);
+      // Add to closedSet
       closedSet.add(currentKey);
 
       // Check all neighbors (8 directions)
@@ -97,22 +228,21 @@ export class Pathfinder {
           const movementCost = dir.dx !== 0 && dir.dy !== 0 ? 1.414 : 1;
           const tentativeGScore = gScore.get(currentKey) + movementCost;
 
-          const neighborInOpenSet = openSet.some(
-            (node) => node.col === nextCol && node.row === nextRow
-          );
+          const neighborInOpenSet = openSet.contains(nextCol, nextRow);
 
           if (!neighborInOpenSet || tentativeGScore < gScore.get(nextKey)) {
             // This path is better, record it
             parent.set(nextKey, { col: current.col, row: current.row });
             gScore.set(nextKey, tentativeGScore);
-            fScore.set(
-              nextKey,
+            const newFScore =
               tentativeGScore +
-                this.heuristic(nextCol, nextRow, targetCol, targetRow)
-            );
+              this.heuristic(nextCol, nextRow, targetCol, targetRow);
+            fScore.set(nextKey, newFScore);
 
             if (!neighborInOpenSet) {
-              openSet.push({ col: nextCol, row: nextRow });
+              openSet.insert({ col: nextCol, row: nextRow }, newFScore);
+            } else {
+              openSet.updatePriority({ col: nextCol, row: nextRow }, newFScore);
             }
           }
         }
@@ -125,7 +255,7 @@ export class Pathfinder {
 
   // Heuristic function for A* (Manhattan distance)
   heuristic(col1, row1, col2, row2) {
-    return Math.abs(col1 - col2) + Math.abs(row1 - row2);
+    return Math.max(Math.abs(col1 - col2), Math.abs(row1 - row2));
   }
 
   // Check if an object can occupy the specified position, excluding cells occupied by itself

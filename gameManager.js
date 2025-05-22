@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 20;
+    this.fixedTimeStep = 1000 / 15;
     this.accumulator = 0;
     this.debugMode = true;
     this.debugInterval = null;
@@ -118,7 +118,7 @@ class GameManager {
       },
       0,
       0,
-      0,
+      5,
       60
     );
 
