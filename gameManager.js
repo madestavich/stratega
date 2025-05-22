@@ -16,7 +16,7 @@ class GameManager {
     this.deltaTime = 0;
     this.fixedTimeStep = 1000 / 15;
     this.accumulator = 0;
-    this.debugMode = true;
+    this.debugMode = false;
     this.debugInterval = null;
     this.isRunning = true;
 
@@ -97,8 +97,8 @@ class GameManager {
         attackSpeed: 1,
         health: 200,
       },
-      57,
-      20,
+      50,
+      10,
       60,
       40
     );
@@ -118,7 +118,7 @@ class GameManager {
       },
       0,
       0,
-      5,
+      2,
       60
     );
 
