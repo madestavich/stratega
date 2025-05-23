@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 15;
+    this.fixedTimeStep = 1000 / 12;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -74,8 +74,8 @@ class GameManager {
 
   async start() {
     const spriteConfigList = {
-      cavalry: "/game_configs/units/config1.json",
-      archer: "/game_configs/units/config2.json",
+      cavalry: "/game_configs/units/config4.json",
+      archer: "/game_configs/units/config3.json",
       // інші
     };
 
@@ -90,7 +90,7 @@ class GameManager {
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 30,
+        moveSpeed: 22,
         availableActions: ["move", "attack"],
         team: 1,
         attackDamage: 100,
@@ -98,7 +98,7 @@ class GameManager {
         health: 200,
       },
       50,
-      0,
+      2,
       60,
       40
     );
@@ -110,7 +110,7 @@ class GameManager {
         expansionDirection: "bottomRight",
         objectType: "archer",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 8,
+        moveSpeed: 12,
         availableActions: ["move", "attack"],
         team: 2,
         attackDamage: 30,
@@ -175,8 +175,8 @@ class GameManager {
 
   render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    this.gridManager.debugDrawGrid();
-    this.gridManager.debugColorOccupiedCells();
+    // this.gridManager.debugDrawGrid();
+    // this.gridManager.debugColorOccupiedCells();
 
     // Draw debug paths when debug mode is enabled
     if (this.debugMode) {
