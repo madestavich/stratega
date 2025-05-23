@@ -98,7 +98,7 @@ class GameManager {
         health: 200,
       },
       50,
-      10,
+      0,
       60,
       40
     );
@@ -118,7 +118,7 @@ class GameManager {
       },
       0,
       0,
-      2,
+      3,
       60
     );
 
