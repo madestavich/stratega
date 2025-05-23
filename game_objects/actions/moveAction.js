@@ -43,7 +43,7 @@ export class MoveAction {
         // Якщо шлях став вільним або минуло достатньо часу
         if (
           !pathStatus.needsRecalculation ||
-          gameObject.pathRecalculationDelay >= 0.5 // 0.5 секунди
+          gameObject.pathRecalculationDelay >= 3
         ) {
           // Скидаємо прапор очікування і лічильник
           gameObject.waitingForPathClear = false;

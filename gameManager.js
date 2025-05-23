@@ -90,7 +90,7 @@ class GameManager {
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 32,
+        moveSpeed: 20,
         availableActions: ["move", "attack"],
         team: 1,
         attackDamage: 100,
@@ -99,7 +99,7 @@ class GameManager {
       },
       50,
       10,
-      53,
+      56,
       40
     );
     this.objectManager.fillArea(
@@ -119,7 +119,7 @@ class GameManager {
       10,
       20,
       30,
-      30
+      40
     );
 
     // Assign random movement targets to all objects
