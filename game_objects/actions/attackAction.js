@@ -94,25 +94,36 @@ export class AttackAction {
     this._lastEnemyCacheUpdate = now;
     this._enemiesByTeam.clear();
 
-    // Групуємо всіх живих юнітів за командами
-    const allUnits = this.objectManager.objects.filter(
-      (obj) => obj.team && !obj.isDead
-    );
-
-    // Створюємо мапу команд
+    // Групуємо всіх живих юнітів за командами в один прохід
     const teamMap = new Map();
-    allUnits.forEach((unit) => {
-      if (!teamMap.has(unit.team)) {
-        teamMap.set(unit.team, []);
+
+    // Проходимо по всіх об'єктах лише один раз
+    for (const obj of this.objectManager.objects) {
+      // Перевіряємо чи об'єкт має команду і не мертвий
+      if (obj.team && !obj.isDead) {
+        // Якщо команди ще немає в мапі, створюємо для неї масив
+        if (!teamMap.has(obj.team)) {
+          teamMap.set(obj.team, []);
+        }
+        // Додаємо об'єкт до його команди
+        teamMap.get(obj.team).push(obj);
       }
-      teamMap.get(unit.team).push(unit);
-    });
+    }
 
     // Для кожної команди створюємо список ворогів
-    teamMap.forEach((units, team) => {
-      const enemies = allUnits.filter((unit) => unit.team !== team);
+    // Використовуємо вже згруповані дані замість повторної фільтрації
+    for (const [team, units] of teamMap.entries()) {
+      const enemies = [];
+
+      // Збираємо ворогів з усіх інших команд
+      for (const [otherTeam, otherUnits] of teamMap.entries()) {
+        if (otherTeam !== team) {
+          enemies.push(...otherUnits);
+        }
+      }
+
       this._enemiesByTeam.set(team, enemies);
-    });
+    }
   }
 
   // Update method to be called from ActionManager's update
