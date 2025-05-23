@@ -26,7 +26,7 @@ class GameManager {
     this.gridManager = new GridManager(ctx, {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
-      rows: 60,
+      rows: 40,
       cols: 60,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
@@ -99,8 +99,8 @@ class GameManager {
       },
       50,
       10,
-      60,
-      30
+      53,
+      20
     );
     this.objectManager.fillArea(
       this.configLoader.getConfig("skeleton"),
@@ -113,12 +113,12 @@ class GameManager {
         moveSpeed: 10,
         availableActions: ["move", "attack"],
         team: 2,
-        attackDamage: 30,
-        attackSpeed: 1.5,
+        attackDamage: 20,
+        attackSpeed: 2,
       },
       10,
       20,
-      20,
+      13,
       50
     );
 
