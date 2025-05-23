@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 16;
+    this.fixedTimeStep = 1000 / 14;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -90,7 +90,7 @@ class GameManager {
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 22,
+        moveSpeed: 32,
         availableActions: ["move", "attack"],
         team: 1,
         attackDamage: 100,
@@ -119,7 +119,7 @@ class GameManager {
       10,
       20,
       30,
-      50
+      30
     );
 
     // Assign random movement targets to all objects

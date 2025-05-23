@@ -8,7 +8,7 @@ export class AttackAction {
     // Кеш для ворогів, згрупованих за командами
     this._enemiesByTeam = new Map();
     this._lastEnemyCacheUpdate = 0;
-    this._enemyCacheUpdateInterval = 20; // Оновлювати кеш кожні 200мс
+    this._enemyCacheUpdateInterval = 10; // Оновлювати кеш кожні 200мс
   }
 
   canExecute(gameObject) {

@@ -43,7 +43,7 @@ export class MoveAction {
         // Якщо шлях став вільним або минуло достатньо часу
         if (
           !pathStatus.needsRecalculation ||
-          gameObject.pathRecalculationDelay >= 8
+          gameObject.pathRecalculationDelay >= 3
         ) {
           // Скидаємо прапор очікування і лічильник
           gameObject.waitingForPathClear = false;
@@ -200,21 +200,23 @@ export class MoveAction {
       gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
 
       // Set the next step from the path
-      gameObject.nextGridPosition = {
-        col: path[0].col,
-        row: path[0].row,
-      };
+      if (path && path.length > 0) {
+        // Set the next step from the path
+        gameObject.nextGridPosition = {
+          col: path[0].col,
+          row: path[0].row,
+        };
 
-      // Calculate movement direction
-      gameObject.moveDirection = {
-        dx: path[0].col - gameObject.gridCol,
-        dy: path[0].row - gameObject.gridRow,
-      };
+        // Calculate movement direction
+        gameObject.moveDirection = {
+          dx: path[0].col - gameObject.gridCol,
+          dy: path[0].row - gameObject.gridRow,
+        };
 
-      gameObject.waitingForPathClear = false;
-      gameObject.pathRecalculationDelay = 0;
-      gameObject.isMoving = true;
-
+        gameObject.waitingForPathClear = false;
+        gameObject.pathRecalculationDelay = 0;
+        gameObject.isMoving = true;
+      }
       return true;
     } catch (error) {
       console.error("Error in MoveAction.canExecute:", error, {
