@@ -1,8 +1,9 @@
 import { Pathfinder } from "../../import.js";
 
 export class MoveAction {
-  constructor(objectManager) {
+  constructor(objectManager, actionManager) {
     this.objectManager = objectManager;
+    this.actionManager = actionManager; // Store reference to actionManager
     this.pathfinder = null;
   }
 
@@ -42,7 +43,7 @@ export class MoveAction {
         // Якщо шлях став вільним або минуло достатньо часу
         if (
           !pathStatus.needsRecalculation ||
-          gameObject.pathRecalculationDelay >= 2
+          gameObject.pathRecalculationDelay >= 0.5 // 0.5 секунди
         ) {
           // Скидаємо прапор очікування і лічильник
           gameObject.waitingForPathClear = false;
@@ -149,22 +150,49 @@ export class MoveAction {
         }
       }
 
-      // Find a path to the target
-      const path = this.pathfinder.findPath(
+      const sharedPath = this.actionManager.getSharedPath(
         gameObject.gridCol,
         gameObject.gridRow,
         finalTargetCol,
         finalTargetRow,
-        gameObject.gridWidth,
-        gameObject.gridHeight,
-        gameObject.expansionDirection,
-        gameObject,
-        allowedObstacleTypes
+        gameObject.objectType,
+        gameObject.team
       );
+      let path = null;
 
-      // If no path found, we can't execute the action
-      if (!path || path.length === 0) {
-        return false;
+      if (sharedPath) {
+        // Use the shared path
+        gameObject.currentPath = sharedPath;
+      } else {
+        // Find a new path
+        path = this.pathfinder.findPath(
+          gameObject.gridCol,
+          gameObject.gridRow,
+          finalTargetCol,
+          finalTargetRow,
+          gameObject.gridWidth,
+          gameObject.gridHeight,
+          gameObject.expansionDirection,
+          gameObject,
+          allowedObstacleTypes
+        );
+
+        // If path found, store it for sharing
+        if (path && path.length > 0) {
+          this.actionManager.storePath(
+            gameObject.gridCol,
+            gameObject.gridRow,
+            finalTargetCol,
+            finalTargetRow,
+            gameObject.objectType,
+            gameObject.team,
+            path
+          );
+
+          gameObject.currentPath = path;
+        } else {
+          return false;
+        }
       }
 
       // Store the path and target for future use
@@ -172,21 +200,23 @@ export class MoveAction {
       gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
 
       // Set the next step from the path
-      gameObject.nextGridPosition = {
-        col: path[0].col,
-        row: path[0].row,
-      };
+      if (path && path.length > 0) {
+        // Set the next step from the path
+        gameObject.nextGridPosition = {
+          col: path[0].col,
+          row: path[0].row,
+        };
 
-      // Calculate movement direction
-      gameObject.moveDirection = {
-        dx: path[0].col - gameObject.gridCol,
-        dy: path[0].row - gameObject.gridRow,
-      };
+        // Calculate movement direction
+        gameObject.moveDirection = {
+          dx: path[0].col - gameObject.gridCol,
+          dy: path[0].row - gameObject.gridRow,
+        };
 
-      gameObject.waitingForPathClear = false;
-      gameObject.pathRecalculationDelay = 0;
-      gameObject.isMoving = true;
-
+        gameObject.waitingForPathClear = false;
+        gameObject.pathRecalculationDelay = 0;
+        gameObject.isMoving = true;
+      }
       return true;
     } catch (error) {
       console.error("Error in MoveAction.canExecute:", error, {

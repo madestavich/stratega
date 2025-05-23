@@ -4,6 +4,11 @@ export class AttackAction {
   constructor(objectManager) {
     this.objectManager = objectManager;
     this.moveAction = new MoveAction();
+
+    // Кеш для ворогів, згрупованих за командами
+    this._enemiesByTeam = new Map();
+    this._lastEnemyCacheUpdate = 0;
+    this._enemyCacheUpdateInterval = 10; // Оновлювати кеш кожні 200мс
   }
 
   canExecute(gameObject) {
@@ -77,6 +82,50 @@ export class AttackAction {
     return false;
   }
 
+  // Метод для оновлення кешу ворогів
+  updateEnemiesCache() {
+    const now = Date.now();
+
+    // Оновлюємо кеш тільки якщо минув певний час
+    if (now - this._lastEnemyCacheUpdate < this._enemyCacheUpdateInterval) {
+      return;
+    }
+
+    this._lastEnemyCacheUpdate = now;
+    this._enemiesByTeam.clear();
+
+    // Групуємо всіх живих юнітів за командами в один прохід
+    const teamMap = new Map();
+
+    // Проходимо по всіх об'єктах лише один раз
+    for (const obj of this.objectManager.objects) {
+      // Перевіряємо чи об'єкт має команду і не мертвий
+      if (obj.team && !obj.isDead) {
+        // Якщо команди ще немає в мапі, створюємо для неї масив
+        if (!teamMap.has(obj.team)) {
+          teamMap.set(obj.team, []);
+        }
+        // Додаємо об'єкт до його команди
+        teamMap.get(obj.team).push(obj);
+      }
+    }
+
+    // Для кожної команди створюємо список ворогів
+    // Використовуємо вже згруповані дані замість повторної фільтрації
+    for (const [team, units] of teamMap.entries()) {
+      const enemies = [];
+
+      // Збираємо ворогів з усіх інших команд
+      for (const [otherTeam, otherUnits] of teamMap.entries()) {
+        if (otherTeam !== team) {
+          enemies.push(...otherUnits);
+        }
+      }
+
+      this._enemiesByTeam.set(team, enemies);
+    }
+  }
+
   // Update method to be called from ActionManager's update
   update(gameObject, deltaTime) {
     // Reduce attack cooldown if it exists
@@ -86,12 +135,15 @@ export class AttackAction {
   }
 
   findNearestEnemy(gameObject) {
-    const attackRange = gameObject.attackRange || 1; // Default range is 1 cell
-    const enemies = this.objectManager.objects.filter(
-      (obj) => obj.team && obj.team !== gameObject.team && !obj.isDead
-    );
+    const attackRange = gameObject.attackRange || 1;
 
-    // If no enemies found, return false
+    // Використовуємо кешовані дані про ворогів
+    this.updateEnemiesCache();
+
+    // Отримуємо ворогів для команди цього юніта
+    const enemies = this._enemiesByTeam.get(gameObject.team) || [];
+
+    // Якщо ворогів немає, відразу повертаємо результат
     if (enemies.length === 0) {
       return { inRangeEnemy: null, anyEnemy: null };
     }
