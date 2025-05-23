@@ -12,16 +12,40 @@ const actionsClasses = {
 export class ActionManager {
   constructor(objectManager) {
     this.objectManager = objectManager;
-    this.actions = {}; // Зберігатиме екземпляри класів дій
+    this.actions = {};
+    this.pathCache = new Map(); // Cache for shared paths
+    this.pathCacheTimeout = 2000; // Path cache validity in ms
     this.initializeActions(actionsClasses);
   }
 
-  // Ініціалізація доступних дій
+  // When initializing actions, pass the ActionManager itself
   initializeActions(actionsClasses) {
-    // actionsClasses має бути об'єктом, де ключі - назви дій, а значення - класи дій
     for (const [actionType, ActionClass] of Object.entries(actionsClasses)) {
-      this.actions[actionType] = new ActionClass(this.objectManager);
+      this.actions[actionType] = new ActionClass(this.objectManager, this);
     }
+  }
+
+  // Add path caching methods to ActionManager
+  getSharedPath(startCol, startRow, targetCol, targetRow, objectType, team) {
+    const key = `${startCol},${startRow}-${targetCol},${targetRow}-${objectType}-${team}`;
+    const cachedPath = this.pathCache.get(key);
+
+    if (
+      cachedPath &&
+      performance.now() - cachedPath.timestamp < this.pathCacheTimeout
+    ) {
+      return cachedPath.path.slice(); // Return a copy of the cached path
+    }
+
+    return null;
+  }
+
+  storePath(startCol, startRow, targetCol, targetRow, objectType, team, path) {
+    const key = `${startCol},${startRow}-${targetCol},${targetRow}-${objectType}-${team}`;
+    this.pathCache.set(key, {
+      path: path.slice(), // Store a copy
+      timestamp: performance.now(),
+    });
   }
 
   // Виконання дій для всіх об'єктів з урахуванням deltaTime

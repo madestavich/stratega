@@ -1,8 +1,9 @@
 import { Pathfinder } from "../../import.js";
 
 export class MoveAction {
-  constructor(objectManager) {
+  constructor(objectManager, actionManager) {
     this.objectManager = objectManager;
+    this.actionManager = actionManager; // Store reference to actionManager
     this.pathfinder = null;
   }
 
@@ -149,22 +150,49 @@ export class MoveAction {
         }
       }
 
-      // Find a path to the target
-      const path = this.pathfinder.findPath(
+      const sharedPath = this.actionManager.getSharedPath(
         gameObject.gridCol,
         gameObject.gridRow,
         finalTargetCol,
         finalTargetRow,
-        gameObject.gridWidth,
-        gameObject.gridHeight,
-        gameObject.expansionDirection,
-        gameObject,
-        allowedObstacleTypes
+        gameObject.objectType,
+        gameObject.team
       );
+      let path = null;
 
-      // If no path found, we can't execute the action
-      if (!path || path.length === 0) {
-        return false;
+      if (sharedPath) {
+        // Use the shared path
+        gameObject.currentPath = sharedPath;
+      } else {
+        // Find a new path
+        path = this.pathfinder.findPath(
+          gameObject.gridCol,
+          gameObject.gridRow,
+          finalTargetCol,
+          finalTargetRow,
+          gameObject.gridWidth,
+          gameObject.gridHeight,
+          gameObject.expansionDirection,
+          gameObject,
+          allowedObstacleTypes
+        );
+
+        // If path found, store it for sharing
+        if (path && path.length > 0) {
+          this.actionManager.storePath(
+            gameObject.gridCol,
+            gameObject.gridRow,
+            finalTargetCol,
+            finalTargetRow,
+            gameObject.objectType,
+            gameObject.team,
+            path
+          );
+
+          gameObject.currentPath = path;
+        } else {
+          return false;
+        }
       }
 
       // Store the path and target for future use
