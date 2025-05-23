@@ -26,7 +26,7 @@ class GameManager {
     this.gridManager = new GridManager(ctx, {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
-      rows: 60,
+      rows: 50,
       cols: 60,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
@@ -113,8 +113,8 @@ class GameManager {
         moveSpeed: 10,
         availableActions: ["move", "attack"],
         team: 2,
-        attackDamage: 20,
-        attackSpeed: 2,
+        attackDamage: 30,
+        attackSpeed: 1.5,
       },
       10,
       20,
