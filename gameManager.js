@@ -99,7 +99,7 @@ class GameManager {
       },
       50,
       10,
-      53,
+      60,
       30
     );
     this.objectManager.fillArea(
@@ -118,7 +118,7 @@ class GameManager {
       },
       10,
       20,
-      13,
+      20,
       50
     );
 
@@ -175,11 +175,11 @@ class GameManager {
 
   render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // this.gridManager.debugDrawGrid();
-    // this.gridManager.debugColorOccupiedCells();
 
     // Draw debug paths when debug mode is enabled
     if (this.debugMode) {
+      this.gridManager.debugDrawGrid();
+      this.gridManager.debugColorOccupiedCells();
       const moveAction = this.actionManager.actions.move;
       if (moveAction) {
         for (const obj of this.objectManager.objects) {

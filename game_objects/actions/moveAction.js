@@ -27,6 +27,42 @@ export class MoveAction {
         return false;
       }
 
+      // Перевіряємо, чи юніт чекає через перешкоду
+      if (gameObject.waitingForPathClear) {
+        // Перевіряємо, чи шлях тепер вільний
+        const pathStatus = this.pathfinder.checkAdjacentCells(
+          gameObject,
+          gameObject.currentPath,
+          allowedObstacleTypes
+        );
+
+        // Збільшуємо лічильник очікування
+        gameObject.pathRecalculationDelay++;
+
+        // Якщо шлях став вільним або минуло достатньо часу
+        if (
+          !pathStatus.needsRecalculation ||
+          gameObject.pathRecalculationDelay >= 5
+        ) {
+          // Скидаємо прапор очікування і лічильник
+          gameObject.waitingForPathClear = false;
+          gameObject.pathRecalculationDelay = 0;
+
+          // Якщо шлях все ще заблокований, перерахуємо його
+          if (pathStatus.needsRecalculation) {
+            gameObject.currentPath = null; // Змушуємо перерахувати шлях
+          } else {
+            // Шлях вільний, відновлюємо рух
+            gameObject.isMoving = true;
+
+            return true;
+          }
+        } else {
+          // Продовжуємо чекати
+          return false;
+        }
+      }
+
       // If the object is already moving, check if we need to recalculate the path
       if (gameObject.isMoving && gameObject.currentPath) {
         // Check if the target has changed
@@ -44,10 +80,28 @@ export class MoveAction {
             gameObject.currentPath,
             allowedObstacleTypes
           );
-          if (!pathStatus.needsRecalculation) {
-            // Path is still valid, continue using it
-            return true;
+
+          // Якщо шлях потребує перерахунку через перешкоду
+          if (pathStatus.needsRecalculation) {
+            // Зупиняємо рух, але зберігаємо ціль і шлях
+            gameObject.isMoving = false;
+            gameObject.waitingForPathClear = true;
+            gameObject.pathRecalculationDelay = 0; // Починаємо відлік очікування
+
+            // Переходимо в стан "idle"
+            if (
+              gameObject.animator &&
+              gameObject.animator.activeAnimation.name !== "idle"
+            ) {
+              gameObject.animator.setAnimation("idle");
+            }
+
+            // Повертаємо false, щоб юніт не рухався далі
+            return false;
           }
+
+          // Path is still valid, continue using it
+          return true;
         }
       }
 
@@ -129,6 +183,10 @@ export class MoveAction {
         dy: path[0].row - gameObject.gridRow,
       };
 
+      gameObject.waitingForPathClear = false;
+      gameObject.pathRecalculationDelay = 0;
+      gameObject.isMoving = true;
+
       return true;
     } catch (error) {
       console.error("Error in MoveAction.canExecute:", error, {
@@ -185,14 +243,27 @@ export class MoveAction {
 
   // Execute the move action
   execute(gameObject, deltaTime) {
+    if (gameObject.waitingForPathClear) {
+      return;
+    }
     // If we don't have a path or next position, we can't move
     if (!gameObject.currentPath || !gameObject.nextGridPosition) {
       gameObject.isMoving = false;
-      gameObject.animator.setAnimation("idle");
+      if (
+        gameObject.animator &&
+        gameObject.animator.activeAnimation.name !== "idle"
+      ) {
+        gameObject.animator.setAnimation("idle");
+      }
       return;
     }
 
-    if (!gameObject.isMoving) {
+    // Встановлюємо анімацію руху, якщо вона ще не встановлена
+    if (
+      gameObject.isMoving &&
+      gameObject.animator &&
+      gameObject.animator.activeAnimation.name !== "move"
+    ) {
       gameObject.animator.setAnimation("move");
     }
     // Set the moving flag
