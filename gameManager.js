@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 12;
+    this.fixedTimeStep = 1000 / 15;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -86,7 +86,7 @@ class GameManager {
       this.configLoader.getConfig("cavalry"),
       {
         gridWidth: 3,
-        gridHeight: 2,
+        gridHeight: 1,
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
@@ -98,9 +98,9 @@ class GameManager {
         health: 200,
       },
       50,
-      2,
-      60,
-      40
+      10,
+      53,
+      30
     );
     this.objectManager.fillArea(
       this.configLoader.getConfig("archer"),
@@ -116,10 +116,10 @@ class GameManager {
         attackDamage: 30,
         attackSpeed: 1.5,
       },
-      0,
-      0,
-      3,
-      60
+      10,
+      20,
+      13,
+      50
     );
 
     // Assign random movement targets to all objects
