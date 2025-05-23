@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 15;
+    this.fixedTimeStep = 1000 / 14;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -75,7 +75,7 @@ class GameManager {
   async start() {
     const spriteConfigList = {
       cavalry: "/game_configs/units/config4.json",
-      archer: "/game_configs/units/config3.json",
+      skeleton: "/game_configs/units/config3.json",
       // інші
     };
 
@@ -103,14 +103,14 @@ class GameManager {
       30
     );
     this.objectManager.fillArea(
-      this.configLoader.getConfig("archer"),
+      this.configLoader.getConfig("skeleton"),
       {
         gridWidth: 1,
         gridHeight: 1,
         expansionDirection: "bottomRight",
-        objectType: "archer",
+        objectType: "skeleton",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 12,
+        moveSpeed: 10,
         availableActions: ["move", "attack"],
         team: 2,
         attackDamage: 30,
