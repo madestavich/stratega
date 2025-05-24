@@ -119,7 +119,7 @@ class GameManager {
       10,
       20,
       30,
-      40
+      30
     );
 
     // Assign random movement targets to all objects
