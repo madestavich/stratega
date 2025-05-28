@@ -77,13 +77,6 @@ export class AttackAction {
         gameObject.isAttacking = false;
         // Set attack cooldown
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
-
-        // Return to idle animation
-        if (!gameObject.isMoving) {
-          gameObject.animator.setAnimation("idle");
-        } else {
-          gameObject.animator.setAnimation("move");
-        }
         return true;
       }
     }
@@ -96,7 +89,7 @@ export class AttackAction {
     ) {
       gameObject.isAttacking = true;
       this.setLookDirection(gameObject, gameObject.attackTarget);
-      gameObject.animator.setAnimation("attack", false, "idle");
+      gameObject.animator.setAnimation("attack", false);
       return true;
     }
 

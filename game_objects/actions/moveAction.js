@@ -17,8 +17,16 @@ export class MoveAction {
   // Check if the move action can be executed
   canExecute(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
     try {
+      if (
+        !gameObject.isMoving &&
+        !gameObject.isDead &&
+        !gameObject.isAttacking &&
+        gameObject.animator.activeAnimation != "idle"
+      ) {
+        gameObject.animator.setAnimation("idle");
+      }
       // Check basic conditions
-      if (!gameObject || gameObject.isDead || gameObject.moveSpeed <= 0) {
+      if (gameObject.isDead) {
         return false;
       }
 
@@ -187,11 +195,10 @@ export class MoveAction {
   execute(gameObject, deltaTime) {
     // If we don't have a path or next position, we can't move
     if (!gameObject.currentPath || !gameObject.nextGridPosition) {
-      gameObject.isMoving = false;
-      gameObject.animator.setAnimation("idle");
       return;
     }
 
+    // Встановлюємо анімацію руху, якщо об'єкт ще не рухається
     if (!gameObject.isMoving) {
       gameObject.animator.setAnimation("move");
     }
@@ -256,12 +263,12 @@ export class MoveAction {
 
       // If we've reached the end of the path, we're done
       if (gameObject.currentPath.length === 0) {
-        gameObject.isMoving = false;
+        // gameObject.isMoving = false;
         gameObject.currentPath = null;
         gameObject.nextGridPosition = null;
         gameObject.lookDirection = gameObject.moveDirection;
         gameObject.moveDirection = null;
-        gameObject.animator.setAnimation("idle");
+        // gameObject.animator.setAnimation("idle");
         return;
       }
 

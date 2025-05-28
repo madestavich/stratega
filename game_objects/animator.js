@@ -4,7 +4,7 @@ export class Animator {
     this.activeSpritesheet = null;
     this.activeAnimation = null;
     this.activeFrame = null;
-    this.isLooping = false;
+    this.isLooping = true;
     this.frameIndex = 0;
     this.hasFinished = false;
     this.defaultAnimation = "idle"; // Додаємо параметр для дефолтної анімації
