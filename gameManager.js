@@ -7,8 +7,8 @@ import { InputManager } from "./import.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 2500;
-canvas.height = 1500;
+canvas.width = 1800;
+canvas.height = 1000;
 
 class GameManager {
   constructor() {
@@ -27,7 +27,7 @@ class GameManager {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
       rows: 100,
-      cols: 160,
+      cols: 120,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
     this.actionManager = new ActionManager(this.objectManager);
@@ -85,8 +85,8 @@ class GameManager {
     this.objectManager.fillArea(
       this.configLoader.getConfig("cavalry"),
       {
-        gridWidth: 3,
-        gridHeight: 1,
+        gridWidth: 4,
+        gridHeight: 2,
         expansionDirection: "topRight",
         objectType: "cavalry",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
@@ -99,7 +99,7 @@ class GameManager {
       },
       100,
       10,
-      113,
+      118,
       100
     );
     this.objectManager.fillArea(
@@ -118,7 +118,7 @@ class GameManager {
       },
       0,
       0,
-      14,
+      5,
       100
     );
 
