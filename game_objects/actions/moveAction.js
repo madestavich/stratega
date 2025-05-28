@@ -1,9 +1,8 @@
 import { Pathfinder } from "../../import.js";
 
 export class MoveAction {
-  constructor(objectManager, actionManager) {
+  constructor(objectManager) {
     this.objectManager = objectManager;
-    this.actionManager = actionManager; // Store reference to actionManager
     this.pathfinder = null;
   }
 
@@ -28,42 +27,6 @@ export class MoveAction {
         return false;
       }
 
-      // Перевіряємо, чи юніт чекає через перешкоду
-      if (gameObject.waitingForPathClear) {
-        // Перевіряємо, чи шлях тепер вільний
-        const pathStatus = this.pathfinder.checkAdjacentCells(
-          gameObject,
-          gameObject.currentPath,
-          allowedObstacleTypes
-        );
-
-        // Збільшуємо лічильник очікування
-        gameObject.pathRecalculationDelay++;
-
-        // Якщо шлях став вільним або минуло достатньо часу
-        if (
-          !pathStatus.needsRecalculation ||
-          gameObject.pathRecalculationDelay >= 3
-        ) {
-          // Скидаємо прапор очікування і лічильник
-          gameObject.waitingForPathClear = false;
-          gameObject.pathRecalculationDelay = 0;
-
-          // Якщо шлях все ще заблокований, перерахуємо його
-          if (pathStatus.needsRecalculation) {
-            gameObject.currentPath = null; // Змушуємо перерахувати шлях
-          } else {
-            // Шлях вільний, відновлюємо рух
-            gameObject.isMoving = true;
-
-            return true;
-          }
-        } else {
-          // Продовжуємо чекати
-          return false;
-        }
-      }
-
       // If the object is already moving, check if we need to recalculate the path
       if (gameObject.isMoving && gameObject.currentPath) {
         // Check if the target has changed
@@ -81,28 +44,10 @@ export class MoveAction {
             gameObject.currentPath,
             allowedObstacleTypes
           );
-
-          // Якщо шлях потребує перерахунку через перешкоду
-          if (pathStatus.needsRecalculation) {
-            // Зупиняємо рух, але зберігаємо ціль і шлях
-            gameObject.isMoving = false;
-            gameObject.waitingForPathClear = true;
-            gameObject.pathRecalculationDelay = 0; // Починаємо відлік очікування
-
-            // Переходимо в стан "idle"
-            if (
-              gameObject.animator &&
-              gameObject.animator.activeAnimation.name !== "idle"
-            ) {
-              gameObject.animator.setAnimation("idle");
-            }
-
-            // Повертаємо false, щоб юніт не рухався далі
-            return false;
+          if (!pathStatus.needsRecalculation) {
+            // Path is still valid, continue using it
+            return true;
           }
-
-          // Path is still valid, continue using it
-          return true;
         }
       }
 
@@ -150,49 +95,22 @@ export class MoveAction {
         }
       }
 
-      const sharedPath = this.actionManager.getSharedPath(
+      // Find a path to the target
+      const path = this.pathfinder.findPath(
         gameObject.gridCol,
         gameObject.gridRow,
         finalTargetCol,
         finalTargetRow,
-        gameObject.objectType,
-        gameObject.team
+        gameObject.gridWidth,
+        gameObject.gridHeight,
+        gameObject.expansionDirection,
+        gameObject,
+        allowedObstacleTypes
       );
-      let path = null;
 
-      if (sharedPath) {
-        // Use the shared path
-        gameObject.currentPath = sharedPath;
-      } else {
-        // Find a new path
-        path = this.pathfinder.findPath(
-          gameObject.gridCol,
-          gameObject.gridRow,
-          finalTargetCol,
-          finalTargetRow,
-          gameObject.gridWidth,
-          gameObject.gridHeight,
-          gameObject.expansionDirection,
-          gameObject,
-          allowedObstacleTypes
-        );
-
-        // If path found, store it for sharing
-        if (path && path.length > 0) {
-          this.actionManager.storePath(
-            gameObject.gridCol,
-            gameObject.gridRow,
-            finalTargetCol,
-            finalTargetRow,
-            gameObject.objectType,
-            gameObject.team,
-            path
-          );
-
-          gameObject.currentPath = path;
-        } else {
-          return false;
-        }
+      // If no path found, we can't execute the action
+      if (!path || path.length === 0) {
+        return false;
       }
 
       // Store the path and target for future use
@@ -200,23 +118,17 @@ export class MoveAction {
       gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
 
       // Set the next step from the path
-      if (path && path.length > 0) {
-        // Set the next step from the path
-        gameObject.nextGridPosition = {
-          col: path[0].col,
-          row: path[0].row,
-        };
+      gameObject.nextGridPosition = {
+        col: path[0].col,
+        row: path[0].row,
+      };
 
-        // Calculate movement direction
-        gameObject.moveDirection = {
-          dx: path[0].col - gameObject.gridCol,
-          dy: path[0].row - gameObject.gridRow,
-        };
+      // Calculate movement direction
+      gameObject.moveDirection = {
+        dx: path[0].col - gameObject.gridCol,
+        dy: path[0].row - gameObject.gridRow,
+      };
 
-        gameObject.waitingForPathClear = false;
-        gameObject.pathRecalculationDelay = 0;
-        gameObject.isMoving = true;
-      }
       return true;
     } catch (error) {
       console.error("Error in MoveAction.canExecute:", error, {
@@ -273,27 +185,14 @@ export class MoveAction {
 
   // Execute the move action
   execute(gameObject, deltaTime) {
-    if (gameObject.waitingForPathClear) {
-      return;
-    }
     // If we don't have a path or next position, we can't move
     if (!gameObject.currentPath || !gameObject.nextGridPosition) {
       gameObject.isMoving = false;
-      if (
-        gameObject.animator &&
-        gameObject.animator.activeAnimation.name !== "idle"
-      ) {
-        gameObject.animator.setAnimation("idle");
-      }
+      gameObject.animator.setAnimation("idle");
       return;
     }
 
-    // Встановлюємо анімацію руху, якщо вона ще не встановлена
-    if (
-      gameObject.isMoving &&
-      gameObject.animator &&
-      gameObject.animator.activeAnimation.name !== "move"
-    ) {
+    if (!gameObject.isMoving) {
       gameObject.animator.setAnimation("move");
     }
     // Set the moving flag
