@@ -17,14 +17,6 @@ export class MoveAction {
   // Check if the move action can be executed
   canExecute(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
     try {
-      if (
-        !gameObject.isMoving &&
-        !gameObject.isDead &&
-        !gameObject.isAttacking &&
-        gameObject.animator.activeAnimation != "idle"
-      ) {
-        gameObject.animator.setAnimation("idle");
-      }
       // Check basic conditions
       if (gameObject.isDead) {
         return false;
@@ -269,11 +261,6 @@ export class MoveAction {
         gameObject.lookDirection = gameObject.moveDirection;
         gameObject.moveDirection = null;
 
-        // Force the idle animation to play and reset hasFinished
-        if (gameObject.animator.activeAnimation == "idle") {
-          gameObject.isMoving = false;
-        }
-
         return;
       }
 
@@ -333,6 +320,7 @@ export class MoveAction {
 
   // Cancel the current movement
   cancelMovement(gameObject) {
+    gameObject.animator.setAnimation("idle");
     gameObject.isMoving = false;
     gameObject.currentPath = null;
     gameObject.nextGridPosition = null;
