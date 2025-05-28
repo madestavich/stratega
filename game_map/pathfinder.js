@@ -14,144 +14,7 @@ export class Pathfinder {
     ];
   }
 
-  // Binary Heap implementation for priority queue
-  createMinHeap() {
-    return {
-      elements: [],
-      size: 0,
-
-      // Get index of parent node
-      getParentIndex(index) {
-        return Math.floor((index - 1) / 2);
-      },
-
-      // Get index of left child
-      getLeftChildIndex(index) {
-        return 2 * index + 1;
-      },
-
-      // Get index of right child
-      getRightChildIndex(index) {
-        return 2 * index + 2;
-      },
-
-      // Swap two elements
-      swap(i, j) {
-        const temp = this.elements[i];
-        this.elements[i] = this.elements[j];
-        this.elements[j] = temp;
-      },
-
-      // Insert element into heap
-      insert(node, fScore) {
-        node.fScore = fScore;
-        this.elements.push(node);
-        this.size++;
-        this.siftUp(this.size - 1);
-      },
-
-      // Move element up to maintain heap property
-      siftUp(index) {
-        let currentIndex = index;
-        let parentIndex = this.getParentIndex(currentIndex);
-
-        while (
-          currentIndex > 0 &&
-          this.elements[currentIndex].fScore < this.elements[parentIndex].fScore
-        ) {
-          this.swap(currentIndex, parentIndex);
-          currentIndex = parentIndex;
-          parentIndex = this.getParentIndex(currentIndex);
-        }
-      },
-
-      // Extract minimum element
-      extractMin() {
-        if (this.size === 0) return null;
-
-        const min = this.elements[0];
-        this.elements[0] = this.elements[this.size - 1];
-        this.elements.pop();
-        this.size--;
-
-        if (this.size > 0) {
-          this.siftDown(0);
-        }
-
-        return min;
-      },
-
-      // Move element down to maintain heap property
-      siftDown(index) {
-        let currentIndex = index;
-        let minIndex = index;
-
-        while (true) {
-          const leftChildIndex = this.getLeftChildIndex(currentIndex);
-          const rightChildIndex = this.getRightChildIndex(currentIndex);
-
-          if (
-            leftChildIndex < this.size &&
-            this.elements[leftChildIndex].fScore <
-              this.elements[minIndex].fScore
-          ) {
-            minIndex = leftChildIndex;
-          }
-
-          if (
-            rightChildIndex < this.size &&
-            this.elements[rightChildIndex].fScore <
-              this.elements[minIndex].fScore
-          ) {
-            minIndex = rightChildIndex;
-          }
-
-          if (minIndex === currentIndex) break;
-
-          this.swap(currentIndex, minIndex);
-          currentIndex = minIndex;
-        }
-      },
-
-      // Check if heap is empty
-      isEmpty() {
-        return this.size === 0;
-      },
-
-      // Update priority of a node
-      updatePriority(node, newFScore) {
-        for (let i = 0; i < this.size; i++) {
-          if (
-            this.elements[i].col === node.col &&
-            this.elements[i].row === node.row
-          ) {
-            const oldFScore = this.elements[i].fScore;
-            this.elements[i].fScore = newFScore;
-
-            if (newFScore < oldFScore) {
-              this.siftUp(i);
-            } else {
-              this.siftDown(i);
-            }
-            return true;
-          }
-        }
-        return false;
-      },
-
-      // Check if node exists in heap
-      contains(col, row) {
-        for (let i = 0; i < this.size; i++) {
-          if (this.elements[i].col === col && this.elements[i].row === row) {
-            return true;
-          }
-        }
-        return false;
-      },
-    };
-  }
-
-  // Find path with A* algorithm using Binary Heap
+  // Simple direct path finder with minimal obstacle avoidance
   findPath(
     startCol,
     startRow,
@@ -163,99 +26,135 @@ export class Pathfinder {
     gameObject,
     allowedObstacleTypes = [0]
   ) {
-    // Using A* algorithm with Binary Heap for better performance
-    const openSet = this.createMinHeap();
-    const closedSet = new Set();
-    const gScore = new Map();
-    const fScore = new Map();
-    const parent = new Map();
+    // If start and target are the same, return empty path
+    if (startCol === targetCol && startRow === targetRow) {
+      return [];
+    }
 
-    const startKey = `${startCol},${startRow}`;
+    const path = [];
 
-    // Initialize start node
-    const startNode = { col: startCol, row: startRow };
-    gScore.set(startKey, 0);
-    const startFScore = this.heuristic(
+    // Try direct path first
+    const directPath = this.getDirectPath(
       startCol,
       startRow,
       targetCol,
       targetRow
     );
-    fScore.set(startKey, startFScore);
-    openSet.insert(startNode, startFScore);
 
-    while (!openSet.isEmpty()) {
-      // Extract node with lowest fScore
-      const current = openSet.extractMin();
-      const currentKey = `${current.col},${current.row}`;
+    // Check if direct path is clear
+    let isBlocked = false;
+    let blockedStep = null;
 
-      // If we reached the target
-      if (current.col === targetCol && current.row === targetRow) {
-        return this.reconstructPath(
-          parent,
-          startCol,
-          startRow,
-          targetCol,
-          targetRow
-        );
+    for (const step of directPath) {
+      if (
+        !this.canOccupyExcludingSelf(
+          step.col,
+          step.row,
+          objectWidth,
+          objectHeight,
+          expansionDirection,
+          gameObject,
+          allowedObstacleTypes
+        )
+      ) {
+        isBlocked = true;
+        blockedStep = step;
+        break;
+      }
+      path.push(step);
+    }
+
+    // If direct path is clear, return it
+    if (!isBlocked) {
+      return directPath;
+    }
+
+    // If path is blocked, try to find a simple detour
+    // Check adjacent cells to current position
+    const alternativePaths = [];
+
+    for (const dir of this.directions) {
+      const nextCol = startCol + dir.dx;
+      const nextRow = startRow + dir.dy;
+
+      // Skip if out of bounds
+      if (
+        nextCol < 0 ||
+        nextCol >= this.gridManager.cols ||
+        nextRow < 0 ||
+        nextRow >= this.gridManager.rows
+      ) {
+        continue;
       }
 
-      // Add to closedSet
-      closedSet.add(currentKey);
-
-      // Check all neighbors (8 directions)
-      for (const dir of this.directions) {
-        const nextCol = current.col + dir.dx;
-        const nextRow = current.row + dir.dy;
-        const nextKey = `${nextCol},${nextRow}`;
-
-        // Skip if already evaluated
-        if (closedSet.has(nextKey)) continue;
-
-        // Check if we can move to this position considering obstacle types
-        if (
-          this.canOccupyExcludingSelf(
-            nextCol,
-            nextRow,
-            objectWidth,
-            objectHeight,
-            expansionDirection,
-            gameObject,
-            allowedObstacleTypes
-          )
-        ) {
-          // Calculate movement cost (diagonal movement costs more)
-          const movementCost = dir.dx !== 0 && dir.dy !== 0 ? 1.414 : 1;
-          const tentativeGScore = gScore.get(currentKey) + movementCost;
-
-          const neighborInOpenSet = openSet.contains(nextCol, nextRow);
-
-          if (!neighborInOpenSet || tentativeGScore < gScore.get(nextKey)) {
-            // This path is better, record it
-            parent.set(nextKey, { col: current.col, row: current.row });
-            gScore.set(nextKey, tentativeGScore);
-            const newFScore =
-              tentativeGScore +
-              this.heuristic(nextCol, nextRow, targetCol, targetRow);
-            fScore.set(nextKey, newFScore);
-
-            if (!neighborInOpenSet) {
-              openSet.insert({ col: nextCol, row: nextRow }, newFScore);
-            } else {
-              openSet.updatePriority({ col: nextCol, row: nextRow }, newFScore);
-            }
-          }
-        }
+      // Check if we can move to this position
+      if (
+        this.canOccupyExcludingSelf(
+          nextCol,
+          nextRow,
+          objectWidth,
+          objectHeight,
+          expansionDirection,
+          gameObject,
+          allowedObstacleTypes
+        )
+      ) {
+        // Calculate distance to target
+        const distance =
+          Math.abs(nextCol - targetCol) + Math.abs(nextRow - targetRow);
+        alternativePaths.push({
+          col: nextCol,
+          row: nextRow,
+          distance: distance,
+        });
       }
+    }
+
+    // Sort by distance to target
+    alternativePaths.sort((a, b) => a.distance - b.distance);
+
+    // If we found an alternative step, return it
+    if (alternativePaths.length > 0) {
+      return [{ col: alternativePaths[0].col, row: alternativePaths[0].row }];
     }
 
     // No path found
     return null;
   }
 
-  // Heuristic function for A* (Manhattan distance)
-  heuristic(col1, row1, col2, row2) {
-    return Math.max(Math.abs(col1 - col2), Math.abs(row1 - row2));
+  // Get a simple direct path without checking obstacles
+  getDirectPath(startCol, startRow, targetCol, targetRow) {
+    const path = [];
+
+    // Calculate direction vector
+    const dx = targetCol - startCol;
+    const dy = targetRow - startRow;
+
+    // Calculate number of steps needed
+    const steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+    if (steps === 0) return path;
+
+    // Calculate step increments
+    const stepX = dx / steps;
+    const stepY = dy / steps;
+
+    // Generate path
+    for (let i = 1; i <= steps; i++) {
+      const nextCol = Math.round(startCol + stepX * i);
+      const nextRow = Math.round(startRow + stepY * i);
+
+      // Add to path if position has changed
+      if (
+        path.length === 0 ||
+        path[path.length - 1].col !== nextCol ||
+        path[path.length - 1].row !== nextRow
+      ) {
+        path.push({ col: nextCol, row: nextRow });
+      }
+    }
+
+    return path;
   }
 
   // Check if an object can occupy the specified position, excluding cells occupied by itself
@@ -270,26 +169,6 @@ export class Pathfinder {
   ) {
     if (!this.gridManager || !this.gridManager.grid) {
       return false;
-    }
-
-    // Перевірка вхідних параметрів
-    if (
-      col === undefined ||
-      row === undefined ||
-      width === undefined ||
-      height === undefined ||
-      isNaN(col) ||
-      isNaN(row) ||
-      isNaN(width) ||
-      isNaN(height)
-    ) {
-      console.warn("Invalid parameters in canOccupyExcludingSelf", {
-        col,
-        row,
-        width,
-        height,
-      });
-      // return false;
     }
 
     // Determine starting coordinates based on expansion direction
@@ -380,24 +259,6 @@ export class Pathfinder {
     return true;
   }
 
-  // Reconstruct path from target to start position
-  reconstructPath(parent, startCol, startRow, targetCol, targetRow) {
-    const path = [];
-    let current = { col: targetCol, row: targetRow };
-
-    // Reconstruct path from target to start
-    while (current.col !== startCol || current.row !== startRow) {
-      path.unshift(current);
-      const key = `${current.col},${current.row}`;
-      current = parent.get(key);
-
-      // Safety check in case of broken path
-      if (!current) break;
-    }
-
-    return path;
-  }
-
   // Get next step on the path to the target
   getNextStep(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
     const path = this.findPath(
@@ -425,38 +286,26 @@ export class Pathfinder {
     };
   }
 
-  // Check if the current path is still valid by checking adjacent cells
+  // Simple check if the current path is still valid
   isPathStillValid(gameObject, currentPath, allowedObstacleTypes = [0]) {
     if (!currentPath || currentPath.length === 0) {
       return false;
     }
 
-    // Check only the next few steps in the path (e.g., next 3 steps)
-    const stepsToCheck = Math.min(3, currentPath.length);
-
-    for (let i = 0; i < stepsToCheck; i++) {
-      const nextStep = currentPath[i];
-
-      // Check if this step is still valid
-      if (
-        !this.canOccupyExcludingSelf(
-          nextStep.col,
-          nextStep.row,
-          gameObject.gridWidth,
-          gameObject.gridHeight,
-          gameObject.expansionDirection,
-          gameObject,
-          allowedObstacleTypes
-        )
-      ) {
-        return false; // Path is blocked
-      }
-    }
-
-    return true; // Path is still valid
+    // Only check the next step
+    const nextStep = currentPath[0];
+    return this.canOccupyExcludingSelf(
+      nextStep.col,
+      nextStep.row,
+      gameObject.gridWidth,
+      gameObject.gridHeight,
+      gameObject.expansionDirection,
+      gameObject,
+      allowedObstacleTypes
+    );
   }
 
-  // Check adjacent cells to see if the path needs recalculation
+  // Simple check for path recalculation
   checkAdjacentCells(gameObject, currentPath, allowedObstacleTypes = [0]) {
     if (!currentPath || currentPath.length === 0) {
       return { needsRecalculation: true };
@@ -478,43 +327,6 @@ export class Pathfinder {
       )
     ) {
       return { needsRecalculation: true };
-    }
-
-    // Check surrounding cells for any changes that might affect the path
-    for (const dir of this.directions) {
-      const checkCol = gameObject.gridCol + dir.dx;
-      const checkRow = gameObject.gridRow + dir.dy;
-
-      // Skip if out of bounds
-      if (
-        checkCol < 0 ||
-        checkCol >= this.gridManager.cols ||
-        checkRow < 0 ||
-        checkRow >= this.gridManager.rows
-      ) {
-        continue;
-      }
-
-      // Check if a cell that was previously passable is now blocked
-      const cellType = this.gridManager.grid[checkRow][checkCol].type || 0;
-      const wasAllowed = allowedObstacleTypes.includes(cellType);
-      const isOccupied = this.gridManager.grid[checkRow][checkCol].occupied;
-
-      // If a previously passable cell is now blocked, we might need to recalculate
-      if (
-        wasAllowed &&
-        isOccupied &&
-        !allowedObstacleTypes.includes(cellType)
-      ) {
-        // Check if this cell is part of our path
-        const isInPath = currentPath.some(
-          (step) => step.col === checkCol && step.row === checkRow
-        );
-
-        if (isInPath) {
-          return { needsRecalculation: true };
-        }
-      }
     }
 
     return {
