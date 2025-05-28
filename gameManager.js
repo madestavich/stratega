@@ -7,8 +7,8 @@ import { InputManager } from "./import.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 1500;
-canvas.height = 800;
+canvas.width = 2500;
+canvas.height = 1500;
 
 class GameManager {
   constructor() {
@@ -26,8 +26,8 @@ class GameManager {
     this.gridManager = new GridManager(ctx, {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
-      rows: 50,
-      cols: 60,
+      rows: 100,
+      cols: 160,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
     this.actionManager = new ActionManager(this.objectManager);
@@ -97,10 +97,10 @@ class GameManager {
         attackSpeed: 1,
         health: 200,
       },
-      50,
+      100,
       10,
-      56,
-      40
+      113,
+      100
     );
     this.objectManager.fillArea(
       this.configLoader.getConfig("skeleton"),
@@ -116,10 +116,10 @@ class GameManager {
         attackDamage: 30,
         attackSpeed: 1.5,
       },
-      10,
-      20,
-      30,
-      30
+      0,
+      0,
+      14,
+      100
     );
 
     // Assign random movement targets to all objects
