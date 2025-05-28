@@ -263,12 +263,17 @@ export class MoveAction {
 
       // If we've reached the end of the path, we're done
       if (gameObject.currentPath.length === 0) {
-        // gameObject.isMoving = false;
+        // Don't change isMoving to avoid breaking movement
         gameObject.currentPath = null;
         gameObject.nextGridPosition = null;
         gameObject.lookDirection = gameObject.moveDirection;
         gameObject.moveDirection = null;
-        // gameObject.animator.setAnimation("idle");
+
+        // Force the idle animation to play and reset hasFinished
+        if (gameObject.animator.activeAnimation == "idle") {
+          gameObject.isMoving = false;
+        }
+
         return;
       }
 

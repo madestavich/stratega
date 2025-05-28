@@ -47,11 +47,4 @@ export class Animator {
     }
     this.setFrame();
   }
-
-  // Додати новий метод для явного переходу до дефолтної анімації
-  switchToDefaultAnimation() {
-    if (this.defaultAnimation && this.hasFinished) {
-      this.setAnimation(this.defaultAnimation);
-    }
-  }
 }

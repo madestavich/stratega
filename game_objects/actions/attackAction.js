@@ -77,6 +77,7 @@ export class AttackAction {
         gameObject.isAttacking = false;
         // Set attack cooldown
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
+
         return true;
       }
     }
