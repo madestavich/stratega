@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 800 / 16;
+    this.fixedTimeStep = 800 / 14;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -74,8 +74,10 @@ class GameManager {
 
   async start() {
     const spriteConfigList = {
-      cavalry: "/game_configs/units/config4.json",
       skeleton: "/game_configs/units/config3.json",
+      rider: "/game_configs/units/config4.json",
+      paladin: "/game_configs/units/config5.json",
+      horseman: "/game_configs/units/config6.json",
       // інші
     };
 
@@ -83,43 +85,84 @@ class GameManager {
 
     // створення об'єктів
     this.objectManager.fillArea(
-      this.configLoader.getConfig("cavalry"),
-      {
-        gridWidth: 4,
-        gridHeight: 2,
-        expansionDirection: "topRight",
-        objectType: "cavalry",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 20,
-        availableActions: ["move", "attack"],
-        team: 1,
-        attackDamage: 100,
-        attackSpeed: 1,
-        health: 200,
-      },
-      100,
-      10,
-      118,
-      100
-    );
-    this.objectManager.fillArea(
       this.configLoader.getConfig("skeleton"),
       {
         gridWidth: 1,
         gridHeight: 1,
-        expansionDirection: "bottomRight",
+        expansionDirection: "topRight",
         objectType: "skeleton",
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 12,
+        availableActions: ["move", "attack"],
+        team: 2,
+        attackDamage: 25,
+        attackSpeed: 1.5,
+        health: 80,
+      },
+      115,
+      20,
+      120,
+      100
+    );
+    this.objectManager.fillArea(
+      this.configLoader.getConfig("horseman"),
+      {
+        gridWidth: 4,
+        gridHeight: 1,
+        expansionDirection: "topRight",
+        objectType: "horseman",
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 20,
+        availableActions: ["move", "attack"],
+        team: 2,
+        attackDamage: 45,
+        attackSpeed: 1.2,
+        health: 120,
+      },
+      80,
+      20,
+      110,
+      100
+    );
+    this.objectManager.fillArea(
+      this.configLoader.getConfig("paladin"),
+      {
+        gridWidth: 3,
+        gridHeight: 1,
+        expansionDirection: "bottomRight",
+        objectType: "paladin",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
         moveSpeed: 10,
         availableActions: ["move", "attack"],
-        team: 2,
-        attackDamage: 30,
-        attackSpeed: 1.5,
+        team: 1,
+        attackDamage: 120,
+        attackSpeed: 1.7,
+        health: 150,
       },
       0,
       0,
-      5,
+      8,
       100
+    );
+    this.objectManager.fillArea(
+      this.configLoader.getConfig("rider"),
+      {
+        gridWidth: 3,
+        gridHeight: 2,
+        expansionDirection: "topRight",
+        objectType: "rider",
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 25,
+        availableActions: ["move", "attack"],
+        team: 1,
+        attackDamage: 35,
+        attackSpeed: 0.8,
+        health: 140,
+      },
+      30,
+      10,
+      50,
+      90
     );
 
     // Assign random movement targets to all objects

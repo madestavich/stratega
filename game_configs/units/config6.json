@@ -1,0 +1,382 @@
+{
+  "horseman": {
+    "name": "horseman",
+    "sourceImage": {
+      "link": "../sprites/42168.png",
+      "width": 1405,
+      "height": 1740
+    },
+    "animations": {
+      "idle": {
+        "name": "idle",
+        "frames": [
+          {
+            "x": 56.5,
+            "y": 5,
+            "width": 95,
+            "height": 106,
+            "frameCenter": {
+              "x": 104,
+              "y": 111
+            }
+          },
+          {
+            "x": 226.5,
+            "y": 6,
+            "width": 91,
+            "height": 105,
+            "frameCenter": {
+              "x": 272,
+              "y": 111
+            }
+          },
+          {
+            "x": 411.5,
+            "y": 6,
+            "width": 93,
+            "height": 105,
+            "frameCenter": {
+              "x": 458,
+              "y": 111
+            }
+          },
+          {
+            "x": 593.5,
+            "y": 11,
+            "width": 101,
+            "height": 100,
+            "frameCenter": {
+              "x": 644,
+              "y": 111
+            }
+          },
+          {
+            "x": 774.5,
+            "y": 7,
+            "width": 96,
+            "height": 105,
+            "frameCenter": {
+              "x": 822.5,
+              "y": 112
+            }
+          },
+          {
+            "x": 975.5,
+            "y": 6,
+            "width": 94,
+            "height": 105,
+            "frameCenter": {
+              "x": 1022.5,
+              "y": 111
+            }
+          },
+          {
+            "x": 1152.5,
+            "y": 5,
+            "width": 97,
+            "height": 108,
+            "frameCenter": {
+              "x": 1201,
+              "y": 113
+            }
+          },
+          {
+            "x": 1309.5,
+            "y": 6,
+            "width": 97,
+            "height": 107,
+            "frameCenter": {
+              "x": 1358,
+              "y": 113
+            }
+          }
+        ]
+      },
+      "move": {
+        "name": "move",
+        "frames": [
+          {
+            "x": 53.5,
+            "y": 181,
+            "width": 97,
+            "height": 102,
+            "frameCenter": {
+              "x": 102,
+              "y": 283
+            }
+          },
+          {
+            "x": 223.5,
+            "y": 187,
+            "width": 101,
+            "height": 97,
+            "frameCenter": {
+              "x": 274,
+              "y": 284
+            }
+          },
+          {
+            "x": 406.5,
+            "y": 188,
+            "width": 105,
+            "height": 95,
+            "frameCenter": {
+              "x": 459,
+              "y": 283
+            }
+          },
+          {
+            "x": 590.5,
+            "y": 187,
+            "width": 107,
+            "height": 100,
+            "frameCenter": {
+              "x": 644,
+              "y": 287
+            }
+          },
+          {
+            "x": 766.5,
+            "y": 186,
+            "width": 114,
+            "height": 97,
+            "frameCenter": {
+              "x": 823.5,
+              "y": 283
+            }
+          },
+          {
+            "x": 967.5,
+            "y": 187,
+            "width": 115,
+            "height": 97,
+            "frameCenter": {
+              "x": 1025,
+              "y": 284
+            }
+          },
+          {
+            "x": 56.5,
+            "y": 339,
+            "width": 109,
+            "height": 100,
+            "frameCenter": {
+              "x": 111,
+              "y": 439
+            }
+          },
+          {
+            "x": 226.5,
+            "y": 333,
+            "width": 110,
+            "height": 103,
+            "frameCenter": {
+              "x": 281.5,
+              "y": 436
+            }
+          },
+          {
+            "x": 401.5,
+            "y": 337,
+            "width": 121,
+            "height": 100,
+            "frameCenter": {
+              "x": 462,
+              "y": 437
+            }
+          },
+          {
+            "x": 584.5,
+            "y": 335,
+            "width": 116,
+            "height": 104,
+            "frameCenter": {
+              "x": 642.5,
+              "y": 439
+            }
+          },
+          {
+            "x": 766.5,
+            "y": 338,
+            "width": 110,
+            "height": 102,
+            "frameCenter": {
+              "x": 821.5,
+              "y": 440
+            }
+          },
+          {
+            "x": 967.5,
+            "y": 334,
+            "width": 105,
+            "height": 105,
+            "frameCenter": {
+              "x": 1020,
+              "y": 439
+            }
+          }
+        ]
+      },
+      "attack": {
+        "name": "attack",
+        "frames": [
+          {
+            "x": 43.5,
+            "y": 487,
+            "width": 118,
+            "height": 98,
+            "frameCenter": {
+              "x": 102.5,
+              "y": 585
+            }
+          },
+          {
+            "x": 211.5,
+            "y": 477,
+            "width": 101,
+            "height": 105,
+            "frameCenter": {
+              "x": 262,
+              "y": 582
+            }
+          },
+          {
+            "x": 388.5,
+            "y": 466,
+            "width": 97,
+            "height": 114,
+            "frameCenter": {
+              "x": 437,
+              "y": 580
+            }
+          },
+          {
+            "x": 570.5,
+            "y": 459,
+            "width": 109,
+            "height": 122,
+            "frameCenter": {
+              "x": 625,
+              "y": 581
+            }
+          },
+          {
+            "x": 746.5,
+            "y": 491,
+            "width": 148,
+            "height": 96,
+            "frameCenter": {
+              "x": 820.5,
+              "y": 587
+            }
+          },
+          {
+            "x": 951.5,
+            "y": 498,
+            "width": 141,
+            "height": 88,
+            "frameCenter": {
+              "x": 1022,
+              "y": 586
+            }
+          },
+          {
+            "x": 36.5,
+            "y": 651,
+            "width": 124,
+            "height": 99,
+            "frameCenter": {
+              "x": 98.5,
+              "y": 750
+            }
+          },
+          {
+            "x": 205.5,
+            "y": 649,
+            "width": 102,
+            "height": 99,
+            "frameCenter": {
+              "x": 256.5,
+              "y": 748
+            }
+          }
+        ]
+      },
+      "death": {
+        "name": "death",
+        "frames": [
+          {
+            "x": 3.5,
+            "y": 1307,
+            "width": 105,
+            "height": 123,
+            "frameCenter": {
+              "x": 56,
+              "y": 1430
+            }
+          },
+          {
+            "x": 13.5,
+            "y": 1486,
+            "width": 96,
+            "height": 98,
+            "frameCenter": {
+              "x": 61.5,
+              "y": 1584
+            }
+          },
+          {
+            "x": 183.5,
+            "y": 1481,
+            "width": 102,
+            "height": 102,
+            "frameCenter": {
+              "x": 234.5,
+              "y": 1583
+            }
+          },
+          {
+            "x": 370.5,
+            "y": 1464,
+            "width": 95,
+            "height": 116,
+            "frameCenter": {
+              "x": 418,
+              "y": 1580
+            }
+          },
+          {
+            "x": 563.5,
+            "y": 1474,
+            "width": 95,
+            "height": 105,
+            "frameCenter": {
+              "x": 611,
+              "y": 1579
+            }
+          },
+          {
+            "x": 749.5,
+            "y": 1491,
+            "width": 100,
+            "height": 91,
+            "frameCenter": {
+              "x": 799.5,
+              "y": 1582
+            }
+          },
+          {
+            "x": 949.5,
+            "y": 1525,
+            "width": 99,
+            "height": 55,
+            "frameCenter": {
+              "x": 999,
+              "y": 1580
+            }
+          }
+        ]
+      }
+    }
+  }
+}
