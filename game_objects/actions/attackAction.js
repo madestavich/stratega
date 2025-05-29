@@ -38,17 +38,8 @@ export class AttackAction {
       return false;
     }
 
-    // Calculate distance to enemy
-    const distance = this.calculateDistance(
-      gameObject.gridCol,
-      gameObject.gridRow,
-      nearestEnemy.gridCol,
-      nearestEnemy.gridRow
-    );
-
     // Check if enemy is in attack range
-    const attackRange = gameObject.attackRange || 1;
-    if (distance <= attackRange) {
+    if (this.isEnemyInRange(gameObject, nearestEnemy)) {
       // Enemy in range - set as attack target
       gameObject.attackTarget = nearestEnemy;
       return true;
@@ -118,13 +109,8 @@ export class AttackAction {
         continue;
       }
 
-      // Calculate distance
-      const distance = this.calculateDistance(
-        gameObject.gridCol,
-        gameObject.gridRow,
-        obj.gridCol,
-        obj.gridRow
-      );
+      // Calculate minimum distance between any cells of both objects
+      const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
 
       // Update nearest enemy
       if (distance < minDistance) {
@@ -134,6 +120,90 @@ export class AttackAction {
     }
 
     return nearestEnemy;
+  }
+
+  getMinDistanceBetweenObjects(object1, object2) {
+    let minDistance = Infinity;
+
+    // Get all cells occupied by object1
+    for (let col1 = 0; col1 < object1.gridWidth; col1++) {
+      for (let row1 = 0; row1 < object1.gridHeight; row1++) {
+        let cell1Col, cell1Row;
+
+        // Calculate actual cell position based on expansion direction
+        switch (object1.expansionDirection) {
+          case "bottomRight":
+            cell1Col = object1.gridCol + col1;
+            cell1Row = object1.gridRow + row1;
+            break;
+          case "topRight":
+            cell1Col = object1.gridCol + col1;
+            cell1Row = object1.gridRow - row1;
+            break;
+          case "bottomLeft":
+            cell1Col = object1.gridCol - col1;
+            cell1Row = object1.gridRow + row1;
+            break;
+          case "topLeft":
+            cell1Col = object1.gridCol - col1;
+            cell1Row = object1.gridRow - row1;
+            break;
+          default:
+            cell1Col = object1.gridCol + col1;
+            cell1Row = object1.gridRow + row1;
+        }
+
+        // Get all cells occupied by object2
+        for (let col2 = 0; col2 < object2.gridWidth; col2++) {
+          for (let row2 = 0; row2 < object2.gridHeight; row2++) {
+            let cell2Col, cell2Row;
+
+            // Calculate actual cell position based on expansion direction
+            switch (object2.expansionDirection) {
+              case "bottomRight":
+                cell2Col = object2.gridCol + col2;
+                cell2Row = object2.gridRow + row2;
+                break;
+              case "topRight":
+                cell2Col = object2.gridCol + col2;
+                cell2Row = object2.gridRow - row2;
+                break;
+              case "bottomLeft":
+                cell2Col = object2.gridCol - col2;
+                cell2Row = object2.gridRow + row2;
+                break;
+              case "topLeft":
+                cell2Col = object2.gridCol - col2;
+                cell2Row = object2.gridRow - row2;
+                break;
+              default:
+                cell2Col = object2.gridCol + col2;
+                cell2Row = object2.gridRow + row2;
+            }
+
+            // Calculate distance between these two cells
+            const distance = this.calculateDistance(
+              cell1Col,
+              cell1Row,
+              cell2Col,
+              cell2Row
+            );
+
+            if (distance < minDistance) {
+              minDistance = distance;
+            }
+          }
+        }
+      }
+    }
+
+    return minDistance;
+  }
+
+  isEnemyInRange(attacker, target) {
+    const attackRange = attacker.attackRange || 1;
+    const distance = this.getMinDistanceBetweenObjects(attacker, target);
+    return distance <= attackRange;
   }
 
   calculateDistance(col1, row1, col2, row2) {
