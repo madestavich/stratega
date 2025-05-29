@@ -191,11 +191,17 @@ export class MoveAction {
     }
 
     // Встановлюємо анімацію руху, якщо об'єкт ще не рухається
-    if (!gameObject.isMoving) {
+    if (gameObject.isMoving) {
+      // Перевіряємо, чи поточна анімація не "move"
+      if (gameObject.animator.activeAnimation.name !== "move") {
+        gameObject.animator.setAnimation("move");
+      }
+    } else {
+      // Встановлюємо анімацію руху, якщо об'єкт ще не рухається
       gameObject.animator.setAnimation("move");
+      // Set the moving flag
+      gameObject.isMoving = true;
     }
-    // Set the moving flag
-    gameObject.isMoving = true;
 
     // Calculate the target pixel position based on the next grid position
     const { cellWidth, cellHeight } = gameObject.gridManager;
