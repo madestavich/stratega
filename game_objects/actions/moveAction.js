@@ -261,12 +261,21 @@ export class MoveAction {
 
       // If we've reached the end of the path, we're done
       if (gameObject.currentPath.length === 0) {
-        // Don't change isMoving to avoid breaking movement
+        // Перевіряємо, чи анімація руху дійшла до останнього кадру
+        const animator = gameObject.animator;
+        const isLastFrame =
+          animator.frameIndex === animator.activeAnimation.frames.length - 1;
+
+        // Якщо це останній кадр анімації руху або анімація не "move", встановлюємо "idle"
+        if (isLastFrame && animator.activeAnimation.name == "move") {
+          gameObject.isMoving = false;
+          gameObject.animator.setAnimation("idle");
+        }
+
         gameObject.currentPath = null;
         gameObject.nextGridPosition = null;
         gameObject.lookDirection = gameObject.moveDirection;
         gameObject.moveDirection = null;
-
         return;
       }
 
