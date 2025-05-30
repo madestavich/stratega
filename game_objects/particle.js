@@ -40,8 +40,8 @@ export class Particle {
 
     // Setup animator and renderer
     this.animator = new Animator(this.spriteConfig);
-    this.animator.setSpritesheet(particleConfig.spritesheet);
-    this.animator.setAnimation(particleConfig.animation);
+    this.animator.setSpritesheet(this.spriteConfig.spritesheet);
+    this.animator.setAnimation(this.spriteConfig.spritesheet.animations[0]);
 
     this.renderer = new Renderer(this.ctx, this.animator);
 
