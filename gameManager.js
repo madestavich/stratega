@@ -101,49 +101,10 @@ class GameManager {
       },
       115,
       20,
-      120,
+      115,
       100
     );
-    this.objectManager.fillArea(
-      this.configLoader.getConfig("horseman"),
-      {
-        gridWidth: 4,
-        gridHeight: 1,
-        expansionDirection: "topRight",
-        objectType: "horseman",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 20,
-        availableActions: ["move", "attack"],
-        team: 2,
-        attackDamage: 45,
-        attackSpeed: 1.2,
-        health: 120,
-      },
-      80,
-      20,
-      110,
-      100
-    );
-    this.objectManager.fillArea(
-      this.configLoader.getConfig("paladin"),
-      {
-        gridWidth: 3,
-        gridHeight: 1,
-        expansionDirection: "bottomRight",
-        objectType: "paladin",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 10,
-        availableActions: ["move", "attack"],
-        team: 1,
-        attackDamage: 120,
-        attackSpeed: 1.7,
-        health: 150,
-      },
-      0,
-      0,
-      8,
-      100
-    );
+
     this.objectManager.fillArea(
       this.configLoader.getConfig("rider"),
       {
@@ -161,7 +122,7 @@ class GameManager {
       },
       30,
       10,
-      50,
+      32,
       90
     );
 
