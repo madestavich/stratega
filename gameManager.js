@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 800 / 14;
+    this.fixedTimeStep = 800 / 27;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -87,8 +87,8 @@ class GameManager {
     this.objectManager.fillArea(
       this.configLoader.getConfig("skeleton"),
       {
-        gridWidth: 1,
-        gridHeight: 1,
+        gridWidth: 2,
+        gridHeight: 2,
         expansionDirection: "topRight",
         objectType: "skeleton",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
@@ -101,8 +101,8 @@ class GameManager {
       },
       115,
       20,
-      115,
-      100
+      125,
+      30
     );
 
     this.objectManager.fillArea(
@@ -123,7 +123,7 @@ class GameManager {
       30,
       10,
       32,
-      90
+      20
     );
 
     // Assign random movement targets to all objects

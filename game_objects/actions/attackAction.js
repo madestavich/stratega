@@ -92,9 +92,14 @@ export class AttackAction {
 
   // Update method to be called from ActionManager's update
   update(gameObject, deltaTime) {
-    // Reduce attack cooldown if it exists
+    // Зменшуємо час перезарядки атаки, якщо він є
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
       gameObject.attackCooldown -= deltaTime;
+    }
+
+    // Оновлюємо ціль атаки, якщо об'єкт не атакує в даний момент
+    if (!gameObject.isAttacking && !gameObject.isDead) {
+      this.updateAttackTarget(gameObject);
     }
   }
 
@@ -248,6 +253,53 @@ export class AttackAction {
       ) {
         target.animator.setAnimation("death", false);
       }
+    }
+  }
+
+  // Додайте цей метод до класу AttackAction
+
+  updateAttackTarget(gameObject) {
+    // Перевіряємо, чи є ціль атаки
+    if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
+      // Якщо цілі немає або вона мертва, знаходимо нову
+      const nearestEnemy = this.findNearestEnemy(gameObject);
+
+      if (!nearestEnemy) {
+        // Якщо ворогів немає, скидаємо цілі
+        gameObject.attackTarget = null;
+        gameObject.moveTarget = null;
+        return false;
+      }
+
+      // Встановлюємо нову ціль
+      gameObject.attackTarget = nearestEnemy;
+    }
+
+    // Перевіряємо, чи ціль в діапазоні атаки
+    if (this.isEnemyInRange(gameObject, gameObject.attackTarget)) {
+      // Якщо ціль в діапазоні атаки, зупиняємо рух
+      if (gameObject.isMoving && this.moveAction) {
+        this.moveAction.cancelMovement(gameObject);
+      }
+      return true;
+    } else {
+      // Якщо ціль не в діапазоні атаки, оновлюємо moveTarget
+      gameObject.moveTarget = {
+        col: gameObject.attackTarget.gridCol,
+        row: gameObject.attackTarget.gridRow,
+      };
+
+      // Якщо є moveAction і об'єкт рухається, оновлюємо шлях
+      if (this.moveAction && gameObject.isMoving) {
+        this.moveAction.setMoveTarget(
+          gameObject,
+          gameObject.attackTarget.gridCol,
+          gameObject.attackTarget.gridRow,
+          [0] // allowedObstacleTypes
+        );
+      }
+
+      return false;
     }
   }
 }
