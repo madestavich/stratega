@@ -7,8 +7,8 @@ import { InputManager } from "./import.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 1800;
-canvas.height = 1000;
+canvas.width = 1200;
+canvas.height = 800;
 
 class GameManager {
   constructor() {
@@ -26,8 +26,8 @@ class GameManager {
     this.gridManager = new GridManager(ctx, {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
-      rows: 100,
-      cols: 120,
+      rows: 80,
+      cols: 60,
     });
     this.objectManager = new ObjectManager(ctx, this.gridManager);
     this.actionManager = new ActionManager(this.objectManager);
@@ -99,9 +99,9 @@ class GameManager {
         attackSpeed: 1.5,
         health: 80,
       },
-      100,
-      20,
-      120,
+      0,
+      0,
+      10,
       70
     );
 
