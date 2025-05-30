@@ -51,7 +51,10 @@ export class Particle {
     this.hasReachedTarget = false;
   }
 
-  update(dt) {
+  update() {
+    // Instead of using dt which might not be passed correctly
+    const dt = 16.67; // Use a fixed time step for consistency
+
     // If we have a target, update target position (in case target is moving)
     if (this.target && !this.target.isDead) {
       this.targetX = this.target.x;
@@ -74,7 +77,10 @@ export class Particle {
 
     if (distanceToTarget < 5) {
       this.hasReachedTarget = true;
-      // Here you could trigger impact effects or damage calculations
+      // Apply damage to target if it exists
+      if (this.target && typeof this.target.takeDamage === "function") {
+        this.target.takeDamage(this.damage);
+      }
     }
 
     // Update animation
@@ -141,7 +147,7 @@ export class Particle {
     this.renderer.draw(this.x, this.y, this.moveVector);
 
     // Debug visualization for trajectory
-    if (this.trajectoryType === "arc" && true) {
+    if (this.trajectoryType === "arc" && false) {
       // Set to true to enable debug visualization
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";

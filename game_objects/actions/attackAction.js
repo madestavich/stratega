@@ -123,7 +123,7 @@ export class AttackAction {
     // Create arrow projectile configuration
     const arrowConfig = {
       type: "arrow",
-      moveSpeed: 0.1,
+      moveSpeed: 15,
       trajectoryType: "arc",
       damage: gameObject.attackDamage || 10,
     };
@@ -381,7 +381,7 @@ export class AttackAction {
         gameObject.attackTarget
       );
       const minRangeDistance = 5;
-      const maxRangeDistance = 15;
+      const maxRangeDistance = 30;
 
       if (distance >= minRangeDistance && distance <= maxRangeDistance) {
         // Якщо ціль в діапазоні дальньої атаки, зупиняємо рух

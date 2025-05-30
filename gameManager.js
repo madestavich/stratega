@@ -121,9 +121,9 @@ class GameManager {
         attackSpeed: 0.8,
         health: 140,
       },
-      30,
+      55,
       10,
-      40,
+      60,
       36
     );
 
