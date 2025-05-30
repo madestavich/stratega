@@ -20,12 +20,12 @@ export class Animator {
     isLooping = true,
     defaultAnimation = this.defaultAnimation
   ) {
+    this.hasFinished = false; // Явно скидаємо hasFinished на початку
     this.activeAnimation = this.activeSpritesheet.animations[animation];
     this.isLooping = isLooping;
     this.frameIndex = 0;
     this.setFrame();
-    this.hasFinished = false;
-    this.defaultAnimation = defaultAnimation; // Записуємо дефолтну анімацію
+    this.defaultAnimation = defaultAnimation;
   }
 
   // Встановлення кадру
@@ -41,10 +41,9 @@ export class Animator {
       this.frameIndex = 0;
       this.hasFinished = false;
     } else {
-      // Встановлюємо hasFinished = true, але не змінюємо анімацію тут
       this.hasFinished = true;
-      // Не встановлюємо defaultAnimation тут, це має робити клієнтський код
     }
+
     this.setFrame();
   }
 }

@@ -65,7 +65,6 @@ export class GameObject {
     if (!this.animator.hasFinished) {
       this.animator.nextFrame();
     }
-
     this.updateZCoordinate();
   }
 

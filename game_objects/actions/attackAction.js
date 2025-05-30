@@ -69,7 +69,7 @@ export class AttackAction {
         // Set attack cooldown
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
         // Set animation back to idle after attack
-        gameObject.animator.setAnimation("idle");
+        gameObject.animator.setAnimation("idle", true);
 
         return true;
       }

@@ -335,7 +335,9 @@ export class MoveAction {
 
   // Cancel the current movement
   cancelMovement(gameObject) {
-    gameObject.animator.setAnimation("idle");
+    if (gameObject.animator.activeAnimation.name != "idle") {
+      gameObject.animator.setAnimation("idle");
+    }
     gameObject.isMoving = false;
     gameObject.currentPath = null;
     gameObject.nextGridPosition = null;
