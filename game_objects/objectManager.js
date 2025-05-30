@@ -5,6 +5,7 @@ export class ObjectManager {
     this.ctx = ctx;
     this.gridManager = gridManager;
     this.objects = [];
+    this.particles = [];
   }
 
   createObject(spriteConfig, objectConfig, gridCol, gridRow) {
@@ -86,11 +87,13 @@ export class ObjectManager {
 
   updateAll() {
     for (const obj of this.objects) obj.update();
+    for (const particle of this.particles) particle.update();
   }
 
   renderAll() {
     // Сортуємо об'єкти за Z-координатою перед відображенням
     const sortedObjects = [...this.objects].sort((a, b) => a.z - b.z);
     for (const obj of sortedObjects) obj.render();
+    for (const particle of this.particles) particle.draw();
   }
 }

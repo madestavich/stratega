@@ -1,9 +1,15 @@
 import { MoveAction } from "../../import.js";
+import { Particle } from "../../import.js"; // Add this import
+import { ConfigLoader } from "../../import.js";
 
 export class AttackAction {
   constructor(objectManager) {
     this.objectManager = objectManager;
     this.moveAction = new MoveAction();
+    this.configLoader = new ConfigLoader();
+    this.configLoader.load({
+      paladin: "/game_configs/units/config5.json",
+    });
   }
 
   canExecute(gameObject) {
@@ -38,10 +44,25 @@ export class AttackAction {
       return false;
     }
 
+    // Check if unit is ranged
+    if (gameObject.isRanged) {
+      // Find enemy in range attack distance
+      const rangedTarget = this.findRangedTarget(gameObject);
+
+      if (rangedTarget) {
+        // Enemy in ranged attack distance - set as attack target
+        gameObject.attackTarget = rangedTarget;
+        gameObject.isRangedAttack = true;
+        return true;
+      }
+    }
+
+    // If not ranged or no ranged targets found, check for melee attack
     // Check if enemy is in attack range
     if (this.isEnemyInRange(gameObject, nearestEnemy)) {
       // Enemy in range - set as attack target
       gameObject.attackTarget = nearestEnemy;
+      gameObject.isRangedAttack = false;
       return true;
     } else {
       // Enemy not in range - set as move target
@@ -62,10 +83,17 @@ export class AttackAction {
         animator.frameIndex === animator.activeAnimation.frames.length - 1;
 
       if (isLastFrame) {
-        // Deal damage to the target
-        this.dealDamage(gameObject, gameObject.attackTarget);
+        // For ranged attack, spawn a projectile
+        if (gameObject.isRangedAttack && gameObject.attackTarget) {
+          this.spawnProjectile(gameObject, gameObject.attackTarget);
+        } else {
+          // For melee attack, deal damage directly
+          this.dealDamage(gameObject, gameObject.attackTarget);
+        }
+
         // Reset attack state
         gameObject.isAttacking = false;
+        gameObject.isRangedAttack = false;
         // Set attack cooldown
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
         // Set animation back to idle after attack
@@ -88,6 +116,66 @@ export class AttackAction {
     }
 
     return false;
+  }
+
+  // Method to spawn a projectile
+  spawnProjectile(gameObject, target) {
+    // Create arrow projectile configuration
+    const arrowConfig = {
+      type: "arrow",
+      moveSpeed: 0.1,
+      trajectoryType: "arc",
+      damage: gameObject.attackDamage || 10,
+    };
+
+    // Create a new particle at the center of the game object
+    const particle = new Particle(
+      gameObject.ctx,
+      this.configLoader.getConfig("paladin"),
+      arrowConfig,
+      gameObject.x,
+      gameObject.y,
+      target,
+      gameObject.gridManager
+    );
+
+    // Add the particle to the object manager
+    if (this.objectManager.particles) {
+      this.objectManager.particles.push(particle);
+    } else {
+      // If particles array doesn't exist, create it
+      this.objectManager.particles = [particle];
+    }
+  }
+
+  // Find a target for ranged attack
+  findRangedTarget(gameObject) {
+    const minRangeDistance = 2; // Minimum range distance
+    const maxRangeDistance = 15; // Maximum range distance
+    let bestTarget = null;
+    let bestDistance = Infinity;
+
+    // Find all enemies within range
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
+        continue;
+      }
+
+      // Calculate minimum distance between any cells of both objects
+      const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
+
+      // Check if enemy is within ranged attack distance
+      if (distance >= minRangeDistance && distance <= maxRangeDistance) {
+        // Find the closest enemy within range
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestTarget = obj;
+        }
+      }
+    }
+
+    return bestTarget;
   }
 
   // Update method to be called from ActionManager's update
@@ -256,12 +344,22 @@ export class AttackAction {
     }
   }
 
-  // Додайте цей метод до класу AttackAction
-
   updateAttackTarget(gameObject) {
     // Перевіряємо, чи є ціль атаки
     if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
       // Якщо цілі немає або вона мертва, знаходимо нову
+
+      // Для дальнього бою спочатку шукаємо ціль в діапазоні дальньої атаки
+      if (gameObject.isRanged) {
+        const rangedTarget = this.findRangedTarget(gameObject);
+        if (rangedTarget) {
+          gameObject.attackTarget = rangedTarget;
+          gameObject.isRangedAttack = true;
+          return true;
+        }
+      }
+
+      // Якщо немає цілі для дальнього бою, шукаємо найближчого ворога
       const nearestEnemy = this.findNearestEnemy(gameObject);
 
       if (!nearestEnemy) {
@@ -272,14 +370,36 @@ export class AttackAction {
 
       // Встановлюємо нову ціль
       gameObject.attackTarget = nearestEnemy;
+      gameObject.isRangedAttack = false;
     }
 
     // Перевіряємо, чи ціль в діапазоні атаки
+    if (gameObject.isRanged) {
+      // Для дальнього бою перевіряємо, чи ціль в діапазоні дальньої атаки
+      const distance = this.getMinDistanceBetweenObjects(
+        gameObject,
+        gameObject.attackTarget
+      );
+      const minRangeDistance = 5;
+      const maxRangeDistance = 15;
+
+      if (distance >= minRangeDistance && distance <= maxRangeDistance) {
+        // Якщо ціль в діапазоні дальньої атаки, зупиняємо рух
+        if (gameObject.isMoving && this.moveAction) {
+          this.moveAction.cancelMovement(gameObject);
+        }
+        gameObject.isRangedAttack = true;
+        return true;
+      }
+    }
+
+    // Перевіряємо, чи ціль в діапазоні ближньої атаки
     if (this.isEnemyInRange(gameObject, gameObject.attackTarget)) {
       // Якщо ціль в діапазоні атаки, зупиняємо рух
       if (gameObject.isMoving && this.moveAction) {
         this.moveAction.cancelMovement(gameObject);
       }
+      gameObject.isRangedAttack = false;
       return true;
     } else {
       // Якщо ціль не в діапазоні атаки, оновлюємо moveTarget

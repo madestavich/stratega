@@ -30,6 +30,7 @@ export class GameObject {
     this.health = objectConfig.health || 100; // Здоров'я об'єкта
     this.isDead = false; // Чи об'єкт мертвий
     this.isRanged = objectConfig.isRanged || false;
+    this.isRangedAttack = false; // Чи об'єкт атакує здалеку
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;

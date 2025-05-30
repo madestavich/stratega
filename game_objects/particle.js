@@ -40,8 +40,10 @@ export class Particle {
 
     // Setup animator and renderer
     this.animator = new Animator(this.spriteConfig);
-    this.animator.setSpritesheet(this.spriteConfig.spritesheet);
-    this.animator.setAnimation(this.spriteConfig.spritesheet.animations[0]);
+    console.log(this);
+
+    this.animator.setSpritesheet("paladin");
+    this.animator.setAnimation("idle");
 
     this.renderer = new Renderer(this.ctx, this.animator);
 
@@ -139,7 +141,7 @@ export class Particle {
     this.renderer.draw(this.x, this.y, this.moveVector);
 
     // Debug visualization for trajectory
-    if (this.trajectoryType === "arc" && false) {
+    if (this.trajectoryType === "arc" && true) {
       // Set to true to enable debug visualization
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";

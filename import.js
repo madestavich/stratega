@@ -13,6 +13,7 @@ import { AttackAction } from "./game_objects/actions/attackAction.js";
 //! object
 
 import { GameObject } from "./game_objects/gameObject.js";
+import { Particle } from "./game_objects/particle.js";
 import { Animator } from "./game_objects/animator.js";
 import { Renderer } from "./game_objects/renderer.js";
 
@@ -35,4 +36,5 @@ export {
   AttackAction,
   Pathfinder,
   ConfigLoader,
+  Particle,
 };
