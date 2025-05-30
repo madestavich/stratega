@@ -14,7 +14,7 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 800 / 27;
+    this.fixedTimeStep = 800 / 16;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
@@ -99,10 +99,10 @@ class GameManager {
         attackSpeed: 1.5,
         health: 80,
       },
-      115,
+      100,
       20,
-      125,
-      30
+      120,
+      70
     );
 
     this.objectManager.fillArea(
@@ -122,8 +122,8 @@ class GameManager {
       },
       30,
       10,
-      32,
-      16
+      50,
+      36
     );
 
     // Assign random movement targets to all objects
