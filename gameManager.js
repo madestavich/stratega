@@ -98,6 +98,7 @@ class GameManager {
         attackDamage: 25,
         attackSpeed: 1.5,
         health: 80,
+        isRanged: true,
       },
       0,
       0,
