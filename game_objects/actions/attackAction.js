@@ -266,8 +266,7 @@ export class AttackAction {
 
       if (!nearestEnemy) {
         // Якщо ворогів немає, скидаємо цілі
-        gameObject.attackTarget = null;
-        gameObject.moveTarget = null;
+        this.moveAction.cancelMovement(gameObject);
         return false;
       }
 
