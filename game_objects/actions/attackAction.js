@@ -393,12 +393,16 @@ export class AttackAction {
       const maxRangeDistance = 30;
 
       if (distance >= minRangeDistance && distance <= maxRangeDistance) {
-        // Зупиняємо рух
+        // Zupynyayemo rukh
         if (gameObject.isMoving) {
-          this.moveAction.cancelMovement(gameObject, true); // Використовуємо метод cancelMovement з keepAnimation=true
+          // Change this line - don't keep the animation
+          this.moveAction.cancelMovement(gameObject, false); // Set keepAnimation to false
+
+          // Explicitly set idle animation after canceling movement
+          gameObject.animator.setAnimation("idle");
         }
         gameObject.isRangedAttack = true;
-        gameObject.moveTarget = null; // Важливо скинути moveTarget
+        gameObject.moveTarget = null;
         return true;
       }
     }
