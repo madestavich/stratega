@@ -445,25 +445,3 @@ export class AttackAction {
     return false;
   }
 }
-
-// For a direct projectile (arrow)
-const arrow = {
-  type: "arrow",
-  spritesheet: "projectiles",
-  animation: "arrow",
-  moveSpeed: 5,
-  trajectoryType: "direct",
-  damage: 10,
-};
-
-// For an arc projectile (catapult stone)
-const stone = {
-  type: "stone",
-  spritesheet: "projectiles",
-  animation: "stone",
-  moveSpeed: 3,
-  trajectoryType: "arc",
-  arcHeight: 100, // Higher arc
-  damage: 25,
-  effectRadius: 2, // Area damage
-};
