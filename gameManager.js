@@ -96,39 +96,45 @@ class GameManager {
         moveSpeed: 10,
         availableActions: ["move", "attack"],
         team: 2,
-        attackDamage: 100,
+        attackDamage: 20,
         attackSpeed: 1.5,
         health: 80,
         isRanged: true,
         minRangeDistance: 10,
         maxRangeDistance: 30,
+        bulletConfig: {
+          type: "fireball",
+          moveSpeed: 55,
+          trajectoryType: "arc",
+          damage: 100,
+        },
       },
       3,
       15,
       4,
-      50
+      16
     );
 
-    this.objectManager.fillArea(
-      this.configLoader.getConfig("paladin"),
-      {
-        gridWidth: 2,
-        gridHeight: 2,
-        expansionDirection: "topRight",
-        objectType: "paladin",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 12,
-        availableActions: ["move", "attack"],
-        team: 2,
-        attackDamage: 60,
-        attackSpeed: 1.2,
-        health: 150,
-      },
-      7,
-      15,
-      16,
-      50
-    );
+    // this.objectManager.fillArea(
+    //   this.configLoader.getConfig("paladin"),
+    //   {
+    //     gridWidth: 2,
+    //     gridHeight: 2,
+    //     expansionDirection: "topRight",
+    //     objectType: "paladin",
+    //     actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+    //     moveSpeed: 12,
+    //     availableActions: ["move", "attack"],
+    //     team: 2,
+    //     attackDamage: 60,
+    //     attackSpeed: 1.2,
+    //     health: 150,
+    //   },
+    //   7,
+    //   15,
+    //   16,
+    //   50
+    // );
 
     this.objectManager.fillArea(
       this.configLoader.getConfig("rider"),
@@ -147,8 +153,8 @@ class GameManager {
       },
       50,
       15,
-      60,
-      80
+      53,
+      16
     );
 
     // Assign random movement targets to all objects

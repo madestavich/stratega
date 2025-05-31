@@ -1,15 +1,10 @@
 import { MoveAction } from "../../import.js";
 import { Particle } from "../../import.js"; // Add this import
-import { ConfigLoader } from "../../import.js";
 
 export class AttackAction {
   constructor(objectManager) {
     this.objectManager = objectManager;
     this.moveAction = new MoveAction();
-    this.configLoader = new ConfigLoader();
-    this.configLoader.load({
-      mage: "/game_configs/units/config7.json",
-    });
   }
 
   canExecute(gameObject) {
@@ -141,19 +136,11 @@ export class AttackAction {
 
   // Method to spawn a projectile
   spawnProjectile(gameObject, target) {
-    // Create arrow projectile configuration
-    const arrowConfig = {
-      type: "arrow",
-      moveSpeed: 55,
-      trajectoryType: "arc",
-      damage: gameObject.attackDamage,
-    };
-
     // Create a new particle at the center of the game object
     const particle = new Particle(
       gameObject.ctx,
-      this.configLoader.getConfig("mage"),
-      arrowConfig,
+      gameObject.spriteConfig,
+      gameObject.bulletConfig,
       gameObject.x,
       gameObject.y,
       target,

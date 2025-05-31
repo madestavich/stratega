@@ -33,6 +33,7 @@ export class GameObject {
     this.isRangedAttack = false; // Чи об'єкт атакує здалеку
     this.minRangeDistance = objectConfig.minRangeDistance || null;
     this.maxRangeDistance = objectConfig.maxRangeDistance || null;
+    this.bulletConfig = objectConfig.bulletConfig || null; // Конфігурація кулі
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;

@@ -42,7 +42,7 @@ export class Particle {
     this.animator = new Animator(this.spriteConfig);
     console.log(this);
 
-    this.animator.setSpritesheet("mage");
+    this.animator.setSpritesheet(Object.keys(spriteConfig)[0]);
     this.animator.setAnimation("bullet");
 
     this.renderer = new Renderer(this.ctx, this.animator);
@@ -147,7 +147,7 @@ export class Particle {
     this.renderer.draw(this.x, this.y, this.moveVector);
 
     // Debug visualization for trajectory
-    if (this.trajectoryType === "arc" && false) {
+    if (this.trajectoryType === "arc" && true) {
       // Set to true to enable debug visualization
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
@@ -229,9 +229,7 @@ export class Particle {
           this.hasReachedTarget = true;
 
           // Apply damage or effects
-          if (typeof obj.takeDamage === "function") {
-            obj.takeDamage(this.damage);
-          } else if (obj.health !== undefined && !obj.isDead) {
+          if (obj.health !== undefined && !obj.isDead) {
             obj.health -= this.damage;
 
             // Check if target is defeated
