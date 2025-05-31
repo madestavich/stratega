@@ -42,8 +42,8 @@ export class Particle {
     this.animator = new Animator(this.spriteConfig);
     console.log(this);
 
-    this.animator.setSpritesheet("paladin");
-    this.animator.setAnimation("idle");
+    this.animator.setSpritesheet("mage");
+    this.animator.setAnimation("bullet");
 
     this.renderer = new Renderer(this.ctx, this.animator);
 

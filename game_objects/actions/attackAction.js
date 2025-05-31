@@ -8,7 +8,7 @@ export class AttackAction {
     this.moveAction = new MoveAction();
     this.configLoader = new ConfigLoader();
     this.configLoader.load({
-      paladin: "/game_configs/units/config5.json",
+      mage: "/game_configs/units/config7.json",
     });
   }
 
@@ -131,7 +131,7 @@ export class AttackAction {
     // Create a new particle at the center of the game object
     const particle = new Particle(
       gameObject.ctx,
-      this.configLoader.getConfig("paladin"),
+      this.configLoader.getConfig("mage"),
       arrowConfig,
       gameObject.x,
       gameObject.y,

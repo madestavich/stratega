@@ -78,6 +78,7 @@ class GameManager {
       rider: "/game_configs/units/config4.json",
       paladin: "/game_configs/units/config5.json",
       horseman: "/game_configs/units/config6.json",
+      mage: "/game_configs/units/config7.json",
       // інші
     };
 
@@ -85,12 +86,12 @@ class GameManager {
 
     // створення об'єктів
     this.objectManager.fillArea(
-      this.configLoader.getConfig("skeleton"),
+      this.configLoader.getConfig("mage"),
       {
         gridWidth: 2,
         gridHeight: 2,
         expansionDirection: "topRight",
-        objectType: "skeleton",
+        objectType: "mage",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
         moveSpeed: 12,
         availableActions: ["move", "attack"],
