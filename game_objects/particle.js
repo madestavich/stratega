@@ -51,8 +51,16 @@ export class Particle {
 
   update(dt) {
     if (this.target && !this.target.isDead) {
+      // Оновлюємо тільки X-координату цілі, якщо вона рухається
       this.targetX = this.target.x;
-      this.targetY = this.target.y;
+
+      // НЕ оновлюємо Y-координату, щоб зберегти наше налаштування для центру цілі
+      // Якщо ми не встановили targetY раніше, встановлюємо його на центр цілі
+      if (this.targetY === this.target.y) {
+        const targetFrame = this.target.animator.activeFrame;
+        const targetHeight = targetFrame.height;
+        this.targetY = this.target.y - targetHeight / 2;
+      }
     }
 
     if (this.hasReachedTarget) return;
@@ -67,13 +75,15 @@ export class Particle {
     if (distanceToTarget < 5) {
       this.hasReachedTarget = true;
       // Apply damage to target if it exists
-      if (this.target && typeof this.target.takeDamage === "function") {
-        this.target.takeDamage(this.damage);
+      if (this.target && !this.target.isDead) {
+        this.target.health -= this.damage;
+        if (this.target.health <= 0) {
+          this.target.health = 0;
+          this.target.isDead = true;
+          this.target.animator.setAnimation("death", false);
+        }
       }
     }
-
-    // Update animation
-    this.animator.nextFrame();
   }
 
   updateArcTrajectory(dt) {
@@ -147,7 +157,7 @@ export class Particle {
       );
 
       // Check if within collision radius of the target
-      if (distance < 100) {
+      if (distance < 70) {
         this.hasReachedTarget = true;
         console.log(`Particle hit target! Damage: ${this.damage}`); // Add debug log
 

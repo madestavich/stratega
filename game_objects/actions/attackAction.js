@@ -136,16 +136,51 @@ export class AttackAction {
 
   // Method to spawn a projectile
   spawnProjectile(gameObject, target) {
-    // Create a new particle at the center of the game object
+    // Get the current frame
+    const currentFrame = gameObject.animator.activeFrame;
 
+    // Calculate the bullet starting position
+    let bulletX, bulletY;
+
+    if (currentFrame.bulletPoint) {
+      // Calculate the bullet point offset from the frame center
+      const bulletOffsetX =
+        currentFrame.bulletPoint.x - currentFrame.frameCenter.x;
+      const bulletOffsetY =
+        currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
+
+      // Apply the direction (flip if needed)
+      const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
+
+      // Calculate the final world position
+      bulletX = gameObject.x + bulletOffsetX * directionMultiplier;
+      bulletY = gameObject.y + bulletOffsetY;
+    } else {
+      // Fallback to object center if no bullet point defined
+      bulletX = gameObject.x;
+      bulletY = gameObject.y;
+    }
+
+    // Create a particle with the original target
     const particle = new Particle(
       gameObject.ctx,
       gameObject.spriteConfig,
       gameObject.bulletConfig,
-      gameObject.bulletPoint.x,
-      gameObject.bulletPoint.y,
+      bulletX,
+      bulletY,
       target,
       gameObject.gridManager
+    );
+
+    // Adjust the target Y position to aim at the center of the target
+    const targetFrame = target.animator.activeFrame;
+    const targetHeight = targetFrame.height;
+    particle.targetY = target.y - targetHeight / 2;
+
+    // Recalculate total distance with the new target Y
+    particle.totalDistance = Math.sqrt(
+      Math.pow(particle.targetX - particle.startX, 2) +
+        Math.pow(particle.targetY - particle.startY, 2)
     );
 
     // Add the particle to the object manager

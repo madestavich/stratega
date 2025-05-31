@@ -34,16 +34,15 @@ export class GameObject {
     this.minRangeDistance = objectConfig.minRangeDistance || null;
     this.maxRangeDistance = objectConfig.maxRangeDistance || null;
     this.bulletConfig = objectConfig.bulletConfig || null; // Конфігурація кулі
-    // console.log(
-    //   spriteConfig[objectConfig.objectType].animations.range_attack.frames || 0
-    // );
+
     if (this.isRanged) {
-      this.bulletPoint =
+      // Store the bulletPoint from the animation frame
+      const lastFrame =
         spriteConfig[objectConfig.objectType].animations.range_attack.frames[
           spriteConfig[objectConfig.objectType].animations.range_attack.frames
             .length - 1
         ];
-      console.log(this.bulletPoint);
+      this.bulletPoint = lastFrame.bulletPoint || { x: 0, y: 0 };
     }
 
     // Extract size and expansion parameters from objectConfig
