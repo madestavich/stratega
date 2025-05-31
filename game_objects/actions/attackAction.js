@@ -178,44 +178,6 @@ export class AttackAction {
     return bestTarget;
   }
 
-  checkCollision(gameObjects) {
-    if (this.hasReachedTarget) return;
-
-    for (const obj of gameObjects) {
-      // Skip objects from the same team
-      if (obj.team === this.sourceTeam) continue;
-
-      const distance = Math.sqrt(
-        Math.pow(obj.x - this.x, 2) + Math.pow(obj.y - this.y, 2)
-      );
-
-      // Check if within collision radius
-      if (distance < (obj.collisionRadius || 20)) {
-        this.hasReachedTarget = true;
-
-        // Apply damage directly
-        if (!obj.isDead) {
-          obj.health -= this.damage;
-
-          // Check if target is defeated
-          if (obj.health <= 0 && !obj.isDead) {
-            obj.isDead = true;
-            obj.canAct = false;
-
-            // Play death animation if available
-            if (
-              obj.animator &&
-              obj.animator.activeSpritesheet.animations.death
-            ) {
-              obj.animator.setAnimation("death", false);
-            }
-          }
-        }
-        break;
-      }
-    }
-  }
-
   // Update method to be called from ActionManager's update
   update(gameObject, deltaTime) {
     // Зменшуємо час перезарядки атаки, якщо він є

@@ -170,25 +170,86 @@ export class Particle {
   }
 
   // Method to check if particle hit a target
+  // Modify the checkCollision method in Particle class
   checkCollision(gameObjects) {
     if (this.hasReachedTarget) return;
 
-    for (const obj of gameObjects) {
-      // Skip objects from the same team if needed
-      // if (obj.team === this.sourceTeam) continue;
-
+    // First check if we've reached our specific target
+    if (this.target && !this.target.isDead) {
       const distance = Math.sqrt(
-        Math.pow(obj.x - this.x, 2) + Math.pow(obj.y - this.y, 2)
+        Math.pow(this.target.x - this.x, 2) +
+          Math.pow(this.target.y - this.y, 2)
       );
 
-      // Check if within collision radius
-      if (distance < (obj.collisionRadius || 20)) {
+      // Check if within collision radius of the target
+      if (distance < (this.target.collisionRadius || 20)) {
         this.hasReachedTarget = true;
-        // Apply damage or effects
-        if (typeof obj.takeDamage === "function") {
-          obj.takeDamage(this.damage);
+
+        // Apply damage to the specific target
+        if (typeof this.target.takeDamage === "function") {
+          this.target.takeDamage(this.damage);
+        } else if (this.target.health !== undefined) {
+          // Fallback if takeDamage method doesn't exist
+          this.target.health -= this.damage;
+
+          // Check if target is defeated
+          if (this.target.health <= 0 && !this.target.isDead) {
+            this.target.isDead = true;
+            this.target.canAct = false;
+
+            // Play death animation if available
+            if (
+              this.target.animator &&
+              this.target.animator.activeSpritesheet.animations.death
+            ) {
+              this.target.animator.setAnimation("death", false);
+            }
+          }
         }
-        break;
+        return;
+      }
+    }
+
+    // Only check for other collisions if we don't have a specific target
+    // or if we want area of effect damage
+    if (!this.target || this.effectRadius > 0) {
+      for (const obj of gameObjects) {
+        // Skip if it's our specific target (already checked)
+        if (obj === this.target) continue;
+
+        // Skip objects from the same team if needed
+        // if (obj.team === this.sourceTeam) continue;
+
+        const distance = Math.sqrt(
+          Math.pow(obj.x - this.x, 2) + Math.pow(obj.y - this.y, 2)
+        );
+
+        // Check if within collision radius
+        if (distance < (obj.collisionRadius || 20)) {
+          this.hasReachedTarget = true;
+
+          // Apply damage or effects
+          if (typeof obj.takeDamage === "function") {
+            obj.takeDamage(this.damage);
+          } else if (obj.health !== undefined && !obj.isDead) {
+            obj.health -= this.damage;
+
+            // Check if target is defeated
+            if (obj.health <= 0) {
+              obj.isDead = true;
+              obj.canAct = false;
+
+              // Play death animation if available
+              if (
+                obj.animator &&
+                obj.animator.activeSpritesheet.animations.death
+              ) {
+                obj.animator.setAnimation("death", false);
+              }
+            }
+          }
+          break;
+        }
       }
     }
   }
