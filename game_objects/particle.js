@@ -34,8 +34,7 @@ export class Particle {
         )
       : 0;
 
-    // Damage and effect properties
-    this.damage = particleConfig.damage || 0;
+    this.damage = particleConfig.damage;
     this.effectRadius = particleConfig.effectRadius || 0;
 
     // Setup animator and renderer
