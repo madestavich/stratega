@@ -44,35 +44,47 @@ export class AttackAction {
       return false;
     }
 
-    // Check if unit is ranged
+    // Calculate distance to nearest enemy
+    const distanceToNearest = this.getMinDistanceBetweenObjects(
+      gameObject,
+      nearestEnemy
+    );
+
+    // Check if enemy is in melee range first
+    if (this.isEnemyInRange(gameObject, nearestEnemy)) {
+      // Enemy in melee range - set as attack target
+      gameObject.attackTarget = nearestEnemy;
+      gameObject.isRangedAttack = false;
+      return true;
+    }
+
+    // Check if unit is ranged and no enemies are within minRangeDistance
     if (gameObject.isRanged) {
       // Find enemy in range attack distance
       const rangedTarget = this.findRangedTarget(gameObject);
 
-      if (rangedTarget) {
-        // Enemy in ranged attack distance - set as attack target
+      // Check if there are any enemies too close for ranged attack
+      const tooCloseEnemies = this.findEnemiesCloserThan(
+        gameObject,
+        gameObject.minRangeDistance
+      );
+
+      if (rangedTarget && !tooCloseEnemies) {
+        // Enemy in ranged attack distance and no enemies too close - set as attack target
         gameObject.attackTarget = rangedTarget;
         gameObject.isRangedAttack = true;
         return true;
       }
     }
 
-    // If not ranged or no ranged targets found, check for melee attack
-    // Check if enemy is in attack range
-    if (this.isEnemyInRange(gameObject, nearestEnemy)) {
-      // Enemy in range - set as attack target
-      gameObject.attackTarget = nearestEnemy;
-      gameObject.isRangedAttack = false;
-      return true;
-    } else {
-      // Enemy not in range - set as move target
-      gameObject.attackTarget = nearestEnemy;
-      gameObject.moveTarget = {
-        col: nearestEnemy.gridCol,
-        row: nearestEnemy.gridRow,
-      };
-      return false;
-    }
+    // If we got here, no valid attack is possible right now
+    // Set nearest enemy as move target
+    gameObject.attackTarget = nearestEnemy;
+    gameObject.moveTarget = {
+      col: nearestEnemy.gridCol,
+      row: nearestEnemy.gridRow,
+    };
+    return false;
   }
 
   execute(gameObject) {
@@ -155,6 +167,25 @@ export class AttackAction {
       // If particles array doesn't exist, create it
       this.objectManager.particles = [particle];
     }
+  }
+
+  // New helper method to find enemies closer than a specified distance
+  findEnemiesCloserThan(gameObject, maxDistance) {
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
+        continue;
+      }
+
+      // Calculate minimum distance between any cells of both objects
+      const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
+
+      // If any enemy is closer than maxDistance, return true
+      if (distance < maxDistance) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // Find a target for ranged attack
@@ -358,18 +389,6 @@ export class AttackAction {
     // Перевіряємо, чи є ціль атаки
     if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
       // Якщо цілі немає або вона мертва, знаходимо нову
-
-      // Для дальнього бою спочатку шукаємо ціль в діапазоні дальньої атаки
-      if (gameObject.isRanged) {
-        const rangedTarget = this.findRangedTarget(gameObject);
-        if (rangedTarget) {
-          gameObject.attackTarget = rangedTarget;
-          gameObject.isRangedAttack = true;
-          return true;
-        }
-      }
-
-      // Якщо немає цілі для дальнього бою, шукаємо найближчого ворога
       const nearestEnemy = this.findNearestEnemy(gameObject);
 
       if (!nearestEnemy) {
@@ -380,30 +399,6 @@ export class AttackAction {
 
       // Встановлюємо нову ціль
       gameObject.attackTarget = nearestEnemy;
-      gameObject.isRangedAttack = false;
-    }
-
-    // Перевіряємо, чи ціль в діапазоні атаки
-    if (gameObject.isRanged) {
-      // Для дальнього бою перевіряємо, чи ціль в діапазоні дальньої атаки
-      const distance = this.getMinDistanceBetweenObjects(
-        gameObject,
-        gameObject.attackTarget
-      );
-
-      if (
-        distance >= gameObject.minRangeDistance &&
-        distance <= gameObject.maxRangeDistance
-      ) {
-        // Zupynyayemo rukh
-        if (gameObject.isMoving) {
-          // Change this line - don't keep the animation
-          this.moveAction.cancelMovement(gameObject, false); // Set keepAnimation to false
-        }
-        gameObject.isRangedAttack = true;
-        gameObject.moveTarget = null;
-        return true;
-      }
     }
 
     // Перевіряємо, чи ціль в діапазоні ближньої атаки
@@ -414,25 +409,53 @@ export class AttackAction {
       }
       gameObject.isRangedAttack = false;
       return true;
-    } else {
-      // Якщо ціль не в діапазоні атаки, оновлюємо moveTarget
-      gameObject.moveTarget = {
-        col: gameObject.attackTarget.gridCol,
-        row: gameObject.attackTarget.gridRow,
-      };
-
-      // Якщо є moveAction і об'єкт рухається, оновлюємо шлях
-      if (this.moveAction && gameObject.isMoving) {
-        this.moveAction.setMoveTarget(
-          gameObject,
-          gameObject.attackTarget.gridCol,
-          gameObject.attackTarget.gridRow,
-          [0] // allowedObstacleTypes
-        );
-      }
-
-      return false;
     }
+
+    // Перевіряємо, чи ціль в діапазоні дальньої атаки
+    if (gameObject.isRanged) {
+      const distance = this.getMinDistanceBetweenObjects(
+        gameObject,
+        gameObject.attackTarget
+      );
+
+      // Check if there are any enemies too close for ranged attack
+      const tooCloseEnemies = this.findEnemiesCloserThan(
+        gameObject,
+        gameObject.minRangeDistance
+      );
+
+      if (
+        !tooCloseEnemies &&
+        distance >= gameObject.minRangeDistance &&
+        distance <= gameObject.maxRangeDistance
+      ) {
+        // Zupynyayemo rukh
+        if (gameObject.isMoving) {
+          this.moveAction.cancelMovement(gameObject, false);
+        }
+        gameObject.isRangedAttack = true;
+        gameObject.moveTarget = null;
+        return true;
+      }
+    }
+
+    // Якщо ціль не в діапазоні атаки, оновлюємо moveTarget
+    gameObject.moveTarget = {
+      col: gameObject.attackTarget.gridCol,
+      row: gameObject.attackTarget.gridRow,
+    };
+
+    // Якщо є moveAction і об'єкт рухається, оновлюємо шлях
+    if (this.moveAction && gameObject.isMoving) {
+      this.moveAction.setMoveTarget(
+        gameObject,
+        gameObject.attackTarget.gridCol,
+        gameObject.attackTarget.gridRow,
+        [0] // allowedObstacleTypes
+      );
+    }
+
+    return false;
   }
 }
 
