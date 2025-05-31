@@ -133,7 +133,7 @@ export class AttackAction {
     const arrowConfig = {
       type: "arrow",
       moveSpeed: 15,
-      trajectoryType: "arc",
+      trajectoryType: "direct",
       damage: gameObject.attackDamage || 10,
     };
 
@@ -159,8 +159,6 @@ export class AttackAction {
 
   // Find a target for ranged attack
   findRangedTarget(gameObject) {
-    const minRangeDistance = 2; // Minimum range distance
-    const maxRangeDistance = 15; // Maximum range distance
     let bestTarget = null;
     let bestDistance = Infinity;
 
@@ -175,7 +173,10 @@ export class AttackAction {
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
 
       // Check if enemy is within ranged attack distance
-      if (distance >= minRangeDistance && distance <= maxRangeDistance) {
+      if (
+        distance >= gameObject.minRangeDistance &&
+        distance <= gameObject.maxRangeDistance
+      ) {
         // Find the closest enemy within range
         if (distance < bestDistance) {
           bestDistance = distance;
@@ -389,10 +390,11 @@ export class AttackAction {
         gameObject,
         gameObject.attackTarget
       );
-      const minRangeDistance = 5;
-      const maxRangeDistance = 30;
 
-      if (distance >= minRangeDistance && distance <= maxRangeDistance) {
+      if (
+        distance >= gameObject.minRangeDistance &&
+        distance <= gameObject.maxRangeDistance
+      ) {
         // Zupynyayemo rukh
         if (gameObject.isMoving) {
           // Change this line - don't keep the animation

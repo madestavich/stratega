@@ -31,6 +31,8 @@ export class GameObject {
     this.isDead = false; // Чи об'єкт мертвий
     this.isRanged = objectConfig.isRanged || false;
     this.isRangedAttack = false; // Чи об'єкт атакує здалеку
+    this.minRangeDistance = objectConfig.minRangeDistance || null;
+    this.maxRangeDistance = objectConfig.maxRangeDistance || null;
 
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;
