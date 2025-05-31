@@ -104,8 +104,7 @@ class GameManager {
         maxRangeDistance: 30,
         bulletConfig: {
           type: "fireball",
-          moveSpeed: 55,
-          trajectoryType: "arc",
+          moveSpeed: 45,
           damage: 100,
         },
       },
@@ -181,7 +180,7 @@ class GameManager {
   update(dt) {
     try {
       // Оновлюємо всі об'єкти
-      this.objectManager.updateAll();
+      this.objectManager.updateAll(dt);
 
       // Оновлюємо дії для всіх об'єктів через ActionManager
       this.actionManager.update(dt);

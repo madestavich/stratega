@@ -85,13 +85,15 @@ export class ObjectManager {
     }
   }
 
-  updateAll() {
+  updateAll(dt) {
     for (const obj of this.objects) obj.update();
-    for (const particle of this.particles) {
-      particle.update();
+
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const particle = this.particles[i];
+      particle.update(dt);
       particle.checkCollision(this.objects);
       if (particle.hasReachedTarget) {
-        this.particles.splice(particle.index, 1);
+        this.particles.splice(i, 1);
       }
     }
   }

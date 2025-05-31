@@ -16,8 +16,7 @@ export class Particle {
 
     // Target properties
     this.target = target || null;
-    this.trajectoryType = particleConfig.trajectoryType || "direct"; // "direct" or "arc"
-    this.arcHeight = particleConfig.arcHeight || 50; // Controls the height of the arc
+    this.arcHeight = particleConfig.arcHeight || 0; // Controls the height of the arc
 
     // Track progress for arc trajectory
     this.progress = 0;
@@ -50,11 +49,7 @@ export class Particle {
     this.hasReachedTarget = false;
   }
 
-  update() {
-    // Instead of using dt which might not be passed correctly
-    const dt = 16.67; // Use a fixed time step for consistency
-
-    // If we have a target, update target position (in case target is moving)
+  update(dt) {
     if (this.target && !this.target.isDead) {
       this.targetX = this.target.x;
       this.targetY = this.target.y;
@@ -62,12 +57,7 @@ export class Particle {
 
     if (this.hasReachedTarget) return;
 
-    // Calculate movement based on trajectory type
-    if (this.trajectoryType === "direct") {
-      this.updateDirectTrajectory(dt);
-    } else if (this.trajectoryType === "arc") {
-      this.updateArcTrajectory(dt);
-    }
+    this.updateArcTrajectory(dt / 2);
 
     // Check if we've reached the target
     const distanceToTarget = Math.sqrt(
@@ -84,26 +74,6 @@ export class Particle {
 
     // Update animation
     this.animator.nextFrame();
-  }
-
-  updateDirectTrajectory(dt) {
-    // Calculate direction vector to target
-    const dx = this.targetX - this.x;
-    const dy = this.targetY - this.y;
-
-    // Normalize the vector
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance > 0) {
-      const normalizedDx = dx / distance;
-      const normalizedDy = dy / distance;
-
-      // Update position
-      this.x += normalizedDx * this.moveSpeed * (dt / 16.67);
-      this.y += normalizedDy * this.moveSpeed * (dt / 16.67);
-
-      // Update move vector for rendering
-      this.moveVector = { dx: normalizedDx, dy: normalizedDy };
-    }
   }
 
   updateArcTrajectory(dt) {
@@ -144,9 +114,7 @@ export class Particle {
 
   draw() {
     this.renderer.draw(this.x, this.y, this.moveVector);
-
-    // Debug visualization for trajectory
-    if (this.trajectoryType === "arc" && true) {
+    if (true) {
       // Set to true to enable debug visualization
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
@@ -168,8 +136,6 @@ export class Particle {
     }
   }
 
-  // Method to check if particle hit a target
-  // Modify the checkCollision method in Particle class
   checkCollision(gameObjects) {
     if (this.hasReachedTarget) return;
 
@@ -181,18 +147,19 @@ export class Particle {
       );
 
       // Check if within collision radius of the target
-      if (distance < (this.target.collisionRadius || 20)) {
+      if (distance < 100) {
         this.hasReachedTarget = true;
+        console.log(`Particle hit target! Damage: ${this.damage}`); // Add debug log
 
         // Apply damage to the specific target
-        if (typeof this.target.takeDamage === "function") {
-          this.target.takeDamage(this.damage);
-        } else if (this.target.health !== undefined) {
-          // Fallback if takeDamage method doesn't exist
+        if (this.target.health !== undefined) {
+          console.log(`Target health before: ${this.target.health}`); // Debug log
           this.target.health -= this.damage;
+          console.log(`Target health after: ${this.target.health}`); // Debug log
 
           // Check if target is defeated
           if (this.target.health <= 0 && !this.target.isDead) {
+            console.log(`Target defeated!`); // Debug log
             this.target.isDead = true;
             this.target.canAct = false;
 
