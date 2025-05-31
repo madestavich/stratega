@@ -397,9 +397,6 @@ export class AttackAction {
         if (gameObject.isMoving) {
           // Change this line - don't keep the animation
           this.moveAction.cancelMovement(gameObject, false); // Set keepAnimation to false
-
-          // Explicitly set idle animation after canceling movement
-          gameObject.animator.setAnimation("idle");
         }
         gameObject.isRangedAttack = true;
         gameObject.moveTarget = null;
