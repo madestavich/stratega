@@ -110,8 +110,8 @@ class GameManager {
       },
       3,
       15,
-      8,
-      36
+      6,
+      50
     );
 
     this.objectManager.fillArea(
@@ -131,8 +131,8 @@ class GameManager {
       },
       14,
       15,
-      16,
-      50
+      18,
+      80
     );
 
     this.objectManager.fillArea(
@@ -150,10 +150,10 @@ class GameManager {
         attackSpeed: 0.8,
         health: 140,
       },
-      50,
+      45,
       15,
-      63,
-      56
+      60,
+      80
     );
 
     // Assign random movement targets to all objects
