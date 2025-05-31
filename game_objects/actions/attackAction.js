@@ -492,14 +492,25 @@ export class AttackAction {
       row: gameObject.attackTarget.gridRow,
     };
 
-    // Якщо є moveAction і об'єкт рухається, оновлюємо шлях
-    if (this.moveAction && gameObject.isMoving) {
-      this.moveAction.setMoveTarget(
+    // Якщо об'єкт не рухається, спробуємо почати рух
+    if (!gameObject.isMoving && this.moveAction) {
+      const canMove = this.moveAction.setMoveTarget(
         gameObject,
         gameObject.attackTarget.gridCol,
         gameObject.attackTarget.gridRow,
         [0] // allowedObstacleTypes
       );
+
+      // Якщо не можемо рухатися, просто стоїмо на місці
+      if (!canMove) {
+        // Встановлюємо анімацію "idle"
+        if (
+          gameObject.animator &&
+          gameObject.animator.activeAnimation.name !== "idle"
+        ) {
+          gameObject.animator.setAnimation("idle");
+        }
+      }
     }
 
     return false;

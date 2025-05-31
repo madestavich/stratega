@@ -110,6 +110,20 @@ export class MoveAction {
 
       // If no path found, we can't execute the action
       if (!path || path.length === 0) {
+        // Скасовуємо поточний рух
+        this.cancelMovement(gameObject);
+
+        // Зберігаємо ціль, щоб спробувати знову пізніше
+        gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
+
+        // Встановлюємо анімацію "idle"
+        if (
+          gameObject.animator &&
+          gameObject.animator.activeAnimation.name !== "idle"
+        ) {
+          gameObject.animator.setAnimation("idle");
+        }
+
         return false;
       }
 
