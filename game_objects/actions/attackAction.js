@@ -8,6 +8,9 @@ export class AttackAction {
   }
 
   canExecute(gameObject) {
+    if (gameObject.isDead) {
+      return false;
+    }
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       // If it's the last frame of attack animation, we'll handle damage in execute
@@ -262,6 +265,9 @@ export class AttackAction {
 
   // Update method to be called from ActionManager's update
   update(gameObject, deltaTime) {
+    if (gameObject.isDead) {
+      return false;
+    }
     // Зменшуємо час перезарядки атаки, якщо він є
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
       gameObject.attackCooldown -= deltaTime;
