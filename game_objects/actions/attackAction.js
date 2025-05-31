@@ -395,11 +395,10 @@ export class AttackAction {
       if (distance >= minRangeDistance && distance <= maxRangeDistance) {
         // Зупиняємо рух
         if (gameObject.isMoving) {
-          gameObject.isMoving = false;
-          gameObject.currentPath = null;
-          gameObject.nextGridPosition = null;
+          this.moveAction.cancelMovement(gameObject, true); // Використовуємо метод cancelMovement з keepAnimation=true
         }
         gameObject.isRangedAttack = true;
+        gameObject.moveTarget = null; // Важливо скинути moveTarget
         return true;
       }
     }
