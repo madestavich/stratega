@@ -87,7 +87,13 @@ export class ObjectManager {
 
   updateAll() {
     for (const obj of this.objects) obj.update();
-    for (const particle of this.particles) particle.update();
+    for (const particle of this.particles) {
+      particle.update();
+      particle.checkCollision(this.objects);
+      if (particle.hasReachedTarget) {
+        this.particles.splice(particle.index, 1);
+      }
+    }
   }
 
   renderAll() {
