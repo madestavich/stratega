@@ -16,7 +16,7 @@ export class Particle {
 
     // Target properties
     this.target = target || null;
-    this.arcHeight = particleConfig.arcHeight || 0; // Controls the height of the arc
+    this.arcHeight = particleConfig.arcHeight || 30; // Controls the height of the arc
 
     // Track progress for arc trajectory
     this.progress = 0;
