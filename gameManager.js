@@ -96,17 +96,17 @@ class GameManager {
         moveSpeed: 12,
         availableActions: ["move", "attack"],
         team: 2,
-        attackDamage: 25,
+        attackDamage: 70,
         attackSpeed: 1.5,
         health: 80,
         isRanged: true,
-        minRangeDistance: 10,
-        maxRangeDistance: 20,
+        minRangeDistance: 20,
+        maxRangeDistance: 30,
       },
       0,
       0,
-      2,
-      70
+      4,
+      50
     );
 
     this.objectManager.fillArea(
@@ -120,14 +120,14 @@ class GameManager {
         moveSpeed: 25,
         availableActions: ["move", "attack"],
         team: 1,
-        attackDamage: 35,
+        attackDamage: 55,
         attackSpeed: 0.8,
         health: 140,
       },
-      55,
+      50,
       10,
       60,
-      36
+      56
     );
 
     // Assign random movement targets to all objects

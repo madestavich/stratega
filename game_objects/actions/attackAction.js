@@ -134,7 +134,7 @@ export class AttackAction {
       type: "arrow",
       moveSpeed: 15,
       trajectoryType: "direct",
-      damage: gameObject.attackDamage || 10,
+      damage: gameObject.attackDamage,
     };
 
     // Create a new particle at the center of the game object
