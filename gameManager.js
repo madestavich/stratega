@@ -100,7 +100,7 @@ class GameManager {
         attackSpeed: 1.5,
         health: 80,
         isRanged: true,
-        minRangeDistance: 20,
+        minRangeDistance: 5,
         maxRangeDistance: 30,
       },
       0,
