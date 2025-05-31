@@ -111,7 +111,16 @@ export class AttackAction {
     ) {
       gameObject.isAttacking = true;
       this.setLookDirection(gameObject, gameObject.attackTarget);
-      gameObject.animator.setAnimation("attack", false);
+
+      // Вибір правильної анімації в залежності від типу атаки
+      if (
+        gameObject.isRangedAttack &&
+        gameObject.animator.activeSpritesheet.animations.range_attack
+      ) {
+        gameObject.animator.setAnimation("range_attack", false);
+      } else {
+        gameObject.animator.setAnimation("attack", false);
+      }
       return true;
     }
 
@@ -384,10 +393,11 @@ export class AttackAction {
       const maxRangeDistance = 30;
 
       if (distance >= minRangeDistance && distance <= maxRangeDistance) {
-        // Якщо ціль в діапазоні дальньої атаки, зупиняємо рух
-        if (gameObject.isMoving && this.moveAction) {
-          // Використовуємо правильний метод для скасування руху
-          this.moveAction.cancelMovement(gameObject, true);
+        // Зупиняємо рух
+        if (gameObject.isMoving) {
+          gameObject.isMoving = false;
+          gameObject.currentPath = null;
+          gameObject.nextGridPosition = null;
         }
         gameObject.isRangedAttack = true;
         return true;
