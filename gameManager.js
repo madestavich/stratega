@@ -105,7 +105,7 @@ class GameManager {
       },
       0,
       0,
-      10,
+      2,
       70
     );
 
