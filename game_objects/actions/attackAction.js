@@ -137,12 +137,13 @@ export class AttackAction {
   // Method to spawn a projectile
   spawnProjectile(gameObject, target) {
     // Create a new particle at the center of the game object
+
     const particle = new Particle(
       gameObject.ctx,
       gameObject.spriteConfig,
       gameObject.bulletConfig,
-      gameObject.x,
-      gameObject.y,
+      gameObject.bulletPoint.x,
+      gameObject.bulletPoint.y,
       target,
       gameObject.gridManager
     );

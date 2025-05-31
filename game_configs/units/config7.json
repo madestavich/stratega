@@ -18,7 +18,8 @@
             "frameCenter": {
               "x": 36.5,
               "y": 89
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 104.5,
@@ -28,7 +29,8 @@
             "frameCenter": {
               "x": 127.5,
               "y": 88
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 192.5,
@@ -38,7 +40,8 @@
             "frameCenter": {
               "x": 215.5,
               "y": 87
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 287.5,
@@ -48,7 +51,8 @@
             "frameCenter": {
               "x": 311.5,
               "y": 87
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 393.5,
@@ -58,7 +62,8 @@
             "frameCenter": {
               "x": 417.5,
               "y": 89
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 476.5,
@@ -68,7 +73,8 @@
             "frameCenter": {
               "x": 501,
               "y": 88
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 555.5,
@@ -78,7 +84,8 @@
             "frameCenter": {
               "x": 581.5,
               "y": 87
-            }
+            },
+            "bulletPoint": null
           }
         ]
       },
@@ -93,7 +100,8 @@
             "frameCenter": {
               "x": 36.5,
               "y": 200
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 103.5,
@@ -103,7 +111,8 @@
             "frameCenter": {
               "x": 129.5,
               "y": 200
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 186.5,
@@ -113,7 +122,8 @@
             "frameCenter": {
               "x": 212.5,
               "y": 200
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 283.5,
@@ -123,7 +133,8 @@
             "frameCenter": {
               "x": 308.5,
               "y": 201
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 388.5,
@@ -133,7 +144,8 @@
             "frameCenter": {
               "x": 415,
               "y": 199
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 471.5,
@@ -143,7 +155,8 @@
             "frameCenter": {
               "x": 498.5,
               "y": 199
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 551.5,
@@ -153,7 +166,8 @@
             "frameCenter": {
               "x": 577,
               "y": 200
-            }
+            },
+            "bulletPoint": null
           }
         ]
       },
@@ -168,7 +182,8 @@
             "frameCenter": {
               "x": 37,
               "y": 580
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 106.5,
@@ -178,7 +193,8 @@
             "frameCenter": {
               "x": 134,
               "y": 580
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 188.5,
@@ -188,7 +204,8 @@
             "frameCenter": {
               "x": 231,
               "y": 582
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 285.5,
@@ -198,7 +215,8 @@
             "frameCenter": {
               "x": 330,
               "y": 579
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 392.5,
@@ -208,7 +226,8 @@
             "frameCenter": {
               "x": 420,
               "y": 579
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 470.5,
@@ -218,6 +237,10 @@
             "frameCenter": {
               "x": 498.5,
               "y": 580
+            },
+            "bulletPoint": {
+              "x": 520.5,
+              "y": 527
             }
           }
         ]
@@ -233,7 +256,8 @@
             "frameCenter": {
               "x": 206,
               "y": 338
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 263.5,
@@ -243,7 +267,8 @@
             "frameCenter": {
               "x": 291,
               "y": 337
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 357.5,
@@ -253,7 +278,8 @@
             "frameCenter": {
               "x": 389.5,
               "y": 335
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 464.5,
@@ -263,7 +289,8 @@
             "frameCenter": {
               "x": 496,
               "y": 337
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 547.5,
@@ -273,7 +300,8 @@
             "frameCenter": {
               "x": 580.5,
               "y": 335
-            }
+            },
+            "bulletPoint": null
           }
         ]
       },
@@ -288,7 +316,8 @@
             "frameCenter": {
               "x": 41.5,
               "y": 924
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 102.5,
@@ -298,7 +327,8 @@
             "frameCenter": {
               "x": 142.5,
               "y": 920
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 190.5,
@@ -308,7 +338,8 @@
             "frameCenter": {
               "x": 229.5,
               "y": 922
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 283.5,
@@ -318,7 +349,8 @@
             "frameCenter": {
               "x": 322.5,
               "y": 924
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 386.5,
@@ -328,7 +360,8 @@
             "frameCenter": {
               "x": 421.5,
               "y": 924
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 477.5,
@@ -338,7 +371,8 @@
             "frameCenter": {
               "x": 506,
               "y": 918
-            }
+            },
+            "bulletPoint": null
           }
         ]
       },
@@ -353,7 +387,8 @@
             "frameCenter": {
               "x": 331,
               "y": 1220
-            }
+            },
+            "bulletPoint": null
           }
         ]
       }
