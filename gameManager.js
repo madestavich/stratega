@@ -110,30 +110,30 @@ class GameManager {
       },
       3,
       15,
-      6,
+      8,
       36
     );
 
-    // this.objectManager.fillArea(
-    //   this.configLoader.getConfig("paladin"),
-    //   {
-    //     gridWidth: 2,
-    //     gridHeight: 2,
-    //     expansionDirection: "topRight",
-    //     objectType: "paladin",
-    //     actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-    //     moveSpeed: 12,
-    //     availableActions: ["move", "attack"],
-    //     team: 2,
-    //     attackDamage: 60,
-    //     attackSpeed: 1.2,
-    //     health: 150,
-    //   },
-    //   7,
-    //   15,
-    //   16,
-    //   50
-    // );
+    this.objectManager.fillArea(
+      this.configLoader.getConfig("paladin"),
+      {
+        gridWidth: 2,
+        gridHeight: 2,
+        expansionDirection: "topRight",
+        objectType: "paladin",
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 12,
+        availableActions: ["move", "attack"],
+        team: 2,
+        attackDamage: 60,
+        attackSpeed: 1.2,
+        health: 150,
+      },
+      14,
+      15,
+      16,
+      50
+    );
 
     this.objectManager.fillArea(
       this.configLoader.getConfig("rider"),
@@ -152,7 +152,7 @@ class GameManager {
       },
       50,
       15,
-      53,
+      63,
       56
     );
 
