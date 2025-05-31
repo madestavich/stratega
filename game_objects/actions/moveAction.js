@@ -334,8 +334,9 @@ export class MoveAction {
   }
 
   // Cancel the current movement
-  cancelMovement(gameObject) {
-    if (gameObject.animator.activeAnimation.name != "idle") {
+
+  cancelMovement(gameObject, keepAnimation = false) {
+    if (!keepAnimation && gameObject.animator.activeAnimation.name != "idle") {
       gameObject.animator.setAnimation("idle");
     }
     gameObject.isMoving = false;

@@ -386,7 +386,24 @@ export class AttackAction {
       if (distance >= minRangeDistance && distance <= maxRangeDistance) {
         // Якщо ціль в діапазоні дальньої атаки, зупиняємо рух
         if (gameObject.isMoving && this.moveAction) {
-          this.moveAction.cancelMovement(gameObject);
+          // Don't immediately set to idle animation when canceling movement
+          // Store the current state before canceling
+          const wasMoving = gameObject.isMoving;
+
+          // Cancel movement but don't change animation yet
+          gameObject.isMoving = false;
+          gameObject.currentPath = null;
+          gameObject.nextGridPosition = null;
+          gameObject.moveTarget = null;
+
+          // Only set to idle if we're not about to attack
+          if (
+            wasMoving &&
+            gameObject.animator.activeAnimation.name !== "attack"
+          ) {
+            // Set to idle only if not already in attack animation
+            gameObject.animator.setAnimation("idle");
+          }
         }
         gameObject.isRangedAttack = true;
         return true;
