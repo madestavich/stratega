@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("canvas")
       );
       this.loadConfigBtn = document.getElementById("loadConfig");
+      this.bulletPointX = document.getElementById("bulletPointX");
+      this.bulletPointY = document.getElementById("bulletPointY");
     }
 
     updateUIState() {
@@ -149,6 +151,31 @@ document.addEventListener("DOMContentLoaded", () => {
         this.drawSelectedFrame(); // Оновлюємо фрейм при зміні анімації
       });
       this.loadConfigBtn.addEventListener("click", () => this.loadConfig());
+      // Додаємо обробники для bulletPoint інпутів
+      if (this.bulletPointX && this.bulletPointY) {
+        [this.bulletPointX, this.bulletPointY].forEach((input) => {
+          input.addEventListener("change", () => {
+            if (!this.currentSpritesheetKey || !this.currentAnimation) return;
+
+            const selectedSpritesheet =
+              this.spritesheets[this.currentSpritesheetKey];
+            const selectedAnimation =
+              selectedSpritesheet.animations[this.currentAnimation];
+            const frameIndex = parseInt(this.frameSlider.value, 10);
+            const frame = selectedAnimation.frames[frameIndex];
+
+            // Створюємо bulletPoint, якщо його немає
+            if (!frame.bulletPoint) {
+              frame.bulletPoint = { x: 0, y: 0 };
+            }
+
+            frame.bulletPoint.x = parseInt(this.bulletPointX.value) || 0;
+            frame.bulletPoint.y = parseInt(this.bulletPointY.value) || 0;
+
+            this.canvasRenderer.redrawCanvas();
+          });
+        });
+      }
     }
 
     addSpritesheet() {
@@ -246,13 +273,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
                   // Load frames
                   anim.frames.forEach((frameData) => {
+                    const bulletPointX = frameData.bulletPoint
+                      ? frameData.bulletPoint.x
+                      : null;
+                    const bulletPointY = frameData.bulletPoint
+                      ? frameData.bulletPoint.y
+                      : null;
+
                     const frame = new Frame(
                       frameData.x,
                       frameData.y,
                       frameData.width,
                       frameData.height,
                       frameData.frameCenter.x,
-                      frameData.frameCenter.y
+                      frameData.frameCenter.y,
+                      bulletPointX,
+                      bulletPointY
                     );
                     this.spritesheets[key].animations[animKey].frames.push(
                       frame
@@ -474,6 +510,17 @@ document.addEventListener("DOMContentLoaded", () => {
       this.frameHeight.value = frame.height;
       this.centerX.value = frame.frameCenter.x;
       this.centerY.value = frame.frameCenter.y;
+
+      // Оновлюємо поля bulletPoint, якщо вони існують
+      if (this.bulletPointX && this.bulletPointY) {
+        if (frame.bulletPoint) {
+          this.bulletPointX.value = frame.bulletPoint.x;
+          this.bulletPointY.value = frame.bulletPoint.y;
+        } else {
+          this.bulletPointX.value = "";
+          this.bulletPointY.value = "";
+        }
+      }
     }
   }
 
@@ -493,12 +540,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   class Frame {
-    constructor(x, y, width, height, centerX, centerY) {
+    constructor(
+      x,
+      y,
+      width,
+      height,
+      centerX,
+      centerY,
+      bulletPointX = null,
+      bulletPointY = null
+    ) {
       this.x = x;
       this.y = y;
       this.width = width;
       this.height = height;
       this.frameCenter = { x: centerX, y: centerY };
+      this.bulletPoint =
+        bulletPointX !== null && bulletPointY !== null
+          ? { x: bulletPointX, y: bulletPointY }
+          : null;
     }
   }
 
@@ -560,8 +620,8 @@ document.addEventListener("DOMContentLoaded", () => {
     drawFrame(frame) {
       this.ctx.strokeStyle = "red";
       this.ctx.lineWidth = 2;
-      this.ctx.fillStyle = "blue";
 
+      // Draw frame rectangle
       this.ctx.strokeRect(
         this.imageOffsetX + frame.x,
         this.imageOffsetY + frame.y,
@@ -569,6 +629,8 @@ document.addEventListener("DOMContentLoaded", () => {
         frame.height
       );
 
+      // Draw frame center point
+      this.ctx.fillStyle = "blue";
       this.ctx.beginPath();
       this.ctx.arc(
         this.imageOffsetX + frame.frameCenter.x,
@@ -578,6 +640,20 @@ document.addEventListener("DOMContentLoaded", () => {
         Math.PI * 2
       );
       this.ctx.fill();
+
+      // Draw bullet point if exists
+      if (frame.bulletPoint) {
+        this.ctx.fillStyle = "green";
+        this.ctx.beginPath();
+        this.ctx.arc(
+          this.imageOffsetX + frame.bulletPoint.x,
+          this.imageOffsetY + frame.bulletPoint.y,
+          4,
+          0,
+          Math.PI * 2
+        );
+        this.ctx.fill();
+      }
     }
 
     enableFrameSelection(enable) {
@@ -600,6 +676,48 @@ document.addEventListener("DOMContentLoaded", () => {
             0,
             0
           );
+          return;
+        }
+
+        // Ctrl+клік для зміни центральної точки
+        if (e.ctrlKey && this.currentFrame) {
+          const clickX = e.offsetX - this.imageOffsetX;
+          const clickY = e.offsetY - this.imageOffsetY;
+
+          this.currentFrame.frameCenter.x = clickX;
+          this.currentFrame.frameCenter.y = clickY;
+
+          // Оновлюємо інпути для центральної точки
+          editor.centerX.value = clickX;
+          editor.centerY.value = clickY;
+
+          // Застосовуємо зміни до поточного кадру
+          editor.applyFrameSelection(this.currentFrame);
+          this.redrawCanvas();
+          return;
+        }
+
+        // Shift+клік для додавання/зміни bulletPoint
+        if (e.shiftKey && this.currentFrame) {
+          const clickX = e.offsetX - this.imageOffsetX;
+          const clickY = e.offsetY - this.imageOffsetY;
+
+          if (!this.currentFrame.bulletPoint) {
+            this.currentFrame.bulletPoint = { x: clickX, y: clickY };
+          } else {
+            this.currentFrame.bulletPoint.x = clickX;
+            this.currentFrame.bulletPoint.y = clickY;
+          }
+
+          // Оновлюємо інпути для bulletPoint (потрібно додати їх в HTML)
+          if (editor.bulletPointX && editor.bulletPointY) {
+            editor.bulletPointX.value = clickX;
+            editor.bulletPointY.value = clickY;
+          }
+
+          // Застосовуємо зміни до поточного кадру
+          editor.applyFrameSelection(this.currentFrame);
+          this.redrawCanvas();
           return;
         }
 
