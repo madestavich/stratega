@@ -336,7 +336,12 @@ export class MoveAction {
   // Cancel the current movement
 
   cancelMovement(gameObject, keepAnimation = false) {
-    if (!keepAnimation && gameObject.animator.activeAnimation.name != "idle") {
+    // Не змінюємо анімацію, якщо об'єкт мертвий
+    if (
+      !keepAnimation &&
+      !gameObject.isDead &&
+      gameObject.animator.activeAnimation.name != "idle"
+    ) {
       gameObject.animator.setAnimation("idle");
     }
     gameObject.isMoving = false;

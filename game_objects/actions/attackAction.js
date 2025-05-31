@@ -161,7 +161,7 @@ export class AttackAction {
       bulletY = gameObject.y;
     }
 
-    // Create a particle with the original target
+    // Create a particle
     const particle = new Particle(
       gameObject.ctx,
       gameObject.spriteConfig,
@@ -173,11 +173,12 @@ export class AttackAction {
     );
 
     // Adjust the target Y position to aim at the center of the target
+    // Get target's current frame to determine its height
     const targetFrame = target.animator.activeFrame;
     const targetHeight = targetFrame.height;
     particle.targetY = target.y - targetHeight / 2;
 
-    // Recalculate total distance with the new target Y
+    // Recalculate trajectory with the new target Y
     particle.totalDistance = Math.sqrt(
       Math.pow(particle.targetX - particle.startX, 2) +
         Math.pow(particle.targetY - particle.startY, 2)
@@ -214,7 +215,7 @@ export class AttackAction {
   // Find a target for ranged attack
   findRangedTarget(gameObject) {
     let bestTarget = null;
-    let bestDistance = Infinity;
+    let bestScore = Infinity; // Lower score is better
 
     // Find all enemies within range
     for (const obj of this.objectManager.objects) {
@@ -231,9 +232,26 @@ export class AttackAction {
         distance >= gameObject.minRangeDistance &&
         distance <= gameObject.maxRangeDistance
       ) {
-        // Find the closest enemy within range
-        if (distance < bestDistance) {
-          bestDistance = distance;
+        // Calculate direction vector
+        const dx = obj.gridCol - gameObject.gridCol;
+        const dy = obj.gridRow - gameObject.gridRow;
+
+        // Calculate score based on distance and direction
+        // Lower score means higher priority
+        let score = distance * 10; // Base score is distance
+
+        // Check if target is in straight line (horizontally or vertically)
+        if (dx === 0 || dy === 0) {
+          // Straight line gets priority (subtract 50 from score)
+          score -= 50;
+        } else if (Math.abs(dx) === Math.abs(dy)) {
+          // Diagonal line gets secondary priority (subtract 25 from score)
+          score -= 25;
+        }
+
+        // Find the target with the best (lowest) score
+        if (score < bestScore) {
+          bestScore = score;
           bestTarget = obj;
         }
       }
