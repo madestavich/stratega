@@ -93,19 +93,40 @@ class GameManager {
         expansionDirection: "topRight",
         objectType: "mage",
         actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 12,
+        moveSpeed: 10,
         availableActions: ["move", "attack"],
         team: 2,
-        attackDamage: 70,
+        attackDamage: 100,
         attackSpeed: 1.5,
         health: 80,
         isRanged: true,
-        minRangeDistance: 5,
+        minRangeDistance: 10,
         maxRangeDistance: 30,
       },
-      0,
-      0,
+      3,
+      15,
       4,
+      50
+    );
+
+    this.objectManager.fillArea(
+      this.configLoader.getConfig("paladin"),
+      {
+        gridWidth: 2,
+        gridHeight: 2,
+        expansionDirection: "topRight",
+        objectType: "paladin",
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 12,
+        availableActions: ["move", "attack"],
+        team: 2,
+        attackDamage: 60,
+        attackSpeed: 1.2,
+        health: 150,
+      },
+      7,
+      15,
+      16,
       50
     );
 
@@ -125,9 +146,9 @@ class GameManager {
         health: 140,
       },
       50,
-      10,
+      15,
       60,
-      56
+      80
     );
 
     // Assign random movement targets to all objects

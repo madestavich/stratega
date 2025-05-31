@@ -144,8 +144,8 @@ export class AttackAction {
     // Create arrow projectile configuration
     const arrowConfig = {
       type: "arrow",
-      moveSpeed: 15,
-      trajectoryType: "direct",
+      moveSpeed: 55,
+      trajectoryType: "arc",
       damage: gameObject.attackDamage,
     };
 
