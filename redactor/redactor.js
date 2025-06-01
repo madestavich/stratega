@@ -67,6 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
         this.frameHeight,
         this.centerX,
         this.centerY,
+        this.bulletPointX, // Add bulletPointX here
+        this.bulletPointY, // Add bulletPointY here
       ];
       frameInputs.forEach((input) => (input.disabled = !hasFrames));
       if (hasAnimation && hasFrames) {
