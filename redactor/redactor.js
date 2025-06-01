@@ -212,17 +212,19 @@ document.addEventListener("DOMContentLoaded", () => {
         return alert("Invalid or duplicate name");
 
       const file = fileInput.files[0];
-      const fileName = file.name;
-      const relativeToEditor = "../sprites/" + fileName;
+
+      // Create a URL for the uploaded file
+      const objectURL = URL.createObjectURL(file);
 
       const image = new Image();
-      image.src = relativeToEditor;
+      image.src = objectURL;
 
       image.onload = () => {
         this.spritesheets[name] = new Spritesheet(name, {
-          link: relativeToEditor,
+          link: objectURL, // Use the object URL directly
           width: image.width,
           height: image.height,
+          fileName: file.name, // Store the filename for reference
         });
         this.currentSpritesheetKey = name;
         this.updateUIState();
@@ -488,7 +490,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const fileName = prompt("Введіть назву файлу:", "config");
       if (!fileName) return;
 
-      const dataStr = JSON.stringify(this.spritesheets, null, 2);
+      // Create a copy of the spritesheets for saving
+      const configToSave = {};
+      Object.entries(this.spritesheets).forEach(([key, spritesheet]) => {
+        configToSave[key] = JSON.parse(JSON.stringify(spritesheet));
+
+        // Replace the object URL with a placeholder that includes the original filename
+        if (spritesheet.sourceImage.fileName) {
+          configToSave[key].sourceImage.link =
+            "../sprites/" + spritesheet.sourceImage.fileName;
+        }
+
+        // Remove temporary properties
+        delete configToSave[key].sourceImage.fileName;
+      });
+
+      const dataStr = JSON.stringify(configToSave, null, 2);
       const blob = new Blob([dataStr], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
