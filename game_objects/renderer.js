@@ -10,36 +10,33 @@ export class Renderer {
     // Зберігаємо поточний стан контексту
     this.ctx.save();
 
-    // Якщо рух вліво (dx < 0), застосовуємо дзеркальне відображення
-    if (moveDirection && moveDirection.dx < 0) {
-      // Переміщуємо точку відліку для правильного дзеркального відображення
-      this.ctx.translate(x + f.width, y);
+    // Визначаємо напрямок відображення
+    const flipHorizontal = moveDirection && moveDirection.dx < 0;
+
+    // Переміщуємо точку відліку до центру кадру
+    const centerOffsetX = f.frameCenter.x - f.x;
+    const centerOffsetY = f.frameCenter.y - f.y;
+
+    // Переміщуємо контекст до позиції об'єкта
+    this.ctx.translate(x + centerOffsetX, y + centerOffsetY);
+
+    // Застосовуємо дзеркальне відображення, якщо потрібно
+    if (flipHorizontal) {
       this.ctx.scale(-1, 1);
-      this.ctx.drawImage(
-        this.animator.activeSpritesheet.sourceImage.link,
-        f.x,
-        f.y,
-        f.width,
-        f.height,
-        0, // x тепер 0, оскільки ми перемістили точку відліку
-        0, // y тепер 0, оскільки ми перемістили точку відліку
-        f.width,
-        f.height
-      );
-    } else {
-      // Звичайне відображення без дзеркального ефекту
-      this.ctx.drawImage(
-        this.animator.activeSpritesheet.sourceImage.link,
-        f.x,
-        f.y,
-        f.width,
-        f.height,
-        x,
-        y,
-        f.width,
-        f.height
-      );
     }
+
+    // Малюємо зображення, центроване відносно точки відліку
+    this.ctx.drawImage(
+      this.animator.activeSpritesheet.sourceImage.link,
+      f.x,
+      f.y,
+      f.width,
+      f.height,
+      -centerOffsetX,
+      -centerOffsetY,
+      f.width,
+      f.height
+    );
 
     // Відновлюємо попередній стан контексту
     this.ctx.restore();

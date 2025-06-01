@@ -13,55 +13,44 @@
           {
             "x": 49,
             "y": 41.5,
-            "width": 85,
+            "width": 86,
             "height": 97,
             "frameCenter": {
-              "x": 91.5,
+              "x": 92,
               "y": 138.5
             },
             "bulletPoint": null
           },
           {
-            "x": 182,
-            "y": 40,
+            "x": 183,
+            "y": 40.5,
             "width": 88,
             "height": 98,
             "frameCenter": {
-              "x": 226,
-              "y": 138
+              "x": 227,
+              "y": 138.5
             },
             "bulletPoint": null
           },
           {
-            "x": 321,
-            "y": 35,
-            "width": 86,
-            "height": 103,
-            "frameCenter": {
-              "x": 364,
-              "y": 138
-            },
-            "bulletPoint": null
-          },
-          {
-            "x": 455,
-            "y": 39,
-            "width": 90,
-            "height": 99,
-            "frameCenter": {
-              "x": 500,
-              "y": 138
-            },
-            "bulletPoint": null
-          },
-          {
-            "x": 320,
+            "x": 322,
             "y": 40,
-            "width": 89,
-            "height": 98,
+            "width": 86,
+            "height": 100,
             "frameCenter": {
-              "x": 364.5,
+              "x": 365,
               "y": 138
+            },
+            "bulletPoint": null
+          },
+          {
+            "x": 459,
+            "y": 42.5,
+            "width": 85,
+            "height": 96,
+            "frameCenter": {
+              "x": 501.5,
+              "y": 138.5
             },
             "bulletPoint": null
           }
@@ -72,55 +61,66 @@
         "frames": [
           {
             "x": 317,
-            "y": 174.5,
+            "y": 174,
             "width": 94,
             "height": 95,
             "frameCenter": {
               "x": 364,
-              "y": 269.5
-            },
-            "bulletPoint": null
-          },
-          {
-            "x": 450,
-            "y": 174.5,
-            "width": 100,
-            "height": 93,
-            "frameCenter": {
-              "x": 500,
-              "y": 267.5
-            },
-            "bulletPoint": null
-          },
-          {
-            "x": 589,
-            "y": 176,
-            "width": 125,
-            "height": 94,
-            "frameCenter": {
-              "x": 651.5,
               "y": 270
             },
             "bulletPoint": null
           },
           {
-            "x": 741,
-            "y": 172,
-            "width": 129,
-            "height": 96,
+            "x": 452,
+            "y": 175,
+            "width": 97,
+            "height": 91,
             "frameCenter": {
-              "x": 805.5,
-              "y": 268
+              "x": 500,
+              "y": 270
             },
             "bulletPoint": null
           },
           {
-            "x": 889,
+            "x": 592,
+            "y": 177,
+            "width": 114,
+            "height": 93,
+            "frameCenter": {
+              "x": 649,
+              "y": 270
+            },
+            "bulletPoint": null
+          },
+          {
+            "x": 743,
             "y": 175,
-            "width": 127,
+            "width": 131,
+            "height": 94,
+            "frameCenter": {
+              "x": 808,
+              "y": 270
+            },
+            "bulletPoint": null
+          },
+          {
+            "x": 885,
+            "y": 174,
+            "width": 138,
+            "height": 94,
+            "frameCenter": {
+              "x": 954,
+              "y": 270
+            },
+            "bulletPoint": null
+          },
+          {
+            "x": 1046,
+            "y": 174,
+            "width": 115,
             "height": 95,
             "frameCenter": {
-              "x": 952.5,
+              "x": 1103,
               "y": 270
             },
             "bulletPoint": null
