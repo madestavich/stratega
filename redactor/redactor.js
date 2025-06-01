@@ -315,6 +315,17 @@ document.addEventListener("DOMContentLoaded", () => {
             this.updateSheetSelect();
             this.updateAnimationSelect();
             this.updateUIState();
+            if (this.currentSpritesheetKey && this.currentAnimation) {
+              const selectedSpritesheet =
+                this.spritesheets[this.currentSpritesheetKey];
+              const selectedAnimation =
+                selectedSpritesheet.animations[this.currentAnimation];
+              if (selectedAnimation && selectedAnimation.frames.length > 0) {
+                this.frameSlider.max = selectedAnimation.frames.length - 1;
+                this.frameSlider.value = 0;
+                this.updateFrameInputs(selectedAnimation.frames[0]);
+              }
+            }
 
             alert("Configuration loaded successfully!");
           } catch (error) {
