@@ -814,7 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
       this.currentFrameIndex = 0;
       this.animationInterval = null;
       this.frameDelay = 150; // milliseconds between frames
-      this.scale = 2.0; // Add scaling factor
+      this.scale = 2.5; // Add scaling factor
     }
 
     startPreview(imageSrc, frames) {
@@ -859,7 +859,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Calculate center position in preview canvas
       const centerX = this.canvas.width / 2;
-      const centerY = this.canvas.height / 2;
+      const centerY = this.canvas.height / 1.5;
 
       // Calculate drawing position with scaling
       const offsetX = frame.frameCenter.x - frame.x;
