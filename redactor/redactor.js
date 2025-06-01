@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
       this.loadConfigBtn = document.getElementById("loadConfig");
       this.bulletPointX = document.getElementById("bulletPointX");
       this.bulletPointY = document.getElementById("bulletPointY");
+      this.previewCanvas = document.getElementById("previewCanvas");
+      this.previewRenderer = new AnimationPreviewRenderer(this.previewCanvas);
     }
 
     updateUIState() {
@@ -67,6 +69,14 @@ document.addEventListener("DOMContentLoaded", () => {
         this.centerY,
       ];
       frameInputs.forEach((input) => (input.disabled = !hasFrames));
+      if (hasAnimation && hasFrames) {
+        this.previewRenderer.startPreview(
+          selectedSpritesheet.sourceImage.link,
+          selectedAnimation.frames
+        );
+      } else {
+        this.previewRenderer.stopPreview();
+      }
     }
 
     setupEventListeners() {
@@ -113,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
         this.centerX.value = frame.frameCenter.x;
         this.centerY.value = frame.frameCenter.y;
         this.drawSelectedFrame();
+        this.previewRenderer.updateFrames(selectedAnimation.frames);
       });
 
       [
@@ -778,6 +789,87 @@ document.addEventListener("DOMContentLoaded", () => {
         this.lastOffsetX = this.imageOffsetX;
         this.lastOffsetY = this.imageOffsetY;
       });
+    }
+  }
+
+  class AnimationPreviewRenderer {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d");
+      this.image = null;
+      this.frames = [];
+      this.currentFrameIndex = 0;
+      this.animationInterval = null;
+      this.frameDelay = 150; // milliseconds between frames
+      this.scale = 2.0; // Add scaling factor
+    }
+
+    startPreview(imageSrc, frames) {
+      // Stop any existing preview
+      this.stopPreview();
+
+      // Load the image
+      this.image = new Image();
+      this.image.src = imageSrc;
+      this.frames = frames;
+
+      this.image.onload = () => {
+        // Start animation loop once image is loaded
+        this.currentFrameIndex = 0;
+        this.animationInterval = setInterval(
+          () => this.renderNextFrame(),
+          this.frameDelay
+        );
+      };
+    }
+
+    stopPreview() {
+      if (this.animationInterval) {
+        clearInterval(this.animationInterval);
+        this.animationInterval = null;
+      }
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    updateFrames(frames) {
+      this.frames = frames;
+    }
+
+    renderNextFrame() {
+      if (!this.image || this.frames.length === 0) return;
+
+      // Clear canvas
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      // Get current frame
+      const frame = this.frames[this.currentFrameIndex];
+
+      // Calculate center position in preview canvas
+      const centerX = this.canvas.width / 2;
+      const centerY = this.canvas.height / 2;
+
+      // Calculate drawing position with scaling
+      const offsetX = frame.frameCenter.x - frame.x;
+      const offsetY = frame.frameCenter.y - frame.y;
+      const drawX = centerX - offsetX * this.scale;
+      const drawY = centerY - offsetY * this.scale;
+
+      // Draw the frame with scaling
+      this.ctx.drawImage(
+        this.image,
+        frame.x,
+        frame.y,
+        frame.width,
+        frame.height,
+        drawX,
+        drawY,
+        frame.width * this.scale,
+        frame.height * this.scale
+      );
+
+      // Move to next frame
+      this.currentFrameIndex =
+        (this.currentFrameIndex + 1) % this.frames.length;
     }
   }
 

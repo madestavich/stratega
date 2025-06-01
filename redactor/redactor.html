@@ -132,9 +132,35 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
+      /* Preview canvas container */
+      .preview-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #3a3a3a;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+      }
+
+      #previewCanvas {
+        background-color: #1e1e1e;
+      }
+
+      .preview-title {
+        font-size: 16px;
+        text-align: center;
+        margin-bottom: 5px;
+      }
     </style>
   </head>
   <body>
+    <!-- Preview container -->
+    <div class="preview-container">
+      <div class="preview-title">Animation Preview</div>
+      <canvas id="previewCanvas" width="400" height="500"></canvas>
+    </div>
     <canvas id="canvas" width="1300" height="900"></canvas>
 
     <div class="controls">
