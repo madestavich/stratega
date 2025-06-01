@@ -156,11 +156,19 @@
     </style>
   </head>
   <body>
-    <!-- Preview container -->
-    <div class="preview-container">
-      <div class="preview-title">Animation Preview</div>
-      <canvas id="previewCanvas" width="400" height="500"></canvas>
+    <div>
+      <!-- Preview container -->
+      <div class="preview-container">
+        <div class="preview-title">Animation Preview</div>
+        <canvas id="previewCanvas" width="400" height="500"></canvas>
+      </div>
+      <!-- Add the mirrored preview container -->
+      <div class="preview-container">
+        <div class="preview-title">Mirrored Animation Preview</div>
+        <canvas id="mirroredPreviewCanvas" width="400" height="500"></canvas>
+      </div>
     </div>
+
     <canvas id="canvas" width="1300" height="900"></canvas>
 
     <div class="controls">

@@ -33,6 +33,13 @@ document.addEventListener("DOMContentLoaded", () => {
       this.bulletPointY = document.getElementById("bulletPointY");
       this.previewCanvas = document.getElementById("previewCanvas");
       this.previewRenderer = new AnimationPreviewRenderer(this.previewCanvas);
+      this.mirroredPreviewCanvas = document.getElementById(
+        "mirroredPreviewCanvas"
+      );
+      this.mirroredPreviewRenderer = new AnimationPreviewRenderer(
+        this.mirroredPreviewCanvas,
+        true
+      );
     }
 
     updateUIState() {
@@ -76,8 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
           selectedSpritesheet.sourceImage.link,
           selectedAnimation.frames
         );
+        this.mirroredPreviewRenderer.startPreview(
+          selectedSpritesheet.sourceImage.link,
+          selectedAnimation.frames
+        );
       } else {
         this.previewRenderer.stopPreview();
+        this.mirroredPreviewRenderer.stopPreview();
       }
     }
 
