@@ -124,17 +124,6 @@
               "y": 270
             },
             "bulletPoint": null
-          },
-          {
-            "x": 1043,
-            "y": 174,
-            "width": 116,
-            "height": 93,
-            "frameCenter": {
-              "x": 1101,
-              "y": 267
-            },
-            "bulletPoint": null
           }
         ]
       },

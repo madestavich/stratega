@@ -818,7 +818,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   class AnimationPreviewRenderer {
-    constructor(canvas) {
+    constructor(canvas, mirrored = false) {
       this.canvas = canvas;
       this.ctx = canvas.getContext("2d");
       this.image = null;
@@ -826,7 +826,8 @@ document.addEventListener("DOMContentLoaded", () => {
       this.currentFrameIndex = 0;
       this.animationInterval = null;
       this.frameDelay = 150; // milliseconds between frames
-      this.scale = 2.5; // Add scaling factor
+      this.scale = 2.5; // scaling factor
+      this.mirrored = mirrored; // Add mirrored flag
     }
 
     startPreview(imageSrc, frames) {
@@ -876,21 +877,51 @@ document.addEventListener("DOMContentLoaded", () => {
       // Calculate drawing position with scaling
       const offsetX = frame.frameCenter.x - frame.x;
       const offsetY = frame.frameCenter.y - frame.y;
-      const drawX = centerX - offsetX * this.scale;
-      const drawY = centerY - offsetY * this.scale;
 
-      // Draw the frame with scaling
-      this.ctx.drawImage(
-        this.image,
-        frame.x,
-        frame.y,
-        frame.width,
-        frame.height,
-        drawX,
-        drawY,
-        frame.width * this.scale,
-        frame.height * this.scale
-      );
+      if (this.mirrored) {
+        // For mirrored view
+        this.ctx.save();
+
+        // Set the drawing position
+        const drawX = centerX + offsetX * this.scale - frame.width * this.scale;
+        const drawY = centerY - offsetY * this.scale;
+
+        // Apply mirroring transformation
+        this.ctx.translate(centerX, 0);
+        this.ctx.scale(-1, 1);
+        this.ctx.translate(-centerX, 0);
+
+        // Draw the frame with scaling
+        this.ctx.drawImage(
+          this.image,
+          frame.x,
+          frame.y,
+          frame.width,
+          frame.height,
+          drawX,
+          drawY,
+          frame.width * this.scale,
+          frame.height * this.scale
+        );
+
+        this.ctx.restore();
+      } else {
+        // Original non-mirrored rendering
+        const drawX = centerX - offsetX * this.scale;
+        const drawY = centerY - offsetY * this.scale;
+
+        this.ctx.drawImage(
+          this.image,
+          frame.x,
+          frame.y,
+          frame.width,
+          frame.height,
+          drawX,
+          drawY,
+          frame.width * this.scale,
+          frame.height * this.scale
+        );
+      }
 
       // Move to next frame
       this.currentFrameIndex =
