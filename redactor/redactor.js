@@ -1018,16 +1018,17 @@ document.addEventListener("DOMContentLoaded", () => {
         // For mirrored view
         this.ctx.save();
 
-        // Set the drawing position
-        const drawX = centerX + offsetX * this.scale - frame.width * this.scale;
-        const drawY = centerY - offsetY * this.scale;
-
-        // Apply mirroring transformation
+        // Встановлюємо точку відліку в центр канвасу
         this.ctx.translate(centerX, 0);
+        // Застосовуємо дзеркальне відображення по горизонталі
         this.ctx.scale(-1, 1);
+        // Повертаємо точку відліку назад
         this.ctx.translate(-centerX, 0);
 
-        // Draw the frame with scaling
+        // Використовуємо ті ж координати, що й для звичайного відображення
+        const drawX = centerX - offsetX * this.scale;
+        const drawY = centerY - offsetY * this.scale;
+
         this.ctx.drawImage(
           this.image,
           frame.x,
