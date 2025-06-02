@@ -96,9 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setupEventListeners() {
-      this.frameSelectionToggle.addEventListener("change", (e) => {
-        this.canvasRenderer.enableFrameSelection(e.target.checked);
-      });
+      // this.frameSelectionToggle.addEventListener("change", (e) => {
+      //   this.canvasRenderer.enableFrameSelection(e.target.checked);
+      // });
       this.sheetSelect.addEventListener("change", () => {
         this.currentSpritesheetKey = this.sheetSelect.value;
         this.updateAnimationSelect();
@@ -784,7 +784,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initCanvasEvents() {
       this.canvas.addEventListener("mousedown", (e) => {
-        if (this.isFrameSelectionMode) {
+        if (this.isSpacePressed) {
           if (!editor.currentSpritesheetKey || !editor.currentAnimation) return;
 
           this.isSelectingFrame = true;
@@ -802,6 +802,25 @@ document.addEventListener("DOMContentLoaded", () => {
             },
           };
           return;
+        }
+
+        // Alt+click для переміщення існуючого фрейму
+        if (this.isAltPressed && this.currentFrame) {
+          const clickX = (e.offsetX - this.imageOffsetX) / this.zoomLevel;
+          const clickY = (e.offsetY - this.imageOffsetY) / this.zoomLevel;
+
+          // Перевіряємо, чи клік всередині поточного фрейму
+          if (
+            clickX >= this.currentFrame.x &&
+            clickX <= this.currentFrame.x + this.currentFrame.width &&
+            clickY >= this.currentFrame.y &&
+            clickY <= this.currentFrame.y + this.currentFrame.height
+          ) {
+            this.isMovingFrame = true;
+            this.moveStartX = clickX;
+            this.moveStartY = clickY;
+            return;
+          }
         }
 
         // Ctrl+click for changing center point
@@ -849,6 +868,7 @@ document.addEventListener("DOMContentLoaded", () => {
         this.startY = e.clientY;
       });
 
+      // Замінити існуючий обробник mousemove (приблизно рядок 518)
       this.canvas.addEventListener("mousemove", (e) => {
         if (this.isSelectingFrame) {
           // Adjust for zoom when selecting frame
@@ -868,6 +888,55 @@ document.addEventListener("DOMContentLoaded", () => {
           // Встановлюємо центр фрейму за замовчуванням
           this.currentFrame.frameCenter.x = x + width / 2;
           this.currentFrame.frameCenter.y = y + height;
+
+          this.redrawCanvas();
+          return;
+        }
+
+        // Обробка переміщення фрейму
+        if (this.isMovingFrame && this.currentFrame) {
+          const currentX = (e.offsetX - this.imageOffsetX) / this.zoomLevel;
+          const currentY = (e.offsetY - this.imageOffsetY) / this.zoomLevel;
+
+          const dx = currentX - this.moveStartX;
+          const dy = currentY - this.moveStartY;
+
+          // Оновлюємо позицію фрейму
+          this.currentFrame.x += dx;
+          this.currentFrame.y += dy;
+
+          // Оновлюємо позицію центру фрейму
+          this.currentFrame.frameCenter.x += dx;
+          this.currentFrame.frameCenter.y += dy;
+
+          // Оновлюємо позицію точки пострілу, якщо вона існує
+          if (this.currentFrame.bulletPoint) {
+            this.currentFrame.bulletPoint.x += dx;
+            this.currentFrame.bulletPoint.y += dy;
+          }
+
+          // Оновлюємо початкову точку для наступного руху
+          this.moveStartX = currentX;
+          this.moveStartY = currentY;
+
+          // Оновлюємо значення в полях вводу
+          editor.frameX.value = Math.round(this.currentFrame.x);
+          editor.frameY.value = Math.round(this.currentFrame.y);
+          editor.centerX.value = Math.round(this.currentFrame.frameCenter.x);
+          editor.centerY.value = Math.round(this.currentFrame.frameCenter.y);
+
+          if (
+            editor.bulletPointX &&
+            editor.bulletPointY &&
+            this.currentFrame.bulletPoint
+          ) {
+            editor.bulletPointX.value = Math.round(
+              this.currentFrame.bulletPoint.x
+            );
+            editor.bulletPointY.value = Math.round(
+              this.currentFrame.bulletPoint.y
+            );
+          }
 
           this.redrawCanvas();
           return;
@@ -924,6 +993,7 @@ document.addEventListener("DOMContentLoaded", () => {
         this.redrawCanvas();
       });
 
+      // Замінити існуючий обробник mouseup (приблизно рядок 580)
       this.canvas.addEventListener("mouseup", () => {
         if (this.isSelectingFrame) {
           this.isSelectingFrame = false;
@@ -946,9 +1016,38 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+        if (this.isMovingFrame) {
+          this.isMovingFrame = false;
+          editor.applyFrameSelection(this.currentFrame);
+          return;
+        }
+
         this.isDragging = false;
         this.lastOffsetX = this.imageOffsetX;
         this.lastOffsetY = this.imageOffsetY;
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault(); // Запобігаємо прокрутці сторінки
+          this.isSpacePressed = true;
+          this.canvas.style.cursor = "crosshair";
+        }
+        if (e.code === "AltLeft" || e.code === "AltRight") {
+          e.preventDefault();
+          this.isAltPressed = true;
+          this.canvas.style.cursor = "move";
+        }
+      });
+
+      document.addEventListener("keyup", (e) => {
+        if (e.code === "Space") {
+          this.isSpacePressed = false;
+          this.canvas.style.cursor = "default";
+        }
+        if (e.code === "AltLeft" || e.code === "AltRight") {
+          this.isAltPressed = false;
+          this.canvas.style.cursor = "default";
+        }
       });
     }
   }
@@ -964,6 +1063,11 @@ document.addEventListener("DOMContentLoaded", () => {
       this.frameDelay = 150; // milliseconds between frames
       this.scale = 2.5; // scaling factor
       this.mirrored = mirrored; // Add mirrored flag
+      this.isSpacePressed = false;
+      this.isAltPressed = false;
+      this.isMovingFrame = false;
+      this.moveStartX = 0;
+      this.moveStartY = 0;
     }
 
     startPreview(imageSrc, frames) {
