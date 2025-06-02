@@ -151,8 +151,21 @@
       .preview-title {
         font-size: 16px;
         text-align: center;
-        margin-bottom: 5px;
+        /* margin-bottom: 5px; */
       }
+      
+  
+  #zoomSlider {
+    /* width: 200px; */
+    vertical-align: middle;
+  }
+  
+  #zoomValue {
+    display: inline-block;
+    width: 50px;
+    text-align: left;
+    margin-left: 5px;
+  }
     </style>
   </head>
   <body>
@@ -170,6 +183,23 @@
     </div>
 
     <canvas id="canvas" width="1300" height="900"></canvas>
+
+    <div class="controls">
+      <!-- Add this after existing controls -->
+      <div>
+        <label for="zoomSlider">Zoom:</label>
+        <input
+          type="range"
+          id="zoomSlider"
+          min="0.5"
+          max="3"
+          step="0.1"
+          value="1"
+        />
+        <span id="zoomValue">100%</span>
+      </div>
+
+      
 
     <div class="controls">
       <div>
