@@ -14,11 +14,12 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 18;
+    this.fixedTimeStep = 1000 / 15;
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
     this.isRunning = true;
+    this.isPaused = true;
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -33,6 +34,8 @@ class GameManager {
     this.actionManager = new ActionManager(this.objectManager);
     this.inputManager = new InputManager();
 
+    this.inputManager.setPlayButtonCallback(() => this.togglePauseMode());
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "`") {
         this.toggleDebugMode();
@@ -40,6 +43,15 @@ class GameManager {
     });
 
     this.start();
+  }
+
+  togglePauseMode() {
+    this.isPaused = !this.isPaused;
+
+    // Оновлюємо текст кнопки через InputManager
+    this.inputManager.updatePlayButtonText(this.isPaused);
+
+    console.log(`Game ${this.isPaused ? "paused" : "resumed"}`);
   }
 
   logGameObjects() {
@@ -233,11 +245,26 @@ class GameManager {
     if (this.lastTime === 0) this.lastTime = timestamp;
     this.deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
+
+    // Завжди накопичуємо час для анімацій
     this.accumulator += this.deltaTime;
 
+    // Оновлюємо анімації з тим самим фіксованим кроком
     while (this.accumulator >= this.fixedTimeStep) {
-      this.update(this.fixedTimeStep);
+      // Оновлюємо анімації навіть у режимі паузи
+      for (const obj of this.objectManager.objects) {
+        if (obj.animator && !obj.animator.hasFinished) {
+          obj.animator.nextFrame();
+        }
+      }
+
+      // Оновлюємо логіку гри тільки якщо не на паузі
+      if (!this.isPaused) {
+        this.update(this.fixedTimeStep);
+      }
+
       this.accumulator -= this.fixedTimeStep;
+
       // Якщо гра зупинена через помилку, виходимо з циклу
       if (!this.isRunning) break;
     }
