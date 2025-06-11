@@ -6,9 +6,6 @@ import { ConfigLoader } from "./game_configs/configLoader.js";
 //! objects actions
 import { MoveAction } from "./game_objects/actions/moveAction.js";
 import { AttackAction } from "./game_objects/actions/attackAction.js";
-// import { DefendAction } from "./actions/defendAction.js";
-// import { PatrolAction } from "./actions/patrolAction.js";
-// import { RetreatAction } from "./actions/retreatAction.js";
 
 //! object
 

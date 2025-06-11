@@ -97,55 +97,6 @@ class GameManager {
     await this.configLoader.load(spriteConfigList);
 
     // створення об'єктів
-    this.objectManager.fillArea(
-      this.configLoader.getConfig("mage"),
-      {
-        gridWidth: 2,
-        gridHeight: 2,
-        expansionDirection: "topRight",
-        objectType: "mage",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 10,
-        availableActions: ["move", "attack"],
-        team: 2,
-        attackDamage: 20,
-        attackSpeed: 1.5,
-        health: 80,
-        isRanged: true,
-        minRangeDistance: 10,
-        maxRangeDistance: 30,
-        bulletConfig: {
-          type: "fireball",
-          moveSpeed: 45,
-          damage: 100,
-        },
-      },
-      3,
-      15,
-      6,
-      50
-    );
-
-    this.objectManager.fillArea(
-      this.configLoader.getConfig("paladin"),
-      {
-        gridWidth: 2,
-        gridHeight: 2,
-        expansionDirection: "topRight",
-        objectType: "paladin",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 12,
-        availableActions: ["move", "attack"],
-        team: 2,
-        attackDamage: 60,
-        attackSpeed: 1.2,
-        health: 150,
-      },
-      14,
-      15,
-      18,
-      80
-    );
 
     this.objectManager.fillArea(
       this.configLoader.getConfig("rider"),
@@ -168,25 +119,7 @@ class GameManager {
       80
     );
 
-    // Assign random movement targets to all objects
-    // this.assignRandomMovementToAllObjects();
-    // this.toggleDebugMode();
-
     requestAnimationFrame((t) => this.loop(t));
-  }
-
-  assignRandomMovementToAllObjects() {
-    const moveAction = this.actionManager.actions.move;
-    if (!moveAction) return;
-
-    for (const obj of this.objectManager.objects) {
-      // Generate random target within grid bounds
-      const targetCol = Math.floor(Math.random() * this.gridManager.cols);
-      const targetRow = Math.floor(Math.random() * this.gridManager.rows);
-
-      // Use the setMoveTarget method from MoveAction
-      moveAction.setMoveTarget(obj, targetCol, targetRow, [0]);
-    }
   }
 
   update(dt) {
