@@ -115,7 +115,28 @@ class GameManager {
       },
       45,
       15,
-      60,
+      58,
+      80
+    );
+
+    this.objectManager.fillArea(
+      this.configLoader.getConfig("rider"),
+      {
+        gridWidth: 3,
+        gridHeight: 2,
+        expansionDirection: "topRight",
+        objectType: "rider",
+        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
+        moveSpeed: 25,
+        availableActions: ["move", "attack"],
+        team: 2,
+        attackDamage: 55,
+        attackSpeed: 0.8,
+        health: 140,
+      },
+      2,
+      15,
+      15,
       80
     );
 
@@ -178,13 +199,10 @@ class GameManager {
     if (this.lastTime === 0) this.lastTime = timestamp;
     this.deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
-
-    // Завжди накопичуємо час для анімацій
     this.accumulator += this.deltaTime;
 
-    // Оновлюємо анімації з тим самим фіксованим кроком
     while (this.accumulator >= this.fixedTimeStep) {
-      // Оновлюємо анімації навіть у режимі паузи
+      // Оновлюємо анімації для всіх об'єктів незалежно від режиму
       for (const obj of this.objectManager.objects) {
         if (obj.animator && !obj.animator.hasFinished) {
           obj.animator.nextFrame();
@@ -193,7 +211,19 @@ class GameManager {
 
       // Оновлюємо логіку гри тільки якщо не на паузі
       if (!this.isPaused) {
-        this.update(this.fixedTimeStep);
+        // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
+        for (const obj of this.objectManager.objects) {
+          // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
+          if (!obj.isDead) {
+            obj.updateZCoordinate();
+          }
+        }
+
+        // Оновлюємо дії для всіх об'єктів через ActionManager
+        this.actionManager.update(this.fixedTimeStep);
+
+        // Оновлюємо стан сітки після руху
+        this.gridManager.updateGridObjects(this.objectManager);
       }
 
       this.accumulator -= this.fixedTimeStep;
