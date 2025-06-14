@@ -86,59 +86,10 @@ class GameManager {
 
   async start() {
     const spriteConfigList = {
-      skeleton: "/game_configs/units/config3.json",
       rider: "/game_configs/units/config4.json",
-      paladin: "/game_configs/units/config5.json",
-      horseman: "/game_configs/units/config6.json",
-      mage: "/game_configs/units/config7.json",
-      // інші
     };
 
     await this.configLoader.load(spriteConfigList);
-
-    // створення об'єктів
-
-    this.objectManager.fillArea(
-      this.configLoader.getConfig("rider"),
-      {
-        gridWidth: 3,
-        gridHeight: 2,
-        expansionDirection: "topRight",
-        objectType: "rider",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 25,
-        availableActions: ["move", "attack"],
-        team: 1,
-        attackDamage: 55,
-        attackSpeed: 0.8,
-        health: 140,
-      },
-      45,
-      15,
-      58,
-      80
-    );
-
-    this.objectManager.fillArea(
-      this.configLoader.getConfig("rider"),
-      {
-        gridWidth: 3,
-        gridHeight: 2,
-        expansionDirection: "topRight",
-        objectType: "rider",
-        actionPriorities: ["attack", "move"], // Пріоритет дій для цього об'єкта
-        moveSpeed: 25,
-        availableActions: ["move", "attack"],
-        team: 2,
-        attackDamage: 55,
-        attackSpeed: 0.8,
-        health: 140,
-      },
-      2,
-      15,
-      15,
-      80
-    );
 
     requestAnimationFrame((t) => this.loop(t));
   }
