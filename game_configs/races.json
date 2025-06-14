@@ -1,0 +1,83 @@
+{
+  "castle": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "conflux": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "dungeon": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "fortress": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "inferno": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "necropolis": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "rampart": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "stronghold": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "tower": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "neutral": {
+    "units": {
+      "tier_one": {},
+      "tier_two": {},
+      "tier_three": {},
+      "tier_four": {}
+    }
+  },
+  "war_machines": {}
+}
