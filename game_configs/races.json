@@ -74,7 +74,21 @@
   "neutral": {
     "units": {
       "tier_one": {},
-      "tier_two": {},
+      "tier_two": {
+        "rider": {
+          "gridWidth": 3,
+          "gridHeight": 2,
+          "expansionDirection": "topRight",
+          "objectType": "rider",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 25,
+          "availableActions": ["move", "attack"],
+          "team": 1,
+          "attackDamage": 55,
+          "attackSpeed": 0.8,
+          "health": 140
+        }
+      },
       "tier_three": {},
       "tier_four": {}
     }
