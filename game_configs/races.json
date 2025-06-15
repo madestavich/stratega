@@ -83,7 +83,6 @@
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 25,
           "availableActions": ["move", "attack"],
-          "team": 1,
           "attackDamage": 55,
           "attackSpeed": 0.8,
           "health": 140

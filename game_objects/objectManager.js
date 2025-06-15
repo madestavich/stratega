@@ -10,7 +10,7 @@ export class ObjectManager {
     this.particles = [];
   }
 
-  async createObject(objectType, objectConfig, gridCol, gridRow) {
+  async createObject(objectType, objectConfig, team, gridCol, gridRow) {
     // Перевіряємо, чи спрайт вже завантажений
     if (!this.configLoader.getConfig(objectType)) {
       // Якщо ні, завантажуємо його
@@ -25,6 +25,7 @@ export class ObjectManager {
       return null;
     }
 
+    objectConfig.team = team;
     const obj = new GameObject(
       this.ctx,
       spriteConfig,

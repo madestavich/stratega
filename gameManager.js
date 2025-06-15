@@ -98,8 +98,16 @@ class GameManager {
     await this.objectManager.createObject(
       "rider",
       this.configLoader.getUnitConfig("neutral", "tier_two", "rider"),
+      1,
       10,
       10
+    );
+    await this.objectManager.createObject(
+      "rider",
+      this.configLoader.getUnitConfig("neutral", "tier_two", "rider"),
+      2,
+      30,
+      30
     );
 
     requestAnimationFrame((t) => this.loop(t));
