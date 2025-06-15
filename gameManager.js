@@ -92,8 +92,15 @@ class GameManager {
   }
 
   async start() {
+    await this.configLoader.loadRacesConfig();
     await this.spriteLoader.loadRaceSprites("neutral");
-    await this.objectManager.createObject("rider", objectConfig, 10, 10);
+
+    await this.objectManager.createObject(
+      "rider",
+      this.configLoader.getUnitConfig("neutral", "tier_two", "rider"),
+      10,
+      10
+    );
 
     requestAnimationFrame((t) => this.loop(t));
   }

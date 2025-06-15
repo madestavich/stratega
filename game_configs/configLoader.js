@@ -1,6 +1,7 @@
 export class ConfigLoader {
   constructor() {
     this.configs = {};
+    this.racesConfig = null;
   }
 
   async load(configList) {
@@ -15,6 +16,33 @@ export class ConfigLoader {
       config[defaultId].sourceImage.link = img;
 
       this.configs[key] = config;
+    }
+  }
+
+  async loadRacesConfig() {
+    try {
+      const response = await fetch("/game_configs/races.json");
+      this.racesConfig = await response.json();
+      return this.racesConfig;
+    } catch (error) {
+      console.error("Error loading races configuration:", error);
+      return null;
+    }
+  }
+
+  getUnitConfig(race, tier, unitName) {
+    if (!this.racesConfig) {
+      console.warn("Races config not loaded. Call loadRacesConfig first.");
+      return null;
+    }
+
+    try {
+      return this.racesConfig[race].units[tier][unitName];
+    } catch (error) {
+      console.error(
+        `Unit config not found: race=${race}, tier=${tier}, unit=${unitName}`
+      );
+      return null;
     }
   }
 
