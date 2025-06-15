@@ -3,6 +3,7 @@ import { ObjectManager } from "./import.js";
 import { GridManager } from "./import.js";
 import { ActionManager } from "./import.js";
 import { InputManager } from "./import.js";
+import { SpriteLoader } from "./import.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -24,13 +25,19 @@ class GameManager {
     //! ініціалізація об'єктів і інших менеджерів
 
     this.configLoader = new ConfigLoader();
+    this.spriteLoader = new SpriteLoader(this.configLoader);
     this.gridManager = new GridManager(ctx, {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
       rows: 80,
       cols: 60,
     });
-    this.objectManager = new ObjectManager(ctx, this.gridManager);
+    this.objectManager = new ObjectManager(
+      ctx,
+      this.gridManager,
+      this.configLoader,
+      this.spriteLoader
+    );
     this.actionManager = new ActionManager(this.objectManager);
     this.inputManager = new InputManager();
 
@@ -85,11 +92,8 @@ class GameManager {
   }
 
   async start() {
-    const spriteConfigList = {
-      rider: "/game_configs/units/config4.json",
-    };
-
-    await this.configLoader.load(spriteConfigList);
+    await this.spriteLoader.loadRaceSprites("neutral");
+    await this.objectManager.createObject("rider", objectConfig, 10, 10);
 
     requestAnimationFrame((t) => this.loop(t));
   }
