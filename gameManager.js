@@ -141,7 +141,7 @@ class GameManager {
       this.configLoader.getUnitConfig("neutral", "tier_two", "rider"),
       2,
       30,
-      30
+      10
     );
 
     requestAnimationFrame((t) => this.loop(t));
