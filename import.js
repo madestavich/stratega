@@ -3,6 +3,7 @@
 import { Pathfinder } from "./game_map/pathfinder.js";
 import { ConfigLoader } from "./game_configs/configLoader.js";
 import { SpriteLoader } from "./game_configs/spriteLoader.js";
+import { Player } from "./player.js";
 
 //! objects actions
 import { MoveAction } from "./game_objects/actions/moveAction.js";
@@ -21,6 +22,7 @@ import { ObjectManager } from "./game_objects/objectManager.js";
 import { GridManager } from "./game_map/gridManager.js";
 import { ActionManager } from "./game_objects/actionManager.js";
 import { InputManager } from "./input/inputManager.js";
+import { InterfaceManager } from "./input/interfaceManager.js";
 
 export {
   ObjectManager,
@@ -36,4 +38,6 @@ export {
   ConfigLoader,
   Particle,
   SpriteLoader,
+  Player,
+  InterfaceManager,
 };

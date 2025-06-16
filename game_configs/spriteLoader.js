@@ -4,7 +4,7 @@ export class SpriteLoader {
     this.loadedSprites = new Set();
     this.spriteConfigMap = {
       // Мапа всіх доступних спрайтів
-      rider: "/game_configs/units/config4.json",
+      rider: "/game_configs/units/rider.json",
       // Додайте інші спрайти тут
     };
   }

@@ -4,6 +4,8 @@ import { GridManager } from "./import.js";
 import { ActionManager } from "./import.js";
 import { InputManager } from "./import.js";
 import { SpriteLoader } from "./import.js";
+import { Player } from "./import.js";
+import { InterfaceManager } from "./import.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -21,6 +23,7 @@ class GameManager {
     this.debugInterval = null;
     this.isRunning = true;
     this.isPaused = true;
+    this.player = null;
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -42,6 +45,10 @@ class GameManager {
     this.inputManager = new InputManager();
 
     this.inputManager.setPlayButtonCallback(() => this.togglePauseMode());
+    this.interfaceManager = new InterfaceManager(
+      this.spriteLoader,
+      this.configLoader
+    );
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "`") {
@@ -91,9 +98,36 @@ class GameManager {
     }
   }
 
+  async loadUnitIcons(race) {
+    // Get all units for the race
+    const raceData = this.configLoader.racesConfig[race];
+    if (!raceData) return;
+
+    // Collect all unit keys that need icons
+    const unitKeys = [];
+    Object.values(raceData.units).forEach((tier) => {
+      Object.keys(tier).forEach((unitKey) => {
+        unitKeys.push(`${unitKey}_icon`);
+      });
+    });
+
+    // Load sprites for all unit icons
+    if (unitKeys.length > 0) {
+      await this.spriteLoader.loadSprites(unitKeys);
+    }
+  }
+
   async start() {
     await this.configLoader.loadRacesConfig();
-    await this.spriteLoader.loadRaceSprites("neutral");
+    // Create player (for example purposes)
+    this.player = new Player({
+      nickname: "Player1",
+      race: "neutral", // Use one of the races from races.json
+      team: 1,
+      coins: 100,
+    });
+
+    this.interfaceManager.updatePlayerInterface(this.player);
 
     await this.objectManager.createObject(
       "rider",
