@@ -81,7 +81,7 @@ export class InterfaceManager {
   }
 
   /**
-   * Create a unit element with icon and name
+   * Create a unit element with icon only
    * @param {Object} unit - Unit data with name and key
    * @returns {HTMLElement} - The created unit element
    */
@@ -89,10 +89,14 @@ export class InterfaceManager {
     const unitIcon = document.createElement("div");
     unitIcon.className = "unit-icon";
     unitIcon.dataset.unitKey = unit.key;
+    unitIcon.title = unit.name; // Add name as tooltip
 
     // Create image element
     const img = document.createElement("img");
     img.alt = unit.name;
+    img.style.width = "100%"; // Make image fill the container
+    img.style.height = "100%"; // Make image fill the container
+    img.style.objectFit = "contain"; // Maintain aspect ratio while filling
 
     // Try to get the unit's sprite configuration
     const spriteConfig = this.configLoader.getConfig(unit.key);
@@ -131,33 +135,8 @@ export class InterfaceManager {
         // Use the canvas as the image source
         img.src = canvas.toDataURL();
       } else {
-        // If no icon animation, try to use the first frame of the idle animation
-        if (spritesheet.animations.idle) {
-          const idleFrame = spritesheet.animations.idle.frames[0];
-
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-
-          canvas.width = idleFrame.width;
-          canvas.height = idleFrame.height;
-
-          ctx.drawImage(
-            spritesheet.sourceImage.link,
-            idleFrame.x,
-            idleFrame.y,
-            idleFrame.width,
-            idleFrame.height,
-            0,
-            0,
-            idleFrame.width,
-            idleFrame.height
-          );
-
-          img.src = canvas.toDataURL();
-        } else {
-          // Fallback to placeholder
-          img.src = "placeholder.png";
-        }
+        // Fallback to placeholder if no icon animation
+        img.src = "placeholder.png";
       }
     } else {
       // Fallback to placeholder if no sprite config found
@@ -165,14 +144,8 @@ export class InterfaceManager {
       console.warn(`Sprite config not found for unit: ${unit.key}`);
     }
 
-    // Create name element
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "unit-name";
-    nameDiv.textContent = unit.name;
-
-    // Append elements
+    // Append only the image element
     unitIcon.appendChild(img);
-    unitIcon.appendChild(nameDiv);
 
     return unitIcon;
   }
