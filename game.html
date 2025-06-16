@@ -103,6 +103,8 @@
         gap: 10px;
         padding: 10px 0;
         height: 100%;
+        align-content: flex-start; /* Ensures items align at the top */
+        overflow-y: auto; /* Adds scrolling if content exceeds height */
       }
 
       .category-content.active {
@@ -121,6 +123,7 @@
         justify-content: center;
         transition: border-color 0.3s;
         flex-direction: column;
+        flex-shrink: 0; /* Prevents the unit from shrinking */
       }
 
       .unit-icon:hover {
