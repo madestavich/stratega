@@ -1,0 +1,57 @@
+{
+  "jack": {
+    "name": "jack",
+    "sourceImage": {
+      "link": "../sprites/thing.png",
+      "width": 631,
+      "height": 638
+    },
+    "animations": {
+      "go": {
+        "name": "go",
+        "frames": [
+          {
+            "x": 3,
+            "y": 4,
+            "width": 99,
+            "height": 124,
+            "frameCenter": {
+              "x": 53,
+              "y": 128
+            }
+          },
+          {
+            "x": 108,
+            "y": 3,
+            "width": 101,
+            "height": 125,
+            "frameCenter": {
+              "x": 158,
+              "y": 128
+            }
+          },
+          {
+            "x": 212,
+            "y": 3,
+            "width": 101,
+            "height": 125,
+            "frameCenter": {
+              "x": 263,
+              "y": 128
+            }
+          },
+          {
+            "x": 317.04761904761904,
+            "y": 2,
+            "width": 102,
+            "height": 125,
+            "frameCenter": {
+              "x": 368.04761904761904,
+              "y": 127
+            }
+          }
+        ]
+      }
+    }
+  }
+}
