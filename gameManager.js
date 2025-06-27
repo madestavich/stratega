@@ -135,14 +135,6 @@ class GameManager {
 
     this.interfaceManager.updatePlayerInterface(this.player);
 
-    await this.objectManager.createObject(
-      "rider",
-      this.configLoader.getUnitConfig("neutral", "tier_two", "rider"),
-      2,
-      30,
-      10
-    );
-
     requestAnimationFrame((t) => this.loop(t));
   }
 
