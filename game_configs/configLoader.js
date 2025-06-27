@@ -6,7 +6,12 @@ export class ConfigLoader {
 
   async load(configList) {
     for (const [key, path] of Object.entries(configList)) {
-      const res = await fetch(path);
+      // Adjust path for GitHub Pages if needed
+      const adjustedPath = window.location.pathname.includes("/stratega")
+        ? `/stratega${path}`
+        : path;
+
+      const res = await fetch(adjustedPath);
       const config = await res.json();
 
       const defaultId = Object.keys(config)[0];
@@ -21,7 +26,12 @@ export class ConfigLoader {
 
   async loadRacesConfig() {
     try {
-      const response = await fetch("/game_configs/races.json");
+      // Get the base URL dynamically
+      const baseUrl = window.location.pathname.includes("/stratega")
+        ? "/stratega/game_configs/races.json"
+        : "/game_configs/races.json";
+
+      const response = await fetch(baseUrl);
       this.racesConfig = await response.json();
       return this.racesConfig;
     } catch (error) {
