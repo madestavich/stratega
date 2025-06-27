@@ -5,33 +5,73 @@ export class ConfigLoader {
   }
 
   async load(configList) {
+    const repoName = "stratega"; // Your repository name
+    const isGitHubPages = window.location.hostname.includes("github.io");
+
     for (const [key, path] of Object.entries(configList)) {
-      // Adjust path for GitHub Pages if needed
-      const adjustedPath = window.location.pathname.includes("/stratega")
-        ? `/stratega${path}`
-        : path;
+      try {
+        // Adjust path for GitHub Pages if needed
+        let adjustedPath = path;
+        if (isGitHubPages && !path.startsWith(`/${repoName}`)) {
+          adjustedPath = `/${repoName}${path}`;
+        }
 
-      const res = await fetch(adjustedPath);
-      const config = await res.json();
+        console.log(`Loading config ${key} from:`, adjustedPath);
+        const res = await fetch(adjustedPath);
 
-      const defaultId = Object.keys(config)[0];
-      const img = new Image();
-      img.src = config[defaultId].sourceImage.link;
-      await new Promise((resolve) => (img.onload = resolve));
-      config[defaultId].sourceImage.link = img;
+        if (!res.ok) {
+          throw new Error(
+            `Failed to load config ${key}: ${res.status} ${res.statusText}`
+          );
+        }
 
-      this.configs[key] = config;
+        const config = await res.json();
+
+        const defaultId = Object.keys(config)[0];
+        const img = new Image();
+        img.src = config[defaultId].sourceImage.link;
+
+        // Also adjust image path if needed
+        if (
+          isGitHubPages &&
+          !img.src.includes(`/${repoName}/`) &&
+          !img.src.startsWith("http")
+        ) {
+          img.src = `/${repoName}${img.src}`;
+        }
+
+        await new Promise((resolve) => (img.onload = resolve));
+        config[defaultId].sourceImage.link = img;
+
+        this.configs[key] = config;
+      } catch (error) {
+        console.error(`Error loading config ${key}:`, error);
+      }
     }
   }
 
   async loadRacesConfig() {
     try {
-      // Get the base URL dynamically
-      const baseUrl = window.location.pathname.includes("/stratega")
-        ? "/stratega/game_configs/races.json"
-        : "/game_configs/races.json";
+      // Create the correct URL based on the repository name
+      const repoName = "stratega"; // Your repository name
+      const isGitHubPages = window.location.hostname.includes("github.io");
 
-      const response = await fetch(baseUrl);
+      let racesConfigPath;
+      if (isGitHubPages) {
+        racesConfigPath = `/${repoName}/game_configs/races.json`;
+      } else {
+        racesConfigPath = "/game_configs/races.json";
+      }
+
+      console.log("Attempting to load races config from:", racesConfigPath);
+      const response = await fetch(racesConfigPath);
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to load races config: ${response.status} ${response.statusText}`
+        );
+      }
+
       this.racesConfig = await response.json();
       return this.racesConfig;
     } catch (error) {
