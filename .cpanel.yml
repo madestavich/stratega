@@ -3,3 +3,11 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home3/herostri/public_html/
     - /bin/cp index.html $DEPLOYPATH
+    - /bin/cp player.js $DEPLOYPATH
+    - /bin/cp import.js $DEPLOYPATH
+    - /bin/cp gameManager.js $DEPLOYPATH
+    - /bin/cp -R sprites $DEPLOYPATH
+    - /bin/cp -R input $DEPLOYPATH
+    - /bin/cp -R game_objects $DEPLOYPATH
+    - /bin/cp -R game_map $DEPLOYPATH
+    - /bin/cp -R game_configs $DEPLOYPATH
