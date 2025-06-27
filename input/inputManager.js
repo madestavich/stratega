@@ -187,21 +187,14 @@ export class InputManager {
   }
 
   async placeUnitAtCursor() {
-    if (!this.gameManager || !this.selectedUnitKey) return;
-
-    // Отримуємо координати сітки з координат миші
     const gridCoords = this.gameManager.gridManager.getGridCellFromPixel(
       this.mouse.x,
       this.mouse.y
     );
 
-    if (!gridCoords) return;
-
     try {
       // Використовуємо новий метод для отримання конфігурації юніта
-      const { unitConfig, unitTier } = this.getUnitConfigAndTier(
-        this.selectedUnitKey
-      );
+      const { unitConfig } = this.getUnitConfigAndTier(this.selectedUnitKey);
 
       if (!unitConfig) {
         console.error(
@@ -230,44 +223,18 @@ export class InputManager {
         gridCoords.col,
         gridCoords.row
       );
-      console.log("Can place:", canPlace);
 
       if (!canPlace) {
-        console.log(
-          `Cannot place unit at ${gridCoords.col}, ${gridCoords.row} - not enough space or occupied cells`
-        );
         return; // Виходимо з функції, не створюючи юніта
       }
 
-      // Використовуємо існуючий метод для створення об'єкта ТІЛЬКИ якщо перевірка пройшла успішно
-      console.log("Creating unit at:", gridCoords.col, gridCoords.row);
-      const newUnit = await this.gameManager.objectManager.createObject(
+      await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
         this.gameManager.player.team,
         gridCoords.col,
         gridCoords.row
       );
-
-      if (newUnit) {
-        console.log("Unit created at:", newUnit.gridCol, newUnit.gridRow);
-        // Check if the unit was created at the expected position
-        if (
-          newUnit.gridCol !== gridCoords.col ||
-          newUnit.gridRow !== gridCoords.row
-        ) {
-          console.warn(
-            "Unit was repositioned from",
-            gridCoords.col,
-            gridCoords.row,
-            "to",
-            newUnit.gridCol,
-            newUnit.gridRow
-          );
-        }
-      }
-
-      // Важливо: оновлюємо сітку одразу після створення юніта
       this.gameManager.gridManager.updateGridObjects(
         this.gameManager.objectManager
       );
