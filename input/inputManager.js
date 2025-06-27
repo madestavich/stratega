@@ -120,34 +120,6 @@ export class InputManager {
     });
   }
 
-  initCanvasHandlers() {
-    if (this.canvas) {
-      this.canvas.addEventListener("mousemove", (event) => {
-        const rect = this.canvas.getBoundingClientRect();
-
-        // Враховуємо масштабування канвасу
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-
-        // Перетворюємо координати з урахуванням масштабування
-        this.mouse.x = (event.clientX - rect.left) * scaleX;
-        this.mouse.y = (event.clientY - rect.top) * scaleY;
-
-        // Оновлюємо комірку під курсором
-        this.hoverCell = this.gameManager.gridManager.getGridCellFromPixel(
-          this.mouse.x,
-          this.mouse.y
-        );
-      });
-
-      this.canvas.addEventListener("click", (event) => {
-        if (this.selectedUnitKey && this.gameManager) {
-          this.placeUnitAtCursor();
-        }
-      });
-    }
-  }
-
   // Метод для автоматичного визначення тіеру та конфігурації юніта
   getUnitConfigAndTier(unitKey) {
     if (!this.gameManager || !unitKey) {
@@ -183,63 +155,6 @@ export class InputManager {
     } catch (error) {
       console.error("Error in getUnitConfigAndTier:", error);
       return { unitConfig: null, unitTier: null };
-    }
-  }
-
-  async placeUnitAtCursor() {
-    const gridCoords = this.gameManager.gridManager.getGridCellFromPixel(
-      this.mouse.x,
-      this.mouse.y
-    );
-
-    try {
-      // Використовуємо новий метод для отримання конфігурації юніта
-      const { unitConfig } = this.getUnitConfigAndTier(this.selectedUnitKey);
-
-      if (!unitConfig) {
-        console.error(
-          `Unit configuration not found for ${this.selectedUnitKey}`
-        );
-        return;
-      }
-
-      // Створюємо тимчасовий об'єкт для перевірки розміщення
-      const tempObject = {
-        gridCol: gridCoords.col,
-        gridRow: gridCoords.row,
-        gridWidth: unitConfig.gridWidth || 1,
-        gridHeight: unitConfig.gridHeight || 1,
-        expansionDirection: unitConfig.expansionDirection || "bottomRight",
-      };
-
-      // ВАЖЛИВО: Спочатку оновлюємо сітку, щоб мати актуальну інформацію про зайняті клітинки
-      this.gameManager.gridManager.updateGridObjects(
-        this.gameManager.objectManager
-      );
-
-      // Використовуємо існуючий метод canPlaceAt для перевірки
-      const canPlace = this.gameManager.gridManager.canPlaceAt(
-        tempObject,
-        gridCoords.col,
-        gridCoords.row
-      );
-
-      if (!canPlace) {
-        return; // Виходимо з функції, не створюючи юніта
-      }
-
-      await this.gameManager.objectManager.createObject(
-        this.selectedUnitKey,
-        { ...unitConfig }, // Create a copy to avoid modifying the original
-        this.gameManager.player.team,
-        gridCoords.col,
-        gridCoords.row
-      );
-      this.gameManager.gridManager.updateGridObjects(
-        this.gameManager.objectManager
-      );
-    } catch (error) {
-      console.error(`Error creating unit ${this.selectedUnitKey}:`, error);
     }
   }
 
@@ -310,6 +225,63 @@ export class InputManager {
           );
         }
       }
+    }
+  }
+
+  async placeUnitAtCursor() {
+    const gridCoords = this.gameManager.gridManager.getGridCellFromPixel(
+      this.mouse.x,
+      this.mouse.y
+    );
+
+    try {
+      // Використовуємо новий метод для отримання конфігурації юніта
+      const { unitConfig } = this.getUnitConfigAndTier(this.selectedUnitKey);
+
+      if (!unitConfig) {
+        console.error(
+          `Unit configuration not found for ${this.selectedUnitKey}`
+        );
+        return;
+      }
+
+      // Створюємо тимчасовий об'єкт для перевірки розміщення
+      const tempObject = {
+        gridCol: gridCoords.col,
+        gridRow: gridCoords.row,
+        gridWidth: unitConfig.gridWidth || 1,
+        gridHeight: unitConfig.gridHeight || 1,
+        expansionDirection: unitConfig.expansionDirection || "bottomRight",
+      };
+
+      // ВАЖЛИВО: Спочатку оновлюємо сітку, щоб мати актуальну інформацію про зайняті клітинки
+      this.gameManager.gridManager.updateGridObjects(
+        this.gameManager.objectManager
+      );
+
+      // Використовуємо існуючий метод canPlaceAt для перевірки
+      const canPlace = this.gameManager.gridManager.canPlaceAt(
+        tempObject,
+        gridCoords.col,
+        gridCoords.row
+      );
+
+      if (!canPlace) {
+        return; // Виходимо з функції, не створюючи юніта
+      }
+
+      await this.gameManager.objectManager.createObject(
+        this.selectedUnitKey,
+        { ...unitConfig }, // Create a copy to avoid modifying the original
+        this.gameManager.player.team,
+        gridCoords.col,
+        gridCoords.row
+      );
+      this.gameManager.gridManager.updateGridObjects(
+        this.gameManager.objectManager
+      );
+    } catch (error) {
+      console.error(`Error creating unit ${this.selectedUnitKey}:`, error);
     }
   }
 }
