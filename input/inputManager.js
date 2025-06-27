@@ -71,23 +71,6 @@ export class InputManager {
         this.mouse.x = (event.clientX - rect.left) * scaleX;
         this.mouse.y = (event.clientY - rect.top) * scaleY;
 
-        // Додаємо логування для відлагодження
-        console.log(`Canvas rect: ${rect.width}x${rect.height}`);
-        console.log(
-          `Canvas actual: ${this.canvas.width}x${this.canvas.height}`
-        );
-        console.log(`Scale factors: ${scaleX.toFixed(2)}x${scaleY.toFixed(2)}`);
-        console.log(
-          `Raw mouse: (${event.clientX - rect.left}, ${
-            event.clientY - rect.top
-          })`
-        );
-        console.log(
-          `Adjusted mouse: (${this.mouse.x.toFixed(2)}, ${this.mouse.y.toFixed(
-            2
-          )})`
-        );
-
         // Update the hover cell
         this.hoverCell = this.gameManager.gridManager.getGridCellFromPixel(
           this.mouse.x,
