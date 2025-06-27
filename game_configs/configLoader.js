@@ -5,20 +5,18 @@ export class ConfigLoader {
   }
 
   async load(configList) {
-    const repoName = "stratega"; // Your repository name
-    const isGitHubPages = window.location.hostname.includes("github.io");
+    // Get the base URL for GitHub Pages
+    const baseUrl = window.location.hostname.includes("github.io")
+      ? "https://madestavich.github.io/stratega"
+      : "";
 
     for (const [key, path] of Object.entries(configList)) {
       try {
-        // Adjust path for GitHub Pages if needed
-        let adjustedPath = path;
-        if (isGitHubPages && !path.startsWith(`/${repoName}`)) {
-          adjustedPath = `/${repoName}${path}`;
-        }
+        // Create absolute URL
+        const absolutePath = `${baseUrl}${path}`;
+        console.log(`Loading config ${key} from:`, absolutePath);
 
-        console.log(`Loading config ${key} from:`, adjustedPath);
-        const res = await fetch(adjustedPath);
-
+        const res = await fetch(absolutePath);
         if (!res.ok) {
           throw new Error(
             `Failed to load config ${key}: ${res.status} ${res.statusText}`
@@ -26,33 +24,29 @@ export class ConfigLoader {
         }
 
         const config = await res.json();
-
         const defaultId = Object.keys(config)[0];
 
-        // Adjust sprite path in the config if needed
-        if (
-          isGitHubPages &&
-          config[defaultId].sourceImage &&
-          config[defaultId].sourceImage.link
-        ) {
-          let spritePath = config[defaultId].sourceImage.link;
-          // If it's a relative path and doesn't already include the repo name
-          if (
-            !spritePath.startsWith("http") &&
-            !spritePath.startsWith(`/${repoName}`)
-          ) {
-            config[defaultId].sourceImage.link = `/${repoName}${spritePath}`;
-          }
+        // Fix sprite path - this is critical
+        let spritePath = config[defaultId].sourceImage.link;
+
+        // If it's a relative path, make it absolute
+        if (!spritePath.startsWith("http")) {
+          spritePath = `${baseUrl}/sprites/${spritePath.split("/").pop()}`;
+          console.log(`Adjusted sprite path to: ${spritePath}`);
         }
 
         const img = new Image();
-        img.src = config[defaultId].sourceImage.link;
+        img.src = spritePath;
 
-        console.log(`Loading sprite from: ${img.src}`);
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = () => {
+            console.error(`Failed to load sprite: ${spritePath}`);
+            reject(new Error(`Failed to load sprite: ${spritePath}`));
+          };
+        });
 
-        await new Promise((resolve) => (img.onload = resolve));
         config[defaultId].sourceImage.link = img;
-
         this.configs[key] = config;
       } catch (error) {
         console.error(`Error loading config ${key}:`, error);
@@ -62,20 +56,15 @@ export class ConfigLoader {
 
   async loadRacesConfig() {
     try {
-      // Create the correct URL based on the repository name
-      const repoName = "stratega"; // Your repository name
-      const isGitHubPages = window.location.hostname.includes("github.io");
+      // Get the base URL for GitHub Pages
+      const baseUrl = window.location.hostname.includes("github.io")
+        ? "https://madestavich.github.io/stratega"
+        : "";
 
-      let racesConfigPath;
-      if (isGitHubPages) {
-        racesConfigPath = `/${repoName}/game_configs/races.json`;
-      } else {
-        racesConfigPath = "/game_configs/races.json";
-      }
-
+      const racesConfigPath = `${baseUrl}/game_configs/races.json`;
       console.log("Attempting to load races config from:", racesConfigPath);
-      const response = await fetch(racesConfigPath);
 
+      const response = await fetch(racesConfigPath);
       if (!response.ok) {
         throw new Error(
           `Failed to load races config: ${response.status} ${response.statusText}`
