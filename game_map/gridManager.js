@@ -248,7 +248,7 @@ export class GridManager {
     }
   }
 
-  // Improved getGridCellFromPixel method
+  // Improved getGridCellFromPixel method with better debugging
   getGridCellFromPixel(pixelX, pixelY) {
     // Check if the coordinates are within the canvas bounds
     if (
@@ -261,15 +261,8 @@ export class GridManager {
     }
 
     // Convert pixel coordinates to grid coordinates
-    // Use Math.floor to ensure we get the correct cell
     const col = Math.floor(pixelX / this.cellWidth);
     const row = Math.floor(pixelY / this.cellHeight);
-
-    // Add debug visualization to see which cell is being selected
-    console.log(
-      `Mouse at pixel (${pixelX}, ${pixelY}) -> Grid cell (${col}, ${row})`
-    );
-    console.log(`Cell dimensions: ${this.cellWidth} x ${this.cellHeight}`);
 
     // Ensure the coordinates are within the grid bounds
     if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {

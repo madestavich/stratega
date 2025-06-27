@@ -58,13 +58,41 @@ export class InputManager {
     });
   }
 
-  // Ініціалізація обробників для розміщення юнітів на карті
   initCanvasHandlers() {
     if (this.canvas) {
       this.canvas.addEventListener("mousemove", (event) => {
         const rect = this.canvas.getBoundingClientRect();
-        this.mouse.x = event.clientX - rect.left;
-        this.mouse.y = event.clientY - rect.top;
+
+        // Враховуємо можливе масштабування канвасу
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+
+        // Перетворюємо координати з урахуванням масштабування
+        this.mouse.x = (event.clientX - rect.left) * scaleX;
+        this.mouse.y = (event.clientY - rect.top) * scaleY;
+
+        // Додаємо логування для відлагодження
+        console.log(`Canvas rect: ${rect.width}x${rect.height}`);
+        console.log(
+          `Canvas actual: ${this.canvas.width}x${this.canvas.height}`
+        );
+        console.log(`Scale factors: ${scaleX.toFixed(2)}x${scaleY.toFixed(2)}`);
+        console.log(
+          `Raw mouse: (${event.clientX - rect.left}, ${
+            event.clientY - rect.top
+          })`
+        );
+        console.log(
+          `Adjusted mouse: (${this.mouse.x.toFixed(2)}, ${this.mouse.y.toFixed(
+            2
+          )})`
+        );
+
+        // Update the hover cell
+        this.hoverCell = this.gameManager.gridManager.getGridCellFromPixel(
+          this.mouse.x,
+          this.mouse.y
+        );
       });
 
       this.canvas.addEventListener("click", (event) => {
@@ -128,14 +156,6 @@ export class InputManager {
         expansionDirection: unitConfig.expansionDirection || "bottomRight",
       };
 
-      console.log("Checking placement at:", gridCoords.col, gridCoords.row);
-      console.log(
-        "Unit dimensions:",
-        tempObject.gridWidth,
-        "x",
-        tempObject.gridHeight
-      );
-
       // Використовуємо існуючий метод canPlaceAt для перевірки
       const canPlace = this.gameManager.gridManager.canPlaceAt(
         tempObject,
@@ -188,15 +208,20 @@ export class InputManager {
     }
   }
 
-  // Add this method to the InputManager class
   initCanvasHandlers() {
     if (this.canvas) {
       this.canvas.addEventListener("mousemove", (event) => {
         const rect = this.canvas.getBoundingClientRect();
-        this.mouse.x = event.clientX - rect.left;
-        this.mouse.y = event.clientY - rect.top;
 
-        // Update the hover cell
+        // Враховуємо масштабування канвасу
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+
+        // Перетворюємо координати з урахуванням масштабування
+        this.mouse.x = (event.clientX - rect.left) * scaleX;
+        this.mouse.y = (event.clientY - rect.top) * scaleY;
+
+        // Оновлюємо комірку під курсором
         this.hoverCell = this.gameManager.gridManager.getGridCellFromPixel(
           this.mouse.x,
           this.mouse.y
