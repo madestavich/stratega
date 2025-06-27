@@ -242,10 +242,6 @@ export class InputManager {
       const { col, row } = this.hoverCell;
       const { cellWidth, cellHeight } = this.gameManager.gridManager;
 
-      // Draw a semi-transparent rectangle over the hovered cell
-      ctx.fillStyle = "rgba(25, 0, 255, 0.3)";
-      ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
-
       // If a unit is selected, show the unit's footprint
       if (this.selectedUnitKey) {
         const unitConfig = this.gameManager.configLoader.getUnitConfig(
@@ -283,7 +279,7 @@ export class InputManager {
           }
 
           // Draw the unit's footprint
-          ctx.fillStyle = "rgba(0, 255, 0, 0.3)";
+          ctx.fillStyle = "rgba(37, 201, 119, 0.4)";
           ctx.fillRect(
             startCol * cellWidth,
             startRow * cellHeight,
