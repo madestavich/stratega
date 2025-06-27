@@ -86,8 +86,11 @@ class GameManager {
         "background: #222; color:rgb(47, 201, 9); font-size: 14px;"
       );
       console.log("Scroll down to see detailed object information.");
-      this.debugInterval = setInterval(() => this.logGameObjects(), 2000);
 
+      // Оновлюємо сітку одразу при включенні режиму дебагу
+      this.gridManager.updateGridObjects(this.objectManager);
+
+      this.debugInterval = setInterval(() => this.logGameObjects(), 2000);
       this.logGameObjects();
     } else {
       console.log(
@@ -96,6 +99,9 @@ class GameManager {
       );
       clearInterval(this.debugInterval);
     }
+
+    // Викликаємо render для негайного відображення змін
+    this.render();
   }
 
   async loadUnitIcons(race) {
@@ -129,13 +135,6 @@ class GameManager {
 
     this.interfaceManager.updatePlayerInterface(this.player);
 
-    await this.objectManager.createObject(
-      "rider",
-      this.configLoader.getUnitConfig("neutral", "tier_two", "rider"),
-      1,
-      10,
-      10
-    );
     await this.objectManager.createObject(
       "rider",
       this.configLoader.getUnitConfig("neutral", "tier_two", "rider"),

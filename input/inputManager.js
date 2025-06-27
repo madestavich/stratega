@@ -120,8 +120,7 @@ export class InputManager {
     });
   }
 
-  // Modify the placeUnitAtCursor method in InputManager
-  placeUnitAtCursor() {
+  async placeUnitAtCursor() {
     if (!this.gameManager || !this.selectedUnitKey) return;
 
     // Отримуємо координати сітки з координат миші
@@ -156,6 +155,11 @@ export class InputManager {
         expansionDirection: unitConfig.expansionDirection || "bottomRight",
       };
 
+      // ВАЖЛИВО: Спочатку оновлюємо сітку, щоб мати актуальну інформацію про зайняті клітинки
+      this.gameManager.gridManager.updateGridObjects(
+        this.gameManager.objectManager
+      );
+
       // Використовуємо існуючий метод canPlaceAt для перевірки
       const canPlace = this.gameManager.gridManager.canPlaceAt(
         tempObject,
@@ -173,7 +177,7 @@ export class InputManager {
 
       // Використовуємо існуючий метод для створення об'єкта ТІЛЬКИ якщо перевірка пройшла успішно
       console.log("Creating unit at:", gridCoords.col, gridCoords.row);
-      const newUnit = this.gameManager.objectManager.createObject(
+      const newUnit = await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
         this.gameManager.player.team,
@@ -236,7 +240,6 @@ export class InputManager {
     }
   }
 
-  // Add this method to the InputManager class
   drawHoverIndicator(ctx) {
     if (this.hoverCell && this.gameManager) {
       const { col, row } = this.hoverCell;
@@ -255,6 +258,22 @@ export class InputManager {
           const gridHeight = unitConfig.gridHeight || 1;
           const expansionDirection =
             unitConfig.expansionDirection || "bottomRight";
+
+          // Create a temporary object to check placement
+          const tempObject = {
+            gridCol: col,
+            gridRow: row,
+            gridWidth: gridWidth,
+            gridHeight: gridHeight,
+            expansionDirection: expansionDirection,
+          };
+
+          // Check if placement is valid
+          const canPlace = this.gameManager.gridManager.canPlaceAt(
+            tempObject,
+            col,
+            row
+          );
 
           // Calculate the area the unit would occupy
           let startCol = col;
@@ -278,8 +297,11 @@ export class InputManager {
               break;
           }
 
-          // Draw the unit's footprint
-          ctx.fillStyle = "rgba(37, 201, 119, 0.4)";
+          // Draw the unit's footprint with different color based on placement validity
+          ctx.fillStyle = canPlace
+            ? "rgba(37, 201, 119, 0.4)" // Green if can place
+            : "rgba(255, 0, 0, 0.4)"; // Red if cannot place
+
           ctx.fillRect(
             startCol * cellWidth,
             startRow * cellHeight,
