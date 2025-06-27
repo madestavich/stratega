@@ -120,6 +120,72 @@ export class InputManager {
     });
   }
 
+  initCanvasHandlers() {
+    if (this.canvas) {
+      this.canvas.addEventListener("mousemove", (event) => {
+        const rect = this.canvas.getBoundingClientRect();
+
+        // Враховуємо масштабування канвасу
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+
+        // Перетворюємо координати з урахуванням масштабування
+        this.mouse.x = (event.clientX - rect.left) * scaleX;
+        this.mouse.y = (event.clientY - rect.top) * scaleY;
+
+        // Оновлюємо комірку під курсором
+        this.hoverCell = this.gameManager.gridManager.getGridCellFromPixel(
+          this.mouse.x,
+          this.mouse.y
+        );
+      });
+
+      this.canvas.addEventListener("click", (event) => {
+        if (this.selectedUnitKey && this.gameManager) {
+          this.placeUnitAtCursor();
+        }
+      });
+    }
+  }
+
+  // Метод для автоматичного визначення тіеру та конфігурації юніта
+  getUnitConfigAndTier(unitKey) {
+    if (!this.gameManager || !unitKey) {
+      return { unitConfig: null, unitTier: null };
+    }
+
+    try {
+      const racesConfig = this.gameManager.configLoader.racesConfig;
+      if (!racesConfig) {
+        console.warn("Races configuration not found");
+        return { unitConfig: null, unitTier: null };
+      }
+
+      // Просто перебираємо всі раси і тіери, шукаючи юніт за ключем
+      for (const race in racesConfig) {
+        if (racesConfig[race].units) {
+          for (const tier in racesConfig[race].units) {
+            if (
+              racesConfig[race].units[tier] &&
+              racesConfig[race].units[tier][unitKey]
+            ) {
+              return {
+                unitConfig: racesConfig[race].units[tier][unitKey],
+                unitTier: tier,
+              };
+            }
+          }
+        }
+      }
+
+      console.warn(`Unit configuration not found for ${unitKey}`);
+      return { unitConfig: null, unitTier: null };
+    } catch (error) {
+      console.error("Error in getUnitConfigAndTier:", error);
+      return { unitConfig: null, unitTier: null };
+    }
+  }
+
   async placeUnitAtCursor() {
     if (!this.gameManager || !this.selectedUnitKey) return;
 
@@ -132,10 +198,8 @@ export class InputManager {
     if (!gridCoords) return;
 
     try {
-      // Отримуємо конфігурацію юніта
-      const unitConfig = this.gameManager.configLoader.getUnitConfig(
-        this.gameManager.player.race,
-        "tier_two", // Припускаємо, що всі юніти в tier_two для прикладу
+      // Використовуємо новий метод для отримання конфігурації юніта
+      const { unitConfig, unitTier } = this.getUnitConfigAndTier(
         this.selectedUnitKey
       );
 
@@ -212,34 +276,6 @@ export class InputManager {
     }
   }
 
-  initCanvasHandlers() {
-    if (this.canvas) {
-      this.canvas.addEventListener("mousemove", (event) => {
-        const rect = this.canvas.getBoundingClientRect();
-
-        // Враховуємо масштабування канвасу
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-
-        // Перетворюємо координати з урахуванням масштабування
-        this.mouse.x = (event.clientX - rect.left) * scaleX;
-        this.mouse.y = (event.clientY - rect.top) * scaleY;
-
-        // Оновлюємо комірку під курсором
-        this.hoverCell = this.gameManager.gridManager.getGridCellFromPixel(
-          this.mouse.x,
-          this.mouse.y
-        );
-      });
-
-      this.canvas.addEventListener("click", (event) => {
-        if (this.selectedUnitKey && this.gameManager) {
-          this.placeUnitAtCursor();
-        }
-      });
-    }
-  }
-
   drawHoverIndicator(ctx) {
     if (this.hoverCell && this.gameManager) {
       const { col, row } = this.hoverCell;
@@ -247,11 +283,8 @@ export class InputManager {
 
       // If a unit is selected, show the unit's footprint
       if (this.selectedUnitKey) {
-        const unitConfig = this.gameManager.configLoader.getUnitConfig(
-          this.gameManager.player.race,
-          "tier_two",
-          this.selectedUnitKey
-        );
+        // Використовуємо новий метод для отримання конфігурації юніта
+        const { unitConfig } = this.getUnitConfigAndTier(this.selectedUnitKey);
 
         if (unitConfig) {
           const gridWidth = unitConfig.gridWidth || 1;

@@ -77,7 +77,7 @@
       "tier_two": {
         "rider": {
           "gridWidth": 3,
-          "gridHeight": 1,
+          "gridHeight": 2,
           "expansionDirection": "topRight",
           "objectType": "rider",
           "actionPriorities": ["attack", "move"],
