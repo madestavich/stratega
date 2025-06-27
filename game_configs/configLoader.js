@@ -28,17 +28,27 @@ export class ConfigLoader {
         const config = await res.json();
 
         const defaultId = Object.keys(config)[0];
+
+        // Adjust sprite path in the config if needed
+        if (
+          isGitHubPages &&
+          config[defaultId].sourceImage &&
+          config[defaultId].sourceImage.link
+        ) {
+          let spritePath = config[defaultId].sourceImage.link;
+          // If it's a relative path and doesn't already include the repo name
+          if (
+            !spritePath.startsWith("http") &&
+            !spritePath.startsWith(`/${repoName}`)
+          ) {
+            config[defaultId].sourceImage.link = `/${repoName}${spritePath}`;
+          }
+        }
+
         const img = new Image();
         img.src = config[defaultId].sourceImage.link;
 
-        // Also adjust image path if needed
-        if (
-          isGitHubPages &&
-          !img.src.includes(`/${repoName}/`) &&
-          !img.src.startsWith("http")
-        ) {
-          img.src = `/${repoName}${img.src}`;
-        }
+        console.log(`Loading sprite from: ${img.src}`);
 
         await new Promise((resolve) => (img.onload = resolve));
         config[defaultId].sourceImage.link = img;
