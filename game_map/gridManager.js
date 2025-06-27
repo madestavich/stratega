@@ -247,4 +247,56 @@ export class GridManager {
       }
     }
   }
+
+  // Improved getGridCellFromPixel method
+  getGridCellFromPixel(pixelX, pixelY) {
+    // Check if the coordinates are within the canvas bounds
+    if (
+      pixelX < 0 ||
+      pixelX >= this.pixelWidth ||
+      pixelY < 0 ||
+      pixelY >= this.pixelHeight
+    ) {
+      return null;
+    }
+
+    // Convert pixel coordinates to grid coordinates
+    // Use Math.floor to ensure we get the correct cell
+    const col = Math.floor(pixelX / this.cellWidth);
+    const row = Math.floor(pixelY / this.cellHeight);
+
+    // Add debug visualization to see which cell is being selected
+    console.log(
+      `Mouse at pixel (${pixelX}, ${pixelY}) -> Grid cell (${col}, ${row})`
+    );
+    console.log(`Cell dimensions: ${this.cellWidth} x ${this.cellHeight}`);
+
+    // Ensure the coordinates are within the grid bounds
+    if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
+      return { col, row };
+    }
+
+    return null;
+  }
+
+  // Check if a unit can be placed at the specified position
+  canPlaceUnitAt(
+    col,
+    row,
+    gridWidth,
+    gridHeight,
+    expansionDirection = "bottomRight"
+  ) {
+    // Create a temporary game object with the necessary properties
+    const tempObject = {
+      gridCol: col,
+      gridRow: row,
+      gridWidth: gridWidth,
+      gridHeight: gridHeight,
+      expansionDirection: expansionDirection,
+    };
+
+    // Use the existing canPlaceAt method which already handles unit dimensions and expansion direction
+    return this.canPlaceAt(tempObject, col, row);
+  }
 }

@@ -42,7 +42,7 @@ class GameManager {
       this.spriteLoader
     );
     this.actionManager = new ActionManager(this.objectManager);
-    this.inputManager = new InputManager();
+    this.inputManager = new InputManager(canvas, this);
 
     this.inputManager.setPlayButtonCallback(() => this.togglePauseMode());
     this.interfaceManager = new InterfaceManager(
@@ -194,7 +194,8 @@ class GameManager {
         }
       }
     }
-
+    // Draw the hover indicator
+    this.inputManager.drawHoverIndicator(ctx);
     this.objectManager.renderAll();
   }
 
