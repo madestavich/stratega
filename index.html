@@ -164,6 +164,82 @@
       .footer-links a:hover {
         text-decoration: underline;
       }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.5rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+
+      .form-group .error-message {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: none;
+      }
+
+      .submit-button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        width: 100%;
+        transition: background-color 0.3s;
+      }
+
+      .submit-button:hover {
+        background-color: #2980b9;
+      }
     </style>
   </head>
   <body>
@@ -251,33 +327,42 @@
       <div class="copyright">Stratega © 2022-2023. Всі права захищені.</div>
     </footer>
 
-    <script>
-      // Базова функціональність для кнопок
-      document
-        .getElementById("login-btn")
-        .addEventListener("click", function () {
-          alert("Функція входу буде доступна незабаром");
-        });
+    <!-- Registration Modal -->
+    <div id="registerModal" class="modal">
+      <div class="modal-content">
+        <button class="close-button">&times;</button>
+        <h2>Реєстрація</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="email">Електронна пошта</label>
+            <input type="email" id="email" name="email" required />
+            <div class="error-message" id="email-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="username">Нікнейм</label>
+            <input type="text" id="username" name="username" required />
+            <div class="error-message" id="username-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" required />
+            <div class="error-message" id="password-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="confirm-password">Підтвердження пароля</label>
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+              required
+            />
+            <div class="error-message" id="confirm-password-error"></div>
+          </div>
+          <button type="submit" class="submit-button">Зареєструватися</button>
+        </form>
+      </div>
+    </div>
 
-      document
-        .getElementById("register-btn")
-        .addEventListener("click", function () {
-          alert("Функція реєстрації буде доступна незабаром");
-        });
-
-      // Обробники для кнопок приєднання
-      const joinButtons = document.querySelectorAll(
-        ".join-button:not([disabled])"
-      );
-      joinButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-          if (this.textContent === "Створити гру") {
-            alert("Створення нової гри...");
-          } else {
-            alert("Приєднання до гри...");
-          }
-        });
-      });
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
