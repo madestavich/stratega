@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        outline: none;
+      }
+
+      body {
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        user-select: none;
+      }
+
+      .main-content {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+      }
+
+      canvas {
+        display: block;
+        flex: 1;
+      }
+
+      /* Unit menu styles - Left side */
+      .side-menu {
+        width: 20%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        z-index: 100;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .category-tabs {
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #444;
+        margin-right: 10px;
+        width: 50px;
+      }
+
+      .category-tab {
+        height: 120px;
+        width: 40px;
+        cursor: pointer;
+        background-color: #333;
+        margin-bottom: 5px;
+        border-radius: 5px 0 0 5px;
+        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        transform: rotate(180deg);
+        padding: 10px 0;
+      }
+
+      /* Right side menu tabs */
+      .right-menu .category-tabs {
+        border-right: none;
+        border-left: 1px solid #444;
+        margin-right: 0;
+        margin-left: 10px;
+        order: 2;
+      }
+
+      .right-menu .category-tab {
+        border-radius: 0 5px 5px 0;
+        transform: rotate(0deg);
+        writing-mode: vertical-rl;
+      }
+
+      .category-tab:hover {
+        background-color: #555;
+      }
+
+      .category-tab.active {
+        background-color: #666;
+        font-weight: bold;
+      }
+
+      .category-content-container {
+        flex: 1;
+      }
+
+      .category-content {
+        display: none;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 0;
+        height: 100%;
+        align-content: flex-start; /* Ensures items align at the top */
+        overflow-y: auto; /* Adds scrolling if content exceeds height */
+      }
+
+      .category-content.active {
+        display: flex;
+      }
+
+      .unit-icon {
+        width: 60px;
+        height: 60px;
+        background-color: #444;
+        border: 2px solid #666;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.3s;
+        flex-direction: column;
+        flex-shrink: 0; /* Prevents the unit from shrinking */
+      }
+
+      .unit-icon:hover {
+        border-color: #aaa;
+      }
+
+      .unit-name {
+        font-size: 10px;
+        text-align: center;
+        margin-top: 3px;
+      }
+
+      /* Footer styles */
+      .footer {
+        height: 60px;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .start-button {
+        padding: 10px 40px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .start-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-content">
+      <!-- Left Unit Selection Menu -->
+      <div id="unitMenu" class="side-menu">
+        <div class="category-tabs">
+          <div class="category-tab active" data-category="level1">Level 1</div>
+          <div class="category-tab" data-category="level2">Level 2</div>
+          <div class="category-tab" data-category="level3">Level 3</div>
+          <div class="category-tab" data-category="level4">Level 4</div>
+        </div>
+
+        <div class="category-content-container">
+          <div class="category-content active" id="level1-units">
+            <!-- Level 1 units will be added here from code -->
+          </div>
+
+          <div class="category-content" id="level2-units">
+            <!-- Level 2 units will be added here from code -->
+          </div>
+
+          <div class="category-content" id="level3-units">
+            <!-- Level 3 units will be added here from code -->
+          </div>
+
+          <div class="category-content" id="level4-units">
+            <!-- Level 4 units will be added here from code -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Canvas -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Right Hero/Magic Menu -->
+      <div id="rightMenu" class="side-menu right-menu">
+        <div class="category-content-container">
+          <div class="category-content active" id="hero-panel">
+            <!-- Hero panel content -->
+            <div class="unit-icon">
+              <img alt="Hero Stats" />
+              <div class="unit-name">ПЕДЕРАСТ</div>
+            </div>
+            <div class="unit-icon">
+              <img alt="Equipment" />
+              <div class="unit-name">ПУУУУУШ</div>
+            </div>
+          </div>
+
+          <div class="category-content" id="magic-panel">
+            <!-- Magic panel content -->
+            <div class="unit-icon">
+              <img alt="Fireball" />
+              <div class="unit-name">Fireball</div>
+            </div>
+            <div class="unit-icon">
+              <img alt="Healing" />
+              <div class="unit-name">Healing</div>
+            </div>
+            <div class="unit-icon">
+              <img alt="Lightning" />
+              <div class="unit-name">Lightning</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-tabs">
+          <div class="category-tab active" data-category="hero">Hero</div>
+          <div class="category-tab" data-category="magic">Magic</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer with Start Button -->
+    <div class="footer">
+      <button class="start-button">START</button>
+    </div>
+
+    <script type="module" src="gameManager.js"></script>
+    <script>
+      // Tab switching functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        // Left menu tabs
+        const leftTabs = document.querySelectorAll("#unitMenu .category-tab");
+        leftTabs.forEach((tab) => {
+          tab.addEventListener("click", function () {
+            // Remove active class from all tabs and content in left menu
+            document
+              .querySelectorAll("#unitMenu .category-tab")
+              .forEach((t) => t.classList.remove("active"));
+            document
+              .querySelectorAll("#unitMenu .category-content")
+              .forEach((c) => c.classList.remove("active"));
+
+            // Add active class to clicked tab
+            this.classList.add("active");
+
+            // Show corresponding content
+            const category = this.getAttribute("data-category");
+            document
+              .getElementById(`${category}-units`)
+              .classList.add("active");
+          });
+        });
+
+        // Right menu tabs
+        const rightTabs = document.querySelectorAll("#rightMenu .category-tab");
+        rightTabs.forEach((tab) => {
+          tab.addEventListener("click", function () {
+            // Remove active class from all tabs and content in right menu
+            document
+              .querySelectorAll("#rightMenu .category-tab")
+              .forEach((t) => t.classList.remove("active"));
+            document
+              .querySelectorAll("#rightMenu .category-content")
+              .forEach((c) => c.classList.remove("active"));
+
+            // Add active class to clicked tab
+            this.classList.add("active");
+
+            // Show corresponding content
+            const category = this.getAttribute("data-category");
+            document
+              .getElementById(`${category}-panel`)
+              .classList.add("active");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
