@@ -16,6 +16,8 @@ export class InterfaceManager {
       tier_three: "level3",
       tier_four: "level4",
     };
+
+    this.initTabSwitching();
   }
 
   /**
@@ -156,5 +158,50 @@ export class InterfaceManager {
    */
   async updatePlayerInterface(player) {
     await this.populateUnitTabs(player);
+  }
+
+  // Add this method to the existing InterfaceManager class
+  initTabSwitching() {
+    // Left menu tabs
+    const leftTabs = document.querySelectorAll("#unitMenu .category-tab");
+    leftTabs.forEach((tab) => {
+      tab.addEventListener("click", function () {
+        // Remove active class from all tabs and content in left menu
+        document
+          .querySelectorAll("#unitMenu .category-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll("#unitMenu .category-content")
+          .forEach((c) => c.classList.remove("active"));
+
+        // Add active class to clicked tab
+        this.classList.add("active");
+
+        // Show corresponding content
+        const category = this.getAttribute("data-category");
+        document.getElementById(`${category}-units`).classList.add("active");
+      });
+    });
+
+    // Right menu tabs
+    const rightTabs = document.querySelectorAll("#rightMenu .category-tab");
+    rightTabs.forEach((tab) => {
+      tab.addEventListener("click", function () {
+        // Remove active class from all tabs and content in right menu
+        document
+          .querySelectorAll("#rightMenu .category-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll("#rightMenu .category-content")
+          .forEach((c) => c.classList.remove("active"));
+
+        // Add active class to clicked tab
+        this.classList.add("active");
+
+        // Show corresponding content
+        const category = this.getAttribute("data-category");
+        document.getElementById(`${category}-panel`).classList.add("active");
+      });
+    });
   }
 }
