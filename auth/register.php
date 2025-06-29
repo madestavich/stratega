@@ -1,6 +1,6 @@
 <?php
 // Include database configuration
-require_once '../config.php';
+require_once './config.php';
 
 // Set response header to JSON
 header('Content-Type: application/json');
