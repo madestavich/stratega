@@ -3,7 +3,7 @@ session_start();
 header('Content-Type: application/json');
 
 // Include database configuration
-require_once __DIR__ . './config.php';
+require_once './config.php';
 
 try {
     $pdo = new PDO("mysql:host={$db_config['host']};dbname={$db_config['dbname']}", $db_config['username'], $db_config['password']);
