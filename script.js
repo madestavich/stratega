@@ -1,34 +1,63 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Modal elements
   const registerModal = document.getElementById("registerModal");
+  const loginModal = document.getElementById("loginModal");
   const registerBtn = document.getElementById("register-btn");
-  const closeButton = document.querySelector(".close-button");
+  const loginBtn = document.getElementById("login-btn");
+  const closeButtons = document.querySelectorAll(".close-button");
   const registerForm = document.getElementById("registerForm");
+  const loginForm = document.getElementById("loginForm");
 
-  // Form fields
+  // Form fields - Register
   const emailInput = document.getElementById("email");
   const usernameInput = document.getElementById("username");
   const passwordInput = document.getElementById("password");
   const confirmPasswordInput = document.getElementById("confirm-password");
 
-  // Error messages
+  // Form fields - Login
+  const loginInput = document.getElementById("login");
+  const loginPasswordInput = document.getElementById("login-password");
+
+  // Error messages - Register
   const emailError = document.getElementById("email-error");
   const usernameError = document.getElementById("username-error");
   const passwordError = document.getElementById("password-error");
   const confirmPasswordError = document.getElementById(
     "confirm-password-error"
   );
+
+  // Error messages - Login
+  const loginError = document.getElementById("login-error");
+  const loginPasswordError = document.getElementById("login-password-error");
+
   let mouseDownTarget = null;
 
-  // Open modal when register button is clicked
+  // Check if user is logged in
+  checkLoginStatus();
+
+  // Open register modal when register button is clicked
   registerBtn.addEventListener("click", function () {
     registerModal.style.display = "flex";
   });
 
-  // Close modal when close button is clicked
-  closeButton.addEventListener("click", function () {
-    registerModal.style.display = "none";
-    resetForm();
+  // Open login modal when login button is clicked
+  loginBtn.addEventListener("click", function () {
+    if (loginBtn.textContent === "Вихід") {
+      // Handle logout
+      logout();
+    } else {
+      loginModal.style.display = "flex";
+    }
+  });
+
+  // Close modals when close button is clicked
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      registerModal.style.display = "none";
+      loginModal.style.display = "none";
+      resetRegisterForm();
+      resetLoginForm();
+    });
   });
 
   // Track where the mouse down event occurs
@@ -40,17 +69,21 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("mouseup", function (event) {
     if (event.target === registerModal && mouseDownTarget === registerModal) {
       registerModal.style.display = "none";
-      resetForm();
+      resetRegisterForm();
+    }
+    if (event.target === loginModal && mouseDownTarget === loginModal) {
+      loginModal.style.display = "none";
+      resetLoginForm();
     }
     mouseDownTarget = null;
   });
 
-  // Form submission
+  // Register form submission
   registerForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
     // Reset error messages
-    resetErrors();
+    resetRegisterErrors();
 
     // Get form values
     const email = emailInput.value.trim();
@@ -101,7 +134,8 @@ document.addEventListener("DOMContentLoaded", function () {
           if (data.success) {
             alert("Реєстрація успішна! Тепер ви можете увійти в систему.");
             registerModal.style.display = "none";
-            resetForm();
+            resetRegisterForm();
+            loginModal.style.display = "flex"; // Show login modal after successful registration
           } else {
             // Show error message
             if (data.errors) {
@@ -128,6 +162,70 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Login form submission
+  loginForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    // Reset error messages
+    resetLoginErrors();
+
+    // Get form values
+    const login = loginInput.value.trim();
+    const password = loginPasswordInput.value.trim();
+
+    // Validate form
+    let isValid = true;
+
+    // Login validation
+    if (login.length === 0) {
+      showError(loginError, "Будь ласка, введіть логін або email");
+      isValid = false;
+    }
+
+    // Password validation
+    if (password.length === 0) {
+      showError(loginPasswordError, "Будь ласка, введіть пароль");
+      isValid = false;
+    }
+
+    // If form is valid, submit it
+    if (isValid) {
+      const formData = new FormData();
+      formData.append("login", login);
+      formData.append("password", password);
+
+      fetch("auth/auth.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("Вхід успішний!");
+            loginModal.style.display = "none";
+            resetLoginForm();
+            updateUIAfterLogin(data.user);
+          } else {
+            // Show error message
+            if (data.errors) {
+              if (data.errors.login) {
+                showError(loginError, data.errors.login);
+              }
+              if (data.errors.password) {
+                showError(loginPasswordError, data.errors.password);
+              }
+            } else {
+              alert("Помилка входу: " + (data.message || "Невідома помилка"));
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Сталася помилка при вході. Спробуйте пізніше.");
+        });
+    }
+  });
+
   // Helper functions
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -139,22 +237,76 @@ document.addEventListener("DOMContentLoaded", function () {
     element.style.display = "block";
   }
 
-  function resetErrors() {
+  function resetRegisterErrors() {
     emailError.style.display = "none";
     usernameError.style.display = "none";
     passwordError.style.display = "none";
     confirmPasswordError.style.display = "none";
   }
 
-  function resetForm() {
-    registerForm.reset();
-    resetErrors();
+  function resetLoginErrors() {
+    loginError.style.display = "none";
+    loginPasswordError.style.display = "none";
   }
 
-  // Login button functionality (placeholder)
-  document.getElementById("login-btn").addEventListener("click", function () {
-    alert("Функція входу буде доступна незабаром");
-  });
+  function resetRegisterForm() {
+    registerForm.reset();
+    resetRegisterErrors();
+  }
+
+  function resetLoginForm() {
+    loginForm.reset();
+    resetLoginErrors();
+  }
+
+  function updateUIAfterLogin(user) {
+    // Hide register button
+    registerBtn.style.display = "none";
+
+    // Change login button to logout
+    loginBtn.textContent = "Вихід";
+
+    // You can also update other UI elements to show the logged-in user
+    console.log("Logged in as:", user.username);
+  }
+
+  function updateUIAfterLogout() {
+    // Show register button
+    registerBtn.style.display = "inline-block";
+
+    // Change logout button back to login
+    loginBtn.textContent = "Вхід";
+  }
+
+  function logout() {
+    fetch("auth/logout.php")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("Ви успішно вийшли з системи");
+          updateUIAfterLogout();
+        } else {
+          alert("Помилка при виході з системи");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Сталася помилка при виході з системи");
+      });
+  }
+
+  function checkLoginStatus() {
+    fetch("auth/check_login.php")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.logged_in) {
+          updateUIAfterLogin(data.user);
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking login status:", error);
+      });
+  }
 
   // Game room buttons
   const joinButtons = document.querySelectorAll(".join-button:not([disabled])");
