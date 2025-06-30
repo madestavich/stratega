@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const confirmPasswordError = document.getElementById(
     "confirm-password-error"
   );
+  let mouseDownTarget = null;
 
   // Open modal when register button is clicked
   registerBtn.addEventListener("click", function () {
@@ -30,12 +31,18 @@ document.addEventListener("DOMContentLoaded", function () {
     resetForm();
   });
 
-  // Close modal when clicking outside of it
-  window.addEventListener("click", function (event) {
-    if (event.target === registerModal) {
+  // Track where the mouse down event occurs
+  window.addEventListener("mousedown", function (event) {
+    mouseDownTarget = event.target;
+  });
+
+  // Only close if both mousedown and mouseup happened on the modal background
+  window.addEventListener("mouseup", function (event) {
+    if (event.target === registerModal && mouseDownTarget === registerModal) {
       registerModal.style.display = "none";
       resetForm();
     }
+    mouseDownTarget = null;
   });
 
   // Form submission
