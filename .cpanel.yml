@@ -13,5 +13,5 @@ deployment:
     - /bin/cp -R game_configs $DEPLOYPATH
     - /bin/cp -R auth $DEPLOYPATH
     - /bin/cp -R game $DEPLOYPATH
-    # - /bin/cp -R server $DEPLOYPATH
+    - /bin/cp -R backgrounds $DEPLOYPATH
     - /bin/cp -R textures $DEPLOYPATH
