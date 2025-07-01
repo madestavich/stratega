@@ -303,154 +303,184 @@
         background: url("textures/Shroud.png");
         opacity: 100;
       }
+
+      .rotate-warning {
+        display: none;
+      }
+
+      @media (max-width: 580px) {
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          text-align: center;
+          background: #000;
+          color: #fff;
+          font-size: 20px;
+        }
+
+        .main-content {
+          display: none; /* Ховаємо основний вміст */
+        }
+
+        .rotate-warning {
+          display: block;
+        }
+      }
     </style>
   </head>
 
   <body>
-    <header>
-      <div class="logo">Stratega</div>
-      <div class="auth-buttons">
-        <button id="login-btn">Вхід</button>
-        <button id="register-btn">Реєстрація</button>
+    <div class="main-content">
+      <header>
+        <div class="logo">Stratega</div>
+        <div class="auth-buttons">
+          <button id="login-btn">Вхід</button>
+          <button id="register-btn">Реєстрація</button>
+        </div>
+      </header>
+
+      <main>
+        <div class="left-column">
+          <div class="info-block">
+            <h3>Останні новини</h3>
+            <p>
+              Вийшло нове оновлення гри! Додано нові юніти та покращено баланс.
+            </p>
+            <p>Дата: 15.05.2023</p>
+          </div>
+
+          <div class="info-block">
+            <h3>Майбутні події</h3>
+            <p>
+              Турнір Stratega Masters відбудеться наступного місяця.
+              Реєструйтеся зараз!
+            </p>
+            <p>Дата: 10.06.2023</p>
+          </div>
+
+          <div class="info-block">
+            <h3>Оновлення системи</h3>
+            <p>Виправлено помилки та покращено продуктивність гри.</p>
+            <p>Дата: 01.05.2023</p>
+          </div>
+        </div>
+
+        <div class="right-column">
+          <h2>Ігрові кімнати</h2>
+
+          <div class="game-room">
+            <div class="players">
+              <div class="player">Гравець 1: Alex</div>
+              <div class="player">Гравець 2: -</div>
+            </div>
+            <div class="game-status status-preparing">Підготовка</div>
+            <button class="join-button">Приєднатися</button>
+          </div>
+
+          <div class="game-room">
+            <div class="players">
+              <div class="player">Гравець 1: Maria</div>
+              <div class="player">Гравець 2: John</div>
+            </div>
+            <div class="game-status status-in-progress">Гра йде</div>
+            <button class="join-button" disabled>Приєднатися</button>
+          </div>
+
+          <div class="game-room">
+            <div class="players">
+              <div class="player">Гравець 1: Viktor</div>
+              <div class="player">Гравець 2: -</div>
+            </div>
+            <div class="game-status status-preparing">Підготовка</div>
+            <button class="join-button">Приєднатися</button>
+          </div>
+
+          <div class="game-room">
+            <div class="players">
+              <div class="player">Гравець 1: -</div>
+              <div class="player">Гравець 2: -</div>
+            </div>
+            <div class="game-status status-preparing">Нова кімната</div>
+            <button class="join-button">Створити гру</button>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <div class="footer-links">
+          <a href="#">Правила та умови</a>
+          <a href="#">Про гру</a>
+          <a href="#">Контакти</a>
+        </div>
+        <div class="copyright">Stratega © 2022-2023. Всі права захищені.</div>
+      </footer>
+
+      <!-- Registration Modal -->
+      <div id="registerModal" class="modal">
+        <div class="modal-content">
+          <button class="close-button">&times;</button>
+          <h2>Реєстрація</h2>
+          <form id="registerForm">
+            <div class="form-group">
+              <label for="email">Електронна пошта</label>
+              <input type="email" id="email" name="email" required />
+              <div class="error-message" id="email-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="username">Нікнейм</label>
+              <input type="text" id="username" name="username" required />
+              <div class="error-message" id="username-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="password">Пароль</label>
+              <input type="password" id="password" name="password" required />
+              <div class="error-message" id="password-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="confirm-password">Підтвердження пароля</label>
+              <input
+                type="password"
+                id="confirm-password"
+                name="confirm-password"
+                required
+              />
+              <div class="error-message" id="confirm-password-error"></div>
+            </div>
+            <button type="submit" class="submit-button">Зареєструватися</button>
+          </form>
+        </div>
       </div>
-    </header>
 
-    <main>
-      <div class="left-column">
-        <div class="info-block">
-          <h3>Останні новини</h3>
-          <p>
-            Вийшло нове оновлення гри! Додано нові юніти та покращено баланс.
-          </p>
-          <p>Дата: 15.05.2023</p>
+      <!-- Login Modal -->
+      <div id="loginModal" class="modal">
+        <div class="modal-content">
+          <button class="close-button">&times;</button>
+          <h2>Вхід в систему</h2>
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="login">Логін або Email</label>
+              <input type="text" id="login" name="login" required />
+              <div class="error-message" id="login-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="login-password">Пароль</label>
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                required
+              />
+              <div class="error-message" id="login-password-error"></div>
+            </div>
+            <button type="submit" class="submit-button">Увійти</button>
+          </form>
         </div>
-
-        <div class="info-block">
-          <h3>Майбутні події</h3>
-          <p>
-            Турнір Stratega Masters відбудеться наступного місяця. Реєструйтеся
-            зараз!
-          </p>
-          <p>Дата: 10.06.2023</p>
-        </div>
-
-        <div class="info-block">
-          <h3>Оновлення системи</h3>
-          <p>Виправлено помилки та покращено продуктивність гри.</p>
-          <p>Дата: 01.05.2023</p>
-        </div>
-      </div>
-
-      <div class="right-column">
-        <h2>Ігрові кімнати</h2>
-
-        <div class="game-room">
-          <div class="players">
-            <div class="player">Гравець 1: Alex</div>
-            <div class="player">Гравець 2: -</div>
-          </div>
-          <div class="game-status status-preparing">Підготовка</div>
-          <button class="join-button">Приєднатися</button>
-        </div>
-
-        <div class="game-room">
-          <div class="players">
-            <div class="player">Гравець 1: Maria</div>
-            <div class="player">Гравець 2: John</div>
-          </div>
-          <div class="game-status status-in-progress">Гра йде</div>
-          <button class="join-button" disabled>Приєднатися</button>
-        </div>
-
-        <div class="game-room">
-          <div class="players">
-            <div class="player">Гравець 1: Viktor</div>
-            <div class="player">Гравець 2: -</div>
-          </div>
-          <div class="game-status status-preparing">Підготовка</div>
-          <button class="join-button">Приєднатися</button>
-        </div>
-
-        <div class="game-room">
-          <div class="players">
-            <div class="player">Гравець 1: -</div>
-            <div class="player">Гравець 2: -</div>
-          </div>
-          <div class="game-status status-preparing">Нова кімната</div>
-          <button class="join-button">Створити гру</button>
-        </div>
-      </div>
-    </main>
-
-    <footer>
-      <div class="footer-links">
-        <a href="#">Правила та умови</a>
-        <a href="#">Про гру</a>
-        <a href="#">Контакти</a>
-      </div>
-      <div class="copyright">Stratega © 2022-2023. Всі права захищені.</div>
-    </footer>
-
-    <!-- Registration Modal -->
-    <div id="registerModal" class="modal">
-      <div class="modal-content">
-        <button class="close-button">&times;</button>
-        <h2>Реєстрація</h2>
-        <form id="registerForm">
-          <div class="form-group">
-            <label for="email">Електронна пошта</label>
-            <input type="email" id="email" name="email" required />
-            <div class="error-message" id="email-error"></div>
-          </div>
-          <div class="form-group">
-            <label for="username">Нікнейм</label>
-            <input type="text" id="username" name="username" required />
-            <div class="error-message" id="username-error"></div>
-          </div>
-          <div class="form-group">
-            <label for="password">Пароль</label>
-            <input type="password" id="password" name="password" required />
-            <div class="error-message" id="password-error"></div>
-          </div>
-          <div class="form-group">
-            <label for="confirm-password">Підтвердження пароля</label>
-            <input
-              type="password"
-              id="confirm-password"
-              name="confirm-password"
-              required
-            />
-            <div class="error-message" id="confirm-password-error"></div>
-          </div>
-          <button type="submit" class="submit-button">Зареєструватися</button>
-        </form>
       </div>
     </div>
-
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal">
-      <div class="modal-content">
-        <button class="close-button">&times;</button>
-        <h2>Вхід в систему</h2>
-        <form id="loginForm">
-          <div class="form-group">
-            <label for="login">Логін або Email</label>
-            <input type="text" id="login" name="login" required />
-            <div class="error-message" id="login-error"></div>
-          </div>
-          <div class="form-group">
-            <label for="login-password">Пароль</label>
-            <input
-              type="password"
-              id="login-password"
-              name="password"
-              required
-            />
-            <div class="error-message" id="login-password-error"></div>
-          </div>
-          <button type="submit" class="submit-button">Увійти</button>
-        </form>
-      </div>
+    <div class="rotate-warning">
+      Будь ласка, переверни пристрій горизонтально для кращого перегляду
     </div>
 
     <script src="script.js"></script>
