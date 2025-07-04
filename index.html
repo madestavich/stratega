@@ -43,7 +43,11 @@
         </div>
 
         <div class="right-column">
-          <button class="join-button">Створити гру</button>
+          <div id="create-room-container" style="display: none">
+            <button id="create-room-btn" class="join-button">
+              Створити гру
+            </button>
+          </div>
           <h2>Ігрові кімнати</h2>
         </div>
       </main>
@@ -115,6 +119,31 @@
               <div class="error-message" id="login-password-error"></div>
             </div>
             <button type="submit" class="submit-button">Увійти</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Create Room Modal -->
+      <div id="createRoomModal" class="modal">
+        <div class="modal-content">
+          <button class="close-button">&times;</button>
+          <h2>Створення кімнати</h2>
+          <form id="createRoomForm">
+            <div class="form-group">
+              <label for="room-type">Тип кімнати</label>
+              <select id="room-type" name="room-type">
+                <option value="open">Відкрита</option>
+                <option value="closed">Закрита (з паролем)</option>
+              </select>
+            </div>
+            <div class="form-group" id="password-group" style="display: none">
+              <label for="room-password">Пароль</label>
+              <input type="password" id="room-password" name="room-password" />
+              <div class="error-message" id="room-password-error"></div>
+            </div>
+            <button type="submit" class="submit-button">
+              Створити кімнату
+            </button>
           </form>
         </div>
       </div>
