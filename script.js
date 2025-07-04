@@ -12,6 +12,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const createRoomForm = document.getElementById("createRoomForm");
   const createRoomContainer = document.getElementById("create-room-container");
 
+  // For registration form
+  const emailInput = document.getElementById("email");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const confirmPasswordInput = document.getElementById("confirm-password");
+
+  // For login form
+  const loginInput = document.getElementById("login");
+  const loginPasswordInput = document.getElementById("login-password");
+
   // Room creation form elements
   const roomTypeSelect = document.getElementById("room-type");
   const passwordGroup = document.getElementById("password-group");
