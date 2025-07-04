@@ -320,3 +320,242 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+//! --------------- rooms -----------------
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Game room buttons
+  const joinButtons = document.querySelectorAll(".join-button:not([disabled])");
+  joinButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      if (this.textContent === "Створити гру") {
+        createRoom();
+      } else {
+        const roomId = this.getAttribute("data-room-id");
+        joinRoom(roomId);
+      }
+    });
+  });
+
+  // Load rooms on page load
+  loadRooms();
+});
+
+// Function to create a new room
+function createRoom() {
+  // For closed rooms, you might want to show a modal to enter password
+  const roomType = "open"; // or "closed"
+  const password = ""; // Only needed for closed rooms
+
+  const formData = new FormData();
+  formData.append("action", "create");
+  formData.append("room_type", roomType);
+  if (roomType === "closed") {
+    formData.append("password", password);
+  }
+
+  fetch("/server/room.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        // Redirect to game page or show success message
+        window.location.href = `/game.html?room=${data.room_id}`;
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    })
+    .catch((error) => {
+      console.error("Error creating room:", error);
+      alert("Failed to create room. Please try again.");
+    });
+}
+
+// Function to join an existing room
+function joinRoom(roomId) {
+  const formData = new FormData();
+  formData.append("action", "join");
+  formData.append("room_id", roomId);
+
+  // For closed rooms, you might need to prompt for password
+  const roomElement = document.querySelector(
+    `.game-room[data-room-id="${roomId}"]`
+  );
+  const isClosedRoom =
+    roomElement && roomElement.getAttribute("data-room-type") === "closed";
+
+  if (isClosedRoom) {
+    const password = prompt(
+      "Ця кімната захищена паролем. Будь ласка, введіть пароль:"
+    );
+    if (password === null) return; // User cancelled
+    formData.append("password", password);
+  }
+
+  fetch("/server/room.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        // Redirect to game page
+        window.location.href = `/game.html?room=${data.room_id}`;
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    })
+    .catch((error) => {
+      console.error("Error joining room:", error);
+      alert("Failed to join room. Please try again.");
+    });
+}
+
+// Function to load and display available rooms
+function loadRooms() {
+  fetch("/server/room.php?action=list")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        displayRooms(data.rooms);
+      } else {
+        console.error("Error loading rooms:", data.message);
+      }
+    })
+    .catch((error) => {
+      console.error("Error loading rooms:", error);
+    });
+}
+
+// Function to display rooms in the UI
+function displayRooms(rooms) {
+  const roomsContainer = document.querySelector(".right-column");
+
+  // Clear existing rooms except the header
+  const header = roomsContainer.querySelector("h2");
+  roomsContainer.innerHTML = "";
+  roomsContainer.appendChild(header);
+
+  // Add "Create Room" button
+  const createRoomDiv = document.createElement("div");
+  createRoomDiv.className = "game-room";
+  createRoomDiv.innerHTML = `
+    <div class="players">
+      <div class="player">Створити нову кімнату</div>
+    </div>
+    <div class="game-status status-preparing">Нова гра</div>
+    <button class="join-button">Створити гру</button>
+  `;
+  roomsContainer.appendChild(createRoomDiv);
+
+  // Add event listener to the create button
+  const createButton = createRoomDiv.querySelector(".join-button");
+  createButton.addEventListener("click", createRoom);
+
+  // Add existing rooms
+  rooms.forEach((room) => {
+    const roomDiv = document.createElement("div");
+    roomDiv.className = "game-room";
+    roomDiv.setAttribute("data-room-id", room.id);
+    roomDiv.setAttribute("data-room-type", room.room_type);
+
+    const statusClass =
+      room.status === "preparing" ? "status-preparing" : "status-in-progress";
+    const statusText = room.status === "preparing" ? "Підготовка" : "Гра йде";
+    const canJoin = room.status === "preparing";
+
+    roomDiv.innerHTML = `
+      <div class="players">
+        <div class="player">Гравець 1: ${room.creator_name}</div>
+        <div class="player">Гравець 2: ${room.second_player_name || "-"}</div>
+      </div>
+      <div class="game-status ${statusClass}">${statusText}</div>
+      <button class="join-button" ${canJoin ? "" : "disabled"} data-room-id="${
+      room.id
+    }">
+        ${canJoin ? "Приєднатися" : "Приєднатися"}
+      </button>
+    `;
+
+    roomsContainer.appendChild(roomDiv);
+
+    // Add event listener to join button if it's not disabled
+    if (canJoin) {
+      const joinButton = roomDiv.querySelector(".join-button");
+      joinButton.addEventListener("click", function () {
+        joinRoom(room.id);
+      });
+    }
+  });
+}
+
+// Function to update game state
+function updateGameState(roomId, gameState, currentRound) {
+  const formData = new FormData();
+  formData.append("action", "update");
+  formData.append("room_id", roomId);
+  formData.append("game_state", JSON.stringify(gameState));
+  formData.append("current_round", currentRound);
+
+  return fetch("/server/room.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status !== "success") {
+        console.error("Error updating game state:", data.message);
+      }
+      return data;
+    })
+    .catch((error) => {
+      console.error("Error updating game state:", error);
+      throw error;
+    });
+}
+
+// Function to get room details
+function getRoomDetails(roomId) {
+  return fetch(`/server/room.php?action=get&room_id=${roomId}`)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        return data.room;
+      } else {
+        console.error("Error getting room details:", data.message);
+        throw new Error(data.message);
+      }
+    })
+    .catch((error) => {
+      console.error("Error getting room details:", error);
+      throw error;
+    });
+}
+
+// Function to periodically refresh room data in game
+function startGameStatePolling(roomId, callback, interval = 5000) {
+  // Initial load
+  getRoomDetails(roomId)
+    .then((room) => {
+      if (callback) callback(room);
+    })
+    .catch((error) => console.error("Error in initial room load:", error));
+
+  // Set up polling
+  const pollId = setInterval(() => {
+    getRoomDetails(roomId)
+      .then((room) => {
+        if (callback) callback(room);
+      })
+      .catch((error) => {
+        console.error("Error polling room data:", error);
+        // Optionally stop polling on persistent errors
+        // clearInterval(pollId);
+      });
+  }, interval);
+
+  // Return the interval ID so it can be cleared later
+  return pollId;
+}
