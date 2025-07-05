@@ -346,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         if (data.status === "success") {
           // Redirect to game page
-          window.location.href = `/game/game.html?room=${data.room_id}`;
+          window.location.href = `/game/game.html#room=${data.room_id}`;
         } else {
           alert(`Error: ${data.message}`);
         }
