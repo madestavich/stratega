@@ -49,7 +49,7 @@ export class MultiplayerManager {
   async loadRoomData() {
     try {
       const response = await fetch(
-        `../server/room.php?action=get&room_id=${this.roomId}`
+        `../server/room.php#action=get&room_id=${this.roomId}`
       );
       const data = await response.json();
 
