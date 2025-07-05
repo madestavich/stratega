@@ -177,6 +177,18 @@ export class ObjectManager {
     }
   }
 
+  clearAll() {
+    // Clear the objects array
+    this.objects = [];
+
+    // If there's a grid manager, update it
+    if (this.gridManager) {
+      this.gridManager.updateGridObjects(this);
+    }
+
+    console.log("All objects cleared from ObjectManager");
+  }
+
   updateAll(dt) {
     for (const obj of this.objects) obj.update();
 
