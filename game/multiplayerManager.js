@@ -1,4 +1,4 @@
-import { Player } from "../import.js";
+import { Player } from "./player.js";
 
 /**
  * Клас для управління мультиплеєрними функціями гри
