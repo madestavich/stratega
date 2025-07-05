@@ -158,7 +158,7 @@ export class MultiplayerManager {
       race: playerData.race || "neutral",
       team: this.isHost ? 1 : 2,
       coins: playerData.money || 1000,
-      side: playerSide,
+      side: this.playerSide,
     });
 
     // Оновлюємо інтерфейс гравця
@@ -168,7 +168,7 @@ export class MultiplayerManager {
 
     console.log(`Game room initialized. Room ID: ${this.roomId}`);
     console.log(
-      `You are playing as: ${this.gameManager.player.nickname} (${playerSide} side)`
+      `You are playing as: ${this.gameManager.player.nickname} (${this.playerSide} side)`
     );
     console.log(`Game phase: ${this.gamePhase}`);
 
@@ -236,8 +236,8 @@ export class MultiplayerManager {
 
       // Показуємо меню вибору юнітів
       document.getElementById("unitMenu").style.display = "flex";
-      this.gameManager.player.side = playerSide; // Store the player's side
-      console.log(`Player side set to: ${playerSide}`);
+      this.gameManager.player.side = this.playerSide; // Store the player's side
+      console.log(`Player side set to: ${this.playerSide}`);
 
       // Додаємо обробник для кнопки START
       startButton.onclick = () => this.startGame();
