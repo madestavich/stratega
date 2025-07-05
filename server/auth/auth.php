@@ -76,6 +76,7 @@ echo json_encode([
     'success' => true,
     'message' => 'Авторизація успішна',
     'user' => [
+        'id' => $user['id'],  // Додайте id користувача
         'username' => $user['username'],
         'email' => $user['email']
     ]

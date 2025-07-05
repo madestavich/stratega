@@ -457,6 +457,11 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.logged_in) {
+          // Save user_id to localStorage if not already there
+          if (!localStorage.getItem("user_id") && data.user.id) {
+            localStorage.setItem("user_id", data.user.id);
+          }
+
           updateUIAfterLogin(data.user);
           checkCanCreateRoom(data.user.id);
         } else {
@@ -495,6 +500,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Function to update UI after login
   function updateUIAfterLogin(user) {
+    // Save user_id to localStorage
+    localStorage.setItem("user_id", user.id); // Додайте цей рядок
+
     // Update login button to logout
     loginBtn.textContent = "Вихід";
 
@@ -522,6 +530,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Function to update UI after logout
   function updateUIAfterLogout() {
+    // Remove user_id from localStorage
+    localStorage.removeItem("user_id"); // Додайте цей рядок
+
     // Update logout button to login
     loginBtn.textContent = "Вхід";
 
