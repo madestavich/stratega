@@ -107,7 +107,7 @@ export class MultiplayerManager {
     this.isHost = this.currentPlayerId == this.roomData.creator_id;
 
     // Визначаємо сторону гравця (ліва або права)
-    playerSide = this.determinePlayerSide();
+    this.playerSide = this.determinePlayerSide();
 
     // Парсимо game_state з JSON
     let gameState = {};
