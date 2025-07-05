@@ -48,10 +48,12 @@ export class MultiplayerManager {
    */
   async loadRoomData() {
     try {
-      const response = await fetch(
-        `../server/room.php?action=get&room_id=${this.roomId}`
-      );
+      const url = `../server/room.php?action=get&room_id=${this.roomId}`;
+      console.log("Fetching room data from:", url);
+
+      const response = await fetch(url);
       const data = await response.json();
+      console.log("Server response:", data);
 
       if (data.status === "success") {
         this.roomData = data.room;
