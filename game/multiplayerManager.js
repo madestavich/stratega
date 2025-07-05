@@ -19,7 +19,7 @@ export class MultiplayerManager {
    */
   initFromUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
-    this.roomId = urlParams.get("roomId");
+    this.roomId = urlParams.get("room");
 
     if (this.roomId) {
       this.loadRoomData();
