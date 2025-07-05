@@ -373,7 +373,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // Function to display rooms in the UI
   function displayRooms(rooms) {
     const roomsContainer = document.querySelector(".right-column");
     const header = roomsContainer.querySelector("h2");
@@ -389,15 +388,18 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
+    // Filter out completed rooms
+    const activeRooms = rooms.filter((room) => room.status !== "completed");
+
     // Add existing rooms
-    if (rooms.length === 0) {
+    if (activeRooms.length === 0) {
       const noRoomsMessage = document.createElement("p");
       noRoomsMessage.className = "no-rooms-message";
       noRoomsMessage.textContent =
         "Наразі немає доступних кімнат. Створіть нову!";
       roomsContainer.appendChild(noRoomsMessage);
     } else {
-      rooms.forEach((room) => {
+      activeRooms.forEach((room) => {
         const roomDiv = document.createElement("div");
         roomDiv.className = "game-room";
         roomDiv.setAttribute("data-room-id", room.id);
