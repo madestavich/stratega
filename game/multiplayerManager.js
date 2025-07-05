@@ -18,10 +18,15 @@ export class MultiplayerManager {
    * Ініціалізує дані з URL параметрів
    */
   initFromUrlParams() {
+    console.log("Starting initFromUrlParams");
     const urlParams = new URLSearchParams(window.location.search);
+    console.log("URL search:", window.location.search);
+
     this.roomId = urlParams.get("room");
+    console.log("Room ID from URL:", this.roomId);
 
     if (this.roomId) {
+      console.log("Room ID found, loading room data");
       this.loadRoomData();
     } else {
       console.error("Room ID not found in URL parameters");
@@ -29,7 +34,6 @@ export class MultiplayerManager {
       window.location.href = "../index.html";
     }
   }
-
   /**
    * Завантажує дані про кімнату з сервера
    */
