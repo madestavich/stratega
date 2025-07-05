@@ -501,14 +501,20 @@ document.addEventListener("DOMContentLoaded", function () {
     // Hide register button
     registerBtn.style.display = "none";
 
-    // Add username display
-    const usernameDisplay = document.createElement("span");
-    usernameDisplay.id = "username-display";
-    usernameDisplay.textContent = user.username;
-    usernameDisplay.className = "username-display";
+    // Check if username display already exists
+    let usernameDisplay = document.getElementById("username-display");
 
-    // Insert username before logout button
-    loginBtn.parentNode.insertBefore(usernameDisplay, loginBtn);
+    // If it doesn't exist, create it
+    if (!usernameDisplay) {
+      usernameDisplay = document.createElement("span");
+      usernameDisplay.id = "username-display";
+      usernameDisplay.className = "username-display";
+      // Insert username before logout button
+      loginBtn.parentNode.insertBefore(usernameDisplay, loginBtn);
+    }
+
+    // Update the username text
+    usernameDisplay.textContent = user.username;
 
     // Check if user can create a room
     checkCanCreateRoom(user.id);
