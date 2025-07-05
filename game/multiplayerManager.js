@@ -52,8 +52,22 @@ export class MultiplayerManager {
       console.log("Fetching room data from:", url);
 
       const response = await fetch(url);
-      const data = await response.json();
-      console.log("Server response:", data);
+      console.log("Response status:", response.status);
+
+      // Try to get the response text first
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+
+      // Then try to parse it as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log("Parsed response data:", data);
+      } catch (jsonError) {
+        console.error("Failed to parse response as JSON:", jsonError);
+        alert("Server returned invalid JSON. Check console for details.");
+        return;
+      }
 
       if (data.status === "success") {
         this.roomData = data.room;
@@ -64,7 +78,12 @@ export class MultiplayerManager {
       }
     } catch (error) {
       console.error("Error fetching room data:", error);
-      alert("Failed to load room data. Please try again.");
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+      alert(`Failed to load room data: ${error.message}`);
     }
   }
 
@@ -408,8 +427,20 @@ export class MultiplayerManager {
    * @param {number} interval - Інтервал оновлення в мілісекундах
    */
   startPolling(interval = 3000) {
-    this.pollingInterval = setInterval(() => {
-      this.loadRoomData();
+    console.log("Starting room data polling");
+    this.pollingInterval = setInterval(async () => {
+      try {
+        console.log("Polling for room data updates...");
+        await this.loadRoomData();
+      } catch (error) {
+        console.error("Error during polling:", error);
+        // Stop polling if we encounter too many errors
+        this.pollingErrorCount = (this.pollingErrorCount || 0) + 1;
+        if (this.pollingErrorCount > 5) {
+          console.error("Too many polling errors, stopping polling");
+          this.stopPolling();
+        }
+      }
     }, interval);
   }
 
