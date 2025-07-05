@@ -47,6 +47,9 @@ switch ($action) {
     case 'complete_game':
         completeGame();
         break;
+    case 'update_round_state':
+        updateRoundState();
+        break;
     default:
         echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
         break;
@@ -107,6 +110,7 @@ function createRoom() {
     $userId = getCurrentUserId();
     $roomType = $_POST['room_type'] ?? 'open'; // 'open' or 'closed'
     $password = null;
+    $roundTime = $_POST['round_time'] ?? 60; // Default to 60 seconds if not specified
     
     // Check if user already has an active room
     $stmt = $conn->prepare("
@@ -155,14 +159,14 @@ function createRoom() {
     ]);
     
     try {
-        // Prepare SQL statement
+        // Prepare SQL statement with new columns
         $stmt = $conn->prepare("
             INSERT INTO game_rooms 
-            (creator_id, second_player_id, created_at, current_round, room_type, password, game_state, game_status) 
-            VALUES (?, NULL, NOW(), 0, ?, ?, ?, 'preparing')
+            (creator_id, second_player_id, created_at, current_round, room_type, password, game_state, game_status, round_state, round_time) 
+            VALUES (?, NULL, NOW(), 0, ?, ?, ?, 'preparing', 'preparing', ?)
         ");
         
-        $stmt->bind_param("isss", $userId, $roomType, $password, $gameState);
+        $stmt->bind_param("isssi", $userId, $roomType, $password, $gameState, $roundTime);
         $stmt->execute();
         
         if ($stmt->affected_rows > 0) {
@@ -287,10 +291,10 @@ function listRooms() {
     global $conn;
     
     try {
-        // Get all rooms, prioritizing active ones
+        // Get all rooms, prioritizing active ones, now including round_state and round_time
         $query = "
             SELECT r.id, r.creator_id, r.second_player_id, r.created_at, 
-                   r.current_round, r.room_type, r.game_status,
+                   r.current_round, r.room_type, r.game_status, r.round_state, r.round_time,
                    u1.username as creator_name, u2.username as second_player_name
             FROM game_rooms r
             LEFT JOIN users u1 ON r.creator_id = u1.id
@@ -399,6 +403,81 @@ function updateRoomState() {
 }
 
 /**
+ * Update round state for a room
+ */
+function updateRoundState() {
+    global $conn;
+    
+    // Check if user is logged in
+    if (!isLoggedIn()) {
+        echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
+        return;
+    }
+    
+    $userId = getCurrentUserId();
+    $roomId = $_POST['room_id'] ?? 0;
+    $roundState = $_POST['round_state'] ?? 'preparing';
+    
+    if (!$roomId) {
+        echo json_encode(['status' => 'error', 'message' => 'Room ID is required']);
+        return;
+    }
+    
+    // Validate round_state value
+    if ($roundState !== 'preparing' && $roundState !== 'running') {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid round state value']);
+        return;
+    }
+    
+    try {
+        // Check if user is part of this room
+        $stmt = $conn->prepare("
+            SELECT * FROM game_rooms 
+            WHERE id = ? AND (creator_id = ? OR second_player_id = ?)
+        ");
+        $stmt->bind_param("iii", $roomId, $userId, $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows === 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Not authorized to update this room']);
+            return;
+        }
+        
+        $room = $result->fetch_assoc();
+        
+        // Check if game is still active
+        if ($room['game_status'] === 'completed') {
+            echo json_encode(['status' => 'error', 'message' => 'Game is already completed']);
+            return;
+        }
+        
+        // Update round state
+        $updateStmt = $conn->prepare("
+            UPDATE game_rooms 
+            SET round_state = ? 
+            WHERE id = ?
+        ");
+        $updateStmt->bind_param("si", $roundState, $roomId);
+        $updateStmt->execute();
+        
+        if ($updateStmt->affected_rows > 0) {
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Round state updated successfully'
+            ]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No changes made to round state']);
+        }
+        
+        $updateStmt->close();
+        $stmt->close();
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+}
+
+/**
  * Mark a game as completed
  */
 function completeGame() {
@@ -445,7 +524,7 @@ function completeGame() {
         // Update game status to completed
         $updateStmt = $conn->prepare("
             UPDATE game_rooms 
-            SET game_status = 'completed', winner_id = ? 
+            SET game_status = 'completed', winner_id = ?, round_state = 'preparing'
             WHERE id = ?
         ");
         $updateStmt->bind_param("ii", $winnerId, $roomId);
@@ -484,6 +563,7 @@ function getRoomDetails() {
         $stmt = $conn->prepare("
             SELECT r.id, r.creator_id, r.second_player_id, r.created_at, 
                    r.current_round, r.room_type, r.game_state, r.game_status, r.winner_id,
+                   r.round_state, r.round_time,
                    u1.username as creator_name, u2.username as second_player_name,
                    u3.username as winner_name
             FROM game_rooms r
@@ -520,3 +600,4 @@ function getRoomDetails() {
     }
 }
 ?>
+
