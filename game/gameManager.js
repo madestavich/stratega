@@ -4,7 +4,6 @@ import { GridManager } from "../import.js";
 import { ActionManager } from "../import.js";
 import { InputManager } from "../import.js";
 import { SpriteLoader } from "../import.js";
-import { Player } from "../import.js";
 import { InterfaceManager } from "../import.js";
 import { MultiplayerManager } from "../import.js";
 
