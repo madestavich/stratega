@@ -170,7 +170,8 @@ export class InputManager {
           const canPlace = this.gameManager.gridManager.canPlaceAt(
             tempObject,
             col,
-            row
+            row,
+            this.gameManager.player.side
           );
 
           // Calculate the area the unit would occupy
@@ -246,7 +247,8 @@ export class InputManager {
       const canPlace = this.gameManager.gridManager.canPlaceAt(
         tempObject,
         gridCoords.col,
-        gridCoords.row
+        gridCoords.row,
+        this.gameManager.player.side
       );
 
       if (!canPlace) {

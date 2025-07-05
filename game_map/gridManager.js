@@ -94,9 +94,8 @@ export class GridManager {
     }
   }
 
-  canPlaceAt(gameObject, gridCol, gridRow) {
+  canPlaceAt(gameObject, gridCol, gridRow, playerSide = null) {
     const { gridWidth, gridHeight, expansionDirection } = gameObject;
-
     let startCol = gridCol;
     let startRow = gridRow;
 
@@ -116,6 +115,19 @@ export class GridManager {
       default:
         // No adjustment needed
         break;
+    }
+
+    // Check player side restrictions if specified
+    if (playerSide) {
+      const midCol = Math.floor(this.cols / 2);
+
+      if (playerSide === "left" && startCol + gridWidth > midCol) {
+        return false; // Left player can't place on right side
+      }
+
+      if (playerSide === "right" && startCol < midCol) {
+        return false; // Right player can't place on left side
+      }
     }
 
     // Check if all needed cells are available
