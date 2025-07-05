@@ -4,5 +4,6 @@ export class Player {
     this.race = config.race;
     this.team = config.team;
     this.coins = config.coins || 100;
+    this.side = null;
   }
 }

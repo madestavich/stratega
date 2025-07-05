@@ -235,11 +235,8 @@ export class MultiplayerManager {
 
       // Показуємо меню вибору юнітів
       document.getElementById("unitMenu").style.display = "flex";
-
-      // Дозволяємо розміщувати юніти тільки на своїй стороні
-      this.gameManager.inputManager.setPlacementRestrictions(
-        this.isHost ? "left" : "right"
-      );
+      this.gameManager.player.side = playerSide; // Store the player's side
+      console.log(`Player side set to: ${playerSide}`);
 
       // Додаємо обробник для кнопки START
       startButton.onclick = () => this.startGame();
