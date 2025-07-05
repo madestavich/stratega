@@ -1,0 +1,198 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+
+body {
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  user-select: none;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+canvas {
+  display: block;
+  flex: 1;
+  border-bottom: 5px solid;
+  border-image: url("../textures/Border-gold.png") 10 repeat;
+  background-image: url(../backgrounds/CmBkGrMt.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Unit menu styles - Left side */
+.side-menu {
+  width: 20%;
+  height: 100%;
+  background: url("../textures/Leather-middle.png");
+  color: white;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  border-right: 5px solid transparent;
+  border-image: url("../textures/Border-gold.png") 10 repeat;
+}
+
+.right-menu {
+  border-right: none;
+  border-left: 5px solid transparent;
+  border-image: url("../textures/Border-gold.png") 10 round;
+}
+
+.category-tabs {
+  background: url("../textures/Leather-middle.png");
+  display: flex;
+  flex-direction: column;
+}
+
+.category-tab {
+  height: 120px;
+  width: 40px;
+  cursor: pointer;
+  background: url("../textures/Leather.png");
+  margin-bottom: 5px;
+  border-radius: 5px 0 0 5px;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: 10px 0;
+  border: 3px solid transparent;
+  border-image: url("../textures/Border-small.png") 5 round;
+}
+
+/* Right side menu tabs */
+.right-menu .category-tabs {
+  border-right: none;
+  order: 2;
+}
+
+.right-menu .category-tab {
+  border-radius: 0 5px 5px 0;
+  transform: rotate(0deg);
+  writing-mode: vertical-rl;
+}
+
+.category-tab:hover {
+  background: url("../textures/Leather-middle.png");
+}
+
+.category-tab.active {
+  background: url("../textures/Leather-middle.png");
+  font-weight: bold;
+  border-image: url("../textures/Border-gold.png") 5 round;
+  border-left: none;
+}
+
+.category-content-container {
+  flex: 1;
+}
+
+.category-content {
+  display: none;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 0;
+  height: 100%;
+  align-content: flex-start; /* Ensures items align at the top */
+  justify-content: center;
+  overflow-y: auto; /* Adds scrolling if content exceeds height */
+}
+
+.category-content.active {
+  display: flex;
+}
+
+.unit-icon {
+  width: 60px;
+  height: 60px;
+  background: url("../textures/Leather.png");
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevents the unit from shrinking */
+  border: 3px solid;
+  border-image: url("../textures/Border-small.png") 5 round;
+}
+
+.unit-icon:hover {
+  border-color: rgb(255, 204, 0);
+  box-shadow: rgb(255, 204, 0) 0px 0px 10px;
+}
+
+.unit-name {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 3px;
+  text-shadow: 1px 1px 2px black;
+}
+
+/* Footer styles */
+.footer {
+  height: 60px;
+  background: url("../textures/Leather-middle.png");
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.start-button {
+  padding: 10px 40px;
+  background: url("../textures/Leather-green.png");
+  color: white;
+  border: 4px solid transparent;
+  border-image: url("../textures/Border-gold.png") 10 round;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-shadow: 1px 1px 2px black;
+  font-weight: bold;
+}
+
+.start-button:hover {
+  background: url("../textures/Leather-orange.png");
+  transform: scale(1.05);
+}
+
+/* Shroud for undiscovered areas */
+.shroud {
+  background: url("../textures/Shroud.png");
+  opacity: 1;
+}
+
+/* Scrollbar styling */
+.category-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.category-content::-webkit-scrollbar-track {
+  background: url("../textures/Leather-extra-dark.png");
+}
+
+.category-content::-webkit-scrollbar-thumb {
+  background: url("../textures/Leather-middle.png");
+  border: 2px solid transparent;
+  border-image: url("../textures/Border-small.png") 3 round;
+  border-radius: 4px;
+}
+
+.category-content::-webkit-scrollbar-thumb:hover {
+  background: url("../textures/Leather-blue.png");
+}
