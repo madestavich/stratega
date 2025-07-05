@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
           resetCreateRoomForm();
 
           // Redirect to game page or show success message
-          window.location.href = `/game/game.html?room=${data.room_id}`;
+          window.location.href = `/game/game.html#room=${data.room_id}`;
         } else {
           alert(`Error: ${data.message}`);
         }
