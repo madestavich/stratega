@@ -23,6 +23,7 @@ import { GridManager } from "./game_map/gridManager.js";
 import { ActionManager } from "./game_objects/actionManager.js";
 import { InputManager } from "./input/inputManager.js";
 import { InterfaceManager } from "./input/interfaceManager.js";
+import { MultiplayerManager } from "./game/multiplayerManager.js";
 
 export {
   ObjectManager,
@@ -40,4 +41,5 @@ export {
   SpriteLoader,
   Player,
   InterfaceManager,
+  MultiplayerManager,
 };

@@ -6,6 +6,7 @@ import { InputManager } from "../import.js";
 import { SpriteLoader } from "../import.js";
 import { Player } from "../import.js";
 import { InterfaceManager } from "../import.js";
+import { MultiplayerManager } from "../import.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -22,7 +23,6 @@ class GameManager {
     this.debugMode = false;
     this.debugInterval = null;
     this.isRunning = true;
-    this.isPaused = true;
     this.player = null;
 
     //! ініціалізація об'єктів і інших менеджерів
@@ -44,7 +44,6 @@ class GameManager {
     this.actionManager = new ActionManager(this.objectManager);
     this.inputManager = new InputManager(canvas, this);
 
-    this.inputManager.setPlayButtonCallback(() => this.togglePauseMode());
     this.interfaceManager = new InterfaceManager(
       this.spriteLoader,
       this.configLoader
@@ -57,15 +56,6 @@ class GameManager {
     });
 
     this.start();
-  }
-
-  togglePauseMode() {
-    this.isPaused = !this.isPaused;
-
-    // Оновлюємо текст кнопки через InputManager
-    this.inputManager.updatePlayButtonText(this.isPaused);
-
-    console.log(`Game ${this.isPaused ? "paused" : "resumed"}`);
   }
 
   logGameObjects() {
@@ -125,15 +115,12 @@ class GameManager {
 
   async start() {
     await this.configLoader.loadRacesConfig();
-    // Create player (for example purposes)
-    this.player = new Player({
-      nickname: "Player1",
-      race: "neutral", // Use one of the races from races.json
-      team: 1,
-      coins: 100,
-    });
 
-    this.interfaceManager.updatePlayerInterface(this.player);
+    // Ініціалізуємо MultiplayerManager
+    this.multiplayerManager = new MultiplayerManager(this);
+
+    // Починаємо періодичне оновлення даних кімнати
+    this.multiplayerManager.startPolling();
 
     requestAnimationFrame((t) => this.loop(t));
   }
@@ -198,29 +185,26 @@ class GameManager {
     this.accumulator += this.deltaTime;
 
     while (this.accumulator >= this.fixedTimeStep) {
-      // Оновлюємо анімації для всіх об'єктів незалежно від режиму
+      // Оновлюємо анімації для всіх об'єктів
       for (const obj of this.objectManager.objects) {
         if (obj.animator && !obj.animator.hasFinished) {
           obj.animator.nextFrame();
         }
       }
 
-      // Оновлюємо логіку гри тільки якщо не на паузі
-      if (!this.isPaused) {
-        // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
-        for (const obj of this.objectManager.objects) {
-          // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
-          if (!obj.isDead) {
-            obj.updateZCoordinate();
-          }
+      // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
+      for (const obj of this.objectManager.objects) {
+        // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
+        if (!obj.isDead) {
+          obj.updateZCoordinate();
         }
-
-        // Оновлюємо дії для всіх об'єктів через ActionManager
-        this.actionManager.update(this.fixedTimeStep);
-
-        // Оновлюємо стан сітки після руху
-        this.gridManager.updateGridObjects(this.objectManager);
       }
+
+      // Оновлюємо дії для всіх об'єктів через ActionManager
+      this.actionManager.update(this.fixedTimeStep);
+
+      // Оновлюємо стан сітки після руху
+      this.gridManager.updateGridObjects(this.objectManager);
 
       this.accumulator -= this.fixedTimeStep;
 
