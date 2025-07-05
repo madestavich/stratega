@@ -11,6 +11,7 @@ export class MultiplayerManager {
     this.currentPlayerId = null;
     this.isHost = false;
     this.gamePhase = "preparing"; // 'preparing' або 'running'
+    this.playerSide = null;
 
     // Ініціалізуємо дані з URL параметрів
     this.initFromUrlParams();
@@ -106,7 +107,7 @@ export class MultiplayerManager {
     this.isHost = this.currentPlayerId == this.roomData.creator_id;
 
     // Визначаємо сторону гравця (ліва або права)
-    const playerSide = this.determinePlayerSide();
+    playerSide = this.determinePlayerSide();
 
     // Парсимо game_state з JSON
     let gameState = {};
