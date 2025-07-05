@@ -36,7 +36,7 @@ export class MultiplayerManager {
       this.loadRoomData();
     } else {
       console.error("Room ID not found in URL hash");
-      alert("Room ID not found. Redirecting to home page.");
+      // alert("Room ID not found. Redirecting to home page.");
       // window.location.href = "../index.html";
     }
   }

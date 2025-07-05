@@ -628,10 +628,11 @@ document.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", function () {
       if (this.textContent === "Створити гру") {
         createRoomModal.style.display = "flex";
-      } else {
-        const roomId = this.closest(".game-room").getAttribute("data-room-id");
-        joinRoom(roomId);
       }
+      // else {
+      //   const roomId = this.closest(".game-room").getAttribute("data-room-id");
+      //   joinRoom(roomId);
+      // }
     });
   });
 
