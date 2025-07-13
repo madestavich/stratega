@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
       formData.append("username", username);
       formData.append("password", password);
 
-      fetch("auth/register.php", {
+      fetch("server/auth/register.php", {
         method: "POST",
         body: formData,
       })
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", function () {
       formData.append("login", login);
       formData.append("password", password);
 
-      fetch("auth/auth.php", {
+      fetch("server/auth/auth.php", {
         method: "POST",
         body: formData,
       })
@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function logout() {
-    fetch("auth/logout.php")
+    fetch("server/auth/logout.php")
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function checkLoginStatus() {
-    fetch("auth/check_login.php")
+    fetch("server/auth/check_login.php")
       .then((response) => response.json())
       .then((data) => {
         if (data.logged_in) {
