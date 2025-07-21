@@ -307,16 +307,4 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error checking login status:", error);
       });
   }
-
-  // Game room buttons
-  const joinButtons = document.querySelectorAll(".join-button:not([disabled])");
-  joinButtons.forEach((button) => {
-    button.addEventListener("click", function () {
-      if (this.textContent === "Створити гру") {
-        alert("Створення нової гри...");
-      } else {
-        alert("Приєднання до гри...");
-      }
-    });
-  });
 });
