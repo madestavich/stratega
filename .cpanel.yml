@@ -5,6 +5,7 @@ deployment:
     - /bin/cp index.html $DEPLOYPATH
     - /bin/cp script.js $DEPLOYPATH
     - /bin/cp import.js $DEPLOYPATH
+    - /bin/cp style.css $DEPLOYPATH
 
     - /bin/cp -R sprites $DEPLOYPATH
     - /bin/cp -R input $DEPLOYPATH
