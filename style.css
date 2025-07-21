@@ -175,7 +175,7 @@ main {
 footer {
   background: url("textures/Leather-blue.png");
   color: white;
-  /* padding: 1rem; */
+  padding: 1rem;
   text-align: center;
   border: 28px solid;
   border-image: url("textures/Border-blue.png") 50 round;
