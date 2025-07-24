@@ -334,11 +334,11 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch("server/room.php?action=get_rooms")
       .then((response) => response.json())
       .then((data) => {
-        if (data.rooms) {
+        if (data.rooms && window.currentUser) {
           // Check if current user is already in any room
           const userInRoom = data.rooms.find(room => 
-            room.creator_name === getCurrentUsername() || 
-            room.second_player_name === getCurrentUsername()
+            room.creator_id === window.currentUser.id || 
+            room.second_player_id === window.currentUser.id
           );
           
           if (userInRoom) {

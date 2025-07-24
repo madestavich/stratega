@@ -73,6 +73,17 @@ function createRoom($data) {
     }
     
     $creator_id = $_SESSION['user_id'];
+    
+    // Check if user is already in an active room
+    $checkStmt = $conn->prepare("SELECT id FROM game_rooms WHERE (creator_id = ? OR second_player_id = ?) AND game_status IN ('waiting', 'in_progress')");
+    $checkStmt->bind_param("ii", $creator_id, $creator_id);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        throw new Exception('Ви вже берете участь в активній кімнаті');
+    }
+    
     $room_type = $data['room_type'] ?? 'public';
     $password = isset($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
     
@@ -142,6 +153,8 @@ function getRooms() {
     $stmt = $conn->prepare("
         SELECT 
             gr.id, 
+            gr.creator_id,
+            gr.second_player_id,
             gr.room_type, 
             gr.game_status, 
             gr.created_at,
