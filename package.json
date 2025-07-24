@@ -2,6 +2,7 @@
   "name": "stratega",
   "version": "1.0.0",
   "main": "deploy.js",
+  "type": "module",
   "scripts": {
     "deploy": "node deploy.js"
   },
