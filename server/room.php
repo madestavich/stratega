@@ -2,6 +2,35 @@
 session_start();
 require_once 'auth/config.php';
 
+// Database connection
+try {
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    $conn->set_charset("utf8");
+    
+    // Create game_rooms table if it doesn't exist
+    $createTableSQL = "
+    CREATE TABLE IF NOT EXISTS game_rooms (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        creator_id INT NOT NULL,
+        second_player_id INT NULL,
+        room_type VARCHAR(10) NOT NULL DEFAULT 'public',
+        password VARCHAR(255) NULL,
+        game_status VARCHAR(20) NOT NULL DEFAULT 'waiting',
+        created_at DATETIME NOT NULL,
+        current_round INT NOT NULL DEFAULT 0,
+        player1_ready TINYINT(1) NOT NULL DEFAULT 0,
+        player2_ready TINYINT(1) NOT NULL DEFAULT 0,
+        FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (second_player_id) REFERENCES users(id) ON DELETE CASCADE
+    )";
+    $conn->query($createTableSQL);
+    
+} catch (mysqli_sql_exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed']);
+    exit;
+}
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
