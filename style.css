@@ -147,7 +147,8 @@ main {
   /* border: 1px solid #27ae60; */
 }
 
-.create-room-button.join-button {
+.create-room-button,
+.join-button {
   background: url("textures/Leather-middle.png");
   color: white;
   /* border: 2px solid #ffffff; */
