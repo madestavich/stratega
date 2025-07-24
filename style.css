@@ -160,12 +160,14 @@ main {
   border-image: url("textures/Border-small.png") 3 round;
 }
 
+.create-room-button,
 .join-button:hover {
   background: url("textures/Leather.png");
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
+.create-room-button,
 .join-button:disabled {
   background: url("textures/Leather-extra-dark.png");
   border-color: #444;
