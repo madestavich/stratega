@@ -87,8 +87,9 @@ function createRoom($data) {
     $room_type = $data['room_type'] ?? 'public';
     $password = isset($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
     
-    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, room_type, password, game_status, created_at, current_round, player1_ready, player2_ready) VALUES (?, ?, ?, 'waiting', NOW(), 0, 0, 0)");
-    $stmt->bind_param("iss", $creator_id, $room_type, $password);
+    $game_status = 'waiting';
+    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, room_type, password, game_status, created_at, current_round, player1_ready, player2_ready) VALUES (?, ?, ?, ?, NOW(), 0, 0, 0)");
+    $stmt->bind_param("isss", $creator_id, $room_type, $password, $game_status);
     
     if ($stmt->execute()) {
         $room_id = $conn->insert_id;
