@@ -7,9 +7,11 @@ try {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $conn->set_charset("utf8");
     
-    // Create game_rooms table if it doesn't exist
+    // Drop and recreate game_rooms table to ensure correct structure
+    $conn->query("DROP TABLE IF EXISTS game_rooms");
+    
     $createTableSQL = "
-    CREATE TABLE IF NOT EXISTS game_rooms (
+    CREATE TABLE game_rooms (
         id INT AUTO_INCREMENT PRIMARY KEY,
         creator_id INT NOT NULL,
         second_player_id INT NULL,
@@ -88,6 +90,10 @@ function createRoom($data) {
     $password = isset($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
     
     $game_status = 'waiting';
+    
+    // Debug logging
+    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, game_status=$game_status");
+    
     $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, room_type, password, game_status, created_at, current_round, player1_ready, player2_ready) VALUES (?, ?, ?, ?, NOW(), 0, 0, 0)");
     $stmt->bind_param("isss", $creator_id, $room_type, $password, $game_status);
     
