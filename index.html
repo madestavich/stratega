@@ -46,7 +46,13 @@
       <div class="right-column">
         <div class="room-header">
           <h2>Ігрові кімнати</h2>
-          <button id="create-room-btn" style="display: none;">Створити кімнату</button>
+          <button
+            id="create-room-btn"
+            style="display: none"
+            class="create-game-button"
+          >
+            Створити кімнату
+          </button>
         </div>
       </div>
     </main>
@@ -135,7 +141,7 @@
               <option value="private">Приватна</option>
             </select>
           </div>
-          <div class="form-group" id="password-group" style="display: none;">
+          <div class="form-group" id="password-group" style="display: none">
             <label for="room-password">Пароль</label>
             <input type="password" id="room-password" name="room-password" />
             <div class="error-message" id="room-password-error"></div>
