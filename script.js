@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const loginModal = document.getElementById("loginModal");
   const registerBtn = document.getElementById("register-btn");
   const loginBtn = document.getElementById("login-btn");
+  const createRoomBtn = document.getElementById("create-room-btn");
   const closeButtons = document.querySelectorAll(".close-button");
   const registerForm = document.getElementById("registerForm");
   const loginForm = document.getElementById("loginForm");
@@ -226,6 +227,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Create room button click handler
+  createRoomBtn.addEventListener("click", function () {
+    createRoom();
+  });
+
   // Helper functions
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -266,6 +272,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Change login button to logout
     loginBtn.textContent = "Вихід";
 
+    // Show create room button
+    createRoomBtn.style.display = "inline-block";
+
+    // Store current user info globally
+    window.currentUser = user;
+
     // You can also update other UI elements to show the logged-in user
     console.log("Logged in as:", user.username);
   }
@@ -276,6 +288,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Change logout button back to login
     loginBtn.textContent = "Вхід";
+
+    // Hide create room button
+    createRoomBtn.style.display = "none";
+
+    // Clear current user info
+    window.currentUser = null;
   }
 
   function logout() {
@@ -301,10 +319,75 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         if (data.logged_in) {
           updateUIAfterLogin(data.user);
+        } else {
+          // Ensure user info is cleared if not logged in
+          window.currentUser = null;
         }
       })
       .catch((error) => {
         console.error("Error checking login status:", error);
       });
+  }
+
+  function createRoom() {
+    // First check if user is already in a room
+    fetch("server/room.php?action=get_rooms")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.rooms) {
+          // Check if current user is already in any room
+          const userInRoom = data.rooms.find(room => 
+            room.creator_name === getCurrentUsername() || 
+            room.second_player_name === getCurrentUsername()
+          );
+          
+          if (userInRoom) {
+            alert("Ви вже берете участь в іншій кімнаті");
+            return;
+          }
+        }
+        
+        // Create room
+        const roomData = {
+          action: "create_room",
+          room_type: "public" // Default to public room
+        };
+        
+        fetch("server/room.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(roomData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Кімнату створено успішно! ID кімнати: " + data.room_id);
+              // Optionally refresh the room list or redirect to game
+            } else {
+              alert("Помилка створення кімнати: " + (data.error || "Невідома помилка"));
+            }
+          })
+          .catch((error) => {
+            console.error("Error creating room:", error);
+            alert("Сталася помилка при створенні кімнати");
+          });
+      })
+      .catch((error) => {
+        console.error("Error checking rooms:", error);
+        alert("Сталася помилка при перевірці кімнат");
+      });
+  }
+
+  function getCurrentUsername() {
+    // This is a simplified version - you might want to store username in a global variable
+    // when user logs in, or fetch it from session
+    return window.currentUser ? window.currentUser.username : null;
+  }
+
+  function getCurrentUserId() {
+    // Similar to username, store this when user logs in
+    return window.currentUser ? window.currentUser.id : null;
   }
 });
