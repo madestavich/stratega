@@ -2,12 +2,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // Modal elements
   const registerModal = document.getElementById("registerModal");
   const loginModal = document.getElementById("loginModal");
+  const createRoomModal = document.getElementById("createRoomModal");
   const registerBtn = document.getElementById("register-btn");
   const loginBtn = document.getElementById("login-btn");
   const createRoomBtn = document.getElementById("create-room-btn");
   const closeButtons = document.querySelectorAll(".close-button");
   const registerForm = document.getElementById("registerForm");
   const loginForm = document.getElementById("loginForm");
+  const createRoomForm = document.getElementById("createRoomForm");
 
   // Form fields - Register
   const emailInput = document.getElementById("email");
@@ -56,8 +58,10 @@ document.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", function () {
       registerModal.style.display = "none";
       loginModal.style.display = "none";
+      createRoomModal.style.display = "none";
       resetRegisterForm();
       resetLoginForm();
+      resetCreateRoomForm();
     });
   });
 
@@ -75,6 +79,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (event.target === loginModal && mouseDownTarget === loginModal) {
       loginModal.style.display = "none";
       resetLoginForm();
+    }
+    if (event.target === createRoomModal && mouseDownTarget === createRoomModal) {
+      createRoomModal.style.display = "none";
+      resetCreateRoomForm();
     }
     mouseDownTarget = null;
   });
@@ -227,9 +235,41 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Create room button click handler
+  // Create room button click handler - now opens modal
   createRoomBtn.addEventListener("click", function () {
-    createRoom();
+    createRoomModal.style.display = "flex";
+  });
+
+  // Room type change handler - show/hide password field
+  const roomTypeSelect = document.getElementById("room-type");
+  const passwordGroup = document.getElementById("password-group");
+  
+  roomTypeSelect.addEventListener("change", function () {
+    if (this.value === "private") {
+      passwordGroup.style.display = "block";
+      document.getElementById("room-password").required = true;
+    } else {
+      passwordGroup.style.display = "none";
+      document.getElementById("room-password").required = false;
+    }
+  });
+
+  // Create room form submission
+  createRoomForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    
+    const roomType = document.getElementById("room-type").value;
+    const roomPassword = document.getElementById("room-password").value;
+    const roundTime = document.getElementById("round-time").value;
+    
+    // Validate password for private room
+    if (roomType === "private" && !roomPassword.trim()) {
+      document.getElementById("room-password-error").textContent = "Пароль обов'язковий для приватної кімнати";
+      document.getElementById("room-password-error").style.display = "block";
+      return;
+    }
+    
+    createRoom(roomType, roomPassword, roundTime);
   });
 
   // Helper functions
@@ -263,6 +303,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function resetLoginForm() {
     loginForm.reset();
     resetLoginErrors();
+  }
+
+  function resetCreateRoomForm() {
+    createRoomForm.reset();
+    passwordGroup.style.display = "none";
+    document.getElementById("room-password").required = false;
+    document.getElementById("room-password-error").style.display = "none";
   }
 
   function updateUIAfterLogin(user) {
@@ -329,7 +376,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  function createRoom() {
+  function createRoom(roomType, roomPassword, roundTime) {
+    // Clear any previous errors
+    document.getElementById("room-password-error").style.display = "none";
+    
     // First check if user is already in a room
     fetch("server/room.php?action=get_rooms")
       .then((response) => response.json())
@@ -347,11 +397,17 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }
         
-        // Create room
+        // Create room with parameters
         const roomData = {
           action: "create_room",
-          room_type: "public" // Default to public room
+          room_type: roomType,
+          round_time: parseInt(roundTime)
         };
+        
+        // Add password if room is private
+        if (roomType === "private" && roomPassword) {
+          roomData.password = roomPassword;
+        }
         
         fetch("server/room.php", {
           method: "POST",
@@ -364,6 +420,8 @@ document.addEventListener("DOMContentLoaded", function () {
           .then((data) => {
             if (data.success) {
               alert("Кімнату створено успішно! ID кімнати: " + data.room_id);
+              createRoomModal.style.display = "none";
+              resetCreateRoomForm();
               // Optionally refresh the room list or redirect to game
             } else {
               alert("Помилка створення кімнати: " + (data.error || "Невідома помилка"));

@@ -122,6 +122,37 @@
       </div>
     </div>
 
+    <!-- Create Room Modal -->
+    <div id="createRoomModal" class="modal">
+      <div class="modal-content">
+        <button class="close-button">&times;</button>
+        <h2>Створити кімнату</h2>
+        <form id="createRoomForm">
+          <div class="form-group">
+            <label for="room-type">Тип кімнати</label>
+            <select id="room-type" name="room-type" required>
+              <option value="public">Публічна</option>
+              <option value="private">Приватна</option>
+            </select>
+          </div>
+          <div class="form-group" id="password-group" style="display: none;">
+            <label for="room-password">Пароль</label>
+            <input type="password" id="room-password" name="room-password" />
+            <div class="error-message" id="room-password-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="round-time">Час раунду (секунди)</label>
+            <select id="round-time" name="round-time" required>
+              <option value="30">30 секунд</option>
+              <option value="45" selected>45 секунд</option>
+              <option value="60">60 секунд</option>
+            </select>
+          </div>
+          <button type="submit" class="submit-button">Створити кімнату</button>
+        </form>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>

@@ -94,14 +94,15 @@ function createRoom($data) {
     
     $room_type = $data['room_type'] ?? 'public';
     $password = isset($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
+    $round_time = $data['round_time'] ?? 45; // Default 45 seconds
     
     $game_status = 'waiting';
     
     // Debug logging
-    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, game_status=$game_status");
+    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, game_status=$game_status");
     
-    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status) VALUES (?, NOW(), ?, ?, ?)");
-    $stmt->bind_param("isss", $creator_id, $room_type, $password, $game_status);
+    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time) VALUES (?, NOW(), ?, ?, ?, ?)");
+    $stmt->bind_param("isssi", $creator_id, $room_type, $password, $game_status, $round_time);
     
     if ($stmt->execute()) {
         $room_id = $conn->insert_id;
