@@ -8,30 +8,30 @@ try {
     $conn->set_charset("utf8");
     
     // Drop and recreate game_rooms table to ensure correct structure
-    $conn->query("DROP TABLE IF EXISTS game_rooms");
+    // $conn->query("DROP TABLE IF EXISTS game_rooms");
     
-    $createTableSQL = "
-    CREATE TABLE game_rooms (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        creator_id INT NOT NULL,
-        second_player_id INT NULL,
-        created_at DATETIME NOT NULL,
-        current_round INT NOT NULL DEFAULT 0,
-        room_type VARCHAR(10) NOT NULL DEFAULT 'public',
-        password VARCHAR(255) NULL,
-        game_status VARCHAR(20) NOT NULL DEFAULT 'waiting',
-        winner_id INT NULL,
-        round_state VARCHAR(20) NULL,
-        round_time INT NULL,
-        player1_objects TEXT NULL,
-        player2_objects TEXT NULL,
-        player1_ready TINYINT(1) NOT NULL DEFAULT 0,
-        player2_ready TINYINT(1) NOT NULL DEFAULT 0,
-        FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (second_player_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE SET NULL
-    )";
-    $conn->query($createTableSQL);
+    // $createTableSQL = "
+    // CREATE TABLE game_rooms (
+    //     id INT AUTO_INCREMENT PRIMARY KEY,
+    //     creator_id INT NOT NULL,
+    //     second_player_id INT NULL,
+    //     created_at DATETIME NOT NULL,
+    //     current_round INT NOT NULL DEFAULT 0,
+    //     room_type VARCHAR(10) NOT NULL DEFAULT 'public',
+    //     password VARCHAR(255) NULL,
+    //     game_status VARCHAR(20) NOT NULL DEFAULT 'waiting',
+    //     winner_id INT NULL,
+    //     round_state VARCHAR(20) NULL,
+    //     round_time INT NULL,
+    //     player1_objects TEXT NULL,
+    //     player2_objects TEXT NULL,
+    //     player1_ready TINYINT(1) NOT NULL DEFAULT 0,
+    //     player2_ready TINYINT(1) NOT NULL DEFAULT 0,
+    //     FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE,
+    //     FOREIGN KEY (second_player_id) REFERENCES users(id) ON DELETE CASCADE,
+    //     FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE SET NULL
+    // )";
+    // $conn->query($createTableSQL);
     
 } catch (mysqli_sql_exception $e) {
     http_response_code(500);
