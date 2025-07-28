@@ -40,6 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
   
   // Load rooms list
   loadRooms();
+  
+  // Periodically refresh rooms list every 10 seconds
+  setInterval(loadRooms, 10000);
 
   // Open register modal when register button is clicked
   registerBtn.addEventListener("click", function () {
@@ -217,6 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
             loginModal.style.display = "none";
             resetLoginForm();
             updateUIAfterLogin(data.user);
+            loadRooms(); // Refresh rooms list after login
           } else {
             // Show error message
             if (data.errors) {
@@ -369,6 +373,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         if (data.logged_in) {
           updateUIAfterLogin(data.user);
+          loadRooms(); // Load rooms if user is already logged in
         } else {
           // Ensure user info is cleared if not logged in
           window.currentUser = null;
