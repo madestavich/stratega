@@ -507,7 +507,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  function joinRoom(roomId, roomType) {
+  window.joinRoom = function(roomId, roomType) {
     if (!window.currentUser) {
       alert("Спочатку увійдіть в систему");
       return;
