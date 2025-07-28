@@ -37,6 +37,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Check if user is logged in
   checkLoginStatus();
+  
+  // Load rooms list
+  loadRooms();
 
   // Open register modal when register button is clicked
   registerBtn.addEventListener("click", function () {
@@ -422,7 +425,7 @@ document.addEventListener("DOMContentLoaded", function () {
               alert("Кімнату створено успішно! ID кімнати: " + data.room_id);
               createRoomModal.style.display = "none";
               resetCreateRoomForm();
-              // Optionally refresh the room list or redirect to game
+              loadRooms(); // Refresh room list
             } else {
               alert("Помилка створення кімнати: " + (data.error || "Невідома помилка"));
             }
@@ -447,5 +450,89 @@ document.addEventListener("DOMContentLoaded", function () {
   function getCurrentUserId() {
     // Similar to username, store this when user logs in
     return window.currentUser ? window.currentUser.id : null;
+  }
+
+  function loadRooms() {
+    fetch("server/room.php?action=get_rooms")
+      .then((response) => response.json())
+      .then((data) => {
+        const roomsList = document.getElementById("rooms-list");
+        
+        if (data.rooms && data.rooms.length > 0) {
+          let roomsHTML = "";
+          
+          data.rooms.forEach((room) => {
+            const roomTypeText = room.room_type === "private" ? "🔒 Приватна" : "🌐 Публічна";
+            const statusText = room.game_status === "waiting" ? "Очікування" : "В грі";
+            const playerCount = room.second_player_name ? "2/2" : "1/2";
+            
+            roomsHTML += `
+              <div class="room-item" data-room-id="${room.id}">
+                <div class="room-info">
+                  <div class="room-title">
+                    <span class="room-type">${roomTypeText}</span>
+                    <span class="room-players">${playerCount}</span>
+                  </div>
+                  <div class="room-details">
+                    <span class="room-creator">Створив: ${room.creator_name}</span>
+                    <span class="room-status">${statusText}</span>
+                  </div>
+                </div>
+                ${room.game_status === "waiting" && (!window.currentUser || window.currentUser.id !== room.creator_id) ? 
+                  `<button class="join-room-btn" onclick="joinRoom(${room.id}, '${room.room_type}')">Приєднатися</button>` : 
+                  ""}
+              </div>
+            `;
+          });
+          
+          roomsList.innerHTML = roomsHTML;
+        } else {
+          roomsList.innerHTML = '<div class="no-rooms-message">Немає активних кімнат</div>';
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading rooms:", error);
+        document.getElementById("rooms-list").innerHTML = '<div class="error-message">Помилка завантаження кімнат</div>';
+      });
+  }
+
+  function joinRoom(roomId, roomType) {
+    if (!window.currentUser) {
+      alert("Спочатку увійдіть в систему");
+      return;
+    }
+    
+    let password = "";
+    if (roomType === "private") {
+      password = prompt("Введіть пароль для приватної кімнати:");
+      if (!password) return;
+    }
+    
+    const joinData = {
+      action: "join_room",
+      room_id: roomId,
+      password: password
+    };
+    
+    fetch("server/room.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(joinData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("Успішно приєдналися до кімнати!");
+          loadRooms(); // Refresh room list
+        } else {
+          alert("Помилка приєднання: " + (data.error || "Невідома помилка"));
+        }
+      })
+      .catch((error) => {
+        console.error("Error joining room:", error);
+        alert("Сталася помилка при приєднанні до кімнати");
+      });
   }
 });
