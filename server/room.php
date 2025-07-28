@@ -109,7 +109,8 @@ function createRoom($data) {
         echo json_encode([
             'success' => true,
             'room_id' => $room_id,
-            'message' => 'Кімнату створено успішно'
+            'message' => 'Кімнату створено успішно',
+            'redirect' => 'game/game.html'
         ]);
     } else {
         throw new Exception('Помилка створення кімнати');
@@ -154,7 +155,8 @@ function joinRoom($data) {
     if ($stmt->execute()) {
         echo json_encode([
             'success' => true,
-            'message' => 'Успішно приєдналися до кімнати'
+            'message' => 'Успішно приєдналися до кімнати',
+            'redirect' => 'game/game.html'
         ]);
     } else {
         throw new Exception('Помилка приєднання до кімнати');

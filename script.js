@@ -430,7 +430,13 @@ document.addEventListener("DOMContentLoaded", function () {
               alert("Кімнату створено успішно! ID кімнати: " + data.room_id);
               createRoomModal.style.display = "none";
               resetCreateRoomForm();
-              loadRooms(); // Refresh room list
+              
+              // Redirect to game if redirect URL is provided
+              if (data.redirect) {
+                window.location.href = data.redirect;
+              } else {
+                loadRooms(); // Refresh room list
+              }
             } else {
               alert("Помилка створення кімнати: " + (data.error || "Невідома помилка"));
             }
@@ -530,7 +536,13 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         if (data.success) {
           alert("Успішно приєдналися до кімнати!");
-          loadRooms(); // Refresh room list
+          
+          // Redirect to game if redirect URL is provided
+          if (data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            loadRooms(); // Refresh room list
+          }
         } else {
           alert("Помилка приєднання: " + (data.error || "Невідома помилка"));
         }
