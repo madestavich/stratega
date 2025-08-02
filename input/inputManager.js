@@ -10,23 +10,14 @@ export class InputManager {
     };
     this.hoverCell = null;
 
-    // Додаємо стан для кнопки плей/пауза
-    this.playButton = document.querySelector(".start-button");
-    this.playButtonCallback = null;
+
 
     // Додаємо стан для вибраного юніта
     this.selectedUnitKey = null;
     this.gameManager = gameManager;
     this.canvas = canvas;
 
-    // Ініціалізуємо обробник для кнопки
-    if (this.playButton) {
-      this.playButton.addEventListener("click", () => {
-        if (this.playButtonCallback) {
-          this.playButtonCallback();
-        }
-      });
-    }
+
 
     // Ініціалізуємо обробники для вибору юнітів
     this.initUnitSelectionHandlers();
@@ -35,17 +26,7 @@ export class InputManager {
     this.initCanvasHandlers();
   }
 
-  // Метод для встановлення колбеку для кнопки
-  setPlayButtonCallback(callback) {
-    this.playButtonCallback = callback;
-  }
 
-  // Метод для оновлення тексту кнопки
-  updatePlayButtonText(isPaused) {
-    if (this.playButton) {
-      this.playButton.textContent = isPaused ? "START" : "PAUSE";
-    }
-  }
 
   // Ініціалізація обробників для вибору юнітів
   initUnitSelectionHandlers() {

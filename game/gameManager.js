@@ -22,7 +22,6 @@ class GameManager {
     this.debugMode = false;
     this.debugInterval = null;
     this.isRunning = false;
-    this.isPaused = true;
     this.player = null;
 
     //! ініціалізація об'єктів і інших менеджерів
@@ -44,7 +43,6 @@ class GameManager {
     this.actionManager = new ActionManager(this.objectManager);
     this.inputManager = new InputManager(canvas, this);
 
-    this.inputManager.setPlayButtonCallback(() => this.togglePauseMode());
     this.interfaceManager = new InterfaceManager(
       this.spriteLoader,
       this.configLoader
@@ -59,14 +57,7 @@ class GameManager {
     this.start();
   }
 
-  togglePauseMode() {
-    this.isPaused = !this.isPaused;
 
-    // Оновлюємо текст кнопки через InputManager
-    this.inputManager.updatePlayButtonText(this.isPaused);
-
-    console.log(`Game ${this.isPaused ? "paused" : "resumed"}`);
-  }
 
   logGameObjects() {
     const timestamp = new Date().toLocaleTimeString();
@@ -205,22 +196,19 @@ class GameManager {
         }
       }
 
-      // Оновлюємо логіку гри тільки якщо не на паузі
-      if (!this.isPaused) {
-        // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
-        for (const obj of this.objectManager.objects) {
-          // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
-          if (!obj.isDead) {
-            obj.updateZCoordinate();
-          }
+      // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
+      for (const obj of this.objectManager.objects) {
+        // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
+        if (!obj.isDead) {
+          obj.updateZCoordinate();
         }
-
-        // Оновлюємо дії для всіх об'єктів через ActionManager
-        this.actionManager.update(this.fixedTimeStep);
-
-        // Оновлюємо стан сітки після руху
-        this.gridManager.updateGridObjects(this.objectManager);
       }
+
+      // Оновлюємо дії для всіх об'єктів через ActionManager
+      this.actionManager.update(this.fixedTimeStep);
+
+      // Оновлюємо стан сітки після руху
+      this.gridManager.updateGridObjects(this.objectManager);
 
       this.accumulator -= this.fixedTimeStep;
 
