@@ -201,7 +201,8 @@ class GameManager {
 
     while (this.accumulator >= this.fixedTimeStep) {
       // Оновлюємо анімації для всіх об'єктів незалежно від режиму
-      for (const obj of this.objectManager.objects) {
+      const allObjects = [...this.objectManager.objects, ...this.objectManager.enemyObjects];
+      for (const obj of allObjects) {
         if (obj.animator && !obj.animator.hasFinished) {
           obj.animator.nextFrame();
         }
@@ -210,7 +211,7 @@ class GameManager {
       // Оновлюємо логіку гри тільки якщо не на паузі
       if (!this.isPaused) {
         // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
-        for (const obj of this.objectManager.objects) {
+        for (const obj of allObjects) {
           // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
           if (!obj.isDead) {
             obj.updateZCoordinate();
@@ -221,7 +222,7 @@ class GameManager {
         this.actionManager.update(this.fixedTimeStep);
 
         // Оновлюємо стан сітки після руху
-        this.gridManager.updateGridObjects(this.objectManager);
+        this.objectManager.updateGridWithAllObjects();
       }
 
       this.accumulator -= this.fixedTimeStep;

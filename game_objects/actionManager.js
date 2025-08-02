@@ -50,8 +50,9 @@ export class ActionManager {
 
   // Виконання дій для всіх об'єктів з урахуванням deltaTime
   update(deltaTime) {
-    // Process actions for all objects
-    for (const gameObject of this.objectManager.objects) {
+    // Process actions for all objects (player and enemy)
+    const allObjects = [...this.objectManager.objects, ...this.objectManager.enemyObjects];
+    for (const gameObject of allObjects) {
       // Update action-specific timers and states
       if (this.actions.attack) {
         this.actions.attack.update(gameObject, deltaTime);

@@ -129,12 +129,14 @@ export class ObjectManager {
   }
 
   updateAll(dt) {
-    for (const obj of this.objects) obj.update();
+    // Update all objects (player and enemy)
+    const allObjects = [...this.objects, ...this.enemyObjects];
+    for (const obj of allObjects) obj.update();
 
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const particle = this.particles[i];
       particle.update(dt);
-      particle.checkCollision(this.objects);
+      particle.checkCollision(allObjects);
       if (particle.hasReachedTarget) {
         this.particles.splice(i, 1);
       }

@@ -7,6 +7,17 @@ export class AttackAction {
     this.moveAction = new MoveAction();
   }
 
+  // Get the appropriate enemy array based on the gameObject's team
+  getEnemyArray(gameObject) {
+    // If gameObject is in player objects (team 1), enemies are in enemyObjects
+    // If gameObject is in enemy objects (team 2), enemies are in player objects
+    if (gameObject.team === 1) {
+      return this.objectManager.enemyObjects;
+    } else {
+      return this.objectManager.objects;
+    }
+  }
+
   canExecute(gameObject) {
     if (gameObject.isDead) {
       return false;
@@ -198,9 +209,12 @@ export class AttackAction {
 
   // New helper method to find enemies closer than a specified distance
   findEnemiesCloserThan(gameObject, maxDistance) {
-    for (const obj of this.objectManager.objects) {
-      // Skip if dead, same team, or no team
-      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
+    // Get the appropriate enemy array based on which team the gameObject belongs to
+    const enemyArray = this.getEnemyArray(gameObject);
+    
+    for (const obj of enemyArray) {
+      // Skip if dead or no team
+      if (obj.isDead || !obj.team) {
         continue;
       }
 
@@ -220,10 +234,13 @@ export class AttackAction {
     let bestTarget = null;
     let bestScore = Infinity; // Lower score is better
 
+    // Get the appropriate enemy array based on which team the gameObject belongs to
+    const enemyArray = this.getEnemyArray(gameObject);
+
     // Find all enemies within range
-    for (const obj of this.objectManager.objects) {
-      // Skip if dead, same team, or no team
-      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
+    for (const obj of enemyArray) {
+      // Skip if dead or no team
+      if (obj.isDead || !obj.team) {
         continue;
       }
 
@@ -283,10 +300,13 @@ export class AttackAction {
     let nearestEnemy = null;
     let minDistance = Infinity;
 
+    // Get the appropriate enemy array based on which team the gameObject belongs to
+    const enemyArray = this.getEnemyArray(gameObject);
+
     // Find all enemies (units from other teams)
-    for (const obj of this.objectManager.objects) {
-      // Skip if dead, same team, or no team
-      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
+    for (const obj of enemyArray) {
+      // Skip if dead or no team
+      if (obj.isDead || !obj.team) {
         continue;
       }
 
