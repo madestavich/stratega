@@ -195,7 +195,7 @@ export class ObjectManager {
       );
 
       // Update grid with loaded objects
-      this.gridManager.updateGridObjects(this);
+      this.updateGridWithAllObjects();
 
       return true;
     } else {
@@ -208,6 +208,48 @@ export class ObjectManager {
     }
   }
 
+  // Serialize objects to simple format for database
+  serializeObjectsForDB() {
+    return this.objects.map(obj => {
+      // Find unit type and tier from races config
+      const unitInfo = this.findUnitTypeAndTier(obj);
+      
+      return {
+        gridCol: obj.gridCol,
+        gridRow: obj.gridRow,
+        unitType: unitInfo.unitType,
+        unitTier: unitInfo.unitTier,
+        race: unitInfo.race || 'neutral'
+      };
+    });
+  }
+
+  // Find unit type and tier from races config
+  findUnitTypeAndTier(gameObject) {
+    const racesConfig = this.configLoader.racesConfig;
+    if (!racesConfig) return { unitType: 'unknown', unitTier: 'tier1', race: 'neutral' };
+
+    // Search through all races and tiers
+    for (const race in racesConfig) {
+      if (racesConfig[race].units) {
+        for (const tier in racesConfig[race].units) {
+          for (const unitType in racesConfig[race].units[tier]) {
+            const unitConfig = racesConfig[race].units[tier][unitType];
+            
+            // Match by sprite config or other unique properties
+            if (gameObject.spriteConfig && 
+                gameObject.spriteConfig.imagePath && 
+                gameObject.spriteConfig.imagePath.includes(unitType)) {
+              return { unitType, unitTier: tier, race };
+            }
+          }
+        }
+      }
+    }
+    
+    return { unitType: 'unknown', unitTier: 'tier1', race: 'neutral' };
+  }
+
   // Save objects to server
   async saveObjects() {
     if (!this.currentRoomId) {
@@ -216,6 +258,8 @@ export class ObjectManager {
     }
 
     try {
+      const serializedObjects = this.serializeObjectsForDB();
+      
       const response = await fetch("../server/room.php", {
         method: "POST",
         headers: {
@@ -225,7 +269,7 @@ export class ObjectManager {
         body: JSON.stringify({
           action: "save_objects",
           room_id: this.currentRoomId,
-          objects: this.objects,
+          objects: serializedObjects,
         }),
       });
 
@@ -267,11 +311,21 @@ export class ObjectManager {
       const result = await response.json();
 
       if (result.success) {
-        // Simply assign the loaded objects
-        this.objects = result.player_objects || [];
-        this.enemyObjects = result.enemy_objects || [];
+        // Clear current objects
+        this.objects = [];
+        this.enemyObjects = [];
 
-        console.log("Objects loaded successfully");
+        // Recreate player objects from serialized data
+        for (const objData of result.player_objects || []) {
+          await this.createObjectFromSerializedData(objData, this.objects);
+        }
+
+        // Recreate enemy objects from serialized data
+        for (const objData of result.enemy_objects || []) {
+          await this.createObjectFromSerializedData(objData, this.enemyObjects);
+        }
+
+        console.log(`Objects loaded successfully: ${this.objects.length} player, ${this.enemyObjects.length} enemy`);
         return true;
       } else {
         console.error("Failed to load objects:", result.error);
@@ -280,6 +334,61 @@ export class ObjectManager {
     } catch (error) {
       console.error("Error loading objects:", error);
       return false;
+    }
+  }
+
+  // Create object from serialized data using races config
+  async createObjectFromSerializedData(objData, targetArray) {
+    try {
+      const racesConfig = this.configLoader.racesConfig;
+      if (!racesConfig || !racesConfig[objData.race]) {
+        console.error(`Race "${objData.race}" not found in config`);
+        return null;
+      }
+
+      const raceConfig = racesConfig[objData.race];
+      if (!raceConfig.units[objData.unitTier] || !raceConfig.units[objData.unitTier][objData.unitType]) {
+        console.error(`Unit "${objData.unitType}" of tier "${objData.unitTier}" not found in race "${objData.race}"`);
+        return null;
+      }
+
+      // Get unit configuration
+      const unitConfig = raceConfig.units[objData.unitTier][objData.unitType];
+
+      // Load sprite if needed
+      await this.spriteLoader.loadSprites(objData.unitType);
+
+      // Get sprite configuration
+      const spriteConfig = this.configLoader.getConfig(objData.unitType);
+      if (!spriteConfig) {
+        console.error(`Sprite config for "${objData.unitType}" not found`);
+        return null;
+      }
+
+      // Determine team based on which array we're adding to
+      const team = (targetArray === this.objects) ? 1 : 2;
+
+      // Create GameObject
+      const obj = new GameObject(
+        this.ctx,
+        spriteConfig,
+        unitConfig,
+        objData.gridCol,
+        objData.gridRow,
+        this.gridManager
+      );
+
+      // Set team (1 for player objects, 2 for enemy objects)
+      obj.team = team;
+      
+      // Health comes from unit config, no need to restore from DB
+      // obj.health and obj.maxHealth are already set from unitConfig
+
+      targetArray.push(obj);
+      return obj;
+    } catch (error) {
+      console.error('Error creating object from serialized data:', error);
+      return null;
     }
   }
 
@@ -302,7 +411,7 @@ export class ObjectManager {
         );
 
         // Update grid with all objects
-        this.gridManager.updateGridObjects(this);
+        this.updateGridWithAllObjects();
 
         return true;
       }
@@ -317,5 +426,15 @@ export class ObjectManager {
       return await this.loadObjects();
     }
     return false;
+  }
+
+  // Update grid with both player and enemy objects
+  updateGridWithAllObjects() {
+    // Create temporary object manager with all objects
+    const tempObjectManager = {
+      objects: [...this.objects, ...this.enemyObjects]
+    };
+    
+    this.gridManager.updateGridObjects(tempObjectManager);
   }
 }

@@ -135,7 +135,7 @@ class GameManager {
     this.interfaceManager.updatePlayerInterface(this.player);
 
     // Start round management
-    this.startRoundTimer();
+    await this.startRoundTimer();
 
     requestAnimationFrame((t) => this.loop(t));
   }
@@ -235,14 +235,16 @@ class GameManager {
   }
 
   // Round timer management
-  startRoundTimer() {
+  async startRoundTimer() {
     if (!this.objectManager.currentRoomId) {
       console.warn('Cannot start round timer without room ID');
       return;
     }
 
     this.isRoundActive = true;
-    this.getRoundDuration();
+    
+    // Get round duration first, then start timer
+    await this.getRoundDuration();
     
     // Start countdown
     this.roundTimer = setInterval(() => {
@@ -283,6 +285,7 @@ class GameManager {
       if (result.success) {
         this.roundDuration = result.round_time || 45;
         this.roundTimeLeft = this.roundDuration;
+        console.log(`Round duration set to: ${this.roundDuration} seconds`);
       }
     } catch (error) {
       console.error('Error getting round duration:', error);
@@ -399,14 +402,14 @@ class GameManager {
     }, 10000); // 10 seconds of gameplay
   }
 
-  pauseForNextRound() {
+  async pauseForNextRound() {
     console.log('Pausing for next round...');
     
     // Pause the game
     this.isPaused = true;
     
     // Start new round timer
-    this.startRoundTimer();
+    await this.startRoundTimer();
   }
 }
 
