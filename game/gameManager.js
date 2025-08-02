@@ -21,7 +21,7 @@ class GameManager {
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
-    this.isRunning = true;
+    this.isRunning = false;
     this.isPaused = true;
     this.player = null;
 
