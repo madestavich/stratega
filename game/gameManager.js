@@ -210,15 +210,21 @@ class GameManager {
 
       // Оновлюємо логіку гри тільки якщо не на паузі
       if (!this.isPaused) {
-        // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
-        for (const obj of allObjects) {
+        // Сортуємо об'єкти для детермінованого порядку обробки
+        const sortedObjects = allObjects.sort((a, b) => {
+          if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
+          return a.gridCol - b.gridCol;
+        });
+
+        // Оновлюємо ВСІ об'єкти (свої і ворожі) для однакового результату
+        for (const obj of sortedObjects) {
           // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
           if (!obj.isDead) {
             obj.updateZCoordinate();
           }
         }
 
-        // Оновлюємо дії для всіх об'єктів через ActionManager
+        // Оновлюємо дії для ВСІХ об'єктів (детермінованно)
         this.actionManager.update(this.fixedTimeStep);
 
         // Оновлюємо стан сітки після руху

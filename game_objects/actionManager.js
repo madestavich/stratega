@@ -50,9 +50,15 @@ export class ActionManager {
 
   // Виконання дій для всіх об'єктів з урахуванням deltaTime
   update(deltaTime) {
-    // Process actions for all objects (player and enemy)
+    // Process actions for ALL objects (player and enemy) for consistent results
+    // Sort objects by position for deterministic processing order
     const allObjects = [...this.objectManager.objects, ...this.objectManager.enemyObjects];
-    for (const gameObject of allObjects) {
+    const sortedObjects = allObjects.sort((a, b) => {
+      if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
+      return a.gridCol - b.gridCol;
+    });
+
+    for (const gameObject of sortedObjects) {
       // Update action-specific timers and states
       if (this.actions.attack) {
         this.actions.attack.update(gameObject, deltaTime);

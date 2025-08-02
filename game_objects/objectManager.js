@@ -129,10 +129,17 @@ export class ObjectManager {
   }
 
   updateAll(dt) {
-    // Update all objects (player and enemy)
+    // Update ALL objects (player and enemy) for consistent game state
+    // Sort objects for deterministic update order
     const allObjects = [...this.objects, ...this.enemyObjects];
-    for (const obj of allObjects) obj.update();
+    const sortedObjects = allObjects.sort((a, b) => {
+      if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
+      return a.gridCol - b.gridCol;
+    });
+    
+    for (const obj of sortedObjects) obj.update();
 
+    // Update particles and check collisions with ALL objects
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const particle = this.particles[i];
       particle.update(dt);
