@@ -37,6 +37,12 @@ export class ObjectManager {
       this.gridManager
     );
     this.objects.push(obj);
+    
+    // Auto-save to database after creating object
+    if (this.currentRoomId) {
+      this.saveObjects().catch(err => console.error('Failed to auto-save object:', err));
+    }
+    
     return obj;
   }
 
@@ -109,6 +115,11 @@ export class ObjectManager {
       this.objects.splice(index, 1);
       // Update the grid to reflect that cells are no longer occupied by this object
       this.gridManager.updateGridObjects(this);
+      
+      // Auto-save to database after removing object
+      if (this.currentRoomId) {
+        this.saveObjects().catch(err => console.error('Failed to auto-save after removal:', err));
+      }
     }
   }
 
@@ -227,7 +238,7 @@ export class ObjectManager {
   // Find unit type and tier from races config
   findUnitTypeAndTier(gameObject) {
     const racesConfig = this.configLoader.racesConfig;
-    if (!racesConfig) return { unitType: 'unknown', unitTier: 'tier1', race: 'neutral' };
+    if (!racesConfig) return { unitType: 'unknown', unitTier: 'tier_one', race: 'neutral' };
 
     // Search through all races and tiers
     for (const race in racesConfig) {
@@ -236,10 +247,8 @@ export class ObjectManager {
           for (const unitType in racesConfig[race].units[tier]) {
             const unitConfig = racesConfig[race].units[tier][unitType];
             
-            // Match by sprite config or other unique properties
-            if (gameObject.spriteConfig && 
-                gameObject.spriteConfig.imagePath && 
-                gameObject.spriteConfig.imagePath.includes(unitType)) {
+            // Try multiple matching methods
+            if (this.isMatchingUnit(gameObject, unitType, unitConfig)) {
               return { unitType, unitTier: tier, race };
             }
           }
@@ -247,7 +256,36 @@ export class ObjectManager {
       }
     }
     
-    return { unitType: 'unknown', unitTier: 'tier1', race: 'neutral' };
+    return { unitType: 'unknown', unitTier: 'tier_one', race: 'neutral' };
+  }
+
+  // Check if gameObject matches this unit type
+  isMatchingUnit(gameObject, unitType, unitConfig) {
+    // Method 1: Check sprite imagePath
+    if (gameObject.spriteConfig && 
+        gameObject.spriteConfig.imagePath && 
+        gameObject.spriteConfig.imagePath.includes(unitType)) {
+      return true;
+    }
+    
+    // Method 2: Check objectType property
+    if (gameObject.config && gameObject.config.objectType === unitType) {
+      return true;
+    }
+    
+    // Method 3: Check grid dimensions and other properties
+    if (gameObject.config && unitConfig) {
+      const configMatch = 
+        gameObject.config.gridWidth === unitConfig.gridWidth &&
+        gameObject.config.gridHeight === unitConfig.gridHeight &&
+        gameObject.config.health === unitConfig.health;
+      
+      if (configMatch) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   // Save objects to server

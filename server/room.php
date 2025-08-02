@@ -80,6 +80,9 @@ try {
         case 'check_round_status':
             checkRoundStatus($input);
             break;
+        case 'reset_ready_status':
+            resetReadyStatus($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -434,5 +437,29 @@ function checkRoundStatus($data) {
         'round_time' => $round_time,
         'should_start_game' => $both_ready
     ]);
+}
+
+function resetReadyStatus($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Reset both players ready status
+    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Ready status reset'
+        ]);
+    } else {
+        throw new Exception('Помилка скидання статусу готовності');
+    }
 }
 ?>

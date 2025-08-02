@@ -323,12 +323,14 @@ class GameManager {
   handleTimeUp() {
     console.log('Time is up! Auto-setting player as ready...');
     
+    // Stop timer first
+    if (this.roundTimer) {
+      clearInterval(this.roundTimer);
+      this.roundTimer = null;
+    }
+    
     // Auto-set current player as ready
     this.setPlayerReady();
-    
-    // Stop timer
-    clearInterval(this.roundTimer);
-    this.roundTimer = null;
   }
 
   async setPlayerReady() {
@@ -408,8 +410,43 @@ class GameManager {
     // Pause the game
     this.isPaused = true;
     
+    // Reset ready status for new round
+    await this.resetReadyStatus();
+    
     // Start new round timer
     await this.startRoundTimer();
+  }
+
+  async resetReadyStatus() {
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'reset_ready_status',
+          room_id: this.objectManager.currentRoomId
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('Ready status reset for new round');
+        
+        // Reset UI button
+        const readyButton = document.getElementById('ready-button');
+        if (readyButton) {
+          readyButton.disabled = false;
+          readyButton.textContent = 'ГОТОВИЙ';
+          readyButton.style.backgroundColor = '';
+        }
+      }
+    } catch (error) {
+      console.error('Error resetting ready status:', error);
+    }
   }
 }
 
