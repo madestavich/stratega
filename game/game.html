@@ -143,9 +143,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 20px;
       }
 
-      .start-button {
+      .ready-button {
         padding: 10px 40px;
         background-color: #4caf50;
         color: white;
@@ -156,8 +157,37 @@
         transition: background-color 0.3s;
       }
 
-      .start-button:hover {
+      .ready-button:hover {
         background-color: #45a049;
+      }
+
+      .ready-button:disabled {
+        background-color: #666;
+        cursor: not-allowed;
+      }
+
+      .round-timer {
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: 2px solid #555;
+        min-width: 80px;
+        text-align: center;
+      }
+
+      .round-timer.warning {
+        color: #ff6b6b;
+        border-color: #ff6b6b;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
       }
     </style>
   </head>
@@ -233,9 +263,10 @@
       </div>
     </div>
 
-    <!-- Footer with Start Button -->
+    <!-- Footer with Ready Button and Timer -->
     <div class="footer">
-      <button class="start-button">READY</button>
+      <div id="round-timer" class="round-timer">0:00</div>
+      <button id="ready-button" class="ready-button">ГОТОВИЙ</button>
     </div>
 
     <script type="module" src="gameManager.js"></script>

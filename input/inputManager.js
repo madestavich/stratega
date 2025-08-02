@@ -15,11 +15,17 @@ export class InputManager {
     this.gameManager = gameManager;
     this.canvas = canvas;
 
+    // Ready button
+    this.readyButton = document.getElementById('ready-button');
+
     // Ініціалізуємо обробники для вибору юнітів
     this.initUnitSelectionHandlers();
 
     // Ініціалізуємо обробники для розміщення юнітів на карті
     this.initCanvasHandlers();
+    
+    // Ініціалізуємо обробник кнопки ready
+    this.initReadyButton();
   }
 
   // Ініціалізація обробників для вибору юнітів
@@ -240,6 +246,53 @@ export class InputManager {
       );
     } catch (error) {
       console.error(`Error creating unit ${this.selectedUnitKey}:`, error);
+    }
+  }
+
+  // Initialize ready button handler
+  initReadyButton() {
+    if (this.readyButton) {
+      this.readyButton.addEventListener('click', () => {
+        this.handleReadyClick();
+      });
+    } else {
+      console.warn('Ready button not found in DOM');
+    }
+  }
+
+  // Handle ready button click
+  async handleReadyClick() {
+    if (!this.gameManager || !this.gameManager.objectManager.currentRoomId) {
+      console.error('Cannot set ready: no room ID available');
+      return;
+    }
+
+    // Disable button to prevent multiple clicks
+    if (this.readyButton) {
+      this.readyButton.disabled = true;
+      this.readyButton.textContent = 'Готовий...';
+    }
+
+    try {
+      // Call gameManager's setPlayerReady method
+      await this.gameManager.setPlayerReady();
+      
+      // Update button state
+      if (this.readyButton) {
+        this.readyButton.textContent = 'Готовий ✓';
+        this.readyButton.style.backgroundColor = '#4CAF50';
+      }
+      
+      console.log('Player marked as ready via button');
+    } catch (error) {
+      console.error('Error setting player ready:', error);
+      
+      // Re-enable button on error
+      if (this.readyButton) {
+        this.readyButton.disabled = false;
+        this.readyButton.textContent = 'Готовий';
+        this.readyButton.style.backgroundColor = '';
+      }
     }
   }
 }

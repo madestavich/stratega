@@ -23,6 +23,13 @@ class GameManager {
     this.debugInterval = null;
     this.isRunning = true;
     this.player = null;
+    
+    // Round management
+    this.roundTimer = null;
+    this.roundTimeLeft = 0;
+    this.roundDuration = 45; // Default 45 seconds
+    this.isRoundActive = false;
+    this.checkStatusInterval = null;
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -126,6 +133,9 @@ class GameManager {
 
     this.interfaceManager.updatePlayerInterface(this.player);
 
+    // Start round management
+    this.startRoundTimer();
+
     requestAnimationFrame((t) => this.loop(t));
   }
 
@@ -218,6 +228,184 @@ class GameManager {
 
     this.render();
     requestAnimationFrame((t) => this.loop(t));
+  }
+
+  // Round timer management
+  startRoundTimer() {
+    if (!this.objectManager.currentRoomId) {
+      console.warn('Cannot start round timer without room ID');
+      return;
+    }
+
+    this.isRoundActive = true;
+    this.getRoundDuration();
+    
+    // Start countdown
+    this.roundTimer = setInterval(() => {
+      this.roundTimeLeft--;
+      
+      // Update UI with remaining time
+      this.updateTimerDisplay();
+      
+      if (this.roundTimeLeft <= 0) {
+        this.handleTimeUp();
+      }
+    }, 1000);
+
+    // Check round status every 2 seconds
+    this.checkStatusInterval = setInterval(() => {
+      this.checkRoundStatus();
+    }, 2000);
+
+    console.log(`Round timer started: ${this.roundDuration} seconds`);
+  }
+
+  async getRoundDuration() {
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'check_round_status',
+          room_id: this.objectManager.currentRoomId
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        this.roundDuration = result.round_time || 45;
+        this.roundTimeLeft = this.roundDuration;
+      }
+    } catch (error) {
+      console.error('Error getting round duration:', error);
+      this.roundTimeLeft = this.roundDuration; // Use default
+    }
+  }
+
+  async checkRoundStatus() {
+    if (!this.isRoundActive) return;
+
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'check_round_status',
+          room_id: this.objectManager.currentRoomId
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success && result.should_start_game) {
+        console.log('Both players ready! Starting game logic...');
+        this.startGameLogic();
+      }
+    } catch (error) {
+      console.error('Error checking round status:', error);
+    }
+  }
+
+  handleTimeUp() {
+    console.log('Time is up! Auto-setting player as ready...');
+    
+    // Auto-set current player as ready
+    this.setPlayerReady();
+    
+    // Stop timer
+    clearInterval(this.roundTimer);
+    this.roundTimer = null;
+  }
+
+  async setPlayerReady() {
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'set_ready',
+          room_id: this.objectManager.currentRoomId
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('Player marked as ready');
+      }
+    } catch (error) {
+      console.error('Error setting player ready:', error);
+    }
+  }
+
+  updateTimerDisplay() {
+    // Find timer element and update it
+    const timerElement = document.getElementById('round-timer');
+    if (timerElement) {
+      const minutes = Math.floor(this.roundTimeLeft / 60);
+      const seconds = this.roundTimeLeft % 60;
+      timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Add warning style when time is low
+      if (this.roundTimeLeft <= 10) {
+        timerElement.classList.add('warning');
+      } else {
+        timerElement.classList.remove('warning');
+      }
+    }
+  }
+
+  // Main game logic that runs when both players are ready
+  startGameLogic() {
+    console.log('=== STARTING GAME LOGIC ===');
+    
+    // Stop all timers
+    if (this.roundTimer) {
+      clearInterval(this.roundTimer);
+      this.roundTimer = null;
+    }
+    
+    if (this.checkStatusInterval) {
+      clearInterval(this.checkStatusInterval);
+      this.checkStatusInterval = null;
+    }
+    
+    this.isRoundActive = false;
+    
+    // Save current player units and sync with enemy
+    this.objectManager.synchronizeAfterTurn().then(() => {
+      console.log('Units synchronized. Game logic can continue...');
+      
+      // Here you can add actual game logic:
+      // - Unit combat resolution
+      // - Movement execution  
+      // - Effects processing
+      // - Victory condition checks
+      // - Next round preparation
+      
+      // For now, just prepare for next round
+      setTimeout(() => {
+        this.prepareNextRound();
+      }, 3000);
+    });
+  }
+
+  prepareNextRound() {
+    console.log('Preparing next round...');
+    
+    // Reset ready status for next round (server-side implementation needed)
+    // Restart timer for next round
+    this.startRoundTimer();
   }
 }
 

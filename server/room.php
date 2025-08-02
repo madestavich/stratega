@@ -74,6 +74,12 @@ try {
         case 'get_current_room':
             getCurrentRoom();
             break;
+        case 'set_ready':
+            setPlayerReady($input);
+            break;
+        case 'check_round_status':
+            checkRoundStatus($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -356,5 +362,77 @@ function getCurrentRoom() {
             'message' => 'Користувач не знаходиться в активній кімнаті'
         ]);
     }
+}
+
+function setPlayerReady($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Find user's active room and their role
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    // Determine which player ready field to update
+    $ready_field = ($room['creator_id'] == $user_id) ? 'player1_ready' : 'player2_ready';
+    
+    // Set player as ready
+    $stmt = $conn->prepare("UPDATE game_rooms SET $ready_field = 1 WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Гравець готовий'
+        ]);
+    } else {
+        throw new Exception('Помилка оновлення статусу готовності');
+    }
+}
+
+function checkRoundStatus($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room status
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    $both_ready = ($room['player1_ready'] == 1 && $room['player2_ready'] == 1);
+    $round_time = $room['round_time'];
+    
+    echo json_encode([
+        'success' => true,
+        'player1_ready' => (bool)$room['player1_ready'],
+        'player2_ready' => (bool)$room['player2_ready'],
+        'both_ready' => $both_ready,
+        'round_time' => $round_time,
+        'should_start_game' => $both_ready
+    ]);
 }
 ?>
