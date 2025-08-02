@@ -128,6 +128,16 @@ function joinRoom($data) {
     $room_id = $data['room_id'] ?? 0;
     $password = $data['password'] ?? '';
     
+    // Check if user is already in an active room
+    $checkStmt = $conn->prepare("SELECT id FROM game_rooms WHERE (creator_id = ? OR second_player_id = ?) AND game_status IN ('waiting', 'in_progress')");
+    $checkStmt->bind_param("ii", $user_id, $user_id);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        throw new Exception('Ви вже берете участь в активній кімнаті');
+    }
+    
     // Перевіряємо чи існує кімната
     $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND game_status = 'waiting'");
     $stmt->bind_param("i", $room_id);
