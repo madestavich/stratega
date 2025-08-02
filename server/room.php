@@ -71,6 +71,9 @@ try {
         case 'load_objects':
             loadObjects($input);
             break;
+        case 'get_current_room':
+            getCurrentRoom();
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -323,5 +326,35 @@ function loadObjects($data) {
         'player_objects' => $player_objects,
         'enemy_objects' => $enemy_objects
     ]);
+}
+
+function getCurrentRoom() {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    
+    // Find user's active room
+    $stmt = $conn->prepare("SELECT id, creator_id, second_player_id FROM game_rooms WHERE (creator_id = ? OR second_player_id = ?) AND game_status IN ('waiting', 'in_progress') LIMIT 1");
+    $stmt->bind_param("ii", $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if ($room) {
+        echo json_encode([
+            'success' => true,
+            'room_id' => $room['id'],
+            'is_creator' => ($room['creator_id'] == $user_id)
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Користувач не знаходиться в активній кімнаті'
+        ]);
+    }
 }
 ?>

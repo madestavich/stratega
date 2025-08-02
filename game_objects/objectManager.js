@@ -127,7 +127,9 @@ export class ObjectManager {
 
   renderAll() {
     // Сортуємо об'єкти за Z-координатою перед відображенням
-    const sortedObjects = [...this.objects, ...this.enemyObjects].sort((a, b) => a.z - b.z);
+    const sortedObjects = [...this.objects, ...this.enemyObjects].sort(
+      (a, b) => a.z - b.z
+    );
     for (const obj of sortedObjects) obj.render();
     for (const particle of this.particles) particle.draw();
   }
@@ -137,22 +139,68 @@ export class ObjectManager {
     this.currentRoomId = roomId;
   }
 
-  // Initialize game - load existing units from database
-  async initializeGame(roomId) {
+  // Get current room ID from server based on user session
+  async getCurrentRoomId() {
+    try {
+      const response = await fetch('server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'get_current_room'
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        return {
+          roomId: result.room_id,
+          isCreator: result.is_creator
+        };
+      } else {
+        console.error('Failed to get current room:', result.message);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error getting current room:', error);
+      return null;
+    }
+  }
+
+  // Initialize game - automatically detect room and load existing units
+  async initializeGame(roomId = null) {
+    // If no roomId provided, try to get it from server
+    if (!roomId) {
+      const roomInfo = await this.getCurrentRoomId();
+      if (roomInfo) {
+        roomId = roomInfo.roomId;
+        console.log(`Auto-detected room ID: ${roomId} (${roomInfo.isCreator ? 'creator' : 'player 2'})`);
+      } else {
+        console.error('Could not determine current room ID');
+        return false;
+      }
+    }
+
     this.setRoomId(roomId);
-    
+
     // Load existing units from previous rounds
     const loadSuccess = await this.loadObjects();
-    
+
     if (loadSuccess) {
-      console.log(`Game initialized with ${this.objects.length} player units and ${this.enemyObjects.length} enemy units`);
-      
+      console.log(
+        `Game initialized with ${this.objects.length} player units and ${this.enemyObjects.length} enemy units`
+      );
+
       // Update grid with loaded objects
       this.gridManager.updateGridObjects(this);
-      
+
       return true;
     } else {
-      console.log('Game initialized with empty state (new game or load failed)');
+      console.log(
+        "Game initialized with empty state (new game or load failed)"
+      );
       this.objects = [];
       this.enemyObjects = [];
       return false;
@@ -162,34 +210,34 @@ export class ObjectManager {
   // Save objects to server
   async saveObjects() {
     if (!this.currentRoomId) {
-      console.error('No room ID set for object synchronization');
+      console.error("No room ID set for object synchronization");
       return false;
     }
 
     try {
-      const response = await fetch('server/room.php', {
-        method: 'POST',
+      const response = await fetch("server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'save_objects',
+          action: "save_objects",
           room_id: this.currentRoomId,
-          objects: this.objects
-        })
+          objects: this.objects,
+        }),
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
-        console.log('Objects saved successfully');
+        console.log("Objects saved successfully");
         return true;
       } else {
-        console.error('Failed to save objects:', result.error);
+        console.error("Failed to save objects:", result.error);
         return false;
       }
     } catch (error) {
-      console.error('Error saving objects:', error);
+      console.error("Error saving objects:", error);
       return false;
     }
   }
@@ -197,62 +245,62 @@ export class ObjectManager {
   // Load objects from server
   async loadObjects() {
     if (!this.currentRoomId) {
-      console.error('No room ID set for object synchronization');
+      console.error("No room ID set for object synchronization");
       return false;
     }
 
     try {
-      const response = await fetch('server/room.php', {
-        method: 'POST',
+      const response = await fetch("server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'load_objects',
-          room_id: this.currentRoomId
-        })
+          action: "load_objects",
+          room_id: this.currentRoomId,
+        }),
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         // Simply assign the loaded objects
         this.objects = result.player_objects || [];
         this.enemyObjects = result.enemy_objects || [];
 
-        console.log('Objects loaded successfully');
+        console.log("Objects loaded successfully");
         return true;
       } else {
-        console.error('Failed to load objects:', result.error);
+        console.error("Failed to load objects:", result.error);
         return false;
       }
     } catch (error) {
-      console.error('Error loading objects:', error);
+      console.error("Error loading objects:", error);
       return false;
     }
   }
 
-
-
   // Synchronize objects after turn (save current state, then load enemy updates)
   async synchronizeAfterTurn() {
     console.log(`Saving ${this.objects.length} player units...`);
-    
+
     const saveSuccess = await this.saveObjects();
     if (saveSuccess) {
       // Only reload enemy objects, keep our own units
       const oldPlayerObjects = [...this.objects];
-      
+
       const loadSuccess = await this.loadObjects();
       if (loadSuccess) {
         // Restore our player objects (they shouldn't change)
         this.objects = oldPlayerObjects;
-        
-        console.log(`Synchronization complete. Player units: ${this.objects.length}, Enemy units: ${this.enemyObjects.length}`);
-        
+
+        console.log(
+          `Synchronization complete. Player units: ${this.objects.length}, Enemy units: ${this.enemyObjects.length}`
+        );
+
         // Update grid with all objects
         this.gridManager.updateGridObjects(this);
-        
+
         return true;
       }
     }
