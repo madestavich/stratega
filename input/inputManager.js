@@ -193,6 +193,12 @@ export class InputManager {
   }
 
   async placeUnitAtCursor() {
+    // Allow unit placement only when game is paused (between rounds)
+    if (!this.gameManager.isPaused) {
+      console.log("Cannot place units during active battle. Wait for next round.");
+      return;
+    }
+
     const gridCoords = this.gameManager.gridManager.getGridCellFromPixel(
       this.mouse.x,
       this.mouse.y

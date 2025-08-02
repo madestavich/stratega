@@ -405,10 +405,88 @@ class GameManager {
     // Unpause the game - existing logic in update() will handle the rest
     this.isPaused = false;
     
-    // After some time, pause again for next round
-    setTimeout(() => {
-      this.pauseForNextRound();
-    }, 10000); // 10 seconds of gameplay
+    // Start checking for round end conditions (all units of one player dead)
+    this.battleCheckInterval = setInterval(() => {
+      this.checkBattleEnd();
+    }, 500); // Check every 0.5 seconds
+  }
+
+  checkBattleEnd() {
+    const playerUnits = this.objectManager.objects.filter(obj => !obj.isDead);
+    const enemyUnits = this.objectManager.enemyObjects.filter(obj => !obj.isDead);
+    
+    // Check if one team has no units left
+    if (playerUnits.length === 0 || enemyUnits.length === 0) {
+      console.log(`Battle ended! Player units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`);
+      
+      // Stop battle checking
+      if (this.battleCheckInterval) {
+        clearInterval(this.battleCheckInterval);
+        this.battleCheckInterval = null;
+      }
+      
+      // End the round
+      this.endRound();
+    }
+  }
+
+  async endRound() {
+    console.log('Round ended! Resetting positions...');
+    
+    // Pause the game
+    this.isPaused = true;
+    
+    // Reset all units to starting positions
+    await this.resetUnitsToStartingPositions();
+    
+    // Reset ready status for new round
+    await this.resetReadyStatus();
+    
+    // Start new round timer
+    await this.startRoundTimer();
+  }
+
+  async resetUnitsToStartingPositions() {
+    // Remove all dead units completely
+    this.objectManager.objects = this.objectManager.objects.filter(unit => !unit.isDead);
+    this.objectManager.enemyObjects = this.objectManager.enemyObjects.filter(unit => !unit.isDead);
+    
+    // Reset surviving player units to starting positions
+    for (const unit of this.objectManager.objects) {
+      // Reset position based on team
+      if (unit.team === 1) {
+        // Player 1 units - left side of map
+        unit.gridCol = Math.floor(Math.random() * 15) + 5; // Columns 5-19
+        unit.gridRow = Math.floor(Math.random() * 30) + 25; // Rows 25-54
+      }
+      // Reset health and other stats to full
+      unit.isDead = false;
+      unit.currentHealth = unit.maxHealth;
+      unit.moveTarget = null;
+      unit.attackTarget = null;
+    }
+    
+    // Reset surviving enemy units to starting positions
+    for (const unit of this.objectManager.enemyObjects) {
+      // Reset position based on team
+      if (unit.team === 2) {
+        // Player 2 units - right side of map
+        unit.gridCol = Math.floor(Math.random() * 15) + 40; // Columns 40-54
+        unit.gridRow = Math.floor(Math.random() * 30) + 25; // Rows 25-54
+      }
+      // Reset health and other stats to full
+      unit.isDead = false;
+      unit.currentHealth = unit.maxHealth;
+      unit.moveTarget = null;
+      unit.attackTarget = null;
+    }
+    
+    // Update grid after position reset
+    this.objectManager.updateGridWithAllObjects();
+    console.log('Units reset to starting positions, dead units removed');
+    
+    // Save the reset state to database
+    await this.objectManager.saveObjects();
   }
 
   async pauseForNextRound() {
