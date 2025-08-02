@@ -10,14 +10,10 @@ export class InputManager {
     };
     this.hoverCell = null;
 
-
-
     // Додаємо стан для вибраного юніта
     this.selectedUnitKey = null;
     this.gameManager = gameManager;
     this.canvas = canvas;
-
-
 
     // Ініціалізуємо обробники для вибору юнітів
     this.initUnitSelectionHandlers();
@@ -25,8 +21,6 @@ export class InputManager {
     // Ініціалізуємо обробники для розміщення юнітів на карті
     this.initCanvasHandlers();
   }
-
-
 
   // Ініціалізація обробників для вибору юнітів
   initUnitSelectionHandlers() {

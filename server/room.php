@@ -65,6 +65,12 @@ try {
         case 'get_room_info':
             getRoomInfo($input);
             break;
+        case 'save_objects':
+            saveObjects($input);
+            break;
+        case 'load_objects':
+            loadObjects($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -233,5 +239,89 @@ function getRoomInfo($data) {
     }
     
     echo json_encode(['room' => $room]);
+}
+
+function saveObjects($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    $objects = $data['objects'] ?? [];
+    
+    // Find user's active room and their role
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    // Determine which player field to update
+    $player_field = ($room['creator_id'] == $user_id) ? 'player1_objects' : 'player2_objects';
+    
+    // Serialize objects to JSON
+    $objects_json = json_encode($objects);
+    
+    // Update the appropriate player objects field
+    $stmt = $conn->prepare("UPDATE game_rooms SET $player_field = ? WHERE id = ?");
+    $stmt->bind_param("si", $objects_json, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Об\'єкти збережено успішно'
+        ]);
+    } else {
+        throw new Exception('Помилка збереження об\'єктів');
+    }
+}
+
+function loadObjects($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Find user's active room
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    // Determine player and enemy objects
+    $player_objects = [];
+    $enemy_objects = [];
+    
+    if ($room['creator_id'] == $user_id) {
+        // User is player 1 (creator)
+        $player_objects = $room['player1_objects'] ? json_decode($room['player1_objects'], true) : [];
+        $enemy_objects = $room['player2_objects'] ? json_decode($room['player2_objects'], true) : [];
+    } else {
+        // User is player 2
+        $player_objects = $room['player2_objects'] ? json_decode($room['player2_objects'], true) : [];
+        $enemy_objects = $room['player1_objects'] ? json_decode($room['player1_objects'], true) : [];
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'player_objects' => $player_objects,
+        'enemy_objects' => $enemy_objects
+    ]);
 }
 ?>
