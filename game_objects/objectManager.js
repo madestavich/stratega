@@ -36,6 +36,11 @@ export class ObjectManager {
       gridRow,
       this.gridManager
     );
+    
+    // Store the unit type info for later serialization
+    obj.unitType = objectType;
+    obj.unitInfo = this.findUnitInfoByType(objectType);
+    
     this.objects.push(obj);
     
     // Auto-save to database after creating object
@@ -222,20 +227,20 @@ export class ObjectManager {
   // Serialize objects to simple format for database
   serializeObjectsForDB() {
     return this.objects.map(obj => {
-      // Find unit type and tier from races config
-      const unitInfo = this.findUnitTypeAndTier(obj);
+      // Use stored unit info if available, otherwise try to find it
+      const unitInfo = obj.unitInfo || this.findUnitTypeAndTier(obj);
       
       return {
         gridCol: obj.gridCol,
         gridRow: obj.gridRow,
-        unitType: unitInfo.unitType,
+        unitType: obj.unitType || unitInfo.unitType,
         unitTier: unitInfo.unitTier,
         race: unitInfo.race || 'neutral'
       };
     });
   }
 
-  // Find unit type and tier from races config
+  // Find unit type and tier from races config (fallback method)
   findUnitTypeAndTier(gameObject) {
     const racesConfig = this.configLoader.racesConfig;
     if (!racesConfig) return { unitType: 'unknown', unitTier: 'tier_one', race: 'neutral' };
@@ -286,6 +291,25 @@ export class ObjectManager {
     }
     
     return false;
+  }
+
+  // Find unit info by type name from races config
+  findUnitInfoByType(unitType) {
+    const racesConfig = this.configLoader.racesConfig;
+    if (!racesConfig) return { unitType, unitTier: 'tier_one', race: 'neutral' };
+
+    // Search through all races and tiers
+    for (const race in racesConfig) {
+      if (racesConfig[race].units) {
+        for (const tier in racesConfig[race].units) {
+          if (racesConfig[race].units[tier][unitType]) {
+            return { unitType, unitTier: tier, race };
+          }
+        }
+      }
+    }
+    
+    return { unitType, unitTier: 'tier_one', race: 'neutral' };
   }
 
   // Save objects to server
@@ -418,6 +442,14 @@ export class ObjectManager {
 
       // Set team (1 for player objects, 2 for enemy objects)
       obj.team = team;
+      
+      // Store unit type info for future serialization
+      obj.unitType = objData.unitType;
+      obj.unitInfo = {
+        unitType: objData.unitType,
+        unitTier: objData.unitTier,
+        race: objData.race
+      };
       
       // Health comes from unit config, no need to restore from DB
       // obj.health and obj.maxHealth are already set from unitConfig
