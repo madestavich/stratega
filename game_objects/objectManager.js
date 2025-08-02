@@ -142,7 +142,7 @@ export class ObjectManager {
   // Get current room ID from server based on user session
   async getCurrentRoomId() {
     try {
-      const response = await fetch('server/room.php', {
+      const response = await fetch('../server/room.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ export class ObjectManager {
     }
 
     try {
-      const response = await fetch("server/room.php", {
+      const response = await fetch("../server/room.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -250,7 +250,7 @@ export class ObjectManager {
     }
 
     try {
-      const response = await fetch("server/room.php", {
+      const response = await fetch("../server/room.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
