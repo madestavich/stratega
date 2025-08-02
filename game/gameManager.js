@@ -21,7 +21,7 @@ class GameManager {
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
-    this.isRunning = false;
+    this.isRunning = true;
     this.player = null;
 
     //! ініціалізація об'єктів і інших менеджерів
@@ -56,8 +56,6 @@ class GameManager {
 
     this.start();
   }
-
-
 
   logGameObjects() {
     const timestamp = new Date().toLocaleTimeString();
