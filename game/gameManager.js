@@ -122,6 +122,8 @@ class GameManager {
       coins: 100,
     });
 
+    await this.objectManager.initializeGame();
+
     this.interfaceManager.updatePlayerInterface(this.player);
 
     requestAnimationFrame((t) => this.loop(t));
