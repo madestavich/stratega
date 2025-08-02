@@ -147,6 +147,7 @@ export class ObjectManager {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           action: 'get_current_room'
         })
@@ -220,6 +221,7 @@ export class ObjectManager {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify({
           action: "save_objects",
           room_id: this.currentRoomId,
@@ -255,6 +257,7 @@ export class ObjectManager {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify({
           action: "load_objects",
           room_id: this.currentRoomId,
