@@ -30,6 +30,7 @@ class GameManager {
     this.roundDuration = 45; // Default 45 seconds
     this.isRoundActive = false;
     this.checkStatusInterval = null;
+    this.isPaused = true; // Game starts paused during unit placement
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -206,19 +207,22 @@ class GameManager {
         }
       }
 
-      // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
-      for (const obj of this.objectManager.objects) {
-        // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
-        if (!obj.isDead) {
-          obj.updateZCoordinate();
+      // Оновлюємо логіку гри тільки якщо не на паузі
+      if (!this.isPaused) {
+        // Оновлюємо всі об'єкти (крім анімацій, які вже оновлені)
+        for (const obj of this.objectManager.objects) {
+          // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
+          if (!obj.isDead) {
+            obj.updateZCoordinate();
+          }
         }
+
+        // Оновлюємо дії для всіх об'єктів через ActionManager
+        this.actionManager.update(this.fixedTimeStep);
+
+        // Оновлюємо стан сітки після руху
+        this.gridManager.updateGridObjects(this.objectManager);
       }
-
-      // Оновлюємо дії для всіх об'єктів через ActionManager
-      this.actionManager.update(this.fixedTimeStep);
-
-      // Оновлюємо стан сітки після руху
-      this.gridManager.updateGridObjects(this.objectManager);
 
       this.accumulator -= this.fixedTimeStep;
 
@@ -306,7 +310,7 @@ class GameManager {
       
       if (result.success && result.should_start_game) {
         console.log('Both players ready! Starting game logic...');
-        this.startGameLogic();
+        this.startGame();
       }
     } catch (error) {
       console.error('Error checking round status:', error);
@@ -365,8 +369,8 @@ class GameManager {
     }
   }
 
-  // Main game logic that runs when both players are ready
-  startGameLogic() {
+  // Start game logic when both players are ready
+  async startGame() {
     console.log('=== STARTING GAME LOGIC ===');
     
     // Stop all timers
@@ -383,28 +387,25 @@ class GameManager {
     this.isRoundActive = false;
     
     // Save current player units and sync with enemy
-    this.objectManager.synchronizeAfterTurn().then(() => {
-      console.log('Units synchronized. Game logic can continue...');
-      
-      // Here you can add actual game logic:
-      // - Unit combat resolution
-      // - Movement execution  
-      // - Effects processing
-      // - Victory condition checks
-      // - Next round preparation
-      
-      // For now, just prepare for next round
-      setTimeout(() => {
-        this.prepareNextRound();
-      }, 3000);
-    });
+    await this.objectManager.synchronizeAfterTurn();
+    console.log('Units synchronized. Starting game...');
+    
+    // Unpause the game - existing logic in update() will handle the rest
+    this.isPaused = false;
+    
+    // After some time, pause again for next round
+    setTimeout(() => {
+      this.pauseForNextRound();
+    }, 10000); // 10 seconds of gameplay
   }
 
-  prepareNextRound() {
-    console.log('Preparing next round...');
+  pauseForNextRound() {
+    console.log('Pausing for next round...');
     
-    // Reset ready status for next round (server-side implementation needed)
-    // Restart timer for next round
+    // Pause the game
+    this.isPaused = true;
+    
+    // Start new round timer
     this.startRoundTimer();
   }
 }
