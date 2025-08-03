@@ -250,6 +250,10 @@ export class InputManager {
       this.gameManager.gridManager.updateGridObjects(
         this.gameManager.objectManager
       );
+      
+      // Save units to database immediately after creating new unit
+      await this.gameManager.objectManager.saveObjects();
+      console.log("New unit saved to database for synchronization");
     } catch (error) {
       console.error(`Error creating unit ${this.selectedUnitKey}:`, error);
     }

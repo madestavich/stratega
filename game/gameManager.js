@@ -398,7 +398,11 @@ class GameManager {
     
     this.isRoundActive = false;
     
-    // Save current player units and sync with enemy
+    // CRITICAL: Load all units from database to ensure synchronization
+    console.log('Loading latest units from database...');
+    await this.objectManager.loadObjects();
+    
+    // Save current player units and sync with enemy (ensures both players have same data)
     await this.objectManager.synchronizeAfterTurn();
     console.log('Units synchronized. Starting game...');
     
@@ -447,43 +451,45 @@ class GameManager {
   }
 
   async resetUnitsToStartingPositions() {
-    // Remove all dead units completely
-    this.objectManager.objects = this.objectManager.objects.filter(unit => !unit.isDead);
-    this.objectManager.enemyObjects = this.objectManager.enemyObjects.filter(unit => !unit.isDead);
-    
-    // Reset surviving player units to starting positions
+    // Reset ALL player units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.objects) {
-      // Reset position based on team
-      if (unit.team === 1) {
-        // Player 1 units - left side of map
-        unit.gridCol = Math.floor(Math.random() * 15) + 5; // Columns 5-19
-        unit.gridRow = Math.floor(Math.random() * 30) + 25; // Rows 25-54
-      }
-      // Reset health and other stats to full
+      // Store current position before resetting
+      const currentPos = `[${unit.gridCol}, ${unit.gridRow}]`;
+      
+      // Reset to original starting position
+      unit.gridCol = unit.startingGridCol;
+      unit.gridRow = unit.startingGridRow;
+      
+      // Reset health and other stats to full (resurrect if dead)
       unit.isDead = false;
       unit.currentHealth = unit.maxHealth;
       unit.moveTarget = null;
       unit.attackTarget = null;
+      
+      console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}]`);
     }
     
-    // Reset surviving enemy units to starting positions
+    // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.enemyObjects) {
-      // Reset position based on team
-      if (unit.team === 2) {
-        // Player 2 units - right side of map
-        unit.gridCol = Math.floor(Math.random() * 15) + 40; // Columns 40-54
-        unit.gridRow = Math.floor(Math.random() * 30) + 25; // Rows 25-54
-      }
-      // Reset health and other stats to full
+      // Store current position before resetting
+      const currentPos = `[${unit.gridCol}, ${unit.gridRow}]`;
+      
+      // Reset to original starting position
+      unit.gridCol = unit.startingGridCol;
+      unit.gridRow = unit.startingGridRow;
+      
+      // Reset health and other stats to full (resurrect if dead)
       unit.isDead = false;
       unit.currentHealth = unit.maxHealth;
       unit.moveTarget = null;
       unit.attackTarget = null;
+      
+      console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}]`);
     }
     
-    // Update grid after position reset
+    // Update grid after position reset and resurrection
     this.objectManager.updateGridWithAllObjects();
-    console.log('Units reset to starting positions, dead units removed');
+    console.log('All units moved back to their original starting positions and resurrected with full health');
     
     // Save the reset state to database
     await this.objectManager.saveObjects();

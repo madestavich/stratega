@@ -37,6 +37,10 @@ export class ObjectManager {
       this.gridManager
     );
     
+    // Store starting position for reset between rounds
+    obj.startingGridCol = gridCol;
+    obj.startingGridRow = gridRow;
+    
     // Store the unit type info for later serialization
     obj.unitType = objectType;
     obj.unitInfo = this.findUnitInfoByType(objectType);
@@ -242,6 +246,8 @@ export class ObjectManager {
       return {
         gridCol: obj.gridCol,
         gridRow: obj.gridRow,
+        startingGridCol: obj.startingGridCol,
+        startingGridRow: obj.startingGridRow,
         unitType: obj.unitType || unitInfo.unitType,
         unitTier: unitInfo.unitTier,
         race: unitInfo.race || 'neutral'
@@ -452,6 +458,10 @@ export class ObjectManager {
       // Set team (1 for player objects, 2 for enemy objects)
       obj.team = team;
       
+      // Store starting position (use current position if no starting position stored)
+      obj.startingGridCol = objData.startingGridCol || objData.gridCol;
+      obj.startingGridRow = objData.startingGridRow || objData.gridRow;
+      
       // Store unit type info for future serialization
       obj.unitType = objData.unitType;
       obj.unitInfo = {
@@ -471,22 +481,17 @@ export class ObjectManager {
     }
   }
 
-  // Synchronize objects after turn (save current state, then load enemy updates)
+  // Synchronize objects after turn (save current state, then load full state for both players)
   async synchronizeAfterTurn() {
     console.log(`Saving ${this.objects.length} player units...`);
 
     const saveSuccess = await this.saveObjects();
     if (saveSuccess) {
-      // Only reload enemy objects, keep our own units
-      const oldPlayerObjects = [...this.objects];
-
+      // Load complete state from database to ensure perfect synchronization
       const loadSuccess = await this.loadObjects();
       if (loadSuccess) {
-        // Restore our player objects (they shouldn't change)
-        this.objects = oldPlayerObjects;
-
         console.log(
-          `Synchronization complete. Player units: ${this.objects.length}, Enemy units: ${this.enemyObjects.length}`
+          `Full synchronization complete. Player units: ${this.objects.length}, Enemy units: ${this.enemyObjects.length}`
         );
 
         // Update grid with all objects
