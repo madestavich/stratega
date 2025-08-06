@@ -516,15 +516,12 @@ function getWinnerInfo($data) {
     $room_id = $data['room_id'] ?? 0;
     
     // Get winner information
-    $stmt = $conn->prepare("
-        SELECT 
-            gr.current_round,
-            gr.winner_id,
-            u.nickname as winner_nickname
-        FROM game_rooms gr 
-        LEFT JOIN users u ON gr.winner_id = u.id 
-        WHERE gr.id = ?
-    ");
+    $stmt = $conn->prepare("SELECT gr.current_round, gr.winner_id, u.nickname as winner_nickname FROM game_rooms gr LEFT JOIN users u ON gr.winner_id = u.id WHERE gr.id = ?");
+    
+    if (!$stmt) {
+        throw new Exception('Помилка підготовки запиту: ' . $conn->error);
+    }
+    
     $stmt->bind_param("i", $room_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -553,13 +550,12 @@ function getRoomPlayers($data) {
     $room_id = $data['room_id'] ?? 0;
     
     // Get room players information
-    $stmt = $conn->prepare("
-        SELECT 
-            creator_id,
-            second_player_id
-        FROM game_rooms 
-        WHERE id = ? AND (creator_id = ? OR second_player_id = ?)
-    ");
+    $stmt = $conn->prepare("SELECT creator_id, second_player_id FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    
+    if (!$stmt) {
+        throw new Exception('Помилка підготовки запиту: ' . $conn->error);
+    }
+    
     $stmt->bind_param("iii", $room_id, $user_id, $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
