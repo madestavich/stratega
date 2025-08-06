@@ -450,22 +450,13 @@ class GameManager {
   }
 
   async endRound(winnerId = null) {
-    console.log('Round ended! Processing winner and resetting positions...');
+    console.log('Round ended! Processing winner...');
     
     // Pause the game
     this.isPaused = true;
     
-    // Increment round and show winner modal
+    // Process round end and show winner modal
     await this.processRoundEnd(winnerId);
-    
-    // Reset all units to starting positions
-    await this.resetUnitsToStartingPositions();
-    
-    // Reset ready status for new round
-    await this.resetReadyStatus();
-    
-    // Start new round timer
-    await this.startRoundTimer();
   }
 
   async processRoundEnd(winnerId) {
@@ -494,13 +485,13 @@ class GameManager {
       console.log('I won! Recording result in database...');
       const incrementSuccess = await this.incrementRound(actualWinnerId);
       if (incrementSuccess) {
-        await this.showWinnerModal();
+        await this.showWinnerModalAndContinue();
       }
     } else {
       console.log('I lost. Waiting for winner to record result...');
       // Wait a moment for the winner to record, then show modal
       setTimeout(async () => {
-        await this.showWinnerModal();
+        await this.showWinnerModalAndContinue();
       }, 1000); // Wait 1 second for winner to record result
     }
   }
@@ -563,7 +554,7 @@ class GameManager {
     }
   }
 
-  async showWinnerModal() {
+  async showWinnerModalAndContinue() {
     try {
       // Get winner info from database
       const response = await fetch('../server/room.php', {
@@ -578,25 +569,20 @@ class GameManager {
         })
       });
       
-      // Debug: log response status
-      console.log('get_winner_info response status:', response.status);
-      
-      // Get response as text first to see what we're getting
-      const responseText = await response.text();
-      console.log('get_winner_info response text:', responseText);
-      
       // Check if response is ok
       if (!response.ok) {
-        console.error('Server error:', response.status, responseText);
+        const errorText = await response.text();
+        console.error('Server error:', response.status, errorText);
         return;
       }
       
       // Try to parse JSON
       let result;
       try {
+        const responseText = await response.text();
         result = JSON.parse(responseText);
       } catch (parseError) {
-        console.error('JSON parse error:', parseError, 'Response text:', responseText);
+        console.error('JSON parse error:', parseError);
         return;
       }
       
@@ -612,14 +598,28 @@ class GameManager {
         // Show modal
         modal.style.display = 'flex';
         
-        // Hide modal after 3 seconds
-        setTimeout(() => {
+        // Hide modal after 3 seconds and continue to next phase
+        setTimeout(async () => {
           modal.style.display = 'none';
+          await this.startNextRoundPreparation();
         }, 3000);
       }
     } catch (error) {
       console.error('Error showing winner modal:', error);
     }
+  }
+
+  async startNextRoundPreparation() {
+    console.log('Starting next round preparation...');
+    
+    // Reset all units to starting positions
+    await this.resetUnitsToStartingPositions();
+    
+    // Reset ready status for new round
+    await this.resetReadyStatus();
+    
+    // Start new round timer
+    await this.startRoundTimer();
   }
 
   async resetUnitsToStartingPositions() {
