@@ -600,6 +600,7 @@ class GameManager {
         
         // Hide modal after 3 seconds and continue to next phase
         setTimeout(async () => {
+          console.log('Modal timeout finished, hiding and starting preparation...');
           modal.style.display = 'none';
           await this.startNextRoundPreparation();
         }, 3000);
@@ -623,6 +624,10 @@ class GameManager {
   }
 
   async resetUnitsToStartingPositions() {
+    console.log('=== RESETTING UNITS TO STARTING POSITIONS ===');
+    console.log(`Player units before reset: ${this.objectManager.objects.length}`);
+    console.log(`Enemy units before reset: ${this.objectManager.enemyObjects.length}`);
+    
     // Reset ALL player units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.objects) {
       // Store current position before resetting
@@ -663,8 +668,12 @@ class GameManager {
     this.objectManager.updateGridWithAllObjects();
     console.log('All units moved back to their original starting positions and resurrected with full health');
     
+    // Force a render to update visual positions immediately
+    this.render();
+    
     // Save the reset state to database
     await this.objectManager.saveObjects();
+    console.log('=== RESET COMPLETE ===');
   }
 
   async pauseForNextRound() {
