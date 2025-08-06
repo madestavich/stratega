@@ -22,12 +22,6 @@ export class AttackAction {
     if (gameObject.isDead) {
       return false;
     }
-    
-    // Update move target if we're chasing an enemy
-    if (gameObject.attackTarget && !gameObject.attackTarget.isDead && !gameObject.isAttacking) {
-      this.updateMoveTargetToEnemy(gameObject, gameObject.attackTarget);
-    }
-    
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       // If it's the last frame of attack animation, we'll handle damage in execute
@@ -93,24 +87,13 @@ export class AttackAction {
     }
 
     // If we got here, no valid attack is possible right now
-    // Set nearest enemy as move target and update target position
+    // Set nearest enemy as move target
     gameObject.attackTarget = nearestEnemy;
-    this.updateMoveTargetToEnemy(gameObject, nearestEnemy);
-    return false;
-  }
-
-  // Update move target to follow a specific enemy
-  updateMoveTargetToEnemy(gameObject, enemy) {
-    if (!enemy || enemy.isDead) {
-      gameObject.moveTarget = null;
-      return;
-    }
-    
-    // Always update to enemy's current position
     gameObject.moveTarget = {
-      col: enemy.gridCol,
-      row: enemy.gridRow,
+      col: nearestEnemy.gridCol,
+      row: nearestEnemy.gridRow,
     };
+    return false;
   }
 
   execute(gameObject) {
@@ -163,6 +146,25 @@ export class AttackAction {
     }
 
     return false;
+  }
+
+  // Update method called by ActionManager 
+  update(gameObject, deltaTime) {
+    // Update attack cooldown
+    if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
+      gameObject.attackCooldown -= deltaTime;
+      if (gameObject.attackCooldown < 0) {
+        gameObject.attackCooldown = 0;
+      }
+    }
+
+    // Update move target to follow enemy if we have an attack target
+    if (gameObject.attackTarget && !gameObject.attackTarget.isDead && !gameObject.isAttacking) {
+      gameObject.moveTarget = {
+        col: gameObject.attackTarget.gridCol,
+        row: gameObject.attackTarget.gridRow,
+      };
+    }
   }
 
   // Method to spawn a projectile
