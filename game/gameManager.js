@@ -648,7 +648,7 @@ class GameManager {
       
       // Reset animation to idle
       if (unit.animator) {
-        unit.animator.changeState('idle');
+        unit.animator.setAnimation('idle', true);
       }
       
       console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
@@ -674,7 +674,7 @@ class GameManager {
       
       // Reset animation to idle
       if (unit.animator) {
-        unit.animator.changeState('idle');
+        unit.animator.setAnimation('idle', true);
       }
       
       console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
