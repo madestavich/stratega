@@ -461,5 +461,59 @@ function resetReadyStatus($data) {
     } else {
         throw new Exception('Помилка скидання статусу готовності');
     }
+
+} elseif ($action === 'increment_round') {
+    $room_id = $data['room_id'] ?? 0;
+    $winner_id = $data['winner_id'] ?? null;
+    
+    // Increment round number and set winner
+    $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ? WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iiii", $winner_id, $room_id, $user_id, $user_id);
+    
+    if ($stmt->execute()) {
+        // Get updated round number
+        $stmt = $conn->prepare("SELECT current_round FROM game_rooms WHERE id = ?");
+        $stmt->bind_param("i", $room_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $room = $result->fetch_assoc();
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Round incremented',
+            'new_round' => $room['current_round']
+        ]);
+    } else {
+        throw new Exception('Помилка оновлення раунду');
+    }
+
+} elseif ($action === 'get_winner_info') {
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get winner information
+    $stmt = $conn->prepare("
+        SELECT 
+            gr.current_round,
+            gr.winner_id,
+            u.nickname as winner_nickname
+        FROM game_rooms gr 
+        LEFT JOIN users u ON gr.winner_id = u.id 
+        WHERE gr.id = ?
+    ");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if ($room) {
+        echo json_encode([
+            'success' => true,
+            'current_round' => $room['current_round'],
+            'winner_id' => $room['winner_id'],
+            'winner_nickname' => $room['winner_nickname']
+        ]);
+    } else {
+        throw new Exception('Кімнату не знайдено');
+    }
 }
 ?>

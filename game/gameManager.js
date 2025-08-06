@@ -429,16 +429,27 @@ class GameManager {
         this.battleCheckInterval = null;
       }
       
-      // End the round
-      this.endRound();
+      // Determine winner
+      let winnerId = null;
+      if (playerUnits.length > 0 && enemyUnits.length === 0) {
+        winnerId = 'player'; // Current player wins
+      } else if (enemyUnits.length > 0 && playerUnits.length === 0) {
+        winnerId = 'enemy'; // Enemy player wins
+      }
+      
+      // End the round with winner info
+      this.endRound(winnerId);
     }
   }
 
-  async endRound() {
-    console.log('Round ended! Resetting positions...');
+  async endRound(winnerId = null) {
+    console.log('Round ended! Processing winner and resetting positions...');
     
     // Pause the game
     this.isPaused = true;
+    
+    // Increment round and show winner modal
+    await this.processRoundEnd(winnerId);
     
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
@@ -448,6 +459,123 @@ class GameManager {
     
     // Start new round timer
     await this.startRoundTimer();
+  }
+
+  async processRoundEnd(winnerId) {
+    // Get current user info and room info
+    const currentUserId = await this.getCurrentUserId();
+    let actualWinnerId = null;
+    
+    if (winnerId === 'player') {
+      actualWinnerId = currentUserId;
+    } else if (winnerId === 'enemy') {
+      // Get enemy user ID - we'll need to get this from room info
+      const roomInfo = await this.getRoomInfo();
+      if (roomInfo) {
+        actualWinnerId = roomInfo.creator_id === currentUserId ? roomInfo.second_player_id : roomInfo.creator_id;
+      }
+    }
+    
+    // Increment round in database
+    await this.incrementRound(actualWinnerId);
+    
+    // Show winner modal
+    await this.showWinnerModal();
+  }
+
+  async getCurrentUserId() {
+    try {
+      const response = await fetch('../server/auth/check_login.php', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const result = await response.json();
+      return result.user?.id || null;
+    } catch (error) {
+      console.error('Error getting current user ID:', error);
+      return null;
+    }
+  }
+
+  async getRoomInfo() {
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'get_current_room'
+        })
+      });
+      const result = await response.json();
+      return result.success ? result : null;
+    } catch (error) {
+      console.error('Error getting room info:', error);
+      return null;
+    }
+  }
+
+  async incrementRound(winnerId) {
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'increment_round',
+          room_id: this.objectManager.currentRoomId,
+          winner_id: winnerId
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        console.log(`Round incremented to: ${result.new_round}`);
+      }
+    } catch (error) {
+      console.error('Error incrementing round:', error);
+    }
+  }
+
+  async showWinnerModal() {
+    try {
+      // Get winner info from database
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'get_winner_info',
+          room_id: this.objectManager.currentRoomId
+        })
+      });
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update modal content
+        const modal = document.getElementById('round-winner-modal');
+        const roundNumber = document.getElementById('round-number');
+        const winnerNickname = document.getElementById('winner-nickname');
+        
+        roundNumber.textContent = `Раунд ${result.current_round}`;
+        winnerNickname.textContent = result.winner_nickname || 'Невідомий гравець';
+        
+        // Show modal
+        modal.style.display = 'flex';
+        
+        // Hide modal after 3 seconds
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Error showing winner modal:', error);
+    }
   }
 
   async resetUnitsToStartingPositions() {
