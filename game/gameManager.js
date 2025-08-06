@@ -746,20 +746,14 @@ class GameManager {
     }
     
     // Check if ALL occupied cells are in the correct zone
-    console.log(`Unit placement check: [${startCol}, ${endCol}] vs midpoint ${midpoint}, player: ${this.isRoomCreator ? 'host' : 'guest'}`);
-    
     if (this.isRoomCreator) {
       // Host (creator) can only place units in left half
       // All cells must be < midpoint
-      const canPlace = endCol < midpoint;
-      console.log(`Host check: endCol ${endCol} < ${midpoint} = ${canPlace}`);
-      return canPlace;
+      return endCol < midpoint;
     } else {
       // Guest (player 2) can only place units in right half
       // All cells must be >= midpoint
-      const canPlace = startCol >= midpoint;
-      console.log(`Guest check: startCol ${startCol} >= ${midpoint} = ${canPlace}`);
-      return canPlace;
+      return startCol >= midpoint;
     }
   }
 
