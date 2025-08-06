@@ -83,6 +83,12 @@ try {
         case 'reset_ready_status':
             resetReadyStatus($input);
             break;
+        case 'increment_round':
+            incrementRound($input);
+            break;
+        case 'get_winner_info':
+            getWinnerInfo($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -462,7 +468,16 @@ function resetReadyStatus($data) {
         throw new Exception('Помилка скидання статусу готовності');
     }
 
-} elseif ($action === 'increment_round') {
+}
+
+function incrementRound($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
     $room_id = $data['room_id'] ?? 0;
     $winner_id = $data['winner_id'] ?? null;
     
@@ -486,8 +501,15 @@ function resetReadyStatus($data) {
     } else {
         throw new Exception('Помилка оновлення раунду');
     }
+}
 
-} elseif ($action === 'get_winner_info') {
+function getWinnerInfo($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
     $room_id = $data['room_id'] ?? 0;
     
     // Get winner information
