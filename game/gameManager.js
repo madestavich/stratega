@@ -31,6 +31,7 @@ class GameManager {
     this.isRoundActive = false;
     this.checkStatusInterval = null;
     this.isPaused = true; // Game starts paused during unit placement
+    this.isRoomCreator = false; // Will be set during initialization
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -131,6 +132,13 @@ class GameManager {
     });
 
     await this.objectManager.initializeGame();
+    
+    // Determine if current player is room creator
+    const roomInfo = await this.objectManager.getCurrentRoomId();
+    if (roomInfo) {
+      this.isRoomCreator = roomInfo.isCreator;
+      console.log(`Player is ${this.isRoomCreator ? 'host (creator)' : 'guest (player 2)'}`);
+    }
 
     this.interfaceManager.updatePlayerInterface(this.player);
 
@@ -701,6 +709,40 @@ class GameManager {
     // Save the reset state to database
     await this.objectManager.saveObjects();
     console.log('=== RESET COMPLETE ===');
+  }
+
+  // Check if player can place unit at given position
+  canPlaceUnitAt(gridCol, gridRow) {
+    const gridCols = this.gridManager.cols; // Total columns
+    const midpoint = Math.floor(gridCols / 2); // Middle of the map
+    
+    if (this.isRoomCreator) {
+      // Host (creator) can only place units in left half
+      return gridCol < midpoint;
+    } else {
+      // Guest (player 2) can only place units in right half  
+      return gridCol >= midpoint;
+    }
+  }
+
+  // Get allowed placement zone info for UI feedback
+  getPlacementZoneInfo() {
+    const gridCols = this.gridManager.cols;
+    const midpoint = Math.floor(gridCols / 2);
+    
+    if (this.isRoomCreator) {
+      return {
+        minCol: 0,
+        maxCol: midpoint - 1,
+        side: 'left'
+      };
+    } else {
+      return {
+        minCol: midpoint,
+        maxCol: gridCols - 1,
+        side: 'right'
+      };
+    }
   }
 
   async pauseForNextRound() {

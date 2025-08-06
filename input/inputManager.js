@@ -147,8 +147,11 @@ export class InputManager {
             expansionDirection: expansionDirection,
           };
 
-          // Check if placement is valid
-          const canPlace = this.gameManager.gridManager.canPlaceAt(
+          // Check zone restriction first
+          const canPlaceInZone = this.gameManager.canPlaceUnitAt(col, row);
+          
+          // Check if placement is valid (both zone and collision)
+          const canPlace = canPlaceInZone && this.gameManager.gridManager.canPlaceAt(
             tempObject,
             col,
             row
@@ -228,6 +231,14 @@ export class InputManager {
       this.gameManager.gridManager.updateGridObjects(
         this.gameManager.objectManager
       );
+
+      // Check if player can place in this zone (left/right half restriction)
+      const canPlaceInZone = this.gameManager.canPlaceUnitAt(gridCoords.col, gridCoords.row);
+      if (!canPlaceInZone) {
+        const zoneInfo = this.gameManager.getPlacementZoneInfo();
+        console.log(`Cannot place unit here. You can only place units on the ${zoneInfo.side} side of the map.`);
+        return; // Exit without creating unit
+      }
 
       // Використовуємо існуючий метод canPlaceAt для перевірки
       const canPlace = this.gameManager.gridManager.canPlaceAt(
