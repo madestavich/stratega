@@ -643,7 +643,10 @@ class GameManager {
       unit.moveTarget = null;
       unit.attackTarget = null;
       
-      console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}]`);
+      // Force update visual position from grid coordinates
+      unit.updatePositionFromGrid();
+      
+      console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
     }
     
     // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
@@ -661,15 +664,29 @@ class GameManager {
       unit.moveTarget = null;
       unit.attackTarget = null;
       
-      console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}]`);
+      // Force update visual position from grid coordinates
+      unit.updatePositionFromGrid();
+      
+      console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
     }
     
     // Update grid after position reset and resurrection
     this.objectManager.updateGridWithAllObjects();
     console.log('All units moved back to their original starting positions and resurrected with full health');
     
-    // Force a render to update visual positions immediately
+    // Force clear canvas and re-render everything
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Force multiple renders to ensure positions update
     this.render();
+    setTimeout(() => {
+      this.render();
+    }, 100);
+    setTimeout(() => {
+      this.render();
+    }, 200);
     
     // Save the reset state to database
     await this.objectManager.saveObjects();
