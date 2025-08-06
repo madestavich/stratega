@@ -462,19 +462,25 @@ class GameManager {
   }
 
   async processRoundEnd(winnerId) {
-    // Get current user info and room info
-    const currentUserId = await this.getCurrentUserId();
+    // Get room players info
+    const roomPlayers = await this.getRoomPlayers();
+    if (!roomPlayers) {
+      console.error('Could not get room players info');
+      return;
+    }
+    
     let actualWinnerId = null;
     
     if (winnerId === 'player') {
-      actualWinnerId = currentUserId;
+      actualWinnerId = roomPlayers.current_user_id;
     } else if (winnerId === 'enemy') {
-      // Get enemy user ID - we'll need to get this from room info
-      const roomInfo = await this.getRoomInfo();
-      if (roomInfo) {
-        actualWinnerId = roomInfo.creator_id === currentUserId ? roomInfo.second_player_id : roomInfo.creator_id;
-      }
+      // Get enemy user ID
+      actualWinnerId = roomPlayers.creator_id === roomPlayers.current_user_id 
+        ? roomPlayers.second_player_id 
+        : roomPlayers.creator_id;
     }
+    
+    console.log(`Round winner ID: ${actualWinnerId} (type: ${winnerId})`);
     
     // Increment round in database
     await this.incrementRound(actualWinnerId);
@@ -483,21 +489,9 @@ class GameManager {
     await this.showWinnerModal();
   }
 
-  async getCurrentUserId() {
-    try {
-      const response = await fetch('../server/auth/check_login.php', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      const result = await response.json();
-      return result.user?.id || null;
-    } catch (error) {
-      console.error('Error getting current user ID:', error);
-      return null;
-    }
-  }
 
-  async getRoomInfo() {
+
+  async getRoomPlayers() {
     try {
       const response = await fetch('../server/room.php', {
         method: 'POST',
@@ -506,13 +500,14 @@ class GameManager {
         },
         credentials: 'include',
         body: JSON.stringify({
-          action: 'get_current_room'
+          action: 'get_room_players',
+          room_id: this.objectManager.currentRoomId
         })
       });
       const result = await response.json();
       return result.success ? result : null;
     } catch (error) {
-      console.error('Error getting room info:', error);
+      console.error('Error getting room players:', error);
       return null;
     }
   }

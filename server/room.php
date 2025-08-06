@@ -89,6 +89,9 @@ try {
         case 'get_winner_info':
             getWinnerInfo($input);
             break;
+        case 'get_room_players':
+            getRoomPlayers($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -533,6 +536,41 @@ function getWinnerInfo($data) {
             'current_round' => $room['current_round'],
             'winner_id' => $room['winner_id'],
             'winner_nickname' => $room['winner_nickname']
+        ]);
+    } else {
+        throw new Exception('Кімнату не знайдено');
+    }
+}
+
+function getRoomPlayers($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room players information
+    $stmt = $conn->prepare("
+        SELECT 
+            creator_id,
+            second_player_id
+        FROM game_rooms 
+        WHERE id = ? AND (creator_id = ? OR second_player_id = ?)
+    ");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if ($room) {
+        echo json_encode([
+            'success' => true,
+            'creator_id' => $room['creator_id'],
+            'second_player_id' => $room['second_player_id'],
+            'current_user_id' => $user_id
         ]);
     } else {
         throw new Exception('Кімнату не знайдено');
