@@ -483,10 +483,12 @@ class GameManager {
     console.log(`Round winner ID: ${actualWinnerId} (type: ${winnerId})`);
     
     // Increment round in database
-    await this.incrementRound(actualWinnerId);
+    const incrementSuccess = await this.incrementRound(actualWinnerId);
     
-    // Show winner modal
-    await this.showWinnerModal();
+    // Show winner modal only if increment was successful
+    if (incrementSuccess) {
+      await this.showWinnerModal();
+    }
   }
 
 
@@ -526,12 +528,24 @@ class GameManager {
           winner_id: winnerId
         })
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server error in incrementRound:', response.status, errorText);
+        return false;
+      }
+      
       const result = await response.json();
       if (result.success) {
         console.log(`Round incremented to: ${result.new_round}`);
+        return true;
+      } else {
+        console.error('Failed to increment round:', result.error);
+        return false;
       }
     } catch (error) {
       console.error('Error incrementing round:', error);
+      return false;
     }
   }
 
@@ -549,7 +563,28 @@ class GameManager {
           room_id: this.objectManager.currentRoomId
         })
       });
-      const result = await response.json();
+      
+      // Debug: log response status
+      console.log('get_winner_info response status:', response.status);
+      
+      // Get response as text first to see what we're getting
+      const responseText = await response.text();
+      console.log('get_winner_info response text:', responseText);
+      
+      // Check if response is ok
+      if (!response.ok) {
+        console.error('Server error:', response.status, responseText);
+        return;
+      }
+      
+      // Try to parse JSON
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError, 'Response text:', responseText);
+        return;
+      }
       
       if (result.success) {
         // Update modal content
