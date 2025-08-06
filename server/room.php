@@ -484,12 +484,28 @@ function incrementRound($data) {
     $room_id = $data['room_id'] ?? 0;
     $winner_id = $data['winner_id'] ?? null;
     
-    // Increment round number and set winner
-    $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ? WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
-    $stmt->bind_param("iiii", $winner_id, $room_id, $user_id, $user_id);
+    // Check if round is already incremented (race condition protection)
+    $stmt = $conn->prepare("SELECT current_round FROM game_rooms WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $current_room = $result->fetch_assoc();
+    $current_round_before = $current_room['current_round'];
     
-    if ($stmt->execute()) {
-        // Get updated round number
+    // Increment round number and set winner only if not already incremented
+    $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ? WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
+    $stmt->bind_param("iiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before);
+    
+    if ($stmt->execute() && $stmt->affected_rows > 0) {
+        // Successfully incremented (we were first)
+        echo json_encode([
+            'success' => true,
+            'message' => 'Round incremented',
+            'new_round' => $current_round_before + 1,
+            'was_first' => true
+        ]);
+    } else {
+        // Round was already incremented by other player
         $stmt = $conn->prepare("SELECT current_round FROM game_rooms WHERE id = ?");
         $stmt->bind_param("i", $room_id);
         $stmt->execute();
@@ -498,11 +514,10 @@ function incrementRound($data) {
         
         echo json_encode([
             'success' => true,
-            'message' => 'Round incremented',
-            'new_round' => $room['current_round']
+            'message' => 'Round already incremented by other player',
+            'new_round' => $room['current_round'],
+            'was_first' => false
         ]);
-    } else {
-        throw new Exception('Помилка оновлення раунду');
     }
 }
 

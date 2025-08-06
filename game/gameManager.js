@@ -487,12 +487,21 @@ class GameManager {
         : roomPlayers.creator_id;
     }
     
-    // Increment round and set winner in DB
-    const incrementSuccess = await this.incrementRound(actualWinnerId);
+    console.log(`Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`);
     
-    // Show winner modal - it will read the winner from DB
-    if (incrementSuccess) {
-      await this.showWinnerModal();
+    // Only the winner should try to record the result
+    if (winnerId === 'current_player') {
+      console.log('I won! Recording result in database...');
+      const incrementSuccess = await this.incrementRound(actualWinnerId);
+      if (incrementSuccess) {
+        await this.showWinnerModal();
+      }
+    } else {
+      console.log('I lost. Waiting for winner to record result...');
+      // Wait a moment for the winner to record, then show modal
+      setTimeout(async () => {
+        await this.showWinnerModal();
+      }, 1000); // Wait 1 second for winner to record result
     }
   }
 
