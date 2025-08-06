@@ -516,7 +516,7 @@ function getWinnerInfo($data) {
     $room_id = $data['room_id'] ?? 0;
     
     // Get winner information
-    $stmt = $conn->prepare("SELECT gr.current_round, gr.winner_id, u.nickname as winner_nickname FROM game_rooms gr LEFT JOIN users u ON gr.winner_id = u.id WHERE gr.id = ?");
+    $stmt = $conn->prepare("SELECT gr.current_round, gr.winner_id, u.username as winner_nickname FROM game_rooms gr LEFT JOIN users u ON gr.winner_id = u.id WHERE gr.id = ?");
     
     if (!$stmt) {
         throw new Exception('Помилка підготовки запиту: ' . $conn->error);
