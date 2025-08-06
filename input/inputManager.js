@@ -148,7 +148,7 @@ export class InputManager {
           };
 
           // Check zone restriction first
-          const canPlaceInZone = this.gameManager.canPlaceUnitAt(col, row);
+          const canPlaceInZone = this.gameManager.canPlaceUnitAt(col, row, unitConfig);
           
           // Check if placement is valid (both zone and collision)
           const canPlace = canPlaceInZone && this.gameManager.gridManager.canPlaceAt(
@@ -233,7 +233,7 @@ export class InputManager {
       );
 
       // Check if player can place in this zone (left/right half restriction)
-      const canPlaceInZone = this.gameManager.canPlaceUnitAt(gridCoords.col, gridCoords.row);
+      const canPlaceInZone = this.gameManager.canPlaceUnitAt(gridCoords.col, gridCoords.row, unitConfig);
       if (!canPlaceInZone) {
         const zoneInfo = this.gameManager.getPlacementZoneInfo();
         console.log(`Cannot place unit here. You can only place units on the ${zoneInfo.side} side of the map.`);

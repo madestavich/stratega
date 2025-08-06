@@ -711,17 +711,55 @@ class GameManager {
     console.log('=== RESET COMPLETE ===');
   }
 
-  // Check if player can place unit at given position
-  canPlaceUnitAt(gridCol, gridRow) {
+  // Check if player can place unit at given position (considering unit size)
+  canPlaceUnitAt(gridCol, gridRow, unitConfig) {
     const gridCols = this.gridManager.cols; // Total columns
     const midpoint = Math.floor(gridCols / 2); // Middle of the map
     
+    // Get unit dimensions
+    const gridWidth = unitConfig?.gridWidth || 1;
+    const gridHeight = unitConfig?.gridHeight || 1;
+    const expansionDirection = unitConfig?.expansionDirection || "bottomRight";
+    
+    // Calculate all cells the unit will occupy
+    let startCol = gridCol;
+    let endCol = gridCol;
+    
+    switch (expansionDirection) {
+      case "topLeft":
+        startCol = gridCol - (gridWidth - 1);
+        endCol = gridCol;
+        break;
+      case "topRight":
+        startCol = gridCol;
+        endCol = gridCol + (gridWidth - 1);
+        break;
+      case "bottomLeft":
+        startCol = gridCol - (gridWidth - 1);
+        endCol = gridCol;
+        break;
+      case "bottomRight":
+      default:
+        startCol = gridCol;
+        endCol = gridCol + (gridWidth - 1);
+        break;
+    }
+    
+    // Check if ALL occupied cells are in the correct zone
+    console.log(`Unit placement check: [${startCol}, ${endCol}] vs midpoint ${midpoint}, player: ${this.isRoomCreator ? 'host' : 'guest'}`);
+    
     if (this.isRoomCreator) {
       // Host (creator) can only place units in left half
-      return gridCol < midpoint;
+      // All cells must be < midpoint
+      const canPlace = endCol < midpoint;
+      console.log(`Host check: endCol ${endCol} < ${midpoint} = ${canPlace}`);
+      return canPlace;
     } else {
-      // Guest (player 2) can only place units in right half  
-      return gridCol >= midpoint;
+      // Guest (player 2) can only place units in right half
+      // All cells must be >= midpoint
+      const canPlace = startCol >= midpoint;
+      console.log(`Guest check: startCol ${startCol} >= ${midpoint} = ${canPlace}`);
+      return canPlace;
     }
   }
 
