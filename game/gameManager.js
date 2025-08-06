@@ -423,19 +423,33 @@ class GameManager {
     if (playerUnits.length === 0 || enemyUnits.length === 0) {
       console.log(`Battle ended! Player units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`);
       
+      // Debug: Log unit teams to understand the distribution
+      console.log('Player units teams:', this.objectManager.objects.map(obj => obj.team));
+      console.log('Enemy units teams:', this.objectManager.enemyObjects.map(obj => obj.team));
+      
       // Stop battle checking
       if (this.battleCheckInterval) {
         clearInterval(this.battleCheckInterval);
         this.battleCheckInterval = null;
       }
       
-      // Determine winner
+      // Determine winner based on actual teams, not array position
       let winnerId = null;
-      if (playerUnits.length > 0 && enemyUnits.length === 0) {
-        winnerId = 'player'; // Current player wins
-      } else if (enemyUnits.length > 0 && playerUnits.length === 0) {
-        winnerId = 'enemy'; // Enemy player wins
+      
+      // Count alive units by team
+      const allUnits = [...this.objectManager.objects, ...this.objectManager.enemyObjects];
+      const team1Alive = allUnits.filter(obj => !obj.isDead && obj.team === 1).length;
+      const team2Alive = allUnits.filter(obj => !obj.isDead && obj.team === 2).length;
+      
+      console.log(`Team 1 alive: ${team1Alive}, Team 2 alive: ${team2Alive}`);
+      
+      if (team1Alive > 0 && team2Alive === 0) {
+        winnerId = 'team1'; // Team 1 wins
+      } else if (team2Alive > 0 && team1Alive === 0) {
+        winnerId = 'team2'; // Team 2 wins
       }
+      
+      console.log(`Winner determined: ${winnerId}`);
       
       // End the round with winner info
       this.endRound(winnerId);
@@ -462,30 +476,25 @@ class GameManager {
   }
 
   async processRoundEnd(winnerId) {
-    // Get room players info
+    // Get room players info to determine actual user ID
     const roomPlayers = await this.getRoomPlayers();
     if (!roomPlayers) {
       console.error('Could not get room players info');
       return;
     }
     
+    // Convert team winner to user ID
     let actualWinnerId = null;
-    
-    if (winnerId === 'player') {
-      actualWinnerId = roomPlayers.current_user_id;
-    } else if (winnerId === 'enemy') {
-      // Get enemy user ID
-      actualWinnerId = roomPlayers.creator_id === roomPlayers.current_user_id 
-        ? roomPlayers.second_player_id 
-        : roomPlayers.creator_id;
+    if (winnerId === 'team1') {
+      actualWinnerId = roomPlayers.creator_id;
+    } else if (winnerId === 'team2') {
+      actualWinnerId = roomPlayers.second_player_id;
     }
     
-    console.log(`Round winner ID: ${actualWinnerId} (type: ${winnerId})`);
-    
-    // Increment round in database
+    // Increment round and set winner in DB
     const incrementSuccess = await this.incrementRound(actualWinnerId);
     
-    // Show winner modal only if increment was successful
+    // Show winner modal - it will read the winner from DB
     if (incrementSuccess) {
       await this.showWinnerModal();
     }
