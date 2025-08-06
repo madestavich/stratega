@@ -22,6 +22,12 @@ export class AttackAction {
     if (gameObject.isDead) {
       return false;
     }
+    
+    // Update move target if we're chasing an enemy
+    if (gameObject.attackTarget && !gameObject.attackTarget.isDead && !gameObject.isAttacking) {
+      this.updateMoveTargetToEnemy(gameObject, gameObject.attackTarget);
+    }
+    
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       // If it's the last frame of attack animation, we'll handle damage in execute
@@ -87,13 +93,24 @@ export class AttackAction {
     }
 
     // If we got here, no valid attack is possible right now
-    // Set nearest enemy as move target
+    // Set nearest enemy as move target and update target position
     gameObject.attackTarget = nearestEnemy;
-    gameObject.moveTarget = {
-      col: nearestEnemy.gridCol,
-      row: nearestEnemy.gridRow,
-    };
+    this.updateMoveTargetToEnemy(gameObject, nearestEnemy);
     return false;
+  }
+
+  // Update move target to follow a specific enemy
+  updateMoveTargetToEnemy(gameObject, enemy) {
+    if (!enemy || enemy.isDead) {
+      gameObject.moveTarget = null;
+      return;
+    }
+    
+    // Always update to enemy's current position
+    gameObject.moveTarget = {
+      col: enemy.gridCol,
+      row: enemy.gridRow,
+    };
   }
 
   execute(gameObject) {
