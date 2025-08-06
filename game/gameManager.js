@@ -646,6 +646,11 @@ class GameManager {
       // Force update visual position from grid coordinates
       unit.updatePositionFromGrid();
       
+      // Reset animation to idle
+      if (unit.animator) {
+        unit.animator.changeState('idle');
+      }
+      
       console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
     }
     
@@ -666,6 +671,11 @@ class GameManager {
       
       // Force update visual position from grid coordinates
       unit.updatePositionFromGrid();
+      
+      // Reset animation to idle
+      if (unit.animator) {
+        unit.animator.changeState('idle');
+      }
       
       console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
     }

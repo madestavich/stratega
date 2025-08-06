@@ -401,6 +401,8 @@ export class ObjectManager {
         for (const objData of result.enemy_objects || []) {
           await this.createObjectFromSerializedData(objData, this.enemyObjects);
         }
+        
+        console.log(`Loaded ${this.objects.length} player objects and ${this.enemyObjects.length} enemy objects`);
 
         console.log(`Objects loaded successfully: ${this.objects.length} player, ${this.enemyObjects.length} enemy`);
         return true;
@@ -518,6 +520,8 @@ export class ObjectManager {
     const tempObjectManager = {
       objects: [...this.objects, ...this.enemyObjects]
     };
+    
+    console.log(`Updating grid with ${this.objects.length} player units and ${this.enemyObjects.length} enemy units`);
     
     this.gridManager.updateGridObjects(tempObjectManager);
   }

@@ -247,9 +247,9 @@ export class InputManager {
         gridCoords.col,
         gridCoords.row
       );
-      this.gameManager.gridManager.updateGridObjects(
-        this.gameManager.objectManager
-      );
+      
+      // Update grid with ALL objects (including enemy units) to ensure proper collision detection
+      this.gameManager.objectManager.updateGridWithAllObjects();
       
       // Save units to database immediately after creating new unit
       await this.gameManager.objectManager.saveObjects();
