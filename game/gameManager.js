@@ -433,23 +433,16 @@ class GameManager {
         this.battleCheckInterval = null;
       }
       
-      // Determine winner based on actual teams, not array position
+      // Determine winner based on which array has survivors
       let winnerId = null;
       
-      // Count alive units by team
-      const allUnits = [...this.objectManager.objects, ...this.objectManager.enemyObjects];
-      const team1Alive = allUnits.filter(obj => !obj.isDead && obj.team === 1).length;
-      const team2Alive = allUnits.filter(obj => !obj.isDead && obj.team === 2).length;
-      
-      console.log(`Team 1 alive: ${team1Alive}, Team 2 alive: ${team2Alive}`);
-      
-      if (team1Alive > 0 && team2Alive === 0) {
-        winnerId = 'team1'; // Team 1 wins
-      } else if (team2Alive > 0 && team1Alive === 0) {
-        winnerId = 'team2'; // Team 2 wins
+      if (playerUnits.length > 0 && enemyUnits.length === 0) {
+        winnerId = 'current_player'; // Current player wins
+      } else if (enemyUnits.length > 0 && playerUnits.length === 0) {
+        winnerId = 'other_player'; // Other player wins
       }
       
-      console.log(`Winner determined: ${winnerId}`);
+      console.log(`Winner determined: ${winnerId} (current player units: ${playerUnits.length}, enemy units: ${enemyUnits.length})`);
       
       // End the round with winner info
       this.endRound(winnerId);
@@ -483,12 +476,15 @@ class GameManager {
       return;
     }
     
-    // Convert team winner to user ID
+    // Convert winner to user ID
     let actualWinnerId = null;
-    if (winnerId === 'team1') {
-      actualWinnerId = roomPlayers.creator_id;
-    } else if (winnerId === 'team2') {
-      actualWinnerId = roomPlayers.second_player_id;
+    if (winnerId === 'current_player') {
+      actualWinnerId = roomPlayers.current_user_id;
+    } else if (winnerId === 'other_player') {
+      // Get the other player's ID
+      actualWinnerId = roomPlayers.creator_id === roomPlayers.current_user_id 
+        ? roomPlayers.second_player_id 
+        : roomPlayers.creator_id;
     }
     
     // Increment round and set winner in DB
