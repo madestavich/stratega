@@ -452,8 +452,17 @@ export class ObjectManager {
         return null;
       }
 
-      // Просто: this.objects завжди команда 1, this.enemyObjects завжди команда 2
-      const team = (targetArray === this.objects) ? 1 : 2;
+      // Хост завжди команда 1, гість завжди команда 2 (незалежно від того, хто дивиться)
+      const isRoomCreator = this.gameManager ? this.gameManager.isRoomCreator : true;
+      
+      let team;
+      if (targetArray === this.objects) {
+        // Власні юніти поточного гравця
+        team = isRoomCreator ? 1 : 2; // Хост=1, Гість=2
+      } else {
+        // Ворожі юніти (противник)
+        team = isRoomCreator ? 2 : 1; // Хост бачить гостя=2, Гість бачить хоста=1
+      }
 
       // Create GameObject
       const obj = new GameObject(

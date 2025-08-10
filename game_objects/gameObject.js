@@ -150,11 +150,13 @@ export class GameObject {
   // Встановлює напрямок погляду на основі команди
   setLookDirectionByTeam() {
     if (this.team === 1) {
+      // Команда 1 (хост) дивиться вправо
       this.lookDirection = {
         dx: 1,
         dy: 0,
       };
     } else if (this.team === 2) {
+      // Команда 2 (гість) дивиться вліво
       this.lookDirection = {
         dx: -1,
         dy: 0,
