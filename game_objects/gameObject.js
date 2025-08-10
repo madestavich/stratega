@@ -82,14 +82,12 @@ export class GameObject {
 
     // Adjust the drawing position by the calculated offsets
     if (this.moveDirection) {
-      console.log('Using moveDirection:', this.moveDirection, 'team:', this.team);
       this.renderer.draw(
         this.x - offsetX,
         this.y - offsetY,
         this.moveDirection
       );
     } else {
-      console.log('Using lookDirection:', this.lookDirection, 'team:', this.team);
       this.renderer.draw(
         this.x - offsetX,
         this.y - offsetY,
@@ -151,8 +149,6 @@ export class GameObject {
 
   // Встановлює напрямок погляду на основі команди та того, хто дивиться
   setLookDirectionByTeam() {
-    console.log('BEFORE setLookDirectionByTeam - team:', this.team, 'moveDirection:', this.moveDirection, 'lookDirection:', this.lookDirection);
-    
     // Скидаємо moveDirection щоб використовувався lookDirection
     this.moveDirection = null;
     
@@ -172,7 +168,5 @@ export class GameObject {
         this.lookDirection = { dx: 1, dy: 0 };
       }
     }
-    
-    console.log('AFTER setLookDirectionByTeam - team:', this.team, 'moveDirection:', this.moveDirection, 'lookDirection:', this.lookDirection);
   }
 }
