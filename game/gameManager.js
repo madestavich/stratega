@@ -659,6 +659,15 @@ class GameManager {
         unit.animator.setAnimation('idle', true);
       }
       
+      // Set look direction for placement phase
+      if (unit.team === 1) {
+        // Team 1 (host/left side) looks right
+        unit.lookDirection = { x: 1, y: 0 };
+      } else if (unit.team === 2) {
+        // Team 2 (guest/right side) looks left
+        unit.lookDirection = { x: -1, y: 0 };
+      }
+      
       console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
     }
     
@@ -683,6 +692,15 @@ class GameManager {
       // Reset animation to idle
       if (unit.animator) {
         unit.animator.setAnimation('idle', true);
+      }
+      
+      // Set look direction for placement phase
+      if (unit.team === 1) {
+        // Team 1 (host/left side) looks right
+        unit.lookDirection = { x: 1, y: 0 };
+      } else if (unit.team === 2) {
+        // Team 2 (guest/right side) looks left
+        unit.lookDirection = { x: -1, y: 0 };
       }
       
       console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);

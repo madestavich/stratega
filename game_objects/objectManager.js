@@ -41,6 +41,15 @@ export class ObjectManager {
     obj.startingGridCol = gridCol;
     obj.startingGridRow = gridRow;
     
+    // Set look direction based on team during placement phase
+    if (obj.team === 1) {
+      // Team 1 (host/left side) looks right
+      obj.lookDirection = { x: 1, y: 0 };
+    } else if (obj.team === 2) {
+      // Team 2 (guest/right side) looks left
+      obj.lookDirection = { x: -1, y: 0 };
+    }
+    
     // Store the unit type info for later serialization
     obj.unitType = objectType;
     obj.unitInfo = this.findUnitInfoByType(objectType);
@@ -463,6 +472,15 @@ export class ObjectManager {
       // Store starting position (use current position if no starting position stored)
       obj.startingGridCol = objData.startingGridCol || objData.gridCol;
       obj.startingGridRow = objData.startingGridRow || objData.gridRow;
+      
+      // Set look direction based on team during placement phase
+      if (team === 1) {
+        // Team 1 (host/left side) looks right
+        obj.lookDirection = { x: 1, y: 0 };
+      } else if (team === 2) {
+        // Team 2 (guest/right side) looks left
+        obj.lookDirection = { x: -1, y: 0 };
+      }
       
       // Store unit type info for future serialization
       obj.unitType = objData.unitType;
