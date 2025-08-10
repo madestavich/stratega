@@ -123,14 +123,6 @@ class GameManager {
 
   async start() {
     await this.configLoader.loadRacesConfig();
-    // Create player (for example purposes)
-    this.player = new Player({
-      nickname: "Player1",
-      race: "neutral", // Use one of the races from races.json
-      team: 1,
-      coins: 100,
-    });
-
     await this.objectManager.initializeGame();
     
     // Determine if current player is room creator
@@ -139,6 +131,17 @@ class GameManager {
       this.isRoomCreator = roomInfo.isCreator;
       console.log(`Player is ${this.isRoomCreator ? 'host (creator)' : 'guest (player 2)'}`);
     }
+
+    // Create player with correct team based on room role
+    const playerTeam = this.isRoomCreator ? 1 : 2;
+    this.player = new Player({
+      nickname: "Player1",
+      race: "neutral", // Use one of the races from races.json
+      team: playerTeam,
+      coins: 100,
+    });
+    
+    console.log(`Player created with team: ${playerTeam}`);
 
     this.interfaceManager.updatePlayerInterface(this.player);
 

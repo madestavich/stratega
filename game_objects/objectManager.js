@@ -50,6 +50,8 @@ export class ObjectManager {
       obj.lookDirection = { x: -1, y: 0 };
     }
     
+    console.log(`Unit created with team ${obj.team}, lookDirection:`, obj.lookDirection);
+    
     // Store the unit type info for later serialization
     obj.unitType = objectType;
     obj.unitInfo = this.findUnitInfoByType(objectType);
