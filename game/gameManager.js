@@ -133,6 +133,15 @@ class GameManager {
       this.isRoomCreator = roomInfo.isCreator;
       console.log(`Player is ${this.isRoomCreator ? 'host (creator)' : 'guest (player 2)'}`);
       console.log('DEBUG: gameManager.isRoomCreator set to:', this.isRoomCreator);
+      
+      // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
+      for (const unit of this.objectManager.objects) {
+        unit.setLookDirectionByTeam();
+      }
+      for (const unit of this.objectManager.enemyObjects) {
+        unit.setLookDirectionByTeam();
+      }
+      console.log('Updated look direction for all units after setting isRoomCreator');
     } else {
       console.log('DEBUG: roomInfo is null/undefined');
     }
