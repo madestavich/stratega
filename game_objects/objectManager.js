@@ -452,16 +452,24 @@ export class ObjectManager {
         return null;
       }
 
-      // Хост завжди команда 1, гість завжди команда 2 (незалежно від того, хто дивиться)
+      // Абсолютне призначення: player1 (хост) завжди команда 1, player2 (гість) завжди команда 2
       const isRoomCreator = this.gameManager ? this.gameManager.isRoomCreator : true;
       
       let team;
       if (targetArray === this.objects) {
-        // Власні юніти поточного гравця
-        team = isRoomCreator ? 1 : 2; // Хост=1, Гість=2
+        // Юніти поточного гравця
+        if (isRoomCreator) {
+          team = 1; // Хост (player1) = команда 1
+        } else {
+          team = 2; // Гість (player2) = команда 2  
+        }
       } else {
-        // Ворожі юніти (противник)
-        team = isRoomCreator ? 2 : 1; // Хост бачить гостя=2, Гість бачить хоста=1
+        // Юніти противника
+        if (isRoomCreator) {
+          team = 2; // Хост бачить гостя (player2) = команда 2
+        } else {
+          team = 1; // Гість бачить хоста (player1) = команда 1
+        }
       }
 
       // Create GameObject
