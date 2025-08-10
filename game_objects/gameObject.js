@@ -97,6 +97,10 @@ export class GameObject {
         this.moveDirection
       );
     } else {
+      // Debug log for lookDirection
+      if (this.team && this.lookDirection) {
+        console.log(`Rendering unit team ${this.team} with lookDirection:`, this.lookDirection);
+      }
       this.renderer.draw(
         this.x - offsetX,
         this.y - offsetY,
