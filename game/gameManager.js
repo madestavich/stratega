@@ -736,6 +736,15 @@ class GameManager {
     }, 100);
     setTimeout(() => {
       this.render();
+      
+      // Ще раз оновлюємо напрямок погляду після всіх рендерів
+      for (const unit of this.objectManager.objects) {
+        unit.setLookDirectionByTeam();
+      }
+      for (const unit of this.objectManager.enemyObjects) {
+        unit.setLookDirectionByTeam();
+      }
+      console.log('Final look direction update after renders');
     }, 200);
     
     // Save the reset state to database
