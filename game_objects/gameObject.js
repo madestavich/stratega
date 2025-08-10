@@ -156,11 +156,11 @@ export class GameObject {
 
     if (isGuest) {
       // Для гостя логіка зеркальна
-      if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 }; // Команда 1 дивиться вліво
-      } else if (this.team === 2) {
-        this.lookDirection = { dx: -1, dy: 0 }; // Команда 2 дивиться вправо
-      }
+      // if (this.team === 1) {
+      //   this.lookDirection = { dx: 1, dy: 0 }; // Команда 1 дивиться вліво
+      // } else if (this.team === 2) {
+      //   this.lookDirection = { dx: -1, dy: 0 }; // Команда 2 дивиться вправо
+      // }
     } else {
       // Для хоста звичайна логіка
       if (this.team === 1) {
