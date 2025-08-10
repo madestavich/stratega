@@ -163,6 +163,7 @@ export class GameObject {
         this.lookDirection = { dx: -1, dy: 0 }; // Ворожі юніти вліво
       }
     } else {
+      console.log("GGGGGGGGGGGGGGGGGGGGGGGGG");
       // З точки зору гостя: команда 1 вправо, команда 2 вліво
       if (this.team === 2) {
         this.lookDirection = { dx: 1, dy: 0 }; // Ворожі юніти вправо
