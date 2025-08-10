@@ -154,6 +154,8 @@ export class GameObject {
     const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
 
     if (isRoomCreator) {
+      console.log(isRoomCreator);
+
       // З точки зору хоста: команда 1 вправо, команда 2 вліво
       if (this.team === 2) {
         this.lookDirection = { dx: 1, dy: 0 }; // Власні юніти хоста вправо
