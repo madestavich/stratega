@@ -152,9 +152,16 @@ export class GameObject {
     // Отримуємо інформацію про те, хто дивиться на гру
     const gameManager = window.gameManager;
     const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
+    
+    console.log('DEBUG isRoomCreator:', {
+      gameManager: !!gameManager,
+      isRoomCreator: isRoomCreator,
+      gameManagerIsRoomCreator: gameManager ? gameManager.isRoomCreator : 'no gameManager',
+      team: this.team
+    });
 
     if (isRoomCreator) {
-      console.log(isRoomCreator);
+      console.log('HOST LOGIC for team:', this.team);
 
       // З точки зору хоста: команда 1 вправо, команда 2 вліво
       if (this.team === 2) {
@@ -163,7 +170,7 @@ export class GameObject {
         this.lookDirection = { dx: -1, dy: 0 }; // Ворожі юніти вліво
       }
     } else {
-      console.log("GGGGGGGGGGGGGGGGGGGGGGGGG");
+      console.log('GUEST LOGIC for team:', this.team);
       // З точки зору гостя: команда 1 вправо, команда 2 вліво
       if (this.team === 2) {
         this.lookDirection = { dx: 1, dy: 0 }; // Ворожі юніти вправо
