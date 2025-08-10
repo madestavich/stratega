@@ -662,6 +662,9 @@ class GameManager {
         unit.animator.setAnimation('idle', true);
       }
       
+      // Встановлюємо правильний напрямок погляду відповідно до команди
+      unit.setLookDirectionByTeam();
+      
       console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
     }
     
@@ -687,6 +690,9 @@ class GameManager {
       if (unit.animator) {
         unit.animator.setAnimation('idle', true);
       }
+      
+      // Встановлюємо правильний напрямок погляду відповідно до команди
+      unit.setLookDirectionByTeam();
       
       console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
     }

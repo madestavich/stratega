@@ -63,17 +63,8 @@ export class GameObject {
     this.renderer = new Renderer(ctx, this.animator);
     this.updatePositionFromGrid();
 
-    if (this.team === 2) {
-      this.lookDirection = {
-        dx: -1,
-        dy: 0,
-      };
-    } else if (this.team === 1) {
-      this.lookDirection = {
-        dx: 1,
-        dy: 0,
-      };
-    }
+    // Встановлюємо початковий напрямок при створенні
+    this.setLookDirectionByTeam();
   }
 
   update() {
@@ -154,5 +145,20 @@ export class GameObject {
     }
 
     return this.z;
+  }
+
+  // Встановлює напрямок погляду на основі команди
+  setLookDirectionByTeam() {
+    if (this.team === 2) {
+      this.lookDirection = {
+        dx: -1,
+        dy: 0,
+      };
+    } else if (this.team === 1) {
+      this.lookDirection = {
+        dx: 1,
+        dy: 0,
+      };
+    }
   }
 }
