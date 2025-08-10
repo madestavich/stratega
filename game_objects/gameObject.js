@@ -150,20 +150,21 @@ export class GameObject {
   // Встановлює напрямок погляду на основі команди
   setLookDirectionByTeam() {
     // Перевіряємо чи це гість (через gameManager)
-    const gameManager = window.gameManager || (this.gridManager && this.gridManager.gameManager);
+    const gameManager =
+      window.gameManager || (this.gridManager && this.gridManager.gameManager);
     const isGuest = gameManager && !gameManager.isRoomCreator;
-    
+
     if (isGuest) {
       // Для гостя логіка зеркальна
       if (this.team === 1) {
-        this.lookDirection = { dx: -1, dy: 0 }; // Команда 1 дивиться вліво
+        this.lookDirection = { dx: 1, dy: 0 }; // Команда 1 дивиться вліво
       } else if (this.team === 2) {
-        this.lookDirection = { dx: 1, dy: 0 };  // Команда 2 дивиться вправо
+        this.lookDirection = { dx: -1, dy: 0 }; // Команда 2 дивиться вправо
       }
     } else {
       // Для хоста звичайна логіка
       if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 };  // Команда 1 дивиться вправо
+        this.lookDirection = { dx: 1, dy: 0 }; // Команда 1 дивиться вправо
       } else if (this.team === 2) {
         this.lookDirection = { dx: -1, dy: 0 }; // Команда 2 дивиться вліво
       }
