@@ -452,10 +452,18 @@ export class ObjectManager {
         return null;
       }
 
-      // Determine team based on which array we're adding to
-      // this.objects завжди команда 1 (хост розміщується зліва, дивиться вправо)
-      // this.enemyObjects завжди команда 2 (гість розміщується справа, дивиться вліво)
-      const team = (targetArray === this.objects) ? 1 : 2;
+      // Determine team based on which array we're adding to and player role
+      // Власні юніти завжди дивляться в сторону ворога, ворожі - в сторону гравця
+      const isRoomCreator = this.gameManager ? this.gameManager.isRoomCreator : true;
+      
+      let team;
+      if (targetArray === this.objects) {
+        // Власні юніти гравця
+        team = isRoomCreator ? 1 : 2; // Хост=1 (вправо), Гість=2 (вліво)
+      } else {
+        // Ворожі юніти  
+        team = isRoomCreator ? 2 : 1; // Хост бачить ворога=2 (вліво), Гість бачить ворога=1 (вправо)
+      }
 
       // Create GameObject
       const obj = new GameObject(
