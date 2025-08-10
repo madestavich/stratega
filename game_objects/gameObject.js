@@ -150,22 +150,23 @@ export class GameObject {
   // Встановлює напрямок погляду на основі команди та того, хто дивиться
   setLookDirectionByTeam() {
     // Отримуємо інформацію про те, хто дивиться на гру
-    const gameManager = window.gameManager || (this.gridManager && this.gridManager.gameManager);
+    const gameManager =
+      window.gameManager || (this.gridManager && this.gridManager.gameManager);
     const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
-    
+
     if (isRoomCreator) {
       // З точки зору хоста: команда 1 вправо, команда 2 вліво
       if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 };   // Власні юніти хоста вправо
+        this.lookDirection = { dx: 1, dy: 0 }; // Власні юніти хоста вправо
       } else if (this.team === 2) {
-        this.lookDirection = { dx: -1, dy: 0 };  // Ворожі юніти вліво
+        this.lookDirection = { dx: -1, dy: 0 }; // Ворожі юніти вліво
       }
     } else {
       // З точки зору гостя: команда 1 вправо, команда 2 вліво
-      if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 };   // Ворожі юніти вправо  
-      } else if (this.team === 2) {
-        this.lookDirection = { dx: -1, dy: 0 };  // Власні юніти гостя вліво
+      if (this.team === 2) {
+        this.lookDirection = { dx: 1, dy: 0 }; // Ворожі юніти вправо
+      } else if (this.team === 1) {
+        this.lookDirection = { dx: -1, dy: 0 }; // Власні юніти гостя вліво
       }
     }
   }
