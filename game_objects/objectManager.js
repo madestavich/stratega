@@ -452,8 +452,19 @@ export class ObjectManager {
         return null;
       }
 
-      // Determine team based on which array we're adding to
-      const team = (targetArray === this.objects) ? 1 : 2;
+      // Determine team based on which array we're adding to and room creator status
+      // If player is room creator (host): objects=team1, enemyObjects=team2
+      // If player is guest: objects=team2, enemyObjects=team1
+      const isRoomCreator = this.gameManager ? this.gameManager.isRoomCreator : true; // Default to true for safety
+      let team;
+      
+      if (targetArray === this.objects) {
+        // Player's own objects
+        team = isRoomCreator ? 1 : 2;
+      } else {
+        // Enemy objects
+        team = isRoomCreator ? 2 : 1;
+      }
 
       // Create GameObject
       const obj = new GameObject(

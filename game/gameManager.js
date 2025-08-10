@@ -49,6 +49,8 @@ class GameManager {
       this.configLoader,
       this.spriteLoader
     );
+    // Додаємо зворотне посилання для доступу до isRoomCreator
+    this.objectManager.gameManager = this;
     this.actionManager = new ActionManager(this.objectManager);
     this.inputManager = new InputManager(canvas, this);
 
