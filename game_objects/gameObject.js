@@ -150,23 +150,8 @@ export class GameObject {
   // Встановлює напрямок погляду на основі команди та того, хто дивиться
   setLookDirectionByTeam() {
     // Отримуємо інформацію про те, хто дивиться на гру
-    // Спробуємо знайти gameManager через різні шляхи
-    let gameManager = window.gameManager;
-    if (!gameManager && this.gridManager && this.gridManager.gameManager) {
-      gameManager = this.gridManager.gameManager;
-    }
-    if (!gameManager && window.objectManager && window.objectManager.gameManager) {
-      gameManager = window.objectManager.gameManager;
-    }
-    
+    const gameManager = window.gameManager;
     const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
-    
-    console.log('DEBUG setLookDirectionByTeam:', {
-      team: this.team,
-      gameManager: !!gameManager,
-      isRoomCreator: isRoomCreator,
-      gameManagerIsRoomCreator: gameManager ? gameManager.isRoomCreator : 'no gameManager'
-    });
 
     if (isRoomCreator) {
       // З точки зору хоста: команда 1 вправо, команда 2 вліво

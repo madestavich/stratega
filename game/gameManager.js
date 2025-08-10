@@ -834,4 +834,4 @@ class GameManager {
   }
 }
 
-new GameManager();
+window.gameManager = new GameManager();
