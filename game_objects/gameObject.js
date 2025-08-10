@@ -147,14 +147,26 @@ export class GameObject {
     return this.z;
   }
 
-  // Встановлює напрямок погляду на основі команди
+  // Встановлює напрямок погляду на основі команди та того, хто дивиться
   setLookDirectionByTeam() {
-    if (this.team === 1) {
-      // Команда 1 (хост) дивиться вправо
-      this.lookDirection = { dx: 1, dy: 0 };
-    } else if (this.team === 2) {
-      // Команда 2 (гість) дивиться вліво
-      this.lookDirection = { dx: -1, dy: 0 };
+    // Отримуємо інформацію про те, хто дивиться на гру
+    const gameManager = window.gameManager || (this.gridManager && this.gridManager.gameManager);
+    const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
+    
+    if (isRoomCreator) {
+      // З точки зору хоста: команда 1 вправо, команда 2 вліво
+      if (this.team === 1) {
+        this.lookDirection = { dx: 1, dy: 0 };   // Власні юніти хоста вправо
+      } else if (this.team === 2) {
+        this.lookDirection = { dx: -1, dy: 0 };  // Ворожі юніти вліво
+      }
+    } else {
+      // З точки зору гостя: команда 1 вліво, команда 2 вправо
+      if (this.team === 1) {
+        this.lookDirection = { dx: -1, dy: 0 };  // Ворожі юніти вліво  
+      } else if (this.team === 2) {
+        this.lookDirection = { dx: 1, dy: 0 };   // Власні юніти гостя вправо
+      }
     }
   }
 }

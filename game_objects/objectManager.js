@@ -452,17 +452,8 @@ export class ObjectManager {
         return null;
       }
 
-      // Хост завжди команда 1, гість завжди команда 2
-      const isRoomCreator = this.gameManager ? this.gameManager.isRoomCreator : true;
-      
-      let team;
-      if (targetArray === this.objects) {
-        // Власні юніти: хост=1, гість=2
-        team = isRoomCreator ? 1 : 2;
-      } else {
-        // Ворожі юніти: для хоста це гість=2, для гостя це хост=1
-        team = isRoomCreator ? 2 : 1;
-      }
+      // Просто: this.objects завжди команда 1, this.enemyObjects завжди команда 2
+      const team = (targetArray === this.objects) ? 1 : 2;
 
       // Create GameObject
       const obj = new GameObject(
