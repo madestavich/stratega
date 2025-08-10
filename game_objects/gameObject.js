@@ -156,9 +156,9 @@ export class GameObject {
     if (isRoomCreator) {
       // З точки зору хоста: команда 1 вправо, команда 2 вліво
       if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 }; // Власні юніти хоста вправо
+        this.lookDirection = { dx: -1, dy: 0 }; // Власні юніти хоста вправо
       } else if (this.team === 2) {
-        this.lookDirection = { dx: -1, dy: 0 }; // Ворожі юніти вліво
+        this.lookDirection = { dx: 1, dy: 0 }; // Ворожі юніти вліво
       }
     } else {
       // З точки зору гостя: команда 1 (хост) вправо, команда 2 (гість) вліво
