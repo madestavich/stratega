@@ -152,7 +152,7 @@ export class GameObject {
     if (this.team === 1) {
       this.lookDirection = { dx: 1, dy: 0 }; // Команда 1 дивиться вправо
     } else if (this.team === 2) {
-      this.lookDirection = { dx: -1, dy: 0 }; // Команда 2 дивиться вліво
+      this.lookDirection = { dx: 1, dy: 0 }; // Команда 2 дивиться вліво
     }
   }
 }
