@@ -149,6 +149,9 @@ export class GameObject {
 
   // Встановлює напрямок погляду на основі команди та того, хто дивиться
   setLookDirectionByTeam() {
+    // Скидаємо moveDirection щоб використовувався lookDirection
+    this.moveDirection = null;
+    
     const gameManager = window.gameManager;
     const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
 
