@@ -641,6 +641,15 @@ class GameManager {
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
     
+    // Оновлюємо напрямок погляду для всіх юнітів на початку нового раунду
+    for (const unit of this.objectManager.objects) {
+      unit.setLookDirectionByTeam();
+    }
+    for (const unit of this.objectManager.enemyObjects) {
+      unit.setLookDirectionByTeam();
+    }
+    console.log('Updated look direction for all units for new round preparation');
+    
     // Reset ready status for new round
     await this.resetReadyStatus();
     
