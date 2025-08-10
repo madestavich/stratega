@@ -161,11 +161,11 @@ export class GameObject {
         this.lookDirection = { dx: -1, dy: 0 };  // Ворожі юніти вліво
       }
     } else {
-      // З точки зору гостя: команда 1 вліво, команда 2 вправо
+      // З точки зору гостя: команда 1 вправо, команда 2 вліво
       if (this.team === 1) {
-        this.lookDirection = { dx: -1, dy: 0 };  // Ворожі юніти вліво  
+        this.lookDirection = { dx: 1, dy: 0 };   // Ворожі юніти вправо  
       } else if (this.team === 2) {
-        this.lookDirection = { dx: 1, dy: 0 };   // Власні юніти гостя вправо
+        this.lookDirection = { dx: -1, dy: 0 };  // Власні юніти гостя вліво
       }
     }
   }
