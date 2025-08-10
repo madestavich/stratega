@@ -688,7 +688,7 @@ class GameManager {
       // Встановлюємо правильний напрямок погляду відповідно до команди
       unit.setLookDirectionByTeam();
       
-      console.log(`Player unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
+
     }
     
     // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
@@ -717,7 +717,7 @@ class GameManager {
       // Встановлюємо правильний напрямок погляду відповідно до команди
       unit.setLookDirectionByTeam();
       
-      console.log(`Enemy unit moved from ${currentPos} back to starting position [${unit.gridCol}, ${unit.gridRow}], visual pos: [${unit.x}, ${unit.y}]`);
+
     }
     
     // Update grid after position reset and resurrection
