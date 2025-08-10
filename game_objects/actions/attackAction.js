@@ -43,6 +43,18 @@ export class AttackAction {
       this.moveAction.cancelMovement(gameObject);
     }
 
+    // Update move target if enemy has moved
+    if (gameObject.attackTarget && gameObject.moveTarget && 
+        (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol || 
+         gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)) {
+      // Cancel current movement to recalculate path to new position
+      this.moveAction.cancelMovement(gameObject);
+      gameObject.moveTarget = {
+        col: gameObject.attackTarget.gridCol,
+        row: gameObject.attackTarget.gridRow,
+      };
+    }
+
     // Find nearest enemy
     const nearestEnemy = this.findNearestEnemy(gameObject);
 
@@ -51,6 +63,14 @@ export class AttackAction {
       gameObject.attackTarget = null;
       gameObject.moveTarget = null;
       return false;
+    }
+
+    // Check if we need to switch to a different target
+    if (gameObject.attackTarget && gameObject.attackTarget !== nearestEnemy) {
+      // Target changed, cancel current movement
+      this.moveAction.cancelMovement(gameObject);
+      gameObject.attackTarget = nearestEnemy;
+      gameObject.moveTarget = null; // Will be set below
     }
 
     // Calculate distance to nearest enemy
@@ -156,14 +176,6 @@ export class AttackAction {
       if (gameObject.attackCooldown < 0) {
         gameObject.attackCooldown = 0;
       }
-    }
-
-    // Update move target to follow enemy if we have an attack target
-    if (gameObject.attackTarget && !gameObject.attackTarget.isDead && !gameObject.isAttacking) {
-      gameObject.moveTarget = {
-        col: gameObject.attackTarget.gridCol,
-        row: gameObject.attackTarget.gridRow,
-      };
     }
   }
 
