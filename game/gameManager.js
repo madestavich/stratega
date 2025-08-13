@@ -712,6 +712,10 @@ class GameManager {
     // Reset ready status for new round
     await this.resetReadyStatus();
     
+    // Wait 1 second for ready status reset to propagate to database
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Waited for ready status reset to complete');
+    
     // Get round duration from server before starting timer
     await this.getRoundDuration();
     
