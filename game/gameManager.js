@@ -368,12 +368,19 @@ class GameManager {
       const result = await response.json();
       
       if (result.success) {
+        console.log('DEBUG checkRoundStatus:', {
+          round_active: result.round_active,
+          time_left: result.time_left,
+          should_start_game: result.should_start_game
+        });
+        
         // Оновлюємо стан таймера з серверними даними
         this.isRoundActive = result.round_active;
         
         if (result.round_active && result.time_left > 0) {
           this.roundTimeLeft = result.time_left;
           this.updateTimerDisplay();
+          console.log('DEBUG: Timer updated to', this.roundTimeLeft);
         } else if (result.time_left <= 0 && this.isRoundActive) {
           // Час вийшов на сервері
           this.handleTimeUp();
