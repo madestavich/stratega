@@ -366,8 +366,8 @@ class GameManager {
       const result = await response.json();
       
       if (result.success) {
-        // Тільки оновлюємо таймер якщо він активний
-        if (result.round_active && result.time_left > 0) {
+        // Тільки оновлюємо таймер якщо він активний І гра на паузі (режим розстановки)
+        if (result.round_active && result.time_left > 0 && this.isPaused) {
           this.roundTimeLeft = result.time_left;
           this.isRoundActive = true;
           this.updateTimerDisplay();
