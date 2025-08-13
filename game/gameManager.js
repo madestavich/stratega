@@ -276,35 +276,33 @@ class GameManager {
       return;
     }
 
-    // Спочатку перевіряємо чи вже активний таймер на сервері
-    await this.checkRoundStatus();
-    
-    // Якщо таймер ще не активний - запускаємо новий
-    if (!this.isRoundActive) {
-      try {
-        const response = await fetch('../server/room.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            action: 'start_round_timer',
-            room_id: this.objectManager.currentRoomId,
-            duration: this.roundDuration
-          })
-        });
+    // Завжди запускаємо серверний таймер (сервер сам перевірить чи потрібно)
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'start_round_timer',
+          room_id: this.objectManager.currentRoomId,
+          duration: this.roundDuration
+        })
+      });
 
-        const result = await response.json();
-        if (result.success) {
-          console.log('Server round timer started:', result.duration, 'seconds');
-        } else {
-          console.error('Failed to start server timer:', result.error);
-        }
-      } catch (error) {
-        console.error('Error starting server timer:', error);
+      const result = await response.json();
+      if (result.success) {
+        console.log('Server round timer started/synced:', result.duration, 'seconds');
+      } else {
+        console.error('Failed to start server timer:', result.error);
       }
+    } catch (error) {
+      console.error('Error starting server timer:', error);
     }
+    
+    // Після запуску серверного таймера - отримуємо актуальний стан
+    await this.checkRoundStatus();
     
     // В будь-якому разі запускаємо клієнтську синхронізацію
     if (!this.checkStatusInterval) {

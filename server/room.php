@@ -529,7 +529,25 @@ function startRoundTimer($data) {
     $room_id = $data['room_id'] ?? 0;
     $duration = $data['duration'] ?? 45; // Тривалість раунду в секундах
     
-    // Встановлюємо час початку раунду (round_time уже існує)
+    // Перевіряємо чи таймер вже активний
+    $stmt = $conn->prepare("SELECT round_start_time, round_time FROM game_rooms WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if ($room['round_start_time']) {
+        // Таймер вже активний - повертаємо поточний стан
+        echo json_encode([
+            'success' => true,
+            'message' => 'Таймер раунду вже активний',
+            'duration' => $room['round_time'],
+            'already_active' => true
+        ]);
+        return;
+    }
+    
+    // Встановлюємо час початку раунду
     $stmt = $conn->prepare("
         UPDATE game_rooms 
         SET round_start_time = NOW()
@@ -541,7 +559,7 @@ function startRoundTimer($data) {
         echo json_encode([
             'success' => true,
             'message' => 'Таймер раунду запущено',
-            'duration' => $duration
+            'duration' => $room['round_time']
         ]);
     } else {
         throw new Exception('Помилка запуску таймера раунду');
