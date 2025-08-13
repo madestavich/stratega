@@ -373,8 +373,8 @@ class GameManager {
           this.updateTimerDisplay();
         }
         
-        // Запускаємо гру тільки якщо обидва готові і гра на паузі
-        if (result.should_start_game && this.isPaused) {
+        // Запускаємо гру тільки якщо обидва готові, гра на паузі і таймер активний
+        if (result.should_start_game && this.isPaused && result.player1_ready && result.player2_ready) {
           console.log('Both players ready! Starting game logic...');
           this.startGame();
         }
