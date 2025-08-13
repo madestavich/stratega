@@ -441,15 +441,11 @@ class GameManager {
   async startGame() {
     console.log('=== STARTING GAME LOGIC ===');
     
-    // Stop all timers
-    if (this.roundTimer) {
-      clearInterval(this.roundTimer);
-      this.roundTimer = null;
-    }
-    
+    // Stop round placement timer and status checking
     if (this.checkStatusInterval) {
       clearInterval(this.checkStatusInterval);
       this.checkStatusInterval = null;
+      console.log('DEBUG: Stopped checkStatusInterval in startGame');
     }
     
     this.isRoundActive = false;
