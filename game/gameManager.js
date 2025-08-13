@@ -456,6 +456,13 @@ class GameManager {
       console.log('DEBUG: Stopped checkStatusInterval in startGame');
     }
     
+    // Stop any existing battle check interval to prevent double intervals
+    if (this.battleCheckInterval) {
+      clearInterval(this.battleCheckInterval);
+      this.battleCheckInterval = null;
+      console.log('DEBUG: Stopped existing battleCheckInterval in startGame');
+    }
+    
     this.isRoundActive = false;
     this.roundTimeLeft = 0;
     this.updateTimerDisplay(); // Візуально скидаємо таймер
