@@ -310,7 +310,7 @@ class GameManager {
     if (!this.checkStatusInterval) {
       this.checkStatusInterval = setInterval(() => {
         this.checkRoundStatus();
-      }, 2000);
+      }, 1000);
     }
   }
 
@@ -457,6 +457,8 @@ class GameManager {
     }
     
     this.isRoundActive = false;
+    this.roundTimeLeft = 0;
+    this.updateTimerDisplay(); // Візуально скидаємо таймер
     
     // CRITICAL: Load all units from database to ensure synchronization
     console.log('Loading latest units from database...');
