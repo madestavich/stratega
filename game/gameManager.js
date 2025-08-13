@@ -350,7 +350,7 @@ class GameManager {
   }
 
   async checkRoundStatus() {
-    if (!this.isRoundActive) return;
+    // Завжди перевіряємо статус - сервер може мати активний таймер
 
     try {
       const response = await fetch('../server/room.php', {
