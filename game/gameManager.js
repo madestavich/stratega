@@ -708,6 +708,9 @@ class GameManager {
     // Reset ready status for new round
     await this.resetReadyStatus();
     
+    // Get round duration from server before starting timer
+    await this.getRoundDuration();
+    
     // Start new round timer
     await this.startRoundTimer();
   }
