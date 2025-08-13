@@ -375,6 +375,12 @@ class GameManager {
         
         // Запускаємо гру тільки якщо обидва готові, гра на паузі і таймер активний
         if (result.should_start_game && this.isPaused && result.player1_ready && result.player2_ready) {
+          console.log('DEBUG: All conditions met for game start:', {
+            should_start_game: result.should_start_game,
+            isPaused: this.isPaused,
+            player1_ready: result.player1_ready,
+            player2_ready: result.player2_ready
+          });
           console.log('Both players ready! Starting game logic...');
           this.startGame();
         }
@@ -440,6 +446,8 @@ class GameManager {
   // Start game logic when both players are ready
   async startGame() {
     console.log('=== STARTING GAME LOGIC ===');
+    console.log('DEBUG: startGame called, isPaused:', this.isPaused);
+    console.trace('startGame call stack');
     
     // Stop round placement timer and status checking
     if (this.checkStatusInterval) {
