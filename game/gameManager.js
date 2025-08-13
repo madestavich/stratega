@@ -427,6 +427,14 @@ class GameManager {
     console.log('Loading latest units from database...');
     await this.objectManager.loadObjects();
     
+    // Оновлюємо напрямок погляду після завантаження юнітів
+    for (const unit of this.objectManager.objects) {
+      unit.setLookDirectionByTeam();
+    }
+    for (const unit of this.objectManager.enemyObjects) {
+      unit.setLookDirectionByTeam();
+    }
+    
     // Save current player units and sync with enemy (ensures both players have same data)
     await this.objectManager.synchronizeAfterTurn();
     console.log('Units synchronized. Starting game...');
