@@ -27,7 +27,7 @@ class GameManager {
     // Round management
     this.roundTimer = null;
     this.roundTimeLeft = 0;
-    this.roundDuration = 45; // Default 45 seconds
+    this.roundDuration = 30; // Default 30 seconds - буде оновлено з сервера
     this.isRoundActive = false;
     this.checkStatusInterval = null;
     this.isPaused = true; // Game starts paused during unit placement
@@ -158,6 +158,9 @@ class GameManager {
     console.log(`Player created with team: ${playerTeam}`);
 
     this.interfaceManager.updatePlayerInterface(this.player);
+
+    // Get round duration from server first
+    await this.getRoundDuration();
 
     // Start round management
     await this.startRoundTimer();
@@ -328,8 +331,15 @@ class GameManager {
       const result = await response.json();
       
       if (result.success) {
-        this.roundDuration = result.round_time || 45;
-        this.roundTimeLeft = this.roundDuration;
+        this.roundDuration = result.round_time || 30;
+        // Якщо є активний таймер - використовуємо серверний час
+        if (result.round_active && result.time_left > 0) {
+          this.roundTimeLeft = result.time_left;
+          this.isRoundActive = true;
+        } else {
+          this.roundTimeLeft = this.roundDuration;
+          this.isRoundActive = false;
+        }
         console.log(`Round duration set to: ${this.roundDuration} seconds`);
       }
     } catch (error) {
