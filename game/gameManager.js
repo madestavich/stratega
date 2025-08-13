@@ -306,9 +306,12 @@ class GameManager {
     
     // В будь-якому разі запускаємо клієнтську синхронізацію
     if (!this.checkStatusInterval) {
+      console.log('DEBUG: Starting new checkStatusInterval');
       this.checkStatusInterval = setInterval(() => {
         this.checkRoundStatus();
       }, 1000);
+    } else {
+      console.log('DEBUG: checkStatusInterval already exists');
     }
   }
 
@@ -520,11 +523,7 @@ class GameManager {
   async endRound(winnerId = null) {
     console.log('Round ended! Processing winner...');
     
-    // Stop round timer and status checking
-    if (this.checkStatusInterval) {
-      clearInterval(this.checkStatusInterval);
-      this.checkStatusInterval = null;
-    }
+    // НЕ зупиняємо checkStatusInterval - потрібна синхронізація з сервером
     
     this.isRoundActive = false;
     this.roundTimeLeft = 0;
@@ -690,6 +689,7 @@ class GameManager {
 
   async startNextRoundPreparation() {
     console.log('Starting next round preparation...');
+    console.log('DEBUG: checkStatusInterval active?', !!this.checkStatusInterval);
     
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
