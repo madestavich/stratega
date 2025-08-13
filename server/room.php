@@ -504,8 +504,8 @@ function resetReadyStatus($data) {
     $user_id = $_SESSION['user_id'];
     $room_id = $data['room_id'] ?? 0;
     
-    // Reset both players ready status
-    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    // Reset both players ready status and clear round timer
+    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
     $stmt->bind_param("iii", $room_id, $user_id, $user_id);
     
     if ($stmt->execute()) {
