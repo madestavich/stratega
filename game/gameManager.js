@@ -387,7 +387,7 @@ class GameManager {
           this.handleTimeUp();
         }
         
-        if (result.should_start_game && this.isPaused) {
+        if (result.should_start_game && this.isPaused && result.round_active) {
           console.log('Both players ready! Starting game logic...');
           this.startGame();
         }
