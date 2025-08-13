@@ -273,29 +273,36 @@ class GameManager {
       return;
     }
 
-    this.isRoundActive = true;
-    
-    // Get round duration first, then start timer
-    await this.getRoundDuration();
-    
-    // Start countdown
-    this.roundTimer = setInterval(() => {
-      this.roundTimeLeft--;
-      
-      // Update UI with remaining time
-      this.updateTimerDisplay();
-      
-      if (this.roundTimeLeft <= 0) {
-        this.handleTimeUp();
+    // Запускаємо серверний таймер
+    try {
+      const response = await fetch('../server/room.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'start_round_timer',
+          room_id: this.objectManager.currentRoomId,
+          duration: this.roundDuration
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        console.log('Server round timer started:', result.duration, 'seconds');
+        
+        // Запускаємо клієнтську синхронізацію кожні 2 секунди
+        this.isRoundActive = true;
+        this.checkStatusInterval = setInterval(() => {
+          this.checkRoundStatus();
+        }, 2000);
+      } else {
+        console.error('Failed to start server timer:', result.error);
       }
-    }, 1000);
-
-    // Check round status every 2 seconds
-    this.checkStatusInterval = setInterval(() => {
-      this.checkRoundStatus();
-    }, 2000);
-
-    console.log(`Round timer started: ${this.roundDuration} seconds`);
+    } catch (error) {
+      console.error('Error starting server timer:', error);
+    }
   }
 
   async getRoundDuration() {
@@ -343,9 +350,20 @@ class GameManager {
 
       const result = await response.json();
       
-      if (result.success && result.should_start_game) {
-        console.log('Both players ready! Starting game logic...');
-        this.startGame();
+      if (result.success) {
+        // Оновлюємо таймер з серверними даними
+        if (result.round_active && result.time_left > 0) {
+          this.roundTimeLeft = result.time_left;
+          this.updateTimerDisplay();
+        } else if (result.time_left <= 0 && this.isRoundActive) {
+          // Час вийшов на сервері
+          this.handleTimeUp();
+        }
+        
+        if (result.should_start_game) {
+          console.log('Both players ready! Starting game logic...');
+          this.startGame();
+        }
       }
     } catch (error) {
       console.error('Error checking round status:', error);
@@ -355,11 +373,10 @@ class GameManager {
   handleTimeUp() {
     console.log('Time is up! Auto-setting player as ready...');
     
-    // Stop timer first
-    if (this.roundTimer) {
-      clearInterval(this.roundTimer);
-      this.roundTimer = null;
-    }
+    // Mark round as inactive
+    this.isRoundActive = false;
+    this.roundTimeLeft = 0;
+    this.updateTimerDisplay();
     
     // Auto-set current player as ready
     this.setPlayerReady();

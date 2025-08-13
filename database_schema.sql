@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS game_rooms (
     current_round INT NOT NULL DEFAULT 0,
     player1_ready TINYINT(1) NOT NULL DEFAULT 0,
     player2_ready TINYINT(1) NOT NULL DEFAULT 0,
+    round_start_time DATETIME NULL,
     FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (second_player_id) REFERENCES users(id) ON DELETE CASCADE
 );

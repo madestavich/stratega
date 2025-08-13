@@ -83,6 +83,9 @@ try {
         case 'reset_ready_status':
             resetReadyStatus($input);
             break;
+        case 'start_round_timer':
+            startRoundTimer($input);
+            break;
         case 'increment_round':
             incrementRound($input);
             break;
@@ -438,12 +441,55 @@ function checkRoundStatus($data) {
     $both_ready = ($room['player1_ready'] == 1 && $room['player2_ready'] == 1);
     $round_time = $room['round_time'];
     
+    // Рахуємо залишковий час на основі серверного часу
+    $time_left = 0;
+    $round_active = false;
+    
+    if ($room['round_start_time']) {
+        $start_time = new DateTime($room['round_start_time']);
+        $current_time = new DateTime();
+        $elapsed = $current_time->getTimestamp() - $start_time->getTimestamp();
+        $time_left = max(0, $room['round_time'] - $elapsed);
+        $round_active = ($time_left > 0);
+        
+        // Автоматичне завершення раунду якщо час вийшов
+        if ($time_left <= 0 && !$both_ready) {
+            // Встановлюємо обох гравців як готових
+            $stmt = $conn->prepare("
+                UPDATE game_rooms 
+                SET player1_ready = 1, player2_ready = 1, round_start_time = NULL 
+                WHERE id = ?
+            ");
+            $stmt->bind_param("i", $room_id);
+            $stmt->execute();
+            
+            // Оновлюємо змінні
+            $both_ready = true;
+            $round_active = false;
+            
+            echo json_encode([
+                'success' => true,
+                'player1_ready' => true,
+                'player2_ready' => true,
+                'both_ready' => true,
+                'round_time' => $round_time,
+                'time_left' => 0,
+                'round_active' => false,
+                'should_start_game' => true,
+                'auto_ended' => true
+            ]);
+            return;
+        }
+    }
+    
     echo json_encode([
         'success' => true,
         'player1_ready' => (bool)$room['player1_ready'],
         'player2_ready' => (bool)$room['player2_ready'],
         'both_ready' => $both_ready,
         'round_time' => $round_time,
+        'time_left' => $time_left,
+        'round_active' => $round_active,
         'should_start_game' => $both_ready
     ]);
 }
@@ -471,6 +517,35 @@ function resetReadyStatus($data) {
         throw new Exception('Помилка скидання статусу готовності');
     }
 
+}
+
+function startRoundTimer($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $room_id = $data['room_id'] ?? 0;
+    $duration = $data['duration'] ?? 45; // Тривалість раунду в секундах
+    
+    // Встановлюємо час початку раунду (round_time уже існує)
+    $stmt = $conn->prepare("
+        UPDATE game_rooms 
+        SET round_start_time = NOW()
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Таймер раунду запущено',
+            'duration' => $duration
+        ]);
+    } else {
+        throw new Exception('Помилка запуску таймера раунду');
+    }
 }
 
 function incrementRound($data) {
