@@ -386,7 +386,7 @@ class GameManager {
           this.handleTimeUp();
         }
         
-        if (result.should_start_game) {
+        if (result.should_start_game && !this.isPaused) {
           console.log('Both players ready! Starting game logic...');
           this.startGame();
         }
