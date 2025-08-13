@@ -522,6 +522,16 @@ class GameManager {
   async endRound(winnerId = null) {
     console.log('Round ended! Processing winner...');
     
+    // Stop round timer and status checking
+    if (this.checkStatusInterval) {
+      clearInterval(this.checkStatusInterval);
+      this.checkStatusInterval = null;
+    }
+    
+    this.isRoundActive = false;
+    this.roundTimeLeft = 0;
+    this.updateTimerDisplay(); // Скидаємо таймер візуально
+    
     // Pause the game
     this.isPaused = true;
     
