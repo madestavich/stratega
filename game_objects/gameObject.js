@@ -174,5 +174,8 @@ export class GameObject {
         this.lookDirection = { dx: 1, dy: 0 };
       }
     }
+    
+    // Логування для всіх нових юнітів
+    console.log(`DEBUG ${this.objectType}: team=${this.team}, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(this.lookDirection)}`);
   }
 }

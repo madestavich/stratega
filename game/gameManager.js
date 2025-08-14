@@ -142,6 +142,7 @@ class GameManager {
       );
 
       // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
+      console.log(`About to update look direction for ${this.objectManager.objects.length} player units and ${this.objectManager.enemyObjects.length} enemy units`);
       for (const unit of this.objectManager.objects) {
         unit.setLookDirectionByTeam();
       }
