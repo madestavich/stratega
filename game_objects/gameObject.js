@@ -171,10 +171,10 @@ export class GameObject {
       }
     }
 
-    // Логування для дебагу тільки при створенні нового юніта
-    if (this.objectType === "skeleton" && this.justCreated) {
+    // Логування для дебагу
+    if (this.objectType === "rider") {
       console.log(
-        `DEBUG skeleton CREATED: team=${
+        `DEBUG rider ${this.justCreated ? "CREATED" : "UPDATED"}: team=${
           this.team
         }, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(
           this.lookDirection
