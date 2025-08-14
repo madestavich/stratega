@@ -28,6 +28,8 @@ export class ObjectManager {
     }
 
     objectConfig.team = team;
+    console.log(objectConfig.team);
+
     const obj = new GameObject(
       this.ctx,
       spriteConfig,
@@ -46,11 +48,6 @@ export class ObjectManager {
     obj.unitInfo = this.findUnitInfoByType(objectType);
 
     this.objects.push(obj);
-
-    // Ensure correct look direction after gameManager is fully initialized
-    console.log(`BEFORE objectManager setLookDirectionByTeam: ${obj.objectType} lookDirection=${JSON.stringify(obj.lookDirection)}`);
-    obj.setLookDirectionByTeam();
-    console.log(`AFTER objectManager setLookDirectionByTeam: ${obj.objectType} lookDirection=${JSON.stringify(obj.lookDirection)}`);
 
     // Auto-save to database after creating object
     if (this.currentRoomId) {
