@@ -153,7 +153,7 @@ export class GameObject {
   setLookDirectionByTeam() {
     // Скидаємо moveDirection щоб використовувався lookDirection
     this.moveDirection = null;
-    
+
     const gameManager = window.gameManager;
     const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
 
@@ -165,15 +165,21 @@ export class GameObject {
       }
     } else {
       if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 };
-      } else if (this.team === 2) {
         this.lookDirection = { dx: -1, dy: 0 };
+      } else if (this.team === 2) {
+        this.lookDirection = { dx: 1, dy: 0 };
       }
     }
-    
+
     // Логування для дебагу тільки при створенні нового юніта
-    if (this.objectType === 'skeleton' && this.justCreated) {
-      console.log(`DEBUG skeleton CREATED: team=${this.team}, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(this.lookDirection)}`);
+    if (this.objectType === "skeleton" && this.justCreated) {
+      console.log(
+        `DEBUG skeleton CREATED: team=${
+          this.team
+        }, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(
+          this.lookDirection
+        )}`
+      );
     }
   }
 }
