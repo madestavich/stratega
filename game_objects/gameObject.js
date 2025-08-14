@@ -152,13 +152,19 @@ export class GameObject {
     this.moveDirection = null;
 
     const gameManager = window.gameManager;
-    
+
     // Якщо gameManager ще не готовий або isRoomCreator ще не встановлений - відкладаємо
-    if (!gameManager || gameManager.isRoomCreator === undefined || gameManager.isRoomCreator === null) {
-      console.log(`DEBUG: gameManager not ready, isRoomCreator=${gameManager?.isRoomCreator}`);
+    if (
+      !gameManager ||
+      gameManager.isRoomCreator === undefined ||
+      gameManager.isRoomCreator === null
+    ) {
+      console.log(
+        `DEBUG: gameManager not ready, isRoomCreator=${gameManager?.isRoomCreator}`
+      );
       return;
     }
-    
+
     const isRoomCreator = gameManager.isRoomCreator;
 
     if (isRoomCreator) {
@@ -171,16 +177,26 @@ export class GameObject {
       if (this.team === 1) {
         this.lookDirection = { dx: -1, dy: 0 };
       } else if (this.team === 2) {
-        this.lookDirection = { dx: -1, dy: 0 };
+        this.lookDirection = { dx: 1, dy: 0 };
       }
     }
-    
+
     // Логування для всіх нових юнітів
-    console.log(`DEBUG ${this.objectType}: team=${this.team}, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(this.lookDirection)}`);
-    
+    console.log(
+      `DEBUG ${this.objectType}: team=${
+        this.team
+      }, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(
+        this.lookDirection
+      )}`
+    );
+
     // Додаткова перевірка через 1 секунду
     setTimeout(() => {
-      console.log(`DEBUG ${this.objectType} AFTER 1s: lookDirection=${JSON.stringify(this.lookDirection)}`);
+      console.log(
+        `DEBUG ${this.objectType} AFTER 1s: lookDirection=${JSON.stringify(
+          this.lookDirection
+        )}`
+      );
     }, 1000);
   }
 }
