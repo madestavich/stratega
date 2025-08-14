@@ -4,14 +4,14 @@ export class Renderer {
     this.animator = animator;
   }
 
-  draw(x, y, moveDirection = null) {
+  draw(x, y, direction = null) {
     const f = this.animator.activeFrame;
 
     // Зберігаємо поточний стан контексту
     this.ctx.save();
 
-    // Визначаємо напрямок відображення
-    const flipHorizontal = moveDirection && moveDirection.dx < 0;
+    // Визначаємо напрямок відображення (може бути moveDirection або lookDirection)
+    const flipHorizontal = direction && direction.dx < 0;
 
     // Переміщуємо точку відліку до центру кадру
     const centerOffsetX = f.frameCenter.x - f.x;
