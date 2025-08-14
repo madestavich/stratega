@@ -63,10 +63,7 @@ export class GameObject {
     this.renderer = new Renderer(ctx, this.animator);
     this.updatePositionFromGrid();
 
-    // Встановлюємо початковий напрямок при створенні
-    this.justCreated = true; // Флаг для логування тільки при створенні
     this.setLookDirectionByTeam();
-    this.justCreated = false;
   }
 
   update() {
@@ -169,17 +166,6 @@ export class GameObject {
       } else if (this.team === 2) {
         this.lookDirection = { dx: 1, dy: 0 };
       }
-    }
-
-    // Логування для дебагу
-    if (this.objectType === "rider") {
-      console.log(
-        `DEBUG rider ${this.justCreated ? "CREATED" : "UPDATED"}: team=${
-          this.team
-        }, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(
-          this.lookDirection
-        )}`
-      );
     }
   }
 }
