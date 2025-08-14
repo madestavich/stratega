@@ -177,5 +177,10 @@ export class GameObject {
     
     // Логування для всіх нових юнітів
     console.log(`DEBUG ${this.objectType}: team=${this.team}, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(this.lookDirection)}`);
+    
+    // Додаткова перевірка через 1 секунду
+    setTimeout(() => {
+      console.log(`DEBUG ${this.objectType} AFTER 1s: lookDirection=${JSON.stringify(this.lookDirection)}`);
+    }, 1000);
   }
 }
