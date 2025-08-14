@@ -811,50 +811,50 @@ class GameManager {
   }
 
   // Check if player can place unit at given position (considering unit size)
-  // canPlaceUnitAt(gridCol, gridRow, unitConfig) {
-  //   const gridCols = this.gridManager.cols; // Total columns
-  //   const midpoint = Math.floor(gridCols / 2); // Middle of the map
+  canPlaceUnitAt(gridCol, gridRow, unitConfig) {
+    const gridCols = this.gridManager.cols; // Total columns
+    const midpoint = Math.floor(gridCols / 2); // Middle of the map
 
-  //   // Get unit dimensions
-  //   const gridWidth = unitConfig?.gridWidth || 1;
-  //   const gridHeight = unitConfig?.gridHeight || 1;
-  //   const expansionDirection = unitConfig?.expansionDirection || "bottomRight";
+    // Get unit dimensions
+    const gridWidth = unitConfig?.gridWidth || 1;
+    const gridHeight = unitConfig?.gridHeight || 1;
+    const expansionDirection = unitConfig?.expansionDirection || "bottomRight";
 
-  //   // Calculate all cells the unit will occupy
-  //   let startCol = gridCol;
-  //   let endCol = gridCol;
+    // Calculate all cells the unit will occupy
+    let startCol = gridCol;
+    let endCol = gridCol;
 
-  //   switch (expansionDirection) {
-  //     case "topLeft":
-  //       startCol = gridCol - (gridWidth - 1);
-  //       endCol = gridCol;
-  //       break;
-  //     case "topRight":
-  //       startCol = gridCol;
-  //       endCol = gridCol + (gridWidth - 1);
-  //       break;
-  //     case "bottomLeft":
-  //       startCol = gridCol - (gridWidth - 1);
-  //       endCol = gridCol;
-  //       break;
-  //     case "bottomRight":
-  //     default:
-  //       startCol = gridCol;
-  //       endCol = gridCol + (gridWidth - 1);
-  //       break;
-  //   }
+    switch (expansionDirection) {
+      case "topLeft":
+        startCol = gridCol - (gridWidth - 1);
+        endCol = gridCol;
+        break;
+      case "topRight":
+        startCol = gridCol;
+        endCol = gridCol + (gridWidth - 1);
+        break;
+      case "bottomLeft":
+        startCol = gridCol - (gridWidth - 1);
+        endCol = gridCol;
+        break;
+      case "bottomRight":
+      default:
+        startCol = gridCol;
+        endCol = gridCol + (gridWidth - 1);
+        break;
+    }
 
-  //   // Check if ALL occupied cells are in the correct zone
-  //   if (this.isRoomCreator) {
-  //     // Host (creator) can only place units in left half
-  //     // All cells must be < midpoint
-  //     return endCol < midpoint;
-  //   } else {
-  //     // Guest (player 2) can only place units in right half
-  //     // All cells must be >= midpoint
-  //     return startCol >= midpoint;
-  //   }
-  // }
+    // Check if ALL occupied cells are in the correct zone
+    if (this.isRoomCreator) {
+      // Host (creator) can only place units in left half
+      // All cells must be < midpoint
+      return endCol < midpoint;
+    } else {
+      // Guest (player 2) can only place units in right half
+      // All cells must be >= midpoint
+      return startCol >= midpoint;
+    }
+  }
 
   // Get allowed placement zone info for UI feedback
   getPlacementZoneInfo() {
