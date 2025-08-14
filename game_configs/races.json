@@ -45,7 +45,6 @@
         "skeleton": {
           "gridWidth": 1,
           "gridHeight": 1,
-          "expansionDirection": "topRight",
           "objectType": "skeleton",
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 10,
@@ -91,7 +90,6 @@
         "rider": {
           "gridWidth": 3,
           "gridHeight": 2,
-
           "objectType": "rider",
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 25,
