@@ -41,7 +41,20 @@
   },
   "necropolis": {
     "units": {
-      "tier_one": {},
+      "tier_one": {
+        "skeleton": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "expansionDirection": "topRight",
+          "objectType": "skeleton",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 10,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 15,
+          "attackSpeed": 0.8,
+          "health": 45
+        }
+      },
       "tier_two": {},
       "tier_three": {},
       "tier_four": {}

@@ -23,7 +23,7 @@ class GameManager {
     this.debugInterval = null;
     this.isRunning = true;
     this.player = null;
-    
+
     // Round management
     this.roundTimer = null;
     this.roundTimeLeft = 0;
@@ -126,14 +126,21 @@ class GameManager {
   async start() {
     await this.configLoader.loadRacesConfig();
     await this.objectManager.initializeGame();
-    
+
     // Determine if current player is room creator
     const roomInfo = await this.objectManager.getCurrentRoomId();
     if (roomInfo) {
       this.isRoomCreator = roomInfo.isCreator;
-      console.log(`Player is ${this.isRoomCreator ? 'host (creator)' : 'guest (player 2)'}`);
-      console.log('DEBUG: gameManager.isRoomCreator set to:', this.isRoomCreator);
-      
+      console.log(
+        `Player is ${
+          this.isRoomCreator ? "host (creator)" : "guest (player 2)"
+        }`
+      );
+      console.log(
+        "DEBUG: gameManager.isRoomCreator set to:",
+        this.isRoomCreator
+      );
+
       // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
       for (const unit of this.objectManager.objects) {
         unit.setLookDirectionByTeam();
@@ -141,20 +148,22 @@ class GameManager {
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
-      console.log('Updated look direction for all units after setting isRoomCreator');
+      console.log(
+        "Updated look direction for all units after setting isRoomCreator"
+      );
     } else {
-      console.log('DEBUG: roomInfo is null/undefined');
+      console.log("DEBUG: roomInfo is null/undefined");
     }
 
     // Create player with correct team based on room role
     const playerTeam = this.isRoomCreator ? 1 : 2;
     this.player = new Player({
       nickname: "Player1",
-      race: "neutral", // Use one of the races from races.json
+      race: "necropolis", // Use one of the races from races.json
       team: playerTeam,
       coins: 100,
     });
-    
+
     console.log(`Player created with team: ${playerTeam}`);
 
     this.interfaceManager.updatePlayerInterface(this.player);
@@ -229,7 +238,10 @@ class GameManager {
 
     while (this.accumulator >= this.fixedTimeStep) {
       // Оновлюємо анімації для всіх об'єктів незалежно від режиму
-      const allObjects = [...this.objectManager.objects, ...this.objectManager.enemyObjects];
+      const allObjects = [
+        ...this.objectManager.objects,
+        ...this.objectManager.enemyObjects,
+      ];
       for (const obj of allObjects) {
         if (obj.animator && !obj.animator.hasFinished) {
           obj.animator.nextFrame();
@@ -272,65 +284,69 @@ class GameManager {
   // Round timer management
   async startRoundTimer() {
     if (!this.objectManager.currentRoomId) {
-      console.warn('Cannot start round timer without room ID');
+      console.warn("Cannot start round timer without room ID");
       return;
     }
 
     // Завжди запускаємо серверний таймер (сервер сам перевірить чи потрібно)
     try {
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'start_round_timer',
+          action: "start_round_timer",
           room_id: this.objectManager.currentRoomId,
-          duration: this.roundDuration
-        })
+          duration: this.roundDuration,
+        }),
       });
 
       const result = await response.json();
       if (result.success) {
-        console.log('Server round timer started/synced:', result.duration, 'seconds');
+        console.log(
+          "Server round timer started/synced:",
+          result.duration,
+          "seconds"
+        );
       } else {
-        console.error('Failed to start server timer:', result.error);
+        console.error("Failed to start server timer:", result.error);
       }
     } catch (error) {
-      console.error('Error starting server timer:', error);
+      console.error("Error starting server timer:", error);
     }
-    
+
     // Після запуску серверного таймера - отримуємо актуальний стан
     await this.checkRoundStatus();
-    
+
     // В будь-якому разі запускаємо клієнтську синхронізацію
     if (!this.checkStatusInterval) {
-      console.log('DEBUG: Starting new checkStatusInterval');
+      console.log("DEBUG: Starting new checkStatusInterval");
       this.checkStatusInterval = setInterval(() => {
         this.checkRoundStatus();
       }, 1000);
     } else {
-      console.log('DEBUG: checkStatusInterval already exists');
+      console.log("DEBUG: checkStatusInterval already exists");
     }
   }
 
   async getRoundDuration() {
     try {
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'check_round_status',
-          room_id: this.objectManager.currentRoomId
-        })
+          action: "check_round_status",
+          room_id: this.objectManager.currentRoomId,
+        }),
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         this.roundDuration = result.round_time || 30;
         // Якщо є активний таймер - використовуємо серверний час
@@ -344,27 +360,27 @@ class GameManager {
         console.log(`Round duration set to: ${this.roundDuration} seconds`);
       }
     } catch (error) {
-      console.error('Error getting round duration:', error);
+      console.error("Error getting round duration:", error);
       this.roundTimeLeft = this.roundDuration; // Use default
     }
   }
 
   async checkRoundStatus() {
     try {
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'check_round_status',
-          room_id: this.objectManager.currentRoomId
-        })
+          action: "check_round_status",
+          room_id: this.objectManager.currentRoomId,
+        }),
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         // Тільки оновлюємо таймер якщо він активний І гра на паузі (режим розстановки)
         if (result.round_active && result.time_left > 0 && this.isPaused) {
@@ -372,105 +388,112 @@ class GameManager {
           this.isRoundActive = true;
           this.updateTimerDisplay();
         }
-        
+
         // Запускаємо гру тільки якщо обидва готові, гра на паузі і таймер активний
-        if (result.should_start_game && this.isPaused && result.player1_ready && result.player2_ready) {
-          console.log('DEBUG: All conditions met for game start:', {
+        if (
+          result.should_start_game &&
+          this.isPaused &&
+          result.player1_ready &&
+          result.player2_ready
+        ) {
+          console.log("DEBUG: All conditions met for game start:", {
             should_start_game: result.should_start_game,
             isPaused: this.isPaused,
             player1_ready: result.player1_ready,
-            player2_ready: result.player2_ready
+            player2_ready: result.player2_ready,
           });
-          console.log('Both players ready! Starting game logic...');
+          console.log("Both players ready! Starting game logic...");
           this.startGame();
         }
       }
     } catch (error) {
-      console.error('Error checking round status:', error);
+      console.error("Error checking round status:", error);
     }
   }
 
   handleTimeUp() {
-    console.log('Time is up! Auto-setting player as ready...');
-    
+    console.log("Time is up! Auto-setting player as ready...");
+
     // Mark round as inactive
     this.isRoundActive = false;
     this.roundTimeLeft = 0;
     this.updateTimerDisplay();
-    
+
     // Auto-set current player as ready
     this.setPlayerReady();
   }
 
   async setPlayerReady() {
     try {
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'set_ready',
-          room_id: this.objectManager.currentRoomId
-        })
+          action: "set_ready",
+          room_id: this.objectManager.currentRoomId,
+        }),
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
-        console.log('Player marked as ready');
+        console.log("Player marked as ready");
       }
     } catch (error) {
-      console.error('Error setting player ready:', error);
+      console.error("Error setting player ready:", error);
     }
   }
 
   updateTimerDisplay() {
     // Find timer element and update it
-    const timerElement = document.getElementById('round-timer');
+    const timerElement = document.getElementById("round-timer");
     if (timerElement) {
       const minutes = Math.floor(this.roundTimeLeft / 60);
       const seconds = this.roundTimeLeft % 60;
-      timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      
+      timerElement.textContent = `${minutes}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+
       // Add warning style when time is low
       if (this.roundTimeLeft <= 10) {
-        timerElement.classList.add('warning');
+        timerElement.classList.add("warning");
       } else {
-        timerElement.classList.remove('warning');
+        timerElement.classList.remove("warning");
       }
     }
   }
 
   // Start game logic when both players are ready
   async startGame() {
-    console.log('=== STARTING GAME LOGIC ===');
-    console.log('DEBUG: startGame called, isPaused:', this.isPaused);
-    console.trace('startGame call stack');
-    
+    console.log("=== STARTING GAME LOGIC ===");
+    console.log("DEBUG: startGame called, isPaused:", this.isPaused);
+    console.trace("startGame call stack");
+
     // Stop round placement timer and status checking
     if (this.checkStatusInterval) {
       clearInterval(this.checkStatusInterval);
       this.checkStatusInterval = null;
-      console.log('DEBUG: Stopped checkStatusInterval in startGame');
+      console.log("DEBUG: Stopped checkStatusInterval in startGame");
     }
-    
+
     // Stop any existing battle check interval to prevent double intervals
     if (this.battleCheckInterval) {
       clearInterval(this.battleCheckInterval);
       this.battleCheckInterval = null;
-      console.log('DEBUG: Stopped existing battleCheckInterval in startGame');
+      console.log("DEBUG: Stopped existing battleCheckInterval in startGame");
     }
-    
+
     this.isRoundActive = false;
     this.roundTimeLeft = 0;
     this.updateTimerDisplay(); // Візуально скидаємо таймер
-    
+
     // CRITICAL: Load all units from database to ensure synchronization
-    console.log('Loading latest units from database...');
+    console.log("Loading latest units from database...");
     await this.objectManager.loadObjects();
-    
+
     // Оновлюємо напрямок погляду після завантаження юнітів
     for (const unit of this.objectManager.objects) {
       unit.setLookDirectionByTeam();
@@ -478,14 +501,14 @@ class GameManager {
     for (const unit of this.objectManager.enemyObjects) {
       unit.setLookDirectionByTeam();
     }
-    
+
     // Save current player units and sync with enemy (ensures both players have same data)
     await this.objectManager.synchronizeAfterTurn();
-    console.log('Units synchronized. Starting game...');
-    
+    console.log("Units synchronized. Starting game...");
+
     // Unpause the game - existing logic in update() will handle the rest
     this.isPaused = false;
-    
+
     // Start checking for round end conditions (all units of one player dead)
     this.battleCheckInterval = setInterval(() => {
       this.checkBattleEnd();
@@ -493,51 +516,63 @@ class GameManager {
   }
 
   checkBattleEnd() {
-    const playerUnits = this.objectManager.objects.filter(obj => !obj.isDead);
-    const enemyUnits = this.objectManager.enemyObjects.filter(obj => !obj.isDead);
-    
+    const playerUnits = this.objectManager.objects.filter((obj) => !obj.isDead);
+    const enemyUnits = this.objectManager.enemyObjects.filter(
+      (obj) => !obj.isDead
+    );
+
     // Check if one team has no units left
     if (playerUnits.length === 0 || enemyUnits.length === 0) {
-      console.log(`Battle ended! Player units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`);
-      
+      console.log(
+        `Battle ended! Player units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`
+      );
+
       // Debug: Log unit teams to understand the distribution
-      console.log('Player units teams:', this.objectManager.objects.map(obj => obj.team));
-      console.log('Enemy units teams:', this.objectManager.enemyObjects.map(obj => obj.team));
-      
+      console.log(
+        "Player units teams:",
+        this.objectManager.objects.map((obj) => obj.team)
+      );
+      console.log(
+        "Enemy units teams:",
+        this.objectManager.enemyObjects.map((obj) => obj.team)
+      );
+
       // Stop battle checking
       if (this.battleCheckInterval) {
         clearInterval(this.battleCheckInterval);
         this.battleCheckInterval = null;
       }
-      
+
       // Determine winner based on which array has survivors
       let winnerId = null;
-      
+
       if (playerUnits.length > 0 && enemyUnits.length === 0) {
-        winnerId = 'current_player'; // Current player wins
+        winnerId = "current_player"; // Current player wins
       } else if (enemyUnits.length > 0 && playerUnits.length === 0) {
-        winnerId = 'other_player'; // Other player wins
+        winnerId = "other_player"; // Other player wins
       }
-      
-      console.log(`Winner determined: ${winnerId} (current player units: ${playerUnits.length}, enemy units: ${enemyUnits.length})`);
-      
+
+      console.log(
+        `Winner determined: ${winnerId} (current player units: ${playerUnits.length}, enemy units: ${enemyUnits.length})`
+      );
+
       // End the round with winner info
       this.endRound(winnerId);
     }
   }
 
   async endRound(winnerId = null) {
-    console.log('Round ended! Processing winner...');
-    
+    console.log("Round ended! Processing winner...");
+
     // НЕ зупиняємо checkStatusInterval - потрібна синхронізація з сервером
-    
+
     this.isRoundActive = false;
     this.roundTimeLeft = 0;
     this.updateTimerDisplay(); // Скидаємо таймер візуально
-    
+
     // Pause the game
     this.isPaused = true;
-    
+
     // Process round end and show winner modal
     await this.processRoundEnd(winnerId);
   }
@@ -546,32 +581,35 @@ class GameManager {
     // Get room players info to determine actual user ID
     const roomPlayers = await this.getRoomPlayers();
     if (!roomPlayers) {
-      console.error('Could not get room players info');
+      console.error("Could not get room players info");
       return;
     }
-    
+
     // Convert winner to user ID
     let actualWinnerId = null;
-    if (winnerId === 'current_player') {
+    if (winnerId === "current_player") {
       actualWinnerId = roomPlayers.current_user_id;
-    } else if (winnerId === 'other_player') {
+    } else if (winnerId === "other_player") {
       // Get the other player's ID
-      actualWinnerId = roomPlayers.creator_id === roomPlayers.current_user_id 
-        ? roomPlayers.second_player_id 
-        : roomPlayers.creator_id;
+      actualWinnerId =
+        roomPlayers.creator_id === roomPlayers.current_user_id
+          ? roomPlayers.second_player_id
+          : roomPlayers.creator_id;
     }
-    
-    console.log(`Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`);
-    
+
+    console.log(
+      `Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`
+    );
+
     // Only the winner should try to record the result
-    if (winnerId === 'current_player') {
-      console.log('I won! Recording result in database...');
+    if (winnerId === "current_player") {
+      console.log("I won! Recording result in database...");
       const incrementSuccess = await this.incrementRound(actualWinnerId);
       if (incrementSuccess) {
         await this.showWinnerModalAndContinue();
       }
     } else {
-      console.log('I lost. Waiting for winner to record result...');
+      console.log("I lost. Waiting for winner to record result...");
       // Wait a moment for the winner to record, then show modal
       setTimeout(async () => {
         await this.showWinnerModalAndContinue();
@@ -579,60 +617,62 @@ class GameManager {
     }
   }
 
-
-
   async getRoomPlayers() {
     try {
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'get_room_players',
-          room_id: this.objectManager.currentRoomId
-        })
+          action: "get_room_players",
+          room_id: this.objectManager.currentRoomId,
+        }),
       });
       const result = await response.json();
       return result.success ? result : null;
     } catch (error) {
-      console.error('Error getting room players:', error);
+      console.error("Error getting room players:", error);
       return null;
     }
   }
 
   async incrementRound(winnerId) {
     try {
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'increment_round',
+          action: "increment_round",
           room_id: this.objectManager.currentRoomId,
-          winner_id: winnerId
-        })
+          winner_id: winnerId,
+        }),
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Server error in incrementRound:', response.status, errorText);
+        console.error(
+          "Server error in incrementRound:",
+          response.status,
+          errorText
+        );
         return false;
       }
-      
+
       const result = await response.json();
       if (result.success) {
         console.log(`Round incremented to: ${result.new_round}`);
         return true;
       } else {
-        console.error('Failed to increment round:', result.error);
+        console.error("Failed to increment round:", result.error);
         return false;
       }
     } catch (error) {
-      console.error('Error incrementing round:', error);
+      console.error("Error incrementing round:", error);
       return false;
     }
   }
@@ -640,66 +680,72 @@ class GameManager {
   async showWinnerModalAndContinue() {
     try {
       // Get winner info from database
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'get_winner_info',
-          room_id: this.objectManager.currentRoomId
-        })
+          action: "get_winner_info",
+          room_id: this.objectManager.currentRoomId,
+        }),
       });
-      
+
       // Check if response is ok
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Server error:', response.status, errorText);
+        console.error("Server error:", response.status, errorText);
         return;
       }
-      
+
       // Try to parse JSON
       let result;
       try {
         const responseText = await response.text();
         result = JSON.parse(responseText);
       } catch (parseError) {
-        console.error('JSON parse error:', parseError);
+        console.error("JSON parse error:", parseError);
         return;
       }
-      
+
       if (result.success) {
         // Update modal content
-        const modal = document.getElementById('round-winner-modal');
-        const roundNumber = document.getElementById('round-number');
-        const winnerNickname = document.getElementById('winner-nickname');
-        
+        const modal = document.getElementById("round-winner-modal");
+        const roundNumber = document.getElementById("round-number");
+        const winnerNickname = document.getElementById("winner-nickname");
+
         roundNumber.textContent = `Раунд ${result.current_round}`;
-        winnerNickname.textContent = result.winner_nickname || 'Невідомий гравець';
-        
+        winnerNickname.textContent =
+          result.winner_nickname || "Невідомий гравець";
+
         // Show modal
-        modal.style.display = 'flex';
-        
+        modal.style.display = "flex";
+
         // Hide modal after 3 seconds and continue to next phase
         setTimeout(async () => {
-          console.log('Modal timeout finished, hiding and starting preparation...');
-          modal.style.display = 'none';
+          console.log(
+            "Modal timeout finished, hiding and starting preparation..."
+          );
+          modal.style.display = "none";
           await this.startNextRoundPreparation();
         }, 3000);
       }
     } catch (error) {
-      console.error('Error showing winner modal:', error);
+      console.error("Error showing winner modal:", error);
     }
   }
 
   async startNextRoundPreparation() {
-    console.log('Starting next round preparation...');
-    console.log('DEBUG: checkStatusInterval active?', !!this.checkStatusInterval);
-    
+    console.log("Starting next round preparation...");
+    console.log(
+      "DEBUG: checkStatusInterval active?",
+      !!this.checkStatusInterval
+    );
+
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
-    
+
     // Оновлюємо напрямок погляду для всіх юнітів на початку нового раунду
     for (const unit of this.objectManager.objects) {
       unit.setLookDirectionByTeam();
@@ -707,94 +753,98 @@ class GameManager {
     for (const unit of this.objectManager.enemyObjects) {
       unit.setLookDirectionByTeam();
     }
-    console.log('Updated look direction for all units for new round preparation');
-    
+    console.log(
+      "Updated look direction for all units for new round preparation"
+    );
+
     // Reset ready status for new round
     await this.resetReadyStatus();
-    
+
     // Wait 1 second for ready status reset to propagate to database
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Waited for ready status reset to complete');
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log("Waited for ready status reset to complete");
+
     // Get round duration from server before starting timer
     await this.getRoundDuration();
-    
+
     // Start new round timer
     await this.startRoundTimer();
   }
 
   async resetUnitsToStartingPositions() {
-    console.log('=== RESETTING UNITS TO STARTING POSITIONS ===');
-    console.log(`Player units before reset: ${this.objectManager.objects.length}`);
-    console.log(`Enemy units before reset: ${this.objectManager.enemyObjects.length}`);
-    
+    console.log("=== RESETTING UNITS TO STARTING POSITIONS ===");
+    console.log(
+      `Player units before reset: ${this.objectManager.objects.length}`
+    );
+    console.log(
+      `Enemy units before reset: ${this.objectManager.enemyObjects.length}`
+    );
+
     // Reset ALL player units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.objects) {
       // Store current position before resetting
       const currentPos = `[${unit.gridCol}, ${unit.gridRow}]`;
-      
+
       // Reset to original starting position
       unit.gridCol = unit.startingGridCol;
       unit.gridRow = unit.startingGridRow;
-      
+
       // Reset health and other stats to full (resurrect if dead)
       unit.isDead = false;
       unit.currentHealth = unit.maxHealth;
       unit.moveTarget = null;
       unit.attackTarget = null;
-      
+
       // Force update visual position from grid coordinates
       unit.updatePositionFromGrid();
-      
+
       // Reset animation to idle
       if (unit.animator) {
-        unit.animator.setAnimation('idle', true);
+        unit.animator.setAnimation("idle", true);
       }
-      
+
       // Встановлюємо правильний напрямок погляду відповідно до команди
       unit.setLookDirectionByTeam();
-      
-
     }
-    
+
     // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.enemyObjects) {
       // Store current position before resetting
       const currentPos = `[${unit.gridCol}, ${unit.gridRow}]`;
-      
+
       // Reset to original starting position
       unit.gridCol = unit.startingGridCol;
       unit.gridRow = unit.startingGridRow;
-      
+
       // Reset health and other stats to full (resurrect if dead)
       unit.isDead = false;
       unit.currentHealth = unit.maxHealth;
       unit.moveTarget = null;
       unit.attackTarget = null;
-      
+
       // Force update visual position from grid coordinates
       unit.updatePositionFromGrid();
-      
+
       // Reset animation to idle
       if (unit.animator) {
-        unit.animator.setAnimation('idle', true);
+        unit.animator.setAnimation("idle", true);
       }
-      
+
       // Встановлюємо правильний напрямок погляду відповідно до команди
       unit.setLookDirectionByTeam();
-      
-
     }
-    
+
     // Update grid after position reset and resurrection
     this.objectManager.updateGridWithAllObjects();
-    console.log('All units moved back to their original starting positions and resurrected with full health');
-    
+    console.log(
+      "All units moved back to their original starting positions and resurrected with full health"
+    );
+
     // Force clear canvas and re-render everything
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Force multiple renders to ensure positions update
     this.render();
     setTimeout(() => {
@@ -802,7 +852,7 @@ class GameManager {
     }, 100);
     setTimeout(() => {
       this.render();
-      
+
       // Ще раз оновлюємо напрямок погляду після всіх рендерів
       for (const unit of this.objectManager.objects) {
         unit.setLookDirectionByTeam();
@@ -810,28 +860,28 @@ class GameManager {
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
-      console.log('Final look direction update after renders');
+      console.log("Final look direction update after renders");
     }, 200);
-    
+
     // Save the reset state to database
     await this.objectManager.saveObjects();
-    console.log('=== RESET COMPLETE ===');
+    console.log("=== RESET COMPLETE ===");
   }
 
   // Check if player can place unit at given position (considering unit size)
   canPlaceUnitAt(gridCol, gridRow, unitConfig) {
     const gridCols = this.gridManager.cols; // Total columns
     const midpoint = Math.floor(gridCols / 2); // Middle of the map
-    
+
     // Get unit dimensions
     const gridWidth = unitConfig?.gridWidth || 1;
     const gridHeight = unitConfig?.gridHeight || 1;
     const expansionDirection = unitConfig?.expansionDirection || "bottomRight";
-    
+
     // Calculate all cells the unit will occupy
     let startCol = gridCol;
     let endCol = gridCol;
-    
+
     switch (expansionDirection) {
       case "topLeft":
         startCol = gridCol - (gridWidth - 1);
@@ -851,7 +901,7 @@ class GameManager {
         endCol = gridCol + (gridWidth - 1);
         break;
     }
-    
+
     // Check if ALL occupied cells are in the correct zone
     if (this.isRoomCreator) {
       // Host (creator) can only place units in left half
@@ -868,64 +918,64 @@ class GameManager {
   getPlacementZoneInfo() {
     const gridCols = this.gridManager.cols;
     const midpoint = Math.floor(gridCols / 2);
-    
+
     if (this.isRoomCreator) {
       return {
         minCol: 0,
         maxCol: midpoint - 1,
-        side: 'left'
+        side: "left",
       };
     } else {
       return {
         minCol: midpoint,
         maxCol: gridCols - 1,
-        side: 'right'
+        side: "right",
       };
     }
   }
 
   async pauseForNextRound() {
-    console.log('Pausing for next round...');
-    
+    console.log("Pausing for next round...");
+
     // Pause the game
     this.isPaused = true;
-    
+
     // Reset ready status for new round
     await this.resetReadyStatus();
-    
+
     // Start new round timer
     await this.startRoundTimer();
   }
 
   async resetReadyStatus() {
     try {
-      const response = await fetch('../server/room.php', {
-        method: 'POST',
+      const response = await fetch("../server/room.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
-          action: 'reset_ready_status',
-          room_id: this.objectManager.currentRoomId
-        })
+          action: "reset_ready_status",
+          room_id: this.objectManager.currentRoomId,
+        }),
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
-        console.log('Ready status reset for new round');
-        
+        console.log("Ready status reset for new round");
+
         // Reset UI button
-        const readyButton = document.getElementById('ready-button');
+        const readyButton = document.getElementById("ready-button");
         if (readyButton) {
           readyButton.disabled = false;
-          readyButton.textContent = 'ГОТОВИЙ';
-          readyButton.style.backgroundColor = '';
+          readyButton.textContent = "ГОТОВИЙ";
+          readyButton.style.backgroundColor = "";
         }
       }
     } catch (error) {
-      console.error('Error resetting ready status:', error);
+      console.error("Error resetting ready status:", error);
     }
   }
 }
