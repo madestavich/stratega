@@ -168,5 +168,10 @@ export class GameObject {
         this.lookDirection = { dx: 1, dy: 0 };
       }
     }
+    
+    // Логування для дебагу
+    if (this.objectType === 'skeleton') {
+      console.log(`DEBUG skeleton: team=${this.team}, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(this.lookDirection)}`);
+    }
   }
 }
