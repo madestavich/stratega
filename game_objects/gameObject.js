@@ -166,14 +166,18 @@ export class GameObject {
     }
 
     const isRoomCreator = gameManager.isRoomCreator;
+    
+    console.log(`DEBUG ${this.objectType}: isRoomCreator check: ${isRoomCreator} (type: ${typeof isRoomCreator})`);
 
     if (isRoomCreator) {
+      console.log(`DEBUG ${this.objectType}: TAKING isRoomCreator=true branch`);
       if (this.team === 1) {
         this.lookDirection = { dx: 1, dy: 0 };
       } else if (this.team === 2) {
         this.lookDirection = { dx: -1, dy: 0 };
       }
     } else {
+      console.log(`DEBUG ${this.objectType}: TAKING isRoomCreator=false branch`);
       if (this.team === 1) {
         this.lookDirection = { dx: -1, dy: 0 };
       } else if (this.team === 2) {
