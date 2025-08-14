@@ -128,12 +128,7 @@ class GameManager {
         this.isRoomCreator
       );
       // Оновлюємо напрямок погляду для всіх юнітів після визначення ролі
-      for (const unit of this.objectManager.objects) {
-        unit.setLookDirectionByTeam();
-      }
-      for (const unit of this.objectManager.enemyObjects) {
-        unit.setLookDirectionByTeam();
-      }
+      // Напрямок погляду юнітів не змінюється при старті симуляції
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
     }
