@@ -128,12 +128,7 @@ class GameManager {
         this.isRoomCreator
       );
 
-      for (const unit of this.objectManager.objects) {
-        unit.setLookDirectionByTeam();
-      }
-      for (const unit of this.objectManager.enemyObjects) {
-        unit.setLookDirectionByTeam();
-      }
+      // Напрямок погляду буде встановлено після завантаження юнітів з бази
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
     }
@@ -472,13 +467,7 @@ class GameManager {
     console.log("Loading latest units from database...");
     await this.objectManager.loadObjects();
 
-    // Оновлюємо напрямок погляду після завантаження юнітів
-    for (const unit of this.objectManager.objects) {
-      unit.setLookDirectionByTeam();
-    }
-    for (const unit of this.objectManager.enemyObjects) {
-      unit.setLookDirectionByTeam();
-    }
+    // Напрямок погляду буде встановлено після синхронізації
 
     // Save current player units and sync with enemy (ensures both players have same data)
     await this.objectManager.synchronizeAfterTurn();
@@ -707,13 +696,7 @@ class GameManager {
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
 
-    // Оновлюємо напрямок погляду для всіх юнітів на початку нового раунду
-    for (const unit of this.objectManager.objects) {
-      unit.setLookDirectionByTeam();
-    }
-    for (const unit of this.objectManager.enemyObjects) {
-      unit.setLookDirectionByTeam();
-    }
+    // Напрямок погляду буде встановлено після ресету позицій
 
     // Reset ready status for new round
     await this.resetReadyStatus();
@@ -796,13 +779,7 @@ class GameManager {
     setTimeout(() => {
       this.render();
 
-      // Ще раз оновлюємо напрямок погляду після всіх рендерів
-      for (const unit of this.objectManager.objects) {
-        unit.setLookDirectionByTeam();
-      }
-      for (const unit of this.objectManager.enemyObjects) {
-        unit.setLookDirectionByTeam();
-      }
+      // Додатковий виклик не потрібен
     }, 200);
 
     // Save the reset state to database
