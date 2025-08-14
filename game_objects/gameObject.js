@@ -48,7 +48,7 @@ export class GameObject {
     // Extract size and expansion parameters from objectConfig
     this.gridWidth = objectConfig.gridWidth || 1;
     this.gridHeight = objectConfig.gridHeight || 1;
-    this.expansionDirection = objectConfig.expansionDirection || "bottomLeft";
+    this.expansionDirection = objectConfig.expansionDirection || "bottomRight";
 
     const defaultSpritesheetId = Object.keys(spriteConfig)[0];
 
