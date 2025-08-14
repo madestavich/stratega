@@ -141,16 +141,13 @@ class GameManager {
         this.isRoomCreator
       );
 
-      // // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
-      // for (const unit of this.objectManager.objects) {
-      //   unit.setLookDirectionByTeam();
-      // }
-      // for (const unit of this.objectManager.enemyObjects) {
-      //   unit.setLookDirectionByTeam();
-      // }
-      // console.log(
-      //   "Updated look direction for all units after setting isRoomCreator"
-      // );
+      // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
+      for (const unit of this.objectManager.objects) {
+        unit.setLookDirectionByTeam();
+      }
+      for (const unit of this.objectManager.enemyObjects) {
+        unit.setLookDirectionByTeam();
+      }
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
     }
@@ -772,9 +769,6 @@ class GameManager {
 
     // Reset ALL player units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.objects) {
-      // Store current position before resetting
-      const currentPos = `[${unit.gridCol}, ${unit.gridRow}]`;
-
       // Reset to original starting position
       unit.gridCol = unit.startingGridCol;
       unit.gridRow = unit.startingGridRow;
@@ -799,9 +793,6 @@ class GameManager {
 
     // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.enemyObjects) {
-      // Store current position before resetting
-      const currentPos = `[${unit.gridCol}, ${unit.gridRow}]`;
-
       // Reset to original starting position
       unit.gridCol = unit.startingGridCol;
       unit.gridRow = unit.startingGridRow;
