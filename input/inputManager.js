@@ -267,27 +267,14 @@ export class InputManager {
         "isRoomCreator",
         this.gameManager.isRoomCreator
       );
-      const newUnit = await this.gameManager.objectManager.createObject(
+      await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
         this.gameManager.player.team,
         gridCoords.col,
         gridCoords.row
       );
-      // Встановлюємо напрямок погляду відповідно до команди
-      if (newUnit) {
-        newUnit.setLookDirectionByTeam();
-        console.log(
-          "DEBUG: setLookDirectionByTeam",
-          newUnit.team,
-          window.gameManager.isRoomCreator,
-          newUnit.lookDirection
-        );
-        // Оновити напрямок погляду для всіх юнітів поточного гравця
-        this.gameManager.objectManager.objects.forEach((obj) =>
-          obj.setLookDirectionByTeam()
-        );
-      }
+
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection
       this.gameManager.objectManager.updateGridWithAllObjects();
       // Save units to database immediately after creating new unit
