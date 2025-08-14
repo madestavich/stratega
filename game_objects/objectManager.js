@@ -233,13 +233,7 @@ export class ObjectManager {
         `Game initialized with ${this.objects.length} player units and ${this.enemyObjects.length} enemy units`
       );
 
-      // Встановлюємо правильний напрямок погляду для всіх завантажених юнітів
-      for (const unit of this.objects) {
-        unit.setLookDirectionByTeam();
-      }
-      for (const unit of this.enemyObjects) {
-        unit.setLookDirectionByTeam();
-      }
+      // Напрямок погляду буде встановлено у gameManager після визначення ролі
 
       // Update grid with loaded objects
       this.updateGridWithAllObjects();
