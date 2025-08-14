@@ -31,7 +31,7 @@ class GameManager {
     this.isRoundActive = false;
     this.checkStatusInterval = null;
     this.isPaused = true; // Game starts paused during unit placement
-    this.isRoomCreator = false; // Will be set during initialization
+    this.isRoomCreator; // Will be set during initialization
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -141,16 +141,16 @@ class GameManager {
         this.isRoomCreator
       );
 
-      // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
-      for (const unit of this.objectManager.objects) {
-        unit.setLookDirectionByTeam();
-      }
-      for (const unit of this.objectManager.enemyObjects) {
-        unit.setLookDirectionByTeam();
-      }
-      console.log(
-        "Updated look direction for all units after setting isRoomCreator"
-      );
+      // // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
+      // for (const unit of this.objectManager.objects) {
+      //   unit.setLookDirectionByTeam();
+      // }
+      // for (const unit of this.objectManager.enemyObjects) {
+      //   unit.setLookDirectionByTeam();
+      // }
+      // console.log(
+      //   "Updated look direction for all units after setting isRoomCreator"
+      // );
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
     }
@@ -525,16 +525,6 @@ class GameManager {
     if (playerUnits.length === 0 || enemyUnits.length === 0) {
       console.log(
         `Battle ended! Player units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`
-      );
-
-      // Debug: Log unit teams to understand the distribution
-      console.log(
-        "Player units teams:",
-        this.objectManager.objects.map((obj) => obj.team)
-      );
-      console.log(
-        "Enemy units teams:",
-        this.objectManager.enemyObjects.map((obj) => obj.team)
       );
 
       // Stop battle checking
