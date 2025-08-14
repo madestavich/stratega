@@ -165,9 +165,9 @@ export class GameObject {
       }
     } else {
       if (this.team === 1) {
-        this.lookDirection = { dx: -1, dy: 0 };
-      } else if (this.team === 2) {
         this.lookDirection = { dx: 1, dy: 0 };
+      } else if (this.team === 2) {
+        this.lookDirection = { dx: -1, dy: 0 };
       }
     }
     
