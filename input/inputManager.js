@@ -251,6 +251,7 @@ export class InputManager {
         return; // Виходимо з функції, не створюючи юніта
       }
 
+      console.log(`DEBUG creating unit: player.team=${this.gameManager.player?.team}, isRoomCreator=${this.gameManager.isRoomCreator}`);
       await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
