@@ -159,9 +159,6 @@ export class GameObject {
       gameManager.isRoomCreator === undefined ||
       gameManager.isRoomCreator === null
     ) {
-      console.log(
-        `DEBUG: gameManager not ready, isRoomCreator=${gameManager?.isRoomCreator}`
-      );
       return;
     }
 
