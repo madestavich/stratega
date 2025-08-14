@@ -152,7 +152,14 @@ export class GameObject {
     this.moveDirection = null;
 
     const gameManager = window.gameManager;
-    const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
+    
+    // Якщо gameManager ще не готовий або isRoomCreator ще не встановлений - відкладаємо
+    if (!gameManager || gameManager.isRoomCreator === undefined || gameManager.isRoomCreator === null) {
+      console.log(`DEBUG: gameManager not ready, isRoomCreator=${gameManager?.isRoomCreator}`);
+      return;
+    }
+    
+    const isRoomCreator = gameManager.isRoomCreator;
 
     if (isRoomCreator) {
       if (this.team === 1) {

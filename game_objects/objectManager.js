@@ -48,7 +48,14 @@ export class ObjectManager {
     this.objects.push(obj);
 
     // Ensure correct look direction after gameManager is fully initialized
+    // Якщо gameManager ще не готовий, спробуємо через 100мс
     obj.setLookDirectionByTeam();
+    if (!obj.lookDirection) {
+      setTimeout(() => {
+        obj.setLookDirectionByTeam();
+        console.log(`Delayed setLookDirectionByTeam for ${obj.objectType}`);
+      }, 100);
+    }
 
     // Auto-save to database after creating object
     if (this.currentRoomId) {
