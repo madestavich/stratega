@@ -735,8 +735,7 @@ class GameManager {
         unit.animator.setAnimation("idle", true);
       }
 
-      // Встановлюємо правильний напрямок погляду відповідно до команди
-      unit.setLookDirectionByTeam();
+  // Напрямок погляду встановлюється лише після визначення ролі у старті гри
     }
 
     // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
@@ -759,8 +758,7 @@ class GameManager {
         unit.animator.setAnimation("idle", true);
       }
 
-      // Встановлюємо правильний напрямок погляду відповідно до команди
-      unit.setLookDirectionByTeam();
+  // Напрямок погляду встановлюється лише після визначення ролі у старті гри
     }
 
     // Update grid after position reset and resurrection
