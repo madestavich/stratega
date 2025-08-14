@@ -11,7 +11,7 @@ export class Renderer {
     this.ctx.save();
 
     // Визначаємо напрямок відображення (може бути moveDirection або lookDirection)
-    const flipHorizontal = direction < 0;
+    const flipHorizontal = direction && direction.dx < 0;
 
     // Переміщуємо точку відліку до центру кадру
     const centerOffsetX = f.frameCenter.x - f.x;
