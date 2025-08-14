@@ -127,14 +127,13 @@ class GameManager {
         "DEBUG: gameManager.isRoomCreator set to:",
         this.isRoomCreator
       );
-      // Оновлюємо напрямок погляду для всіх юнітів після визначення ролі
+
       for (const unit of this.objectManager.objects) {
         unit.setLookDirectionByTeam();
       }
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
-      // Напрямок погляду юнітів не змінюється при старті симуляції
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
     }
@@ -473,6 +472,14 @@ class GameManager {
     console.log("Loading latest units from database...");
     await this.objectManager.loadObjects();
 
+    // Оновлюємо напрямок погляду після завантаження юнітів
+    for (const unit of this.objectManager.objects) {
+      unit.setLookDirectionByTeam();
+    }
+    for (const unit of this.objectManager.enemyObjects) {
+      unit.setLookDirectionByTeam();
+    }
+
     // Save current player units and sync with enemy (ensures both players have same data)
     await this.objectManager.synchronizeAfterTurn();
     console.log("Units synchronized. Starting game...");
@@ -700,7 +707,13 @@ class GameManager {
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
 
-    // Напрямок погляду буде встановлено після ресету позицій
+    // Оновлюємо напрямок погляду для всіх юнітів на початку нового раунду
+    for (const unit of this.objectManager.objects) {
+      unit.setLookDirectionByTeam();
+    }
+    for (const unit of this.objectManager.enemyObjects) {
+      unit.setLookDirectionByTeam();
+    }
 
     // Reset ready status for new round
     await this.resetReadyStatus();
@@ -736,7 +749,8 @@ class GameManager {
         unit.animator.setAnimation("idle", true);
       }
 
-      // Напрямок погляду встановлюється лише після визначення ролі у старті гри
+      // Встановлюємо правильний напрямок погляду відповідно до команди
+      unit.setLookDirectionByTeam();
     }
 
     // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
@@ -759,7 +773,8 @@ class GameManager {
         unit.animator.setAnimation("idle", true);
       }
 
-      // Напрямок погляду встановлюється лише після визначення ролі у старті гри
+      // Встановлюємо правильний напрямок погляду відповідно до команди
+      unit.setLookDirectionByTeam();
     }
 
     // Update grid after position reset and resurrection
@@ -781,7 +796,13 @@ class GameManager {
     setTimeout(() => {
       this.render();
 
-      // Додатковий виклик не потрібен
+      // Ще раз оновлюємо напрямок погляду після всіх рендерів
+      for (const unit of this.objectManager.objects) {
+        unit.setLookDirectionByTeam();
+      }
+      for (const unit of this.objectManager.enemyObjects) {
+        unit.setLookDirectionByTeam();
+      }
     }, 200);
 
     // Save the reset state to database
