@@ -262,6 +262,15 @@ export class InputManager {
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection
       this.gameManager.objectManager.updateGridWithAllObjects();
       
+      // Update look direction for all units after creating new unit
+      for (const unit of this.gameManager.objectManager.objects) {
+        unit.setLookDirectionByTeam();
+      }
+      for (const unit of this.gameManager.objectManager.enemyObjects) {
+        unit.setLookDirectionByTeam();
+      }
+      console.log("Updated look direction for all units after creating new unit");
+      
       // Save units to database immediately after creating new unit
       await this.gameManager.objectManager.saveObjects();
       console.log("New unit saved to database for synchronization");
