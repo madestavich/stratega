@@ -64,7 +64,9 @@ export class GameObject {
     this.updatePositionFromGrid();
 
     // Встановлюємо початковий напрямок при створенні
+    this.justCreated = true; // Флаг для логування тільки при створенні
     this.setLookDirectionByTeam();
+    this.justCreated = false;
   }
 
   update() {
@@ -169,9 +171,9 @@ export class GameObject {
       }
     }
     
-    // Логування для дебагу
-    if (this.objectType === 'skeleton') {
-      console.log(`DEBUG skeleton: team=${this.team}, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(this.lookDirection)}`);
+    // Логування для дебагу тільки при створенні нового юніта
+    if (this.objectType === 'skeleton' && this.justCreated) {
+      console.log(`DEBUG skeleton CREATED: team=${this.team}, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(this.lookDirection)}`);
     }
   }
 }

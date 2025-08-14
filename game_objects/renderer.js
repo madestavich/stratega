@@ -12,11 +12,6 @@ export class Renderer {
 
     // Визначаємо напрямок відображення (може бути moveDirection або lookDirection)
     const flipHorizontal = direction && direction.dx < 0;
-    
-    // Логування для дебагу skeleton
-    if (this.animator?.activeSpritesheet?.name === 'skeleton') {
-      console.log(`DEBUG skeleton render: direction=${JSON.stringify(direction)}, flipHorizontal=${flipHorizontal}`);
-    }
 
     // Переміщуємо точку відліку до центру кадру
     const centerOffsetX = f.frameCenter.x - f.x;
