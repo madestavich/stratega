@@ -20,7 +20,7 @@ export class GameObject {
     this.lookDirection = null; // Напрямок огляду
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
     this.availableActions = objectConfig.availableActions || []; // Доступні дії
-    this.team = objectConfig.team || 1; // Команда об'єкта
+    this.team = objectConfig.team; // Команда об'єкта
     this.isAttacking = false; // Чи об'єкт атакує
     this.attackTarget = null; // Ціль для атаки
     this.attackRange = objectConfig.attackRange || 1; // Діапазон атаки
