@@ -155,17 +155,9 @@ export class GameObject {
     const isRoomCreator = gameManager ? gameManager.isRoomCreator : true;
 
     if (isRoomCreator) {
-      if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 };
-      } else if (this.team === 2) {
-        this.lookDirection = { dx: -1, dy: 0 };
-      }
+      this.lookDirection = { dx: 1, dy: 0 };
     } else {
-      if (this.team === 1) {
-        this.lookDirection = { dx: -1, dy: 0 };
-      } else if (this.team === 2) {
-        this.lookDirection = { dx: 1, dy: 0 };
-      }
+      this.lookDirection = { dx: -1, dy: 0 };
     }
   }
 }
