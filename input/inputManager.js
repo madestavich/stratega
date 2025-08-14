@@ -261,19 +261,16 @@ export class InputManager {
         return; // Виходимо з функції, не створюючи юніта
       }
 
-      console.log(
-        "DEBUG: team",
-        this.gameManager.player.team,
-        "isRoomCreator",
-        this.gameManager.isRoomCreator
-      );
-      await this.gameManager.objectManager.createObject(
+      const newUnit = await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
         1, // завжди 1 для своїх юнітів
         gridCoords.col,
         gridCoords.row
       );
+      if (newUnit) {
+        newUnit.setLookDirectionByTeam();
+      }
 
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection
       this.gameManager.objectManager.updateGridWithAllObjects();
