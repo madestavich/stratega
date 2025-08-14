@@ -68,30 +68,17 @@ class GameManager {
     this.start();
   }
 
-  logGameObjects() {
-    const timestamp = new Date().toLocaleTimeString();
-    console.log(
-      `%c ${timestamp} `,
-      "background: #000; color:rgb(212, 194, 27); font-size: 14px;"
-    );
-    console.log(this.objectManager.objects);
-  }
-
   toggleDebugMode() {
     this.debugMode = !this.debugMode;
 
     if (this.debugMode) {
       console.log(
-        "%c Debug mode enabled. Objects will be logged every second.",
+        "%c Debug mode enabled.",
         "background: #222; color:rgb(47, 201, 9); font-size: 14px;"
       );
-      console.log("Scroll down to see detailed object information.");
 
       // Оновлюємо сітку одразу при включенні режиму дебагу
       this.gridManager.updateGridObjects(this.objectManager);
-
-      this.debugInterval = setInterval(() => this.logGameObjects(), 2000);
-      this.logGameObjects();
     } else {
       console.log(
         "%c Debug mode disabled.",
@@ -141,8 +128,6 @@ class GameManager {
         this.isRoomCreator
       );
 
-      // Оновлюємо напрямок погляду для всіх юнітів після встановлення isRoomCreator
-      console.log(`About to update look direction for ${this.objectManager.objects.length} player units and ${this.objectManager.enemyObjects.length} enemy units`);
       for (const unit of this.objectManager.objects) {
         unit.setLookDirectionByTeam();
       }
@@ -320,12 +305,9 @@ class GameManager {
 
     // В будь-якому разі запускаємо клієнтську синхронізацію
     if (!this.checkStatusInterval) {
-      console.log("DEBUG: Starting new checkStatusInterval");
       this.checkStatusInterval = setInterval(() => {
         this.checkRoundStatus();
       }, 1000);
-    } else {
-      console.log("DEBUG: checkStatusInterval already exists");
     }
   }
 
@@ -355,10 +337,8 @@ class GameManager {
           this.roundTimeLeft = this.roundDuration;
           this.isRoundActive = false;
         }
-        console.log(`Round duration set to: ${this.roundDuration} seconds`);
       }
     } catch (error) {
-      console.error("Error getting round duration:", error);
       this.roundTimeLeft = this.roundDuration; // Use default
     }
   }
@@ -712,9 +692,6 @@ class GameManager {
 
         // Hide modal after 3 seconds and continue to next phase
         setTimeout(async () => {
-          console.log(
-            "Modal timeout finished, hiding and starting preparation..."
-          );
           modal.style.display = "none";
           await this.startNextRoundPreparation();
         }, 3000);
@@ -726,10 +703,6 @@ class GameManager {
 
   async startNextRoundPreparation() {
     console.log("Starting next round preparation...");
-    console.log(
-      "DEBUG: checkStatusInterval active?",
-      !!this.checkStatusInterval
-    );
 
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
@@ -741,16 +714,12 @@ class GameManager {
     for (const unit of this.objectManager.enemyObjects) {
       unit.setLookDirectionByTeam();
     }
-    console.log(
-      "Updated look direction for all units for new round preparation"
-    );
 
     // Reset ready status for new round
     await this.resetReadyStatus();
 
     // Wait 1 second for ready status reset to propagate to database
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Waited for ready status reset to complete");
 
     // Get round duration from server before starting timer
     await this.getRoundDuration();
@@ -760,14 +729,6 @@ class GameManager {
   }
 
   async resetUnitsToStartingPositions() {
-    console.log("=== RESETTING UNITS TO STARTING POSITIONS ===");
-    console.log(
-      `Player units before reset: ${this.objectManager.objects.length}`
-    );
-    console.log(
-      `Enemy units before reset: ${this.objectManager.enemyObjects.length}`
-    );
-
     // Reset ALL player units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.objects) {
       // Reset to original starting position
@@ -842,7 +803,6 @@ class GameManager {
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
-      console.log("Final look direction update after renders");
     }, 200);
 
     // Save the reset state to database
@@ -851,50 +811,50 @@ class GameManager {
   }
 
   // Check if player can place unit at given position (considering unit size)
-  canPlaceUnitAt(gridCol, gridRow, unitConfig) {
-    const gridCols = this.gridManager.cols; // Total columns
-    const midpoint = Math.floor(gridCols / 2); // Middle of the map
+  // canPlaceUnitAt(gridCol, gridRow, unitConfig) {
+  //   const gridCols = this.gridManager.cols; // Total columns
+  //   const midpoint = Math.floor(gridCols / 2); // Middle of the map
 
-    // Get unit dimensions
-    const gridWidth = unitConfig?.gridWidth || 1;
-    const gridHeight = unitConfig?.gridHeight || 1;
-    const expansionDirection = unitConfig?.expansionDirection || "bottomRight";
+  //   // Get unit dimensions
+  //   const gridWidth = unitConfig?.gridWidth || 1;
+  //   const gridHeight = unitConfig?.gridHeight || 1;
+  //   const expansionDirection = unitConfig?.expansionDirection || "bottomRight";
 
-    // Calculate all cells the unit will occupy
-    let startCol = gridCol;
-    let endCol = gridCol;
+  //   // Calculate all cells the unit will occupy
+  //   let startCol = gridCol;
+  //   let endCol = gridCol;
 
-    switch (expansionDirection) {
-      case "topLeft":
-        startCol = gridCol - (gridWidth - 1);
-        endCol = gridCol;
-        break;
-      case "topRight":
-        startCol = gridCol;
-        endCol = gridCol + (gridWidth - 1);
-        break;
-      case "bottomLeft":
-        startCol = gridCol - (gridWidth - 1);
-        endCol = gridCol;
-        break;
-      case "bottomRight":
-      default:
-        startCol = gridCol;
-        endCol = gridCol + (gridWidth - 1);
-        break;
-    }
+  //   switch (expansionDirection) {
+  //     case "topLeft":
+  //       startCol = gridCol - (gridWidth - 1);
+  //       endCol = gridCol;
+  //       break;
+  //     case "topRight":
+  //       startCol = gridCol;
+  //       endCol = gridCol + (gridWidth - 1);
+  //       break;
+  //     case "bottomLeft":
+  //       startCol = gridCol - (gridWidth - 1);
+  //       endCol = gridCol;
+  //       break;
+  //     case "bottomRight":
+  //     default:
+  //       startCol = gridCol;
+  //       endCol = gridCol + (gridWidth - 1);
+  //       break;
+  //   }
 
-    // Check if ALL occupied cells are in the correct zone
-    if (this.isRoomCreator) {
-      // Host (creator) can only place units in left half
-      // All cells must be < midpoint
-      return endCol < midpoint;
-    } else {
-      // Guest (player 2) can only place units in right half
-      // All cells must be >= midpoint
-      return startCol >= midpoint;
-    }
-  }
+  //   // Check if ALL occupied cells are in the correct zone
+  //   if (this.isRoomCreator) {
+  //     // Host (creator) can only place units in left half
+  //     // All cells must be < midpoint
+  //     return endCol < midpoint;
+  //   } else {
+  //     // Guest (player 2) can only place units in right half
+  //     // All cells must be >= midpoint
+  //     return startCol >= midpoint;
+  //   }
+  // }
 
   // Get allowed placement zone info for UI feedback
   getPlacementZoneInfo() {

@@ -167,46 +167,18 @@ export class GameObject {
 
     const isRoomCreator = gameManager.isRoomCreator;
 
-    console.log(
-      `DEBUG ${
-        this.objectType
-      }: isRoomCreator check: ${isRoomCreator} (type: ${typeof isRoomCreator})`
-    );
-
     if (isRoomCreator) {
-      console.log(`DEBUG ${this.objectType}: TAKING isRoomCreator=true branch`);
       if (this.team === 1) {
         this.lookDirection = { dx: 1, dy: 0 };
       } else if (this.team === 2) {
         this.lookDirection = { dx: -1, dy: 0 };
       }
     } else {
-      console.log(
-        `DEBUG ${this.objectType}: TAKING isRoomCreator=false branch`
-      );
       if (this.team === 1) {
         this.lookDirection = { dx: -1, dy: 0 };
       } else if (this.team === 2) {
         this.lookDirection = { dx: 1, dy: 0 };
       }
     }
-
-    // Логування для всіх нових юнітів
-    console.log(
-      `DEBUG ${this.objectType}: team=${
-        this.team
-      }, isRoomCreator=${isRoomCreator}, lookDirection=${JSON.stringify(
-        this.lookDirection
-      )}`
-    );
-
-    // Додаткова перевірка через 1 секунду
-    setTimeout(() => {
-      console.log(
-        `DEBUG ${this.objectType} AFTER 1s: lookDirection=${JSON.stringify(
-          this.lookDirection
-        )}`
-      );
-    }, 1000);
   }
 }
