@@ -283,6 +283,10 @@ export class InputManager {
           window.gameManager.isRoomCreator,
           newUnit.lookDirection
         );
+        // Оновити напрямок погляду для всіх юнітів поточного гравця
+        this.gameManager.objectManager.objects.forEach((obj) =>
+          obj.setLookDirectionByTeam()
+        );
       }
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection
       this.gameManager.objectManager.updateGridWithAllObjects();
