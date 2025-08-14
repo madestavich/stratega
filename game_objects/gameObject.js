@@ -161,13 +161,18 @@ export class GameObject {
     
     const isRoomCreator = gameManager.isRoomCreator;
 
-    // Незалежно від того хто створює кімнату:
-    // Команда 1 завжди дивиться вправо (на команду 2)
-    // Команда 2 завжди дивиться вліво (на команду 1)
-    if (this.team === 1) {
-      this.lookDirection = { dx: 1, dy: 0 };
-    } else if (this.team === 2) {
-      this.lookDirection = { dx: -1, dy: 0 };
+    if (isRoomCreator) {
+      if (this.team === 1) {
+        this.lookDirection = { dx: 1, dy: 0 };
+      } else if (this.team === 2) {
+        this.lookDirection = { dx: -1, dy: 0 };
+      }
+    } else {
+      if (this.team === 1) {
+        this.lookDirection = { dx: -1, dy: 0 };
+      } else if (this.team === 2) {
+        this.lookDirection = { dx: 1, dy: 0 };
+      }
     }
     
     // Логування для всіх нових юнітів
