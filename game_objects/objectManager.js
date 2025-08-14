@@ -27,7 +27,7 @@ export class ObjectManager {
       return null;
     }
 
-    // objectConfig.team = team;
+    objectConfig.team = team;
     const obj = new GameObject(
       this.ctx,
       spriteConfig,
