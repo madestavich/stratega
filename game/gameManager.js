@@ -127,8 +127,13 @@ class GameManager {
         "DEBUG: gameManager.isRoomCreator set to:",
         this.isRoomCreator
       );
-
-      // Напрямок погляду буде встановлено після завантаження юнітів з бази
+      // Оновлюємо напрямок погляду для всіх юнітів після визначення ролі
+      for (const unit of this.objectManager.objects) {
+        unit.setLookDirectionByTeam();
+      }
+      for (const unit of this.objectManager.enemyObjects) {
+        unit.setLookDirectionByTeam();
+      }
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
     }
