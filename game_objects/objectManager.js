@@ -47,6 +47,9 @@ export class ObjectManager {
     
     this.objects.push(obj);
     
+    // Ensure correct look direction after gameManager is fully initialized
+    obj.setLookDirectionByTeam();
+    
     // Auto-save to database after creating object
     if (this.currentRoomId) {
       this.saveObjects().catch(err => console.error('Failed to auto-save object:', err));
