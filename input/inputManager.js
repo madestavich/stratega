@@ -262,7 +262,10 @@ export class InputManager {
       }
 
       console.log(
-        `DEBUG creating unit: player.team=${this.gameManager.player?.team}, isRoomCreator=${this.gameManager.isRoomCreator}`
+        "DEBUG: team",
+        this.gameManager.player.team,
+        "isRoomCreator",
+        this.gameManager.isRoomCreator
       );
       const newUnit = await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
@@ -274,6 +277,12 @@ export class InputManager {
       // Встановлюємо напрямок погляду відповідно до команди
       if (newUnit) {
         newUnit.setLookDirectionByTeam();
+        console.log(
+          "DEBUG: setLookDirectionByTeam",
+          newUnit.team,
+          window.gameManager.isRoomCreator,
+          newUnit.lookDirection
+        );
       }
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection
       this.gameManager.objectManager.updateGridWithAllObjects();
