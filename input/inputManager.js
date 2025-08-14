@@ -16,14 +16,14 @@ export class InputManager {
     this.canvas = canvas;
 
     // Ready button
-    this.readyButton = document.getElementById('ready-button');
+    this.readyButton = document.getElementById("ready-button");
 
     // Ініціалізуємо обробники для вибору юнітів
     this.initUnitSelectionHandlers();
 
     // Ініціалізуємо обробники для розміщення юнітів на карті
     this.initCanvasHandlers();
-    
+
     // Ініціалізуємо обробник кнопки ready
     this.initReadyButton();
   }
@@ -148,14 +148,16 @@ export class InputManager {
           };
 
           // Check zone restriction first
-          const canPlaceInZone = this.gameManager.canPlaceUnitAt(col, row, unitConfig);
-          
-          // Check if placement is valid (both zone and collision)
-          const canPlace = canPlaceInZone && this.gameManager.gridManager.canPlaceAt(
-            tempObject,
+          const canPlaceInZone = this.gameManager.canPlaceUnitAt(
             col,
-            row
+            row,
+            unitConfig
           );
+
+          // Check if placement is valid (both zone and collision)
+          const canPlace =
+            canPlaceInZone &&
+            this.gameManager.gridManager.canPlaceAt(tempObject, col, row);
 
           // Calculate the area the unit would occupy
           let startCol = col;
@@ -198,7 +200,9 @@ export class InputManager {
   async placeUnitAtCursor() {
     // Allow unit placement only when game is paused (between rounds)
     if (!this.gameManager.isPaused) {
-      console.log("Cannot place units during active battle. Wait for next round.");
+      console.log(
+        "Cannot place units during active battle. Wait for next round."
+      );
       return;
     }
 
@@ -233,10 +237,16 @@ export class InputManager {
       );
 
       // Check if player can place in this zone (left/right half restriction)
-      const canPlaceInZone = this.gameManager.canPlaceUnitAt(gridCoords.col, gridCoords.row, unitConfig);
+      const canPlaceInZone = this.gameManager.canPlaceUnitAt(
+        gridCoords.col,
+        gridCoords.row,
+        unitConfig
+      );
       if (!canPlaceInZone) {
         const zoneInfo = this.gameManager.getPlacementZoneInfo();
-        console.log(`Cannot place unit here. You can only place units on the ${zoneInfo.side} side of the map.`);
+        console.log(
+          `Cannot place unit here. You can only place units on the ${zoneInfo.side} side of the map.`
+        );
         return; // Exit without creating unit
       }
 
@@ -251,18 +261,22 @@ export class InputManager {
         return; // Виходимо з функції, не створюючи юніта
       }
 
-      console.log(`DEBUG creating unit: player.team=${this.gameManager.player?.team}, isRoomCreator=${this.gameManager.isRoomCreator}`);
-      await this.gameManager.objectManager.createObject(
+      console.log(
+        `DEBUG creating unit: player.team=${this.gameManager.player?.team}, isRoomCreator=${this.gameManager.isRoomCreator}`
+      );
+      const newUnit = await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
         this.gameManager.player.team,
         gridCoords.col,
         gridCoords.row
       );
-      
+      // Встановлюємо напрямок погляду відповідно до команди
+      if (newUnit) {
+        newUnit.setLookDirectionByTeam();
+      }
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection
       this.gameManager.objectManager.updateGridWithAllObjects();
-      
       // Save units to database immediately after creating new unit
       await this.gameManager.objectManager.saveObjects();
       console.log("New unit saved to database for synchronization");
@@ -274,46 +288,46 @@ export class InputManager {
   // Initialize ready button handler
   initReadyButton() {
     if (this.readyButton) {
-      this.readyButton.addEventListener('click', () => {
+      this.readyButton.addEventListener("click", () => {
         this.handleReadyClick();
       });
     } else {
-      console.warn('Ready button not found in DOM');
+      console.warn("Ready button not found in DOM");
     }
   }
 
   // Handle ready button click
   async handleReadyClick() {
     if (!this.gameManager || !this.gameManager.objectManager.currentRoomId) {
-      console.error('Cannot set ready: no room ID available');
+      console.error("Cannot set ready: no room ID available");
       return;
     }
 
     // Disable button to prevent multiple clicks
     if (this.readyButton) {
       this.readyButton.disabled = true;
-      this.readyButton.textContent = 'Готовий...';
+      this.readyButton.textContent = "Готовий...";
     }
 
     try {
       // Call gameManager's setPlayerReady method
       await this.gameManager.setPlayerReady();
-      
+
       // Update button state
       if (this.readyButton) {
-        this.readyButton.textContent = 'Готовий ✓';
-        this.readyButton.style.backgroundColor = '#4CAF50';
+        this.readyButton.textContent = "Готовий ✓";
+        this.readyButton.style.backgroundColor = "#4CAF50";
       }
-      
-      console.log('Player marked as ready via button');
+
+      console.log("Player marked as ready via button");
     } catch (error) {
-      console.error('Error setting player ready:', error);
-      
+      console.error("Error setting player ready:", error);
+
       // Re-enable button on error
       if (this.readyButton) {
         this.readyButton.disabled = false;
-        this.readyButton.textContent = 'Готовий';
-        this.readyButton.style.backgroundColor = '';
+        this.readyButton.textContent = "Готовий";
+        this.readyButton.style.backgroundColor = "";
       }
     }
   }
