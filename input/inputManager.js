@@ -270,7 +270,7 @@ export class InputManager {
       await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
-        this.gameManager.player.team,
+        1, // завжди 1 для своїх юнітів
         gridCoords.col,
         gridCoords.row
       );
