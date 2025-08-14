@@ -63,7 +63,7 @@ export class GameObject {
     this.renderer = new Renderer(ctx, this.animator);
     this.updatePositionFromGrid();
 
-    this.setLookDirectionByTeam();
+    // Напрямок буде встановлено пізніше в objectManager коли gameManager готовий
   }
 
   update() {
