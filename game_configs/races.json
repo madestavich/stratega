@@ -24,7 +24,10 @@
           "availableActions": ["move", "attack"],
           "attackDamage": 60,
           "attackSpeed": 0.8,
-          "health": 100
+          "health": 100,
+          "isRanged": true,
+          "minRangeDistance": 3,
+          "maxRangeDistance": 8
         }
       },
       "tier_four": {}
