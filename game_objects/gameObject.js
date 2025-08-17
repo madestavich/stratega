@@ -150,15 +150,6 @@ export class GameObject {
   setLookDirectionByTeam() {
     // Скидаємо moveDirection щоб використовувався lookDirection
     this.moveDirection = null;
-    console.log(
-      "[setLookDirectionByTeam]",
-      "team:",
-      this.team,
-      "isRoomCreator:",
-      window.gameManager?.isRoomCreator,
-      "lookDirection:",
-      this.lookDirection
-    );
 
     const gameManager = window.gameManager;
 
