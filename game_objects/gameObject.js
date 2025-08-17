@@ -57,12 +57,23 @@ export class GameObject {
 
     if (this.isRanged) {
       // Store the bulletPoint from the animation frame
-      const lastFrame =
-        spriteConfig[objectConfig.objectType].animations.range_attack.frames[
-          spriteConfig[objectConfig.objectType].animations.range_attack.frames
-            .length - 1
-        ];
-      this.bulletPoint = lastFrame.bulletPoint || { x: 0, y: 0 };
+      const rangedAnim =
+        spriteConfig[objectConfig.objectType]?.animations?.range_attack;
+      if (
+        rangedAnim &&
+        Array.isArray(rangedAnim.frames) &&
+        rangedAnim.frames.length > 0
+      ) {
+        const lastFrame = rangedAnim.frames[rangedAnim.frames.length - 1];
+        this.bulletPoint = lastFrame.bulletPoint || { x: 0, y: 0 };
+      } else {
+        console.warn(
+          "Missing or invalid range_attack frames for:",
+          objectConfig.objectType,
+          spriteConfig[objectConfig.objectType]
+        );
+        this.bulletPoint = { x: 0, y: 0 };
+      }
     }
 
     // Extract size and expansion parameters from objectConfig
