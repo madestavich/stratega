@@ -124,7 +124,7 @@ export class Particle {
 
   draw() {
     this.renderer.draw(this.x, this.y, this.moveVector);
-    if (true) {
+    if (false) {
       // Set to true to enable debug visualization
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
