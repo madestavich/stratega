@@ -71,6 +71,12 @@ export class Particle {
 
     this.updateArcTrajectory(dt / 2);
 
+    // If particle finished its trajectory, remove it
+    if (this.progress >= 1) {
+      this.hasReachedTarget = true;
+      return;
+    }
+
     // Check if we've reached the target
     const distanceToTarget = Math.sqrt(
       Math.pow(this.targetX - this.x, 2) + Math.pow(this.targetY - this.y, 2)
