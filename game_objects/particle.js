@@ -50,17 +50,21 @@ export class Particle {
   }
 
   update(dt) {
-    if (this.target && !this.target.isDead) {
-      // Оновлюємо тільки X-координату цілі, якщо вона рухається
-      this.targetX = this.target.x;
+    // If target is missing or dead, remove particle
+    if (!this.target || this.target.isDead) {
+      this.hasReachedTarget = true;
+      return;
+    }
 
-      // НЕ оновлюємо Y-координату, щоб зберегти наше налаштування для центру цілі
-      // Якщо ми не встановили targetY раніше, встановлюємо його на центр цілі
-      if (this.targetY === this.target.y) {
-        const targetFrame = this.target.animator.activeFrame;
-        const targetHeight = targetFrame.height;
-        this.targetY = this.target.y - targetHeight / 2;
-      }
+    // Оновлюємо тільки X-координату цілі, якщо вона рухається
+    this.targetX = this.target.x;
+
+    // НЕ оновлюємо Y-координату, щоб зберегти наше налаштування для центру цілі
+    // Якщо ми не встановили targetY раніше, встановлюємо його на центр цілі
+    if (this.targetY === this.target.y) {
+      const targetFrame = this.target.animator.activeFrame;
+      const targetHeight = targetFrame.height;
+      this.targetY = this.target.y - targetHeight / 2;
     }
 
     if (this.hasReachedTarget) return;
