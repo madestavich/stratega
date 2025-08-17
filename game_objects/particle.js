@@ -16,8 +16,7 @@ export class Particle {
 
     // Target properties
     this.target = target || null;
-    this.trajectoryType = particleConfig.trajectoryType || "direct"; // "direct" or "arc"
-    this.arcHeight = particleConfig.arcHeight || 50; // Controls the height of the arc
+    this.arcHeight = particleConfig.arcHeight || 30; // Controls the height of the arc
 
     // Track progress for arc trajectory
     this.progress = 0;
@@ -34,15 +33,13 @@ export class Particle {
         )
       : 0;
 
-    // Damage and effect properties
-    this.damage = particleConfig.damage || 0;
+    this.damage = particleConfig.damage;
     this.effectRadius = particleConfig.effectRadius || 0;
 
     // Setup animator and renderer
     this.animator = new Animator(this.spriteConfig);
     console.log(this);
 
-    this.animator.setSpritesheet("mage");
     this.animator.setSpritesheet(Object.keys(spriteConfig)[0]);
     this.animator.setAnimation("bullet");
 
@@ -52,24 +49,23 @@ export class Particle {
     this.hasReachedTarget = false;
   }
 
-  update() {
-    // Instead of using dt which might not be passed correctly
-    const dt = 16.67; // Use a fixed time step for consistency
-
-    // If we have a target, update target position (in case target is moving)
+  update(dt) {
     if (this.target && !this.target.isDead) {
+      // Оновлюємо тільки X-координату цілі, якщо вона рухається
       this.targetX = this.target.x;
-      this.targetY = this.target.y;
+
+      // НЕ оновлюємо Y-координату, щоб зберегти наше налаштування для центру цілі
+      // Якщо ми не встановили targetY раніше, встановлюємо його на центр цілі
+      if (this.targetY === this.target.y) {
+        const targetFrame = this.target.animator.activeFrame;
+        const targetHeight = targetFrame.height;
+        this.targetY = this.target.y - targetHeight / 2;
+      }
     }
 
     if (this.hasReachedTarget) return;
 
-    // Calculate movement based on trajectory type
-    if (this.trajectoryType === "direct") {
-      this.updateDirectTrajectory(dt);
-    } else if (this.trajectoryType === "arc") {
-      this.updateArcTrajectory(dt);
-    }
+    this.updateArcTrajectory(dt / 2);
 
     // Check if we've reached the target
     const distanceToTarget = Math.sqrt(
@@ -79,32 +75,14 @@ export class Particle {
     if (distanceToTarget < 5) {
       this.hasReachedTarget = true;
       // Apply damage to target if it exists
-      if (this.target && typeof this.target.takeDamage === "function") {
-        this.target.takeDamage(this.damage);
+      if (this.target && !this.target.isDead) {
+        this.target.health -= this.damage;
+        if (this.target.health <= 0) {
+          this.target.health = 0;
+          this.target.isDead = true;
+          this.target.animator.setAnimation("death", false);
+        }
       }
-    }
-
-    // Update animation
-    this.animator.nextFrame();
-  }
-
-  updateDirectTrajectory(dt) {
-    // Calculate direction vector to target
-    const dx = this.targetX - this.x;
-    const dy = this.targetY - this.y;
-
-    // Normalize the vector
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance > 0) {
-      const normalizedDx = dx / distance;
-      const normalizedDy = dy / distance;
-
-      // Update position
-      this.x += normalizedDx * this.moveSpeed * (dt / 16.67);
-      this.y += normalizedDy * this.moveSpeed * (dt / 16.67);
-
-      // Update move vector for rendering
-      this.moveVector = { dx: normalizedDx, dy: normalizedDy };
     }
   }
 
@@ -146,9 +124,7 @@ export class Particle {
 
   draw() {
     this.renderer.draw(this.x, this.y, this.moveVector);
-
-    // Debug visualization for trajectory
-    if (this.trajectoryType === "arc" && true) {
+    if (false) {
       // Set to true to enable debug visualization
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
@@ -170,8 +146,6 @@ export class Particle {
     }
   }
 
-  // Method to check if particle hit a target
-  // Modify the checkCollision method in Particle class
   checkCollision(gameObjects) {
     if (this.hasReachedTarget) return;
 
@@ -183,18 +157,19 @@ export class Particle {
       );
 
       // Check if within collision radius of the target
-      if (distance < (this.target.collisionRadius || 20)) {
+      if (distance < 70) {
         this.hasReachedTarget = true;
+        console.log(`Particle hit target! Damage: ${this.damage}`); // Add debug log
 
         // Apply damage to the specific target
-        if (typeof this.target.takeDamage === "function") {
-          this.target.takeDamage(this.damage);
-        } else if (this.target.health !== undefined) {
-          // Fallback if takeDamage method doesn't exist
+        if (this.target.health !== undefined) {
+          console.log(`Target health before: ${this.target.health}`); // Debug log
           this.target.health -= this.damage;
+          console.log(`Target health after: ${this.target.health}`); // Debug log
 
           // Check if target is defeated
           if (this.target.health <= 0 && !this.target.isDead) {
+            console.log(`Target defeated!`); // Debug log
             this.target.isDead = true;
             this.target.canAct = false;
 
@@ -230,28 +205,24 @@ export class Particle {
           this.hasReachedTarget = true;
 
           // Apply damage or effects
-          if (typeof obj.takeDamage === "function") {
-            obj.takeDamage(this.damage);
-          } else if (obj.health !== undefined && !obj.isDead) {
-            if (obj.health !== undefined && !obj.isDead) {
-              obj.health -= this.damage;
+          if (obj.health !== undefined && !obj.isDead) {
+            obj.health -= this.damage;
 
-              // Check if target is defeated
-              if (obj.health <= 0) {
-                obj.isDead = true;
-                obj.canAct = false;
+            // Check if target is defeated
+            if (obj.health <= 0) {
+              obj.isDead = true;
+              obj.canAct = false;
 
-                // Play death animation if available
-                if (
-                  obj.animator &&
-                  obj.animator.activeSpritesheet.animations.death
-                ) {
-                  obj.animator.setAnimation("death", false);
-                }
+              // Play death animation if available
+              if (
+                obj.animator &&
+                obj.animator.activeSpritesheet.animations.death
+              ) {
+                obj.animator.setAnimation("death", false);
               }
             }
-            break;
           }
+          break;
         }
       }
     }
