@@ -7,21 +7,7 @@ export class AttackAction {
     this.moveAction = new MoveAction();
   }
 
-  // Get the appropriate enemy array based on the gameObject's team
-  getEnemyArray(gameObject) {
-    // If gameObject is in player objects (team 1), enemies are in enemyObjects
-    // If gameObject is in enemy objects (team 2), enemies are in player objects
-    if (gameObject.team === 1) {
-      return this.objectManager.enemyObjects;
-    } else {
-      return this.objectManager.objects;
-    }
-  }
-
   canExecute(gameObject) {
-    if (gameObject.isDead) {
-      return false;
-    }
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       // If it's the last frame of attack animation, we'll handle damage in execute
@@ -43,21 +29,6 @@ export class AttackAction {
       this.moveAction.cancelMovement(gameObject);
     }
 
-    // Update move target if enemy has moved
-    if (
-      gameObject.attackTarget &&
-      gameObject.moveTarget &&
-      (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
-        gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
-    ) {
-      // Cancel current movement to recalculate path to new position
-      this.moveAction.cancelMovement(gameObject);
-      gameObject.moveTarget = {
-        col: gameObject.attackTarget.gridCol,
-        row: gameObject.attackTarget.gridRow,
-      };
-    }
-
     // Find nearest enemy
     const nearestEnemy = this.findNearestEnemy(gameObject);
 
@@ -66,14 +37,6 @@ export class AttackAction {
       gameObject.attackTarget = null;
       gameObject.moveTarget = null;
       return false;
-    }
-
-    // Check if we need to switch to a different target
-    if (gameObject.attackTarget && gameObject.attackTarget !== nearestEnemy) {
-      // Target changed, cancel current movement
-      this.moveAction.cancelMovement(gameObject);
-      gameObject.attackTarget = nearestEnemy;
-      gameObject.moveTarget = null; // Will be set below
     }
 
     // Calculate distance to nearest enemy
@@ -171,19 +134,9 @@ export class AttackAction {
     return false;
   }
 
-  // Update method called by ActionManager
-  update(gameObject, deltaTime) {
-    // Update attack cooldown
-    if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
-      gameObject.attackCooldown -= deltaTime;
-      if (gameObject.attackCooldown < 0) {
-        gameObject.attackCooldown = 0;
-      }
-    }
-  }
-
   // Method to spawn a projectile
   spawnProjectile(gameObject, target) {
+    // Create a new particle at the center of the game object
     // Get the current frame
     const currentFrame = gameObject.animator.activeFrame;
 
@@ -209,7 +162,7 @@ export class AttackAction {
       bulletY = gameObject.y;
     }
 
-    // Create a particle
+    // Create a particle with the original target
     const particle = new Particle(
       gameObject.ctx,
       gameObject.spriteConfig,
@@ -221,12 +174,11 @@ export class AttackAction {
     );
 
     // Adjust the target Y position to aim at the center of the target
-    // Get target's current frame to determine its height
     const targetFrame = target.animator.activeFrame;
     const targetHeight = targetFrame.height;
     particle.targetY = target.y - targetHeight / 2;
 
-    // Recalculate trajectory with the new target Y
+    // Recalculate total distance with the new target Y
     particle.totalDistance = Math.sqrt(
       Math.pow(particle.targetX - particle.startX, 2) +
         Math.pow(particle.targetY - particle.startY, 2)
@@ -243,12 +195,9 @@ export class AttackAction {
 
   // New helper method to find enemies closer than a specified distance
   findEnemiesCloserThan(gameObject, maxDistance) {
-    // Get the appropriate enemy array based on which team the gameObject belongs to
-    const enemyArray = this.getEnemyArray(gameObject);
-
-    for (const obj of enemyArray) {
-      // Skip if dead or no team
-      if (obj.isDead || !obj.team) {
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
 
@@ -266,15 +215,12 @@ export class AttackAction {
   // Find a target for ranged attack
   findRangedTarget(gameObject) {
     let bestTarget = null;
-    let bestScore = Infinity; // Lower score is better
-
-    // Get the appropriate enemy array based on which team the gameObject belongs to
-    const enemyArray = this.getEnemyArray(gameObject);
+    let bestDistance = Infinity;
 
     // Find all enemies within range
-    for (const obj of enemyArray) {
-      // Skip if dead or no team
-      if (obj.isDead || !obj.team) {
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
 
@@ -286,26 +232,9 @@ export class AttackAction {
         distance >= gameObject.minRangeDistance &&
         distance <= gameObject.maxRangeDistance
       ) {
-        // Calculate direction vector
-        const dx = obj.gridCol - gameObject.gridCol;
-        const dy = obj.gridRow - gameObject.gridRow;
-
-        // Calculate score based on distance and direction
-        // Lower score means higher priority
-        let score = distance * 10; // Base score is distance
-
-        // Check if target is in straight line (horizontally or vertically)
-        if (dx === 0 || dy === 0) {
-          // Straight line gets priority (subtract 50 from score)
-          score -= 50;
-        } else if (Math.abs(dx) === Math.abs(dy)) {
-          // Diagonal line gets secondary priority (subtract 25 from score)
-          score -= 25;
-        }
-
-        // Find the target with the best (lowest) score
-        if (score < bestScore) {
-          bestScore = score;
+        // Find the closest enemy within range
+        if (distance < bestDistance) {
+          bestDistance = distance;
           bestTarget = obj;
         }
       }
@@ -316,9 +245,6 @@ export class AttackAction {
 
   // Update method to be called from ActionManager's update
   update(gameObject, deltaTime) {
-    if (gameObject.isDead) {
-      return false;
-    }
     // Зменшуємо час перезарядки атаки, якщо він є
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
       gameObject.attackCooldown -= deltaTime;
@@ -334,13 +260,10 @@ export class AttackAction {
     let nearestEnemy = null;
     let minDistance = Infinity;
 
-    // Get the appropriate enemy array based on which team the gameObject belongs to
-    const enemyArray = this.getEnemyArray(gameObject);
-
     // Find all enemies (units from other teams)
-    for (const obj of enemyArray) {
-      // Skip if dead or no team
-      if (obj.isDead || !obj.team) {
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
 
@@ -546,25 +469,14 @@ export class AttackAction {
       row: gameObject.attackTarget.gridRow,
     };
 
-    // Якщо об'єкт не рухається, спробуємо почати рух
-    if (!gameObject.isMoving && this.moveAction) {
-      const canMove = this.moveAction.setMoveTarget(
+    // Якщо є moveAction і об'єкт рухається, оновлюємо шлях
+    if (this.moveAction && gameObject.isMoving) {
+      this.moveAction.setMoveTarget(
         gameObject,
         gameObject.attackTarget.gridCol,
         gameObject.attackTarget.gridRow,
         [0] // allowedObstacleTypes
       );
-
-      // Якщо не можемо рухатися, просто стоїмо на місці
-      if (!canMove) {
-        // Встановлюємо анімацію "idle"
-        if (
-          gameObject.animator &&
-          gameObject.animator.activeAnimation.name !== "idle"
-        ) {
-          gameObject.animator.setAnimation("idle");
-        }
-      }
     }
 
     return false;
