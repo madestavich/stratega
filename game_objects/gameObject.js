@@ -19,24 +19,7 @@ export class GameObject {
     this.moveTarget = null; // Ціль для руху
     // Встановлюємо коректний напрямок погляду одразу при створенні
     let initialLookDirection = null;
-    try {
-      const gameManager = window.gameManager;
-      if (
-        gameManager &&
-        gameManager.isRoomCreator !== undefined &&
-        gameManager.isRoomCreator !== null
-      ) {
-        if (gameManager.isRoomCreator) {
-          initialLookDirection =
-            objectConfig.team === 1 ? { dx: 1, dy: 0 } : { dx: -1, dy: 0 };
-        } else {
-          initialLookDirection =
-            objectConfig.team === 1 ? { dx: -1, dy: 0 } : { dx: 1, dy: 0 };
-        }
-      }
-    } catch (e) {
-      initialLookDirection = null;
-    }
+
     this.lookDirection = initialLookDirection; // Напрямок огляду
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
     this.availableActions = objectConfig.availableActions || []; // Доступні дії
@@ -81,9 +64,25 @@ export class GameObject {
     this.animator.setAnimation(defaultAnim);
 
     this.renderer = new Renderer(ctx, this.animator);
+    try {
+      const gameManager = window.gameManager;
+      if (
+        gameManager &&
+        gameManager.isRoomCreator !== undefined &&
+        gameManager.isRoomCreator !== null
+      ) {
+        if (gameManager.isRoomCreator) {
+          initialLookDirection =
+            objectConfig.team === 1 ? { dx: 1, dy: 0 } : { dx: -1, dy: 0 };
+        } else {
+          initialLookDirection =
+            objectConfig.team === 1 ? { dx: -1, dy: 0 } : { dx: 1, dy: 0 };
+        }
+      }
+    } catch (e) {
+      initialLookDirection = null;
+    }
     this.updatePositionFromGrid();
-
-    // Напрямок буде встановлено пізніше в objectManager коли gameManager готовий
   }
 
   update() {
