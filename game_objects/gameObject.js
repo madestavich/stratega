@@ -57,13 +57,6 @@ export class GameObject {
 
     this.animator = new Animator(spriteConfig);
     this.animator.setSpritesheet(defaultSpritesheetId);
-
-    const defaultAnim = Object.keys(
-      spriteConfig[defaultSpritesheetId].animations
-    )[0];
-    this.animator.setAnimation(defaultAnim);
-
-    this.renderer = new Renderer(ctx, this.animator);
     try {
       const gameManager = window.gameManager;
       if (
@@ -82,6 +75,13 @@ export class GameObject {
     } catch (e) {
       initialLookDirection = null;
     }
+    const defaultAnim = Object.keys(
+      spriteConfig[defaultSpritesheetId].animations
+    )[0];
+    this.animator.setAnimation(defaultAnim);
+
+    this.renderer = new Renderer(ctx, this.animator);
+
     this.updatePositionFromGrid();
   }
 
