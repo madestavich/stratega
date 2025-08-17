@@ -153,17 +153,6 @@ export class MoveAction {
 
       return true;
     } catch (error) {
-      console.error("Error in MoveAction.canExecute:", error, {
-        gameObject: gameObject
-          ? {
-              type: gameObject.objectType,
-              col: gameObject.gridCol,
-              row: gameObject.gridRow,
-            }
-          : null,
-        targetCol,
-        targetRow,
-      });
       return false;
     }
   }
@@ -310,7 +299,7 @@ export class MoveAction {
         row: gameObject.currentPath[0].row,
       };
 
-      // Calculate new movement direction
+      // Calculate movement direction
       gameObject.moveDirection = {
         dx: gameObject.currentPath[0].col - gameObject.gridCol,
         dy: gameObject.currentPath[0].row - gameObject.gridRow,

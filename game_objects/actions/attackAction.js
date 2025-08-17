@@ -457,19 +457,6 @@ export class AttackAction {
 
     // Set look direction including diagonals
     gameObject.lookDirection = { x: dirX, y: dirY };
-    console.log(
-      "[attackAction.setLookDirection]",
-      "team:",
-      gameObject.team,
-      "from:",
-      gameObject.gridCol,
-      gameObject.gridRow,
-      "to:",
-      target.gridCol,
-      target.gridRow,
-      "lookDirection:",
-      gameObject.lookDirection
-    );
   }
 
   dealDamage(attacker, target) {

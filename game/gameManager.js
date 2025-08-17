@@ -738,6 +738,9 @@ class GameManager {
       // Reset health and other stats to full (resurrect if dead)
       unit.isDead = false;
       unit.currentHealth = unit.maxHealth;
+
+      // Скидаємо всі напрямки і цілі
+      unit.moveDirection = null;
       unit.moveTarget = null;
       unit.attackTarget = null;
 
@@ -762,6 +765,9 @@ class GameManager {
       // Reset health and other stats to full (resurrect if dead)
       unit.isDead = false;
       unit.currentHealth = unit.maxHealth;
+
+      // Скидаємо всі напрямки і цілі
+      unit.moveDirection = null;
       unit.moveTarget = null;
       unit.attackTarget = null;
 
