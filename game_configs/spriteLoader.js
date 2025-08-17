@@ -6,6 +6,9 @@ export class SpriteLoader {
       // Мапа всіх доступних спрайтів
       rider: "/game_configs/units/rider.json",
       skeleton: "/game_configs/units/skeleton.json",
+      centaur: "/game_configs/units/centaur.json",
+      swordsman: "/game_configs/units/swordsman.json",
+      zealot: "/game_configs/units/zealot.json",
       // Додайте інші спрайти тут
     };
   }

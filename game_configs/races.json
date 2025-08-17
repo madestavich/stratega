@@ -3,7 +3,30 @@
     "units": {
       "tier_one": {},
       "tier_two": {},
-      "tier_three": {},
+      "tier_three": {
+        "swordsman": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "swordsman",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 12,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 75,
+          "attackSpeed": 0.8,
+          "health": 240
+        },
+        "zealot": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "zealot",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 8,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 60,
+          "attackSpeed": 0.8,
+          "health": 100
+        }
+      },
       "tier_four": {}
     }
   },
@@ -61,7 +84,19 @@
   },
   "rampart": {
     "units": {
-      "tier_one": {},
+      "tier_one": {
+        "centaur": {
+          "gridWidth": 2,
+          "gridHeight": 1,
+          "objectType": "centaur",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 22,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 20,
+          "attackSpeed": 0.8,
+          "health": 80
+        }
+      },
       "tier_two": {},
       "tier_three": {},
       "tier_four": {}
