@@ -235,7 +235,6 @@ export class ObjectManager {
 
       // Встановлюємо правильний напрямок погляду для всіх завантажених юнітів
       for (const unit of this.objects) {
-        unit.setLookDirectionByTeam();
       }
       for (const unit of this.enemyObjects) {
         unit.setLookDirectionByTeam();

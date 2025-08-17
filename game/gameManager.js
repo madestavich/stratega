@@ -129,7 +129,6 @@ class GameManager {
       );
 
       for (const unit of this.objectManager.objects) {
-        unit.setLookDirectionByTeam();
       }
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();

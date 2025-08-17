@@ -269,7 +269,6 @@ export class InputManager {
         gridCoords.row
       );
       if (newUnit) {
-        newUnit.setLookDirectionByTeam();
       }
 
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection
