@@ -287,6 +287,21 @@ export class MoveAction {
         ) {
           gameObject.lookDirection = gameObject.moveDirection;
         }
+
+        // Логування тільки для першого юніта команди 2 (enemyObjects[0]) на перших 3 кадрах
+        const objectManager = window.gameManager?.objectManager;
+        if (
+          objectManager &&
+          objectManager.enemyObjects &&
+          objectManager.enemyObjects.length > 0 &&
+          gameObject === objectManager.enemyObjects[0]
+        ) {
+          if (!gameObject._debugFrame) gameObject._debugFrame = 1;
+          if (gameObject._debugFrame <= 3) {
+            console.log(`[DEBUG][Frame ${gameObject._debugFrame}] Enemy[0]: grid=(${gameObject.gridCol},${gameObject.gridRow}), lookDirection=`, gameObject.lookDirection, ', moveDirection=', gameObject.moveDirection);
+            gameObject._debugFrame++;
+          }
+        }
         gameObject.moveDirection = null;
         return;
       }

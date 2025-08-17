@@ -253,6 +253,23 @@ class GameManager {
         // Оновлюємо стан сітки після руху
         this.objectManager.updateGridWithAllObjects();
       }
+      // Логування стану першого юніта команди 2 на перших 3 кадрах
+      if (
+        this.objectManager.enemyObjects &&
+        this.objectManager.enemyObjects.length > 0
+      ) {
+        const unit = this.objectManager.enemyObjects[0];
+        if (!unit._debugFrame) unit._debugFrame = 1;
+        if (unit._debugFrame <= 3) {
+          console.log(
+            `[DEBUG][Frame ${unit._debugFrame}] Enemy[0]: grid=(${unit.gridCol},${unit.gridRow}), lookDirection=`,
+            unit.lookDirection,
+            ", moveDirection=",
+            unit.moveDirection
+          );
+          unit._debugFrame++;
+        }
+      }
 
       this.accumulator -= this.fixedTimeStep;
 
