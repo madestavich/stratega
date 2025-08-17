@@ -278,7 +278,6 @@ export class MoveAction {
         gameObject.currentPath = null;
         gameObject.nextGridPosition = null;
         // Оновлюємо lookDirection тільки якщо об'єкт реально рухався
-        // Оновлюємо lookDirection тільки якщо об'єкт реально змінив позицію на сітці
         if (
           gameObject.isMoving &&
           gameObject.moveDirection &&

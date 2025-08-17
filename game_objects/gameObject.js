@@ -17,7 +17,27 @@ export class GameObject {
     this.isMoving = false; // Чи об'єкт рухається
     this.moveDirection = null; // Напрямок руху
     this.moveTarget = null; // Ціль для руху
-    this.lookDirection = null; // Напрямок огляду
+    // Встановлюємо коректний напрямок погляду одразу при створенні
+    let initialLookDirection = null;
+    try {
+      const gameManager = window.gameManager;
+      if (
+        gameManager &&
+        gameManager.isRoomCreator !== undefined &&
+        gameManager.isRoomCreator !== null
+      ) {
+        if (gameManager.isRoomCreator) {
+          initialLookDirection =
+            objectConfig.team === 1 ? { dx: 1, dy: 0 } : { dx: -1, dy: 0 };
+        } else {
+          initialLookDirection =
+            objectConfig.team === 1 ? { dx: -1, dy: 0 } : { dx: 1, dy: 0 };
+        }
+      }
+    } catch (e) {
+      initialLookDirection = null;
+    }
+    this.lookDirection = initialLookDirection; // Напрямок огляду
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
     this.availableActions = objectConfig.availableActions || []; // Доступні дії
     this.team = objectConfig.team; // Команда об'єкта
