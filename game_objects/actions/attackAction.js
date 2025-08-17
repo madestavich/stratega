@@ -44,9 +44,12 @@ export class AttackAction {
     }
 
     // Update move target if enemy has moved
-    if (gameObject.attackTarget && gameObject.moveTarget && 
-        (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol || 
-         gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)) {
+    if (
+      gameObject.attackTarget &&
+      gameObject.moveTarget &&
+      (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
+        gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
+    ) {
       // Cancel current movement to recalculate path to new position
       this.moveAction.cancelMovement(gameObject);
       gameObject.moveTarget = {
@@ -168,7 +171,7 @@ export class AttackAction {
     return false;
   }
 
-  // Update method called by ActionManager 
+  // Update method called by ActionManager
   update(gameObject, deltaTime) {
     // Update attack cooldown
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
@@ -242,7 +245,7 @@ export class AttackAction {
   findEnemiesCloserThan(gameObject, maxDistance) {
     // Get the appropriate enemy array based on which team the gameObject belongs to
     const enemyArray = this.getEnemyArray(gameObject);
-    
+
     for (const obj of enemyArray) {
       // Skip if dead or no team
       if (obj.isDead || !obj.team) {
@@ -454,6 +457,19 @@ export class AttackAction {
 
     // Set look direction including diagonals
     gameObject.lookDirection = { x: dirX, y: dirY };
+    console.log(
+      "[attackAction.setLookDirection]",
+      "team:",
+      gameObject.team,
+      "from:",
+      gameObject.gridCol,
+      gameObject.gridRow,
+      "to:",
+      target.gridCol,
+      target.gridRow,
+      "lookDirection:",
+      gameObject.lookDirection
+    );
   }
 
   dealDamage(attacker, target) {

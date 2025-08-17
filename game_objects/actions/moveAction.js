@@ -142,6 +142,14 @@ export class MoveAction {
         dx: path[0].col - gameObject.gridCol,
         dy: path[0].row - gameObject.gridRow,
       };
+      console.log(
+        "[moveAction] set moveDirection:",
+        gameObject.moveDirection,
+        "team:",
+        gameObject.team,
+        "object:",
+        gameObject.objectType
+      );
 
       return true;
     } catch (error) {
