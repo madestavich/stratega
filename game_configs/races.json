@@ -22,12 +22,17 @@
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 8,
           "availableActions": ["move", "attack"],
-          "attackDamage": 60,
+          "attackDamage": 20,
           "attackSpeed": 0.8,
           "health": 100,
           "isRanged": true,
           "minRangeDistance": 3,
-          "maxRangeDistance": 8
+          "maxRangeDistance": 8,
+          "bulletConfig": {
+            "bulletType": "bullet",
+            "bulletSpeed": 50,
+            "bulletDamage": 60
+          }
         }
       },
       "tier_four": {}
