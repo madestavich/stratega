@@ -56,22 +56,13 @@ export class GameObject {
     this.bulletConfig = objectConfig.bulletConfig || null; // Конфігурація кулі
 
     if (this.isRanged) {
-      // Store the bulletPoint from the last range_attack frame directly
-      try {
-        const lastFrame =
-          spriteConfig[objectConfig.objectType].animations.range_attack.frames[
-            spriteConfig[objectConfig.objectType].animations.range_attack.frames
-              .length - 1
-          ];
-        this.bulletPoint = lastFrame.bulletPoint || { x: 0, y: 0 };
-      } catch (e) {
-        console.warn(
-          "Missing or invalid range_attack frames for:",
-          objectConfig.objectType,
-          spriteConfig[objectConfig.objectType]
-        );
-        this.bulletPoint = { x: 0, y: 0 };
-      }
+      const lastFrame =
+        spriteConfig[objectConfig.objectType].animations.range_attack.frames[
+          spriteConfig[objectConfig.objectType].animations.range_attack.frames
+            .length - 1
+        ];
+
+      this.bulletPoint = lastFrame.bulletPoint || { x: 0, y: 0 };
     }
 
     // Extract size and expansion parameters from objectConfig
