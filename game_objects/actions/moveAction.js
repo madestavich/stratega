@@ -288,7 +288,10 @@ export class MoveAction {
 
         gameObject.currentPath = null;
         gameObject.nextGridPosition = null;
-        gameObject.lookDirection = gameObject.moveDirection;
+        // Оновлюємо lookDirection тільки якщо об'єкт реально рухався
+        if (gameObject.isMoving && gameObject.moveDirection) {
+          gameObject.lookDirection = gameObject.moveDirection;
+        }
         gameObject.moveDirection = null;
         return;
       }
