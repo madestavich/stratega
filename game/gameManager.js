@@ -119,16 +119,13 @@ class GameManager {
     if (roomInfo) {
       this.isRoomCreator = roomInfo.isCreator;
       console.log(
-        `Player is ${
-          this.isRoomCreator ? "host (creator)" : "guest (player 2)"
-        }`
-      );
-      console.log(
-        "DEBUG: gameManager.isRoomCreator set to:",
-        this.isRoomCreator
+        `Player is ${this.isRoomCreator ? "host (creator)" : "guest (player 2)"}
+      `
       );
 
+      // Після визначення ролі гравця оновлюємо напрямок погляду для всіх юнітів
       for (const unit of this.objectManager.objects) {
+        unit.setLookDirectionByTeam();
       }
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
