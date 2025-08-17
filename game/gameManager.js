@@ -729,9 +729,7 @@ class GameManager {
   }
 
   async resetUnitsToStartingPositions() {
-  // Diagnostic log: check isRoomCreator before resetting units
-  console.log('[DIAG] resetUnitsToStartingPositions: isRoomCreator =', this.isRoomCreator, 'round =', this.roundNumber);
-  // Reset ALL player units (alive and dead) - move them back to their original starting positions
+    // Reset ALL player units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.objects) {
       // Reset to original starting position
       unit.gridCol = unit.startingGridCol;
