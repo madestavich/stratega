@@ -164,17 +164,13 @@ export class Particle {
       // Check if within collision radius of the target
       if (distance < 70) {
         this.hasReachedTarget = true;
-        console.log(`Particle hit target! Damage: ${this.damage}`); // Add debug log
 
         // Apply damage to the specific target
         if (this.target.health !== undefined) {
-          console.log(`Target health before: ${this.target.health}`); // Debug log
           this.target.health -= this.damage;
-          console.log(`Target health after: ${this.target.health}`); // Debug log
 
           // Check if target is defeated
           if (this.target.health <= 0 && !this.target.isDead) {
-            console.log(`Target defeated!`); // Debug log
             this.target.isDead = true;
             this.target.canAct = false;
 
