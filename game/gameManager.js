@@ -233,44 +233,11 @@ class GameManager {
         }
       }
 
-      // Оновлюємо логіку гри тільки якщо не на паузі
+      // Оновлюємо ВСЮ логіку (юніти, particles, дії, сітка) через objectManager.updateAll
       if (!this.isPaused) {
-        // Сортуємо об'єкти для детермінованого порядку обробки
-        const sortedObjects = allObjects.sort((a, b) => {
-          if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
-          return a.gridCol - b.gridCol;
-        });
-
-        // Оновлюємо ВСІ об'єкти (свої і ворожі) для однакового результату
-        for (const obj of sortedObjects) {
-          // Викликаємо тільки оновлення позиції та інших параметрів, без анімації
-          if (!obj.isDead) {
-            obj.updateZCoordinate();
-          }
-        }
-
-        // Оновлюємо дії для ВСІХ об'єктів (детермінованно)
+        this.objectManager.updateAll(this.fixedTimeStep);
         this.actionManager.update(this.fixedTimeStep);
-
-        // Оновлюємо стан сітки після руху
         this.objectManager.updateGridWithAllObjects();
-      }
-      // Логування стану першого юніта команди 2 на перших 3 кадрах
-      if (
-        this.objectManager.enemyObjects &&
-        this.objectManager.enemyObjects.length > 0
-      ) {
-        const unit = this.objectManager.enemyObjects[0];
-        if (!unit._debugFrame) unit._debugFrame = 1;
-        if (unit._debugFrame <= 3) {
-          console.log(
-            `[DEBUG][Frame ${unit._debugFrame}] Enemy[0]: grid=(${unit.gridCol},${unit.gridRow}), lookDirection=`,
-            unit.lookDirection,
-            ", moveDirection=",
-            unit.moveDirection
-          );
-          unit._debugFrame++;
-        }
       }
 
       this.accumulator -= this.fixedTimeStep;
