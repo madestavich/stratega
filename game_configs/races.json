@@ -23,15 +23,15 @@
           "moveSpeed": 8,
           "availableActions": ["move", "attack"],
           "attackDamage": 20,
-          "attackSpeed": 0.8,
+          "attackSpeed": 1,
           "health": 100,
           "isRanged": true,
           "minRangeDistance": 3,
           "maxRangeDistance": 18,
           "bulletConfig": {
             "bulletType": "bullet",
-            "moveSpeed": 15,
-            "bulletDamage": 60
+            "moveSpeed": 35,
+            "bulletDamage": 40
           }
         }
       },
