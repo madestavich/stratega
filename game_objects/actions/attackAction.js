@@ -191,7 +191,7 @@ export class AttackAction {
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
 
       // Apply the direction (flip if needed)
-      const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
+      const directionMultiplier = gameObject.lookDirection.x < 0 ? -1 : 1;
 
       // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX * directionMultiplier;
