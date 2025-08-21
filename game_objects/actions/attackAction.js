@@ -184,17 +184,19 @@ export class AttackAction {
     let bulletX, bulletY;
 
     if (currentFrame.bulletPoint) {
-      // Calculate the bullet point offset from the frame center
-      const bulletOffsetX =
-        currentFrame.bulletPoint.x - currentFrame.frameCenter.x;
+      let bulletPointX = currentFrame.bulletPoint.x;
+      // Якщо дивиться ліворуч, відзеркалюємо bulletPoint.x
+      if (gameObject.lookDirection.x < 0) {
+        bulletPointX =
+          currentFrame.frameCenter.x -
+          (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
+      }
+      const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
       const bulletOffsetY =
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
 
-      // Apply the direction (flip if needed)
-      const directionMultiplier = gameObject.lookDirection.x < 0 ? -1 : 1;
-
       // Calculate the final world position
-      bulletX = gameObject.x + bulletOffsetX * directionMultiplier;
+      bulletX = gameObject.x + bulletOffsetX;
       bulletY = gameObject.y + bulletOffsetY;
     } else {
       // Fallback to object center if no bullet point defined
