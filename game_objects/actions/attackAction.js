@@ -211,7 +211,10 @@ export class AttackAction {
     // Ensure bulletConfig has moveSpeed and damage
     const bulletConfig = Object.assign({}, gameObject.bulletConfig);
     bulletConfig.moveVector = moveVector;
-    bulletConfig.damage = gameObject.attackDamage || 10;
+    bulletConfig.damage =
+      gameObject.bulletConfig && gameObject.bulletConfig.bulletDamage
+        ? gameObject.bulletConfig.bulletDamage
+        : gameObject.attackDamage || 10;
 
     // Create a particle
     const particle = new Particle(
