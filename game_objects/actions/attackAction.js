@@ -186,7 +186,7 @@ export class AttackAction {
     if (currentFrame.bulletPoint) {
       let bulletPointX = currentFrame.bulletPoint.x;
       // Якщо дивиться ліворуч, дзеркалимо bulletPoint.x по центру кадру
-      if (gameObject.lookDirection.dx < 0) {
+      if (gameObject.lookDirection.x < 0) {
         bulletPointX =
           2 * currentFrame.frameCenter.x - currentFrame.bulletPoint.x;
       }
