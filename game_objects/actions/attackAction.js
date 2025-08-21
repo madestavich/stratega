@@ -456,6 +456,8 @@ export class AttackAction {
       ) {
         target.animator.setAnimation("death", false);
       }
+      // Calculate direction multiplier for bullet direction and logging
+      const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
     }
   }
 
