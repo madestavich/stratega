@@ -50,7 +50,6 @@ export class Particle {
   }
 
   update(dt) {
-    console.log("Particle update dt:", dt);
     if (this.target && !this.target.isDead) {
       // Оновлюємо тільки X-координату цілі, якщо вона рухається
       this.targetX = this.target.x;
@@ -93,7 +92,6 @@ export class Particle {
   }
 
   updateArcTrajectory(dt) {
-    console.log("Particle updateArcTrajectory dt:", dt);
     // Calculate direction vector to target
     const dx = this.targetX - this.x;
     const dy = this.targetY - this.y;
