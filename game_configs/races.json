@@ -30,7 +30,7 @@
           "maxRangeDistance": 18,
           "bulletConfig": {
             "bulletType": "bullet",
-            "bulletSpeed": 15000,
+            "moveSpeed": 150,
             "bulletDamage": 60
           }
         }
