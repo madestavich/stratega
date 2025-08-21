@@ -166,6 +166,12 @@ class GameManager {
 
       // Оновлюємо стан сітки після руху
       this.gridManager.updateGridObjects(this.objectManager);
+      // Оновлюємо всі particles
+      if (this.objectManager.particles) {
+        for (const particle of this.objectManager.particles) {
+          particle.update(dt);
+        }
+      }
     } catch (error) {
       console.error("Error in update:", error);
       // Логування стану гри для відлагодження
@@ -206,6 +212,12 @@ class GameManager {
     // Draw the hover indicator
     this.inputManager.drawHoverIndicator(ctx);
     this.objectManager.renderAll();
+    // Рендеримо всі particles
+    if (this.objectManager.particles) {
+      for (const particle of this.objectManager.particles) {
+        particle.draw();
+      }
+    }
   }
 
   loop(timestamp) {
