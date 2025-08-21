@@ -556,10 +556,6 @@ export class ObjectManager {
       objects: [...this.objects, ...this.enemyObjects],
     };
 
-    console.log(
-      `Updating grid with ${this.objects.length} player units and ${this.enemyObjects.length} enemy units`
-    );
-
     this.gridManager.updateGridObjects(tempObjectManager);
   }
 }
