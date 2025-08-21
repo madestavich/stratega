@@ -139,7 +139,11 @@ export class ObjectManager {
   }
 
   updateAll(dt) {
-    console.log('Particles before update:', this.particles.length, this.particles);
+    console.log(
+      "Particles before update:",
+      this.particles.length,
+      this.particles
+    );
     // Update ALL objects (player and enemy) for consistent game state
     // Sort objects for deterministic update order
     const allObjects = [...this.objects, ...this.enemyObjects];
