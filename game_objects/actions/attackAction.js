@@ -242,9 +242,11 @@ export class AttackAction {
     // Add the particle to the object manager
     if (this.objectManager.particles) {
       this.objectManager.particles.push(particle);
+    console.log('Spawned particle:', particle);
     } else {
       // If particles array doesn't exist, create it
       this.objectManager.particles = [particle];
+    console.log('Spawned particle:', particle);
     }
   }
 
