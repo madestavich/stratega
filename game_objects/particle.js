@@ -38,7 +38,6 @@ export class Particle {
 
     // Setup animator and renderer
     this.animator = new Animator(this.spriteConfig);
-    console.log(this);
 
     this.animator.setSpritesheet(Object.keys(spriteConfig)[0]);
     this.animator.setAnimation("bullet");
