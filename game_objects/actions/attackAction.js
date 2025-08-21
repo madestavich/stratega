@@ -7,6 +7,11 @@ export class AttackAction {
     this.moveAction = new MoveAction();
   }
 
+  // Get all objects (player and enemy) in one array
+  getAllObjects() {
+    return [...this.objectManager.objects, ...this.objectManager.enemyObjects];
+  }
+
   canExecute(gameObject) {
     if (gameObject.isDead) {
       return false;
@@ -32,6 +37,20 @@ export class AttackAction {
       this.moveAction.cancelMovement(gameObject);
     }
 
+    // Update move target if enemy has moved
+    if (
+      gameObject.attackTarget &&
+      gameObject.moveTarget &&
+      (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
+        gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
+    ) {
+      this.moveAction.cancelMovement(gameObject);
+      gameObject.moveTarget = {
+        col: gameObject.attackTarget.gridCol,
+        row: gameObject.attackTarget.gridRow,
+      };
+    }
+
     // Find nearest enemy
     const nearestEnemy = this.findNearestEnemy(gameObject);
 
@@ -40,6 +59,14 @@ export class AttackAction {
       gameObject.attackTarget = null;
       gameObject.moveTarget = null;
       return false;
+    }
+
+    // Check if we need to switch to a different target
+    if (gameObject.attackTarget && gameObject.attackTarget !== nearestEnemy) {
+      // Target changed, cancel current movement
+      this.moveAction.cancelMovement(gameObject);
+      gameObject.attackTarget = nearestEnemy;
+      gameObject.moveTarget = null; // Will be set below
     }
 
     // Calculate distance to nearest enemy
@@ -137,6 +164,17 @@ export class AttackAction {
     return false;
   }
 
+  // Update method called by ActionManager
+  update(gameObject, deltaTime) {
+    // Update attack cooldown
+    if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
+      gameObject.attackCooldown -= deltaTime;
+      if (gameObject.attackCooldown < 0) {
+        gameObject.attackCooldown = 0;
+      }
+    }
+  }
+
   // Method to spawn a projectile
   spawnProjectile(gameObject, target) {
     // Get the current frame
@@ -187,6 +225,23 @@ export class AttackAction {
         Math.pow(particle.targetY - particle.startY, 2)
     );
 
+    // Debug logging for particle creation
+    console.log("[PARTICLE SPAWN]", {
+      bulletX,
+      bulletY,
+      targetX: particle.targetX,
+      targetY: particle.targetY,
+      totalDistance: particle.totalDistance,
+      directionMultiplier,
+      gameObjectX: gameObject.x,
+      gameObjectY: gameObject.y,
+      targetObjX: target.x,
+      targetObjY: target.y,
+      bulletPoint: currentFrame.bulletPoint,
+      frameCenter: currentFrame.frameCenter,
+      lookDirection: gameObject.lookDirection,
+    });
+
     // Add the particle to the object manager
     if (this.objectManager.particles) {
       this.objectManager.particles.push(particle);
@@ -198,16 +253,12 @@ export class AttackAction {
 
   // New helper method to find enemies closer than a specified distance
   findEnemiesCloserThan(gameObject, maxDistance) {
-    for (const obj of this.objectManager.objects) {
-      // Skip if dead, same team, or no team
+    for (const obj of this.getAllObjects()) {
+      // Skip if dead, no team, or same team
       if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
-
-      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-
-      // If any enemy is closer than maxDistance, return true
       if (distance < maxDistance) {
         return true;
       }
@@ -219,47 +270,30 @@ export class AttackAction {
   findRangedTarget(gameObject) {
     let bestTarget = null;
     let bestScore = Infinity; // Lower score is better
-
-    // Find all enemies within range
-    for (const obj of this.objectManager.objects) {
-      // Skip if dead, same team, or no team
+    for (const obj of this.getAllObjects()) {
+      // Skip if dead, no team, or same team
       if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
-
-      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-
-      // Check if enemy is within ranged attack distance
       if (
         distance >= gameObject.minRangeDistance &&
         distance <= gameObject.maxRangeDistance
       ) {
-        // Calculate direction vector
         const dx = obj.gridCol - gameObject.gridCol;
         const dy = obj.gridRow - gameObject.gridRow;
-
-        // Calculate score based on distance and direction
-        // Lower score means higher priority
-        let score = distance * 10; // Base score is distance
-
-        // Check if target is in straight line (horizontally or vertically)
+        let score = distance * 10;
         if (dx === 0 || dy === 0) {
-          // Straight line gets priority (subtract 50 from score)
           score -= 50;
         } else if (Math.abs(dx) === Math.abs(dy)) {
-          // Diagonal line gets secondary priority (subtract 25 from score)
           score -= 25;
         }
-
-        // Find the target with the best (lowest) score
         if (score < bestScore) {
           bestScore = score;
           bestTarget = obj;
         }
       }
     }
-
     return bestTarget;
   }
 
@@ -282,24 +316,17 @@ export class AttackAction {
   findNearestEnemy(gameObject) {
     let nearestEnemy = null;
     let minDistance = Infinity;
-
-    // Find all enemies (units from other teams)
-    for (const obj of this.objectManager.objects) {
-      // Skip if dead, same team, or no team
+    for (const obj of this.getAllObjects()) {
+      // Skip if dead, no team, or same team
       if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
-
-      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-
-      // Update nearest enemy
       if (distance < minDistance) {
         minDistance = distance;
         nearestEnemy = obj;
       }
     }
-
     return nearestEnemy;
   }
 
