@@ -140,60 +140,17 @@ export class AttackAction {
       }
     }
 
-    // Start a new attack
-    if (
-      !gameObject.isAttacking &&
-      gameObject.attackTarget &&
-      !gameObject.attackTarget.isDead
-    ) {
-      gameObject.isAttacking = true;
-      this.setLookDirection(gameObject, gameObject.attackTarget);
-
-      // Вибір правильної анімації в залежності від типу атаки
-      if (
-        gameObject.isRangedAttack &&
-        gameObject.animator.activeSpritesheet.animations.range_attack
-      ) {
-        gameObject.animator.setAnimation("range_attack", false);
-      } else {
-        gameObject.animator.setAnimation("attack", false);
-      }
-      return true;
-    }
-
-    return false;
-  }
-
-  // Update method called by ActionManager
-  update(gameObject, deltaTime) {
-    // Update attack cooldown
-    if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
-      gameObject.attackCooldown -= deltaTime;
-      if (gameObject.attackCooldown < 0) {
-        gameObject.attackCooldown = 0;
-      }
-    }
-  }
-
-  // Method to spawn a projectile
-  spawnProjectile(gameObject, target) {
-    // Get the current frame
-    const currentFrame = gameObject.animator.activeFrame;
-
     // Calculate the bullet starting position
     let bulletX, bulletY;
-
+    const currentFrame = gameObject.animator.activeFrame;
+    const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
     if (currentFrame.bulletPoint) {
       // Calculate the bullet point offset from the frame center
       const bulletOffsetX =
         currentFrame.bulletPoint.x - currentFrame.frameCenter.x;
       const bulletOffsetY =
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
-
       // Apply the direction (flip if needed)
-      const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
-
-      // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX * directionMultiplier;
       bulletY = gameObject.y + bulletOffsetY;
     } else {
@@ -214,7 +171,6 @@ export class AttackAction {
     );
 
     // Adjust the target Y position to aim at the center of the target
-    // Get target's current frame to determine its height
     const targetFrame = target.animator.activeFrame;
     const targetHeight = targetFrame.height;
     particle.targetY = target.y - targetHeight / 2;
