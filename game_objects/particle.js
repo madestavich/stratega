@@ -110,21 +110,6 @@ export class Particle {
     this.x = newX;
     this.y = newY - arcOffset; // Subtract because y increases downward in canvas
 
-    // Debug logging for trajectory
-    if (this.progress === 0 || this.progress === 1 || this.progress < 0.05) {
-      console.log("[PARTICLE TRAJECTORY]", {
-        startX: this.startX,
-        startY: this.startY,
-        targetX: this.targetX,
-        targetY: this.targetY,
-        newX,
-        newY,
-        arcOffset,
-        progress: this.progress,
-        totalDistance: this.totalDistance,
-      });
-    }
-
     // Update move vector for rendering
     if (currentDistance > 0) {
       this.moveVector = {

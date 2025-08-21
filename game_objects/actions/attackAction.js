@@ -180,9 +180,6 @@ export class AttackAction {
     // Get the current frame
     const currentFrame = gameObject.animator.activeFrame;
 
-    // Calculate direction multiplier for bullet direction and logging
-    const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
-
     // Calculate the bullet starting position
     let bulletX, bulletY;
 
@@ -192,6 +189,9 @@ export class AttackAction {
         currentFrame.bulletPoint.x - currentFrame.frameCenter.x;
       const bulletOffsetY =
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
+
+      // Apply the direction (flip if needed)
+      const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
 
       // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX * directionMultiplier;
@@ -224,23 +224,6 @@ export class AttackAction {
       Math.pow(particle.targetX - particle.startX, 2) +
         Math.pow(particle.targetY - particle.startY, 2)
     );
-
-    // Debug logging for particle creation
-    console.log("[PARTICLE SPAWN]", {
-      bulletX,
-      bulletY,
-      targetX: particle.targetX,
-      targetY: particle.targetY,
-      totalDistance: particle.totalDistance,
-      directionMultiplier,
-      gameObjectX: gameObject.x,
-      gameObjectY: gameObject.y,
-      targetObjX: target.x,
-      targetObjY: target.y,
-      bulletPoint: currentFrame.bulletPoint,
-      frameCenter: currentFrame.frameCenter,
-      lookDirection: gameObject.lookDirection,
-    });
 
     // Add the particle to the object manager
     if (this.objectManager.particles) {
@@ -456,8 +439,6 @@ export class AttackAction {
       ) {
         target.animator.setAnimation("death", false);
       }
-      // Calculate direction multiplier for bullet direction and logging
-      const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
     }
   }
 
