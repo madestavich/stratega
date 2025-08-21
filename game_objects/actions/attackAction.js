@@ -225,6 +225,23 @@ export class AttackAction {
         Math.pow(particle.targetY - particle.startY, 2)
     );
 
+    // Debug logging for particle creation
+    console.log("[PARTICLE SPAWN]", {
+      bulletX,
+      bulletY,
+      targetX: particle.targetX,
+      targetY: particle.targetY,
+      totalDistance: particle.totalDistance,
+      directionMultiplier,
+      gameObjectX: gameObject.x,
+      gameObjectY: gameObject.y,
+      targetObjX: target.x,
+      targetObjY: target.y,
+      bulletPoint: currentFrame.bulletPoint,
+      frameCenter: currentFrame.frameCenter,
+      lookDirection: gameObject.lookDirection,
+    });
+
     // Add the particle to the object manager
     if (this.objectManager.particles) {
       this.objectManager.particles.push(particle);
