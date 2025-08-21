@@ -61,6 +61,11 @@ export class Particle {
         const targetHeight = targetFrame.height;
         this.targetY = this.target.y - targetHeight / 2;
       }
+      // Оновлюємо totalDistance якщо targetX або targetY змінилися
+      this.totalDistance = Math.sqrt(
+        Math.pow(this.targetX - this.startX, 2) +
+          Math.pow(this.targetY - this.startY, 2)
+      );
     }
 
     if (this.hasReachedTarget) return;
