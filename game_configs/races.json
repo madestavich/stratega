@@ -27,7 +27,7 @@
           "health": 100,
           "isRanged": true,
           "minRangeDistance": 3,
-          "maxRangeDistance": 8,
+          "maxRangeDistance": 18,
           "bulletConfig": {
             "bulletType": "bullet",
             "bulletSpeed": 15000,
