@@ -7,15 +7,9 @@ export class AttackAction {
     this.moveAction = new MoveAction();
   }
 
-  // Get the appropriate enemy array based on the gameObject's team
-  getEnemyArray(gameObject) {
-    // If gameObject is in player objects (team 1), enemies are in enemyObjects
-    // If gameObject is in enemy objects (team 2), enemies are in player objects
-    if (gameObject.team === 1) {
-      return this.objectManager.enemyObjects;
-    } else {
-      return this.objectManager.objects;
-    }
+  // Get all objects (player and enemy) in one array
+  getAllObjects() {
+    return [...this.objectManager.objects, ...this.objectManager.enemyObjects];
   }
 
   canExecute(gameObject) {
@@ -50,7 +44,6 @@ export class AttackAction {
       (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
         gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
     ) {
-      // Cancel current movement to recalculate path to new position
       this.moveAction.cancelMovement(gameObject);
       gameObject.moveTarget = {
         col: gameObject.attackTarget.gridCol,
@@ -243,19 +236,12 @@ export class AttackAction {
 
   // New helper method to find enemies closer than a specified distance
   findEnemiesCloserThan(gameObject, maxDistance) {
-    // Get the appropriate enemy array based on which team the gameObject belongs to
-    const enemyArray = this.getEnemyArray(gameObject);
-
-    for (const obj of enemyArray) {
-      // Skip if dead or no team
-      if (obj.isDead || !obj.team) {
+    for (const obj of this.getAllObjects()) {
+      // Skip if dead, no team, or same team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
-
-      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-
-      // If any enemy is closer than maxDistance, return true
       if (distance < maxDistance) {
         return true;
       }
@@ -267,50 +253,30 @@ export class AttackAction {
   findRangedTarget(gameObject) {
     let bestTarget = null;
     let bestScore = Infinity; // Lower score is better
-
-    // Get the appropriate enemy array based on which team the gameObject belongs to
-    const enemyArray = this.getEnemyArray(gameObject);
-
-    // Find all enemies within range
-    for (const obj of enemyArray) {
-      // Skip if dead or no team
-      if (obj.isDead || !obj.team) {
+    for (const obj of this.getAllObjects()) {
+      // Skip if dead, no team, or same team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
-
-      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-
-      // Check if enemy is within ranged attack distance
       if (
         distance >= gameObject.minRangeDistance &&
         distance <= gameObject.maxRangeDistance
       ) {
-        // Calculate direction vector
         const dx = obj.gridCol - gameObject.gridCol;
         const dy = obj.gridRow - gameObject.gridRow;
-
-        // Calculate score based on distance and direction
-        // Lower score means higher priority
-        let score = distance * 10; // Base score is distance
-
-        // Check if target is in straight line (horizontally or vertically)
+        let score = distance * 10;
         if (dx === 0 || dy === 0) {
-          // Straight line gets priority (subtract 50 from score)
           score -= 50;
         } else if (Math.abs(dx) === Math.abs(dy)) {
-          // Diagonal line gets secondary priority (subtract 25 from score)
           score -= 25;
         }
-
-        // Find the target with the best (lowest) score
         if (score < bestScore) {
           bestScore = score;
           bestTarget = obj;
         }
       }
     }
-
     return bestTarget;
   }
 
@@ -333,27 +299,17 @@ export class AttackAction {
   findNearestEnemy(gameObject) {
     let nearestEnemy = null;
     let minDistance = Infinity;
-
-    // Get the appropriate enemy array based on which team the gameObject belongs to
-    const enemyArray = this.getEnemyArray(gameObject);
-
-    // Find all enemies (units from other teams)
-    for (const obj of enemyArray) {
-      // Skip if dead or no team
-      if (obj.isDead || !obj.team) {
+    for (const obj of this.getAllObjects()) {
+      // Skip if dead, no team, or same team
+      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
-
-      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-
-      // Update nearest enemy
       if (distance < minDistance) {
         minDistance = distance;
         nearestEnemy = obj;
       }
     }
-
     return nearestEnemy;
   }
 
