@@ -204,7 +204,7 @@ export class AttackAction {
 
     // Calculate moveVector towards target
     const dx = target.x - bulletX;
-    const dy = (target.y - bulletY);
+    const dy = target.y - bulletY;
     const distance = Math.sqrt(dx * dx + dy * dy) || 1;
     const moveVector = { dx: dx / distance, dy: dy / distance };
 
