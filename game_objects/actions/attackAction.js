@@ -202,11 +202,22 @@ export class AttackAction {
       bulletY = gameObject.y;
     }
 
+    // Calculate moveVector towards target
+    const dx = target.x - bulletX;
+    const dy = (target.y - bulletY);
+    const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+    const moveVector = { dx: dx / distance, dy: dy / distance };
+
+    // Ensure bulletConfig has moveSpeed and damage
+    const bulletConfig = Object.assign({}, gameObject.bulletConfig);
+    bulletConfig.moveVector = moveVector;
+    bulletConfig.damage = gameObject.attackDamage || 10;
+
     // Create a particle
     const particle = new Particle(
       gameObject.ctx,
       gameObject.spriteConfig,
-      gameObject.bulletConfig,
+      bulletConfig,
       bulletX,
       bulletY,
       target,
