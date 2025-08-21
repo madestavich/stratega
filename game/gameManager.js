@@ -156,35 +156,35 @@ class GameManager {
     requestAnimationFrame((t) => this.loop(t));
   }
 
-  update(dt) {
-    try {
-      // Оновлюємо всі об'єкти
-      this.objectManager.updateAll(dt);
+  // update(dt) {
+  //   try {
+  //     // Оновлюємо всі об'єкти
+  //     this.objectManager.updateAll(dt);
 
-      // Оновлюємо дії для всіх об'єктів через ActionManager
-      this.actionManager.update(dt);
+  //     // Оновлюємо дії для всіх об'єктів через ActionManager
+  //     this.actionManager.update(dt);
 
-      // Оновлюємо стан сітки після руху
-      this.gridManager.updateGridObjects(this.objectManager);
-    } catch (error) {
-      console.error("Error in update:", error);
-      // Логування стану гри для відлагодження
-      console.log("Game state:", {
-        objects: this.objectManager.objects.map((obj) => ({
-          gridCol: obj.gridCol,
-          gridRow: obj.gridRow,
-          gridWidth: obj.gridWidth,
-          gridHeight: obj.gridHeight,
-          expansionDirection: obj.expansionDirection,
-        })),
-      });
-      // Зупиняємо цикл оновлення, щоб уникнути спаму помилками
-      this.isRunning = false;
-      console.warn(
-        "Game loop stopped due to error. Check console for details."
-      );
-    }
-  }
+  //     // Оновлюємо стан сітки після руху
+  //     this.gridManager.updateGridObjects(this.objectManager);
+  //   } catch (error) {
+  //     console.error("Error in update:", error);
+  //     // Логування стану гри для відлагодження
+  //     console.log("Game state:", {
+  //       objects: this.objectManager.objects.map((obj) => ({
+  //         gridCol: obj.gridCol,
+  //         gridRow: obj.gridRow,
+  //         gridWidth: obj.gridWidth,
+  //         gridHeight: obj.gridHeight,
+  //         expansionDirection: obj.expansionDirection,
+  //       })),
+  //     });
+  //     // Зупиняємо цикл оновлення, щоб уникнути спаму помилками
+  //     this.isRunning = false;
+  //     console.warn(
+  //       "Game loop stopped due to error. Check console for details."
+  //     );
+  //   }
+  // }
 
   render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
