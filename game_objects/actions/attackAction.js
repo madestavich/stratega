@@ -7,11 +7,6 @@ export class AttackAction {
     this.moveAction = new MoveAction();
   }
 
-  // Get all objects (player and enemy) in one array
-  getAllObjects() {
-    return [...this.objectManager.objects, ...this.objectManager.enemyObjects];
-  }
-
   canExecute(gameObject) {
     if (gameObject.isDead) {
       return false;
@@ -37,20 +32,6 @@ export class AttackAction {
       this.moveAction.cancelMovement(gameObject);
     }
 
-    // Update move target if enemy has moved
-    if (
-      gameObject.attackTarget &&
-      gameObject.moveTarget &&
-      (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
-        gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
-    ) {
-      this.moveAction.cancelMovement(gameObject);
-      gameObject.moveTarget = {
-        col: gameObject.attackTarget.gridCol,
-        row: gameObject.attackTarget.gridRow,
-      };
-    }
-
     // Find nearest enemy
     const nearestEnemy = this.findNearestEnemy(gameObject);
 
@@ -59,14 +40,6 @@ export class AttackAction {
       gameObject.attackTarget = null;
       gameObject.moveTarget = null;
       return false;
-    }
-
-    // Check if we need to switch to a different target
-    if (gameObject.attackTarget && gameObject.attackTarget !== nearestEnemy) {
-      // Target changed, cancel current movement
-      this.moveAction.cancelMovement(gameObject);
-      gameObject.attackTarget = nearestEnemy;
-      gameObject.moveTarget = null; // Will be set below
     }
 
     // Calculate distance to nearest enemy
@@ -140,17 +113,101 @@ export class AttackAction {
       }
     }
 
-    // ...existing code...
+    // Start a new attack
+    if (
+      !gameObject.isAttacking &&
+      gameObject.attackTarget &&
+      !gameObject.attackTarget.isDead
+    ) {
+      gameObject.isAttacking = true;
+      this.setLookDirection(gameObject, gameObject.attackTarget);
+
+      // Вибір правильної анімації в залежності від типу атаки
+      if (
+        gameObject.isRangedAttack &&
+        gameObject.animator.activeSpritesheet.animations.range_attack
+      ) {
+        gameObject.animator.setAnimation("range_attack", false);
+      } else {
+        gameObject.animator.setAnimation("attack", false);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  // Method to spawn a projectile
+  spawnProjectile(gameObject, target) {
+    // Get the current frame
+    const currentFrame = gameObject.animator.activeFrame;
+
+    // Calculate the bullet starting position
+    let bulletX, bulletY;
+
+    if (currentFrame.bulletPoint) {
+      // Calculate the bullet point offset from the frame center
+      const bulletOffsetX =
+        currentFrame.bulletPoint.x - currentFrame.frameCenter.x;
+      const bulletOffsetY =
+        currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
+
+      // Apply the direction (flip if needed)
+      const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
+
+      // Calculate the final world position
+      bulletX = gameObject.x + bulletOffsetX * directionMultiplier;
+      bulletY = gameObject.y + bulletOffsetY;
+    } else {
+      // Fallback to object center if no bullet point defined
+      bulletX = gameObject.x;
+      bulletY = gameObject.y;
+    }
+
+    // Create a particle
+    const particle = new Particle(
+      gameObject.ctx,
+      gameObject.spriteConfig,
+      gameObject.bulletConfig,
+      bulletX,
+      bulletY,
+      target,
+      gameObject.gridManager
+    );
+
+    // Adjust the target Y position to aim at the center of the target
+    // Get target's current frame to determine its height
+    const targetFrame = target.animator.activeFrame;
+    const targetHeight = targetFrame.height;
+    particle.targetY = target.y - targetHeight / 2;
+
+    // Recalculate trajectory with the new target Y
+    particle.totalDistance = Math.sqrt(
+      Math.pow(particle.targetX - particle.startX, 2) +
+        Math.pow(particle.targetY - particle.startY, 2)
+    );
+
+    // Add the particle to the object manager
+    if (this.objectManager.particles) {
+      this.objectManager.particles.push(particle);
+    } else {
+      // If particles array doesn't exist, create it
+      this.objectManager.particles = [particle];
+    }
   }
 
   // New helper method to find enemies closer than a specified distance
   findEnemiesCloserThan(gameObject, maxDistance) {
-    for (const obj of this.getAllObjects()) {
-      // Skip if dead, no team, or same team
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
       if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
+
+      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
+
+      // If any enemy is closer than maxDistance, return true
       if (distance < maxDistance) {
         return true;
       }
@@ -162,30 +219,47 @@ export class AttackAction {
   findRangedTarget(gameObject) {
     let bestTarget = null;
     let bestScore = Infinity; // Lower score is better
-    for (const obj of this.getAllObjects()) {
-      // Skip if dead, no team, or same team
+
+    // Find all enemies within range
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
       if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
+
+      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
+
+      // Check if enemy is within ranged attack distance
       if (
         distance >= gameObject.minRangeDistance &&
         distance <= gameObject.maxRangeDistance
       ) {
+        // Calculate direction vector
         const dx = obj.gridCol - gameObject.gridCol;
         const dy = obj.gridRow - gameObject.gridRow;
-        let score = distance * 10;
+
+        // Calculate score based on distance and direction
+        // Lower score means higher priority
+        let score = distance * 10; // Base score is distance
+
+        // Check if target is in straight line (horizontally or vertically)
         if (dx === 0 || dy === 0) {
+          // Straight line gets priority (subtract 50 from score)
           score -= 50;
         } else if (Math.abs(dx) === Math.abs(dy)) {
+          // Diagonal line gets secondary priority (subtract 25 from score)
           score -= 25;
         }
+
+        // Find the target with the best (lowest) score
         if (score < bestScore) {
           bestScore = score;
           bestTarget = obj;
         }
       }
     }
+
     return bestTarget;
   }
 
@@ -208,17 +282,24 @@ export class AttackAction {
   findNearestEnemy(gameObject) {
     let nearestEnemy = null;
     let minDistance = Infinity;
-    for (const obj of this.getAllObjects()) {
-      // Skip if dead, no team, or same team
+
+    // Find all enemies (units from other teams)
+    for (const obj of this.objectManager.objects) {
+      // Skip if dead, same team, or no team
       if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
+
+      // Calculate minimum distance between any cells of both objects
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
+
+      // Update nearest enemy
       if (distance < minDistance) {
         minDistance = distance;
         nearestEnemy = obj;
       }
     }
+
     return nearestEnemy;
   }
 
