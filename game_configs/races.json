@@ -11,7 +11,7 @@
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 12,
           "availableActions": ["move", "attack"],
-          "attackDamage": 5,
+          "attackDamage": 75,
           "attackSpeed": 0.8,
           "health": 240
         },
@@ -30,7 +30,7 @@
           "maxRangeDistance": 18,
           "bulletConfig": {
             "bulletType": "bullet",
-            "moveSpeed": 150,
+            "moveSpeed": 15,
             "bulletDamage": 60
           }
         }
