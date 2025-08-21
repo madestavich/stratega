@@ -140,71 +140,7 @@ export class AttackAction {
       }
     }
 
-    // Calculate the bullet starting position
-    let bulletX, bulletY;
-    const currentFrame = gameObject.animator.activeFrame;
-    const directionMultiplier = gameObject.lookDirection.dx < 0 ? -1 : 1;
-    if (currentFrame.bulletPoint) {
-      // Calculate the bullet point offset from the frame center
-      const bulletOffsetX =
-        currentFrame.bulletPoint.x - currentFrame.frameCenter.x;
-      const bulletOffsetY =
-        currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
-      // Apply the direction (flip if needed)
-      bulletX = gameObject.x + bulletOffsetX * directionMultiplier;
-      bulletY = gameObject.y + bulletOffsetY;
-    } else {
-      // Fallback to object center if no bullet point defined
-      bulletX = gameObject.x;
-      bulletY = gameObject.y;
-    }
-
-    // Create a particle
-    const particle = new Particle(
-      gameObject.ctx,
-      gameObject.spriteConfig,
-      gameObject.bulletConfig,
-      bulletX,
-      bulletY,
-      target,
-      gameObject.gridManager
-    );
-
-    // Adjust the target Y position to aim at the center of the target
-    const targetFrame = target.animator.activeFrame;
-    const targetHeight = targetFrame.height;
-    particle.targetY = target.y - targetHeight / 2;
-
-    // Recalculate trajectory with the new target Y
-    particle.totalDistance = Math.sqrt(
-      Math.pow(particle.targetX - particle.startX, 2) +
-        Math.pow(particle.targetY - particle.startY, 2)
-    );
-
-    // Debug logging for particle creation
-    console.log("[PARTICLE SPAWN]", {
-      bulletX,
-      bulletY,
-      targetX: particle.targetX,
-      targetY: particle.targetY,
-      totalDistance: particle.totalDistance,
-      directionMultiplier,
-      gameObjectX: gameObject.x,
-      gameObjectY: gameObject.y,
-      targetObjX: target.x,
-      targetObjY: target.y,
-      bulletPoint: currentFrame.bulletPoint,
-      frameCenter: currentFrame.frameCenter,
-      lookDirection: gameObject.lookDirection,
-    });
-
-    // Add the particle to the object manager
-    if (this.objectManager.particles) {
-      this.objectManager.particles.push(particle);
-    } else {
-      // If particles array doesn't exist, create it
-      this.objectManager.particles = [particle];
-    }
+    // ...existing code...
   }
 
   // New helper method to find enemies closer than a specified distance
