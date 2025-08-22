@@ -482,13 +482,12 @@ export class ObjectManager {
       // Визначаємо команду згідно з роллю
       let team;
       if (this.isCreator === true) {
+        // creator: objects=1, enemyObjects=2
         team = targetArray === this.objects ? 1 : 2;
       } else {
+        // guest: objects=2, enemyObjects=1
         team = targetArray === this.objects ? 2 : 1;
       }
-
-      // Просто: this.objects завжди команда 1, this.enemyObjects завжди команда 2
-      // const team = targetArray === this.objects ? 1 : 2;
 
       // Create GameObject
       const obj = new GameObject(
