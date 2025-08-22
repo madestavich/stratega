@@ -184,11 +184,13 @@ export class AttackAction {
 
     if (currentFrame.bulletPoint) {
       let bulletPointX = currentFrame.bulletPoint.x;
-      // Якщо дивиться ліворуч, дзеркалимо bulletPoint.x по центру кадру
-      if (gameObject.lookDirection && gameObject.lookDirection.dx < 0) {
+      // Для 2 гравця (team === 2) зміщуємо bulletPoint вліво від початку спрайта
+      if (gameObject.team === 2) {
         bulletPointX =
-          currentFrame.frameCenter.x -
-          (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
+          currentFrame.x +
+          (currentFrame.x +
+            currentFrame.frameCenter.x -
+            currentFrame.bulletPoint.x);
       }
       const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
       const bulletOffsetY =
@@ -475,7 +477,7 @@ export class AttackAction {
 
     // Перевіряємо, чи ціль в діапазоні ближньої атаки
     if (this.isEnemyInRange(gameObject, gameObject.attackTarget)) {
-      // Якщо ціль в діапазоні атаки, зупиняємо рух
+      // Якщо ціль в діапазоні атаки, скидаємо рух
       if (gameObject.isMoving && this.moveAction) {
         this.moveAction.cancelMovement(gameObject);
       }
