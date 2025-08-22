@@ -19,7 +19,13 @@ export class GameObject {
     this.moveTarget = null; // Ціль для руху
     // Встановлюємо коректний напрямок погляду одразу при створенні
     let initialLookDirection = null;
-    this.lookDirection = { dx: 1, dy: 0 }; // За замовчуванням вправо
+    // team 1 завжди вправо, team 2 завжди вліво
+    if (objectConfig.team === 1) {
+      initialLookDirection = { dx: 1, dy: 0 };
+    } else if (objectConfig.team === 2) {
+      initialLookDirection = { dx: -1, dy: 0 };
+    }
+    this.lookDirection = initialLookDirection; // Напрямок огляду
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
     this.availableActions = objectConfig.availableActions || []; // Доступні дії
     this.team = objectConfig.team; // Команда об'єкта
@@ -202,7 +208,12 @@ export class GameObject {
   setLookDirectionByTeam() {
     // Скидаємо moveDirection щоб використовувався lookDirection
     this.moveDirection = null;
-    // Не змінюємо lookDirection тут, бо він має встановлюватись через setLookDirectionToTarget при атаці
+    // team 1 завжди вправо, team 2 завжди вліво
+    if (this.team === 1) {
+      this.lookDirection = { dx: 1, dy: 0 };
+    } else if (this.team === 2) {
+      this.lookDirection = { dx: -1, dy: 0 };
+    }
   }
 
   // Встановлює напрямок погляду на ціль (універсально для атаки)
