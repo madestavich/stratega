@@ -362,7 +362,7 @@ export class MoveAction {
   }
 
   // Debug method to draw a direct line from object to movement target
-  debugDrawPath(gameObject) {
+  debugDrawPath(gameObject, forceColor = null) {
     if (!gameObject || !gameObject.moveTarget) return;
 
     const ctx = gameObject.gridManager.ctx;
@@ -371,28 +371,17 @@ export class MoveAction {
     // Save current context state
     ctx.save();
 
-    // Determine line color based on team
+    // Determine line color based on team or forced color
     let lineColor, targetColor;
 
-    console.log(
-      `DEBUG debugDrawPath: gameObject.team = ${
-        gameObject.team
-      } (type: ${typeof gameObject.team})`
-    );
-
-    switch (gameObject.team) {
-      case 1:
-        lineColor = "rgba(0, 100, 255, 0.7)"; // Blue for team 1
-        targetColor = "rgba(0, 50, 255, 0.7)";
-        break;
-      case 2:
-        lineColor = "rgba(255, 50, 0, 0.7)"; // Red for team 2
-        targetColor = "rgba(255, 100, 0, 0.7)";
-        break;
-      default:
-        console.log(`DEBUG: Using orange color for team: ${gameObject.team}`);
-        lineColor = "rgba(0, 255, 0, 0.7)"; // Green for any other team
-        targetColor = "rgba(255, 165, 0, 0.7)";
+    if (forceColor) {
+      // Use forced color (for enemy units)
+      lineColor = forceColor;
+      targetColor = forceColor;
+    } else {
+      // Default colors for own units (always blue)
+      lineColor = "rgba(0, 100, 255, 0.7)"; // Blue for own units
+      targetColor = "rgba(0, 50, 255, 0.7)";
     }
 
     // Draw direct line from object to target

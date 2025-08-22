@@ -174,30 +174,8 @@ class GameManager {
         // Додаємо debug-лінії для другого гравця (enemyObjects, червоні)
         for (const obj of this.objectManager.enemyObjects) {
           if (obj.moveTarget && !obj.isDead) {
-            // Тимчасово змінюємо колір лінії на червоний
-            const origDebugDrawPath = moveAction.debugDrawPath;
-            moveAction.debugDrawPath = function (gameObject) {
-              const ctx = gameObject.gridManager.ctx;
-              const { cellWidth, cellHeight } = gameObject.gridManager;
-              ctx.save();
-              ctx.beginPath();
-              ctx.strokeStyle = "rgba(255,0,0,0.8)";
-              ctx.lineWidth = 2;
-              ctx.moveTo(gameObject.x, gameObject.y);
-              const targetCenterX =
-                (gameObject.moveTarget.col + 0.5) * cellWidth;
-              const targetCenterY =
-                (gameObject.moveTarget.row + 0.5) * cellHeight;
-              ctx.lineTo(targetCenterX, targetCenterY);
-              ctx.stroke();
-              ctx.fillStyle = "rgba(255,0,0,0.8)";
-              ctx.beginPath();
-              ctx.arc(targetCenterX, targetCenterY, 5, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.restore();
-            };
-            moveAction.debugDrawPath(obj);
-            moveAction.debugDrawPath = origDebugDrawPath;
+            // Use forceColor parameter to make enemy lines red
+            moveAction.debugDrawPath(obj, "rgba(255,0,0,0.8)");
           }
         }
       }
