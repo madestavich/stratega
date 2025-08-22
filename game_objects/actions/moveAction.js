@@ -374,6 +374,12 @@ export class MoveAction {
     // Determine line color based on team
     let lineColor, targetColor;
 
+    console.log(
+      `DEBUG debugDrawPath: gameObject.team = ${
+        gameObject.team
+      } (type: ${typeof gameObject.team})`
+    );
+
     switch (gameObject.team) {
       case 1:
         lineColor = "rgba(0, 100, 255, 0.7)"; // Blue for team 1
@@ -384,6 +390,7 @@ export class MoveAction {
         targetColor = "rgba(255, 100, 0, 0.7)";
         break;
       default:
+        console.log(`DEBUG: Using orange color for team: ${gameObject.team}`);
         lineColor = "rgba(0, 255, 0, 0.7)"; // Green for any other team
         targetColor = "rgba(255, 165, 0, 0.7)";
     }

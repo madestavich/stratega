@@ -501,6 +501,13 @@ export class ObjectManager {
 
       // Set team (1 for player objects, 2 for enemy objects)
       obj.team = team;
+      console.log(
+        `DEBUG: Unit created with team: ${team}, isCreator: ${
+          this.isCreator
+        }, targetArray: ${
+          targetArray === this.objects ? "objects" : "enemyObjects"
+        }`
+      );
 
       // Store starting position (use current position if no starting position stored)
       obj.startingGridCol = objData.startingGridCol || objData.gridCol;
