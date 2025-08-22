@@ -148,7 +148,8 @@ export class AttackAction {
     ) {
       gameObject.isAttacking = true;
 
-      gameObject.setLookDirectionByTeam();
+      // Завжди дивимось на ціль атаки
+      this.setLookDirection(gameObject, gameObject.attackTarget);
 
       // Вибір правильної анімації в залежності від типу атаки
       if (
