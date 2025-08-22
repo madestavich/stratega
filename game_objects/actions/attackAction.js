@@ -151,7 +151,7 @@ export class AttackAction {
       if (typeof gameObject.setLookDirectionByTeam === "function") {
         gameObject.setLookDirectionByTeam();
       } else {
-        this.setLookDirection(gameObject, gameObject.attackTarget);
+        // this.setLookDirection(gameObject, gameObject.attackTarget);
       }
       // Вибір правильної анімації в залежності від типу атаки
       if (
