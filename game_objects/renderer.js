@@ -108,11 +108,6 @@ export class Renderer {
 
       const lineEndX = 40 * adjustedDx;
       const lineEndY = 40 * lookDirection.dy;
-      console.log(
-        `DEBUG renderer drawDebugFrame: lookDirection=${JSON.stringify(
-          lookDirection
-        )}, flipHorizontal=${flipHorizontal}, adjustedDx=${adjustedDx}, drawing line from (0,0) to (${lineEndX},${lineEndY})`
-      );
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255,165,0,0.9)";
       this.ctx.lineWidth = 3;

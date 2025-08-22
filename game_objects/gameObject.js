@@ -26,11 +26,6 @@ export class GameObject {
       initialLookDirection = { dx: -1, dy: 0 };
     }
     this.lookDirection = initialLookDirection; // Напрямок огляду
-    console.log(
-      `DEBUG GameObject constructor: team=${
-        objectConfig.team
-      }, initialLookDirection=${JSON.stringify(initialLookDirection)}`
-    );
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
     this.availableActions = objectConfig.availableActions || []; // Доступні дії
     this.team = objectConfig.team; // Команда об'єкта
@@ -116,13 +111,6 @@ export class GameObject {
             y: this.y + bulletOffsetY,
           };
         }
-        console.log(
-          `DEBUG gameObject.render (with moveDirection): team=${
-            this.team
-          }, moveDirection=${JSON.stringify(
-            this.moveDirection
-          )}, lookDirection=${JSON.stringify(this.lookDirection)}`
-        );
         this.renderer.drawDebugFrame(
           this.x - offsetX,
           this.y - offsetY,
@@ -154,13 +142,6 @@ export class GameObject {
             y: this.y + bulletOffsetY,
           };
         }
-        console.log(
-          `DEBUG gameObject.render: team=${
-            this.team
-          }, about to call drawDebugFrame with lookDirection=${JSON.stringify(
-            this.lookDirection
-          )}`
-        );
         this.renderer.drawDebugFrame(
           this.x - offsetX,
           this.y - offsetY,
@@ -226,17 +207,7 @@ export class GameObject {
   // Перевіряє чи спрайт інвертований горизонтально (така сама логіка як в renderer.js)
   isSpriteFlippedHorizontally() {
     const direction = this.moveDirection || this.lookDirection;
-    const result = direction && direction.dx < 0;
-    console.log(
-      `DEBUG isSpriteFlippedHorizontally: team=${
-        this.team
-      }, moveDirection=${JSON.stringify(
-        this.moveDirection
-      )}, lookDirection=${JSON.stringify(
-        this.lookDirection
-      )}, direction=${JSON.stringify(direction)}, result=${result}`
-    );
-    return result;
+    return direction && direction.dx < 0;
   }
 
   // Встановлює напрямок погляду на основі команди та того, хто дивиться
@@ -249,10 +220,5 @@ export class GameObject {
     } else if (this.team === 2) {
       this.lookDirection = { dx: -1, dy: 0 };
     }
-    console.log(
-      `DEBUG setLookDirectionByTeam: team=${
-        this.team
-      }, lookDirection=${JSON.stringify(this.lookDirection)}`
-    );
   }
 }
