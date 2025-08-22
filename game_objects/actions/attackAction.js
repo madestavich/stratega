@@ -188,19 +188,46 @@ export class AttackAction {
 
     if (currentFrame.bulletPoint) {
       let bulletPointX = currentFrame.bulletPoint.x;
+      const originalBulletPointX = bulletPointX;
+      const isFlipped = gameObject.isSpriteFlippedHorizontally();
+
+      console.log(
+        `DEBUG spawnProjectile: team=${
+          gameObject.team
+        }, lookDirection=${JSON.stringify(
+          gameObject.lookDirection
+        )}, isFlipped=${isFlipped}`
+      );
+      console.log(
+        `DEBUG spawnProjectile: original bulletPoint=(${currentFrame.bulletPoint.x},${currentFrame.bulletPoint.y}), frameCenter=(${currentFrame.frameCenter.x},${currentFrame.frameCenter.y})`
+      );
+
       // Якщо дивиться ліворуч, дзеркалимо bulletPoint.x по центру кадру
-      if (gameObject.isSpriteFlippedHorizontally()) {
+      if (isFlipped) {
         bulletPointX =
           currentFrame.frameCenter.x -
           (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
       }
+
+      console.log(
+        `DEBUG spawnProjectile: bulletPointX changed from ${originalBulletPointX} to ${bulletPointX}`
+      );
+
       const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
       const bulletOffsetY =
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
 
+      console.log(
+        `DEBUG spawnProjectile: bulletOffset=(${bulletOffsetX},${bulletOffsetY}), gameObject.position=(${gameObject.x},${gameObject.y})`
+      );
+
       // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX;
       bulletY = gameObject.y + bulletOffsetY;
+
+      console.log(
+        `DEBUG spawnProjectile: final bullet position=(${bulletX},${bulletY})`
+      );
     } else {
       // Fallback to object center if no bullet point defined
       bulletX = gameObject.x;
