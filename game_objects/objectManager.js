@@ -39,6 +39,8 @@ export class ObjectManager {
       gridRow,
       this.gridManager
     );
+    // Встановлюємо напрямок погляду одразу після створення
+    obj.setLookDirectionByTeam();
 
     // Store starting position for reset between rounds
     obj.startingGridCol = gridCol;
@@ -104,6 +106,7 @@ export class ObjectManager {
         gridRow,
         this.gridManager
       );
+      obj.setLookDirectionByTeam(); // Встановлюємо напрямок погляду одразу після створення
       this.objects.push(obj);
       return obj;
     } catch (error) {
