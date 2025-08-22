@@ -479,18 +479,11 @@ export class ObjectManager {
         return null;
       }
 
-      // Визначаємо команду згідно з роллю
-      let team;
-      if (this.isCreator === true) {
-        team = targetArray === this.objects ? 1 : 2;
-      } else {
-        team = targetArray === this.objects ? 2 : 1;
-      }
+      // Визначаємо команду згідно з масивом
+      let team = targetArray === this.objects ? 1 : 2;
 
-      // Просто: this.objects завжди команда 1, this.enemyObjects завжди команда 2
-      // const team = targetArray === this.objects ? 1 : 2;
-
-      // Create GameObject
+      // Create GameObject, explicitly set team in config
+      unitConfig.team = team;
       const obj = new GameObject(
         this.ctx,
         spriteConfig,
@@ -499,9 +492,6 @@ export class ObjectManager {
         objData.gridRow,
         this.gridManager
       );
-
-      // Set team (1 for player objects, 2 for enemy objects)
-      obj.team = team;
 
       // Store starting position (use current position if no starting position stored)
       obj.startingGridCol = objData.startingGridCol || objData.gridCol;
