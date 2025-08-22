@@ -226,7 +226,17 @@ export class GameObject {
   // Перевіряє чи спрайт інвертований горизонтально (така сама логіка як в renderer.js)
   isSpriteFlippedHorizontally() {
     const direction = this.moveDirection || this.lookDirection;
-    return direction && direction.dx < 0;
+    const result = direction && direction.dx < 0;
+    console.log(
+      `DEBUG isSpriteFlippedHorizontally: team=${
+        this.team
+      }, moveDirection=${JSON.stringify(
+        this.moveDirection
+      )}, lookDirection=${JSON.stringify(
+        this.lookDirection
+      )}, direction=${JSON.stringify(direction)}, result=${result}`
+    );
+    return result;
   }
 
   // Встановлює напрямок погляду на основі команди та того, хто дивиться
