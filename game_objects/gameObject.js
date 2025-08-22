@@ -110,7 +110,7 @@ export class GameObject {
         let bulletPointGlobal = null;
         if (currentFrame.bulletPoint) {
           let bulletPointX = currentFrame.bulletPoint.x;
-          if (this.lookDirection && this.lookDirection.x < 0) {
+          if (this.lookDirection && this.lookDirection.dx < 0) {
             bulletPointX =
               currentFrame.frameCenter.x -
               (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
@@ -141,7 +141,7 @@ export class GameObject {
         let bulletPointGlobal = null;
         if (currentFrame.bulletPoint) {
           let bulletPointX = currentFrame.bulletPoint.x;
-          if (this.lookDirection && this.lookDirection.x < 0) {
+          if (this.lookDirection && this.lookDirection.dx < 0) {
             bulletPointX =
               currentFrame.frameCenter.x -
               (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
