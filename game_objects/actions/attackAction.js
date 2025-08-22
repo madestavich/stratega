@@ -147,8 +147,12 @@ export class AttackAction {
       !gameObject.attackTarget.isDead
     ) {
       gameObject.isAttacking = true;
-      this.setLookDirection(gameObject, gameObject.attackTarget);
-
+      // Встановлюємо напрямок погляду відповідно до команди
+      if (typeof gameObject.setLookDirectionByTeam === "function") {
+        gameObject.setLookDirectionByTeam();
+      } else {
+        this.setLookDirection(gameObject, gameObject.attackTarget);
+      }
       // Вибір правильної анімації в залежності від типу атаки
       if (
         gameObject.isRangedAttack &&
