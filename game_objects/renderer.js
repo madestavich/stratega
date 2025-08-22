@@ -100,12 +100,18 @@ export class Renderer {
     }
     // Візуалізація напрямку погляду
     if (lookDirection && (lookDirection.dx !== 0 || lookDirection.dy !== 0)) {
-      const lineEndX = 40 * lookDirection.dx;
+      // Компенсуємо горизонтальне інвертування якщо воно застосоване
+      let adjustedDx = lookDirection.dx;
+      if (flipHorizontal) {
+        adjustedDx = -adjustedDx; // Інвертуємо назад щоб компенсувати scale(-1, 1)
+      }
+
+      const lineEndX = 40 * adjustedDx;
       const lineEndY = 40 * lookDirection.dy;
       console.log(
         `DEBUG renderer drawDebugFrame: lookDirection=${JSON.stringify(
           lookDirection
-        )}, drawing line from (0,0) to (${lineEndX},${lineEndY})`
+        )}, flipHorizontal=${flipHorizontal}, adjustedDx=${adjustedDx}, drawing line from (0,0) to (${lineEndX},${lineEndY})`
       );
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255,165,0,0.9)";
