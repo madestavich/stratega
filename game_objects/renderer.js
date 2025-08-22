@@ -100,17 +100,19 @@ export class Renderer {
     }
     // Візуалізація напрямку погляду
     if (lookDirection && (lookDirection.dx !== 0 || lookDirection.dy !== 0)) {
+      const lineEndX = 40 * lookDirection.dx;
+      const lineEndY = 40 * lookDirection.dy;
       console.log(
         `DEBUG renderer drawDebugFrame: lookDirection=${JSON.stringify(
           lookDirection
-        )}`
+        )}, drawing line from (0,0) to (${lineEndX},${lineEndY})`
       );
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255,165,0,0.9)";
       this.ctx.lineWidth = 3;
       this.ctx.beginPath();
       this.ctx.moveTo(0, 0);
-      this.ctx.lineTo(40 * lookDirection.dx, 40 * lookDirection.dy);
+      this.ctx.lineTo(lineEndX, lineEndY);
       this.ctx.stroke();
       this.ctx.restore();
     }
