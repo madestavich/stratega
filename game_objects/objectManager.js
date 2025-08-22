@@ -240,6 +240,7 @@ export class ObjectManager {
 
       // Встановлюємо правильний напрямок погляду для всіх завантажених юнітів
       for (const unit of this.objects) {
+        unit.setLookDirectionByTeam();
       }
       for (const unit of this.enemyObjects) {
         unit.setLookDirectionByTeam();
@@ -516,6 +517,9 @@ export class ObjectManager {
 
       // Health comes from unit config, no need to restore from DB
       // obj.health and obj.maxHealth are already set from unitConfig
+
+      // Set correct lookDirection based on team
+      obj.setLookDirectionByTeam();
 
       targetArray.push(obj);
       return obj;
