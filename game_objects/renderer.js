@@ -99,13 +99,13 @@ export class Renderer {
       this.ctx.restore();
     }
     // Візуалізація напрямку погляду
-    if (lookDirection && (lookDirection.x !== 0 || lookDirection.y !== 0)) {
+    if (lookDirection && (lookDirection.dx !== 0 || lookDirection.dy !== 0)) {
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255,165,0,0.9)";
       this.ctx.lineWidth = 3;
       this.ctx.beginPath();
       this.ctx.moveTo(0, 0);
-      this.ctx.lineTo(40 * lookDirection.x, 40 * lookDirection.y);
+      this.ctx.lineTo(40 * lookDirection.dx, 40 * lookDirection.dy);
       this.ctx.stroke();
       this.ctx.restore();
     }
