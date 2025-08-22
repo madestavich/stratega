@@ -12,30 +12,18 @@ export class GameObject {
     this.y = undefined;
     this.z = undefined;
     this.objectType = objectConfig.objectType || "default"; // Тип об'єкта
-    this.actionPriorities = objectConfig.actionPriorities || []; // Масив типів дій у порядку пріоритету
+    this.actionPriorities = objectConfig.actionPriorities || [];
     this.canAct = true; // Чи може об'єкт виконувати дії
     this.isMoving = false; // Чи об'єкт рухається
     this.moveDirection = null; // Напрямок руху
     this.moveTarget = null; // Ціль для руху
     // Встановлюємо коректний напрямок погляду одразу при створенні
     let initialLookDirection = null;
-    try {
-      const gameManager = window.gameManager;
-      if (
-        gameManager &&
-        gameManager.isRoomCreator !== undefined &&
-        gameManager.isRoomCreator !== null
-      ) {
-        if (gameManager.isRoomCreator) {
-          initialLookDirection =
-            objectConfig.team === 1 ? { dx: 1, dy: 0 } : { dx: -1, dy: 0 };
-        } else {
-          initialLookDirection =
-            objectConfig.team === 1 ? { dx: -1, dy: 0 } : { dx: 1, dy: 0 };
-        }
-      }
-    } catch (e) {
-      initialLookDirection = null;
+    // team 1 завжди вправо, team 2 завжди вліво
+    if (objectConfig.team === 1) {
+      initialLookDirection = { dx: 1, dy: 0 };
+    } else if (objectConfig.team === 2) {
+      initialLookDirection = { dx: -1, dy: 0 };
     }
     this.lookDirection = initialLookDirection; // Напрямок огляду
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
@@ -220,32 +208,11 @@ export class GameObject {
   setLookDirectionByTeam() {
     // Скидаємо moveDirection щоб використовувався lookDirection
     this.moveDirection = null;
-
-    const gameManager = window.gameManager;
-
-    // Якщо gameManager ще не готовий або isRoomCreator ще не встановлений - відкладаємо
-    if (
-      !gameManager ||
-      gameManager.isRoomCreator === undefined ||
-      gameManager.isRoomCreator === null
-    ) {
-      return;
-    }
-
-    const isRoomCreator = gameManager.isRoomCreator;
-
-    if (isRoomCreator) {
-      if (this.team === 1) {
-        this.lookDirection = { dx: 1, dy: 0 };
-      } else if (this.team === 2) {
-        this.lookDirection = { dx: -1, dy: 0 };
-      }
-    } else {
-      if (this.team === 1) {
-        this.lookDirection = { dx: -1, dy: 0 };
-      } else if (this.team === 2) {
-        this.lookDirection = { dx: 1, dy: 0 };
-      }
+    // team 1 завжди вправо, team 2 завжди вліво
+    if (this.team === 1) {
+      this.lookDirection = { dx: 1, dy: 0 };
+    } else if (this.team === 2) {
+      this.lookDirection = { dx: -1, dy: 0 };
     }
   }
 }
