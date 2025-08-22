@@ -103,7 +103,7 @@ export class GameObject {
         let bulletPointGlobal = null;
         if (currentFrame.bulletPoint) {
           let bulletPointX = currentFrame.bulletPoint.x;
-          if (this.lookDirection && this.lookDirection.dx < 0) {
+          if (this.isSpriteFlippedHorizontally()) {
             bulletPointX =
               currentFrame.frameCenter.x -
               (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
@@ -141,7 +141,7 @@ export class GameObject {
         let bulletPointGlobal = null;
         if (currentFrame.bulletPoint) {
           let bulletPointX = currentFrame.bulletPoint.x;
-          if (this.lookDirection && this.lookDirection.dx < 0) {
+          if (this.isSpriteFlippedHorizontally()) {
             bulletPointX =
               currentFrame.frameCenter.x -
               (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
@@ -221,6 +221,12 @@ export class GameObject {
     }
 
     return this.z;
+  }
+
+  // Перевіряє чи спрайт інвертований горизонтально (така сама логіка як в renderer.js)
+  isSpriteFlippedHorizontally() {
+    const direction = this.moveDirection || this.lookDirection;
+    return direction && direction.dx < 0;
   }
 
   // Встановлює напрямок погляду на основі команди та того, хто дивиться
