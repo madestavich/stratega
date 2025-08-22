@@ -116,6 +116,13 @@ export class GameObject {
             y: this.y + bulletOffsetY,
           };
         }
+        console.log(
+          `DEBUG gameObject.render (with moveDirection): team=${
+            this.team
+          }, moveDirection=${JSON.stringify(
+            this.moveDirection
+          )}, lookDirection=${JSON.stringify(this.lookDirection)}`
+        );
         this.renderer.drawDebugFrame(
           this.x - offsetX,
           this.y - offsetY,
@@ -147,6 +154,13 @@ export class GameObject {
             y: this.y + bulletOffsetY,
           };
         }
+        console.log(
+          `DEBUG gameObject.render: team=${
+            this.team
+          }, about to call drawDebugFrame with lookDirection=${JSON.stringify(
+            this.lookDirection
+          )}`
+        );
         this.renderer.drawDebugFrame(
           this.x - offsetX,
           this.y - offsetY,

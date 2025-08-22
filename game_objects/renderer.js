@@ -100,6 +100,11 @@ export class Renderer {
     }
     // Візуалізація напрямку погляду
     if (lookDirection && (lookDirection.dx !== 0 || lookDirection.dy !== 0)) {
+      console.log(
+        `DEBUG renderer drawDebugFrame: lookDirection=${JSON.stringify(
+          lookDirection
+        )}`
+      );
       this.ctx.save();
       this.ctx.strokeStyle = "rgba(255,165,0,0.9)";
       this.ctx.lineWidth = 3;
