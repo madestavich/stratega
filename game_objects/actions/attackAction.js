@@ -429,7 +429,7 @@ export class AttackAction {
     const dirY = dy === 0 ? 0 : dy > 0 ? 1 : -1;
 
     // Set look direction including diagonals
-    gameObject.lookDirection = { x: dirX, y: dirY };
+    gameObject.lookDirection = { dx: dirX, dy: dirY };
   }
 
   dealDamage(attacker, target) {
