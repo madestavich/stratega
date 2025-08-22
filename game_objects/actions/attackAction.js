@@ -188,7 +188,7 @@ export class AttackAction {
       if (gameObject.team === 2) {
         bulletPointX =
           currentFrame.x +
-          (currentFrame.x +
+          (currentFrame.x -
             currentFrame.frameCenter.x -
             currentFrame.bulletPoint.x);
       }
