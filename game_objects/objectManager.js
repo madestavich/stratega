@@ -10,6 +10,7 @@ export class ObjectManager {
     this.enemyObjects = [];
     this.particles = [];
     this.currentRoomId = null;
+    this.isCreator = null; // Додаємо прапорець, чи це creator
   }
 
   async createObject(objectType, objectConfig, team, gridCol, gridRow) {
@@ -212,9 +213,10 @@ export class ObjectManager {
       const roomInfo = await this.getCurrentRoomId();
       if (roomInfo) {
         roomId = roomInfo.roomId;
+        this.isCreator = roomInfo.isCreator; // Зберігаємо статус creator/guest
         console.log(
           `Auto-detected room ID: ${roomId} (${
-            roomInfo.isCreator ? "creator" : "player 2"
+            roomInfo.isCreator ? "creator" : "guest"
           })`
         );
       } else {
@@ -474,8 +476,16 @@ export class ObjectManager {
         return null;
       }
 
+      // Визначаємо команду згідно з роллю
+      let team;
+      if (this.isCreator === true) {
+        team = targetArray === this.objects ? 1 : 2;
+      } else {
+        team = targetArray === this.objects ? 2 : 1;
+      }
+
       // Просто: this.objects завжди команда 1, this.enemyObjects завжди команда 2
-      const team = targetArray === this.objects ? 1 : 2;
+      // const team = targetArray === this.objects ? 1 : 2;
 
       // Create GameObject
       const obj = new GameObject(
