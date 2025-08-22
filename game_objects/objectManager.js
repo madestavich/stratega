@@ -502,6 +502,15 @@ export class ObjectManager {
 
       // Set team (1 for player objects, 2 for enemy objects)
       obj.team = team;
+      console.log(
+        `DEBUG createObjectFromSerializedData: setting team=${team}, isCreator=${
+          this.isCreator
+        }, targetArray=${
+          targetArray === this.objects ? "objects" : "enemyObjects"
+        }, before setLookDirectionByTeam lookDirection=${JSON.stringify(
+          obj.lookDirection
+        )}`
+      );
 
       // Store starting position (use current position if no starting position stored)
       obj.startingGridCol = objData.startingGridCol || objData.gridCol;
@@ -520,6 +529,11 @@ export class ObjectManager {
 
       // Set correct lookDirection based on team
       obj.setLookDirectionByTeam();
+      console.log(
+        `DEBUG createObjectFromSerializedData: after setLookDirectionByTeam lookDirection=${JSON.stringify(
+          obj.lookDirection
+        )}`
+      );
 
       targetArray.push(obj);
       return obj;

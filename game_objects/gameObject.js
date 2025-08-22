@@ -26,6 +26,11 @@ export class GameObject {
       initialLookDirection = { dx: -1, dy: 0 };
     }
     this.lookDirection = initialLookDirection; // Напрямок огляду
+    console.log(
+      `DEBUG GameObject constructor: team=${
+        objectConfig.team
+      }, initialLookDirection=${JSON.stringify(initialLookDirection)}`
+    );
     this.moveSpeed = objectConfig.moveSpeed || 1; // Швидкість руху
     this.availableActions = objectConfig.availableActions || []; // Доступні дії
     this.team = objectConfig.team; // Команда об'єкта
@@ -214,5 +219,10 @@ export class GameObject {
     } else if (this.team === 2) {
       this.lookDirection = { dx: -1, dy: 0 };
     }
+    console.log(
+      `DEBUG setLookDirectionByTeam: team=${
+        this.team
+      }, lookDirection=${JSON.stringify(this.lookDirection)}`
+    );
   }
 }
