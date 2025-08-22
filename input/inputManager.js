@@ -264,7 +264,7 @@ export class InputManager {
       const newUnit = await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
-        1, // завжди 1 для своїх юнітів
+        this.gameManager.isRoomCreator ? 1 : 2, // команда гравця
         gridCoords.col,
         gridCoords.row
       );
