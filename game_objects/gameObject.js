@@ -105,12 +105,26 @@ export class GameObject {
         this.y - offsetY,
         this.moveDirection
       );
+      if (window.gameManager && window.gameManager.debugMode) {
+        this.renderer.drawDebugFrame(
+          this.x - offsetX,
+          this.y - offsetY,
+          this.moveDirection
+        );
+      }
     } else {
       this.renderer.draw(
         this.x - offsetX,
         this.y - offsetY,
         this.lookDirection
       );
+      if (window.gameManager && window.gameManager.debugMode) {
+        this.renderer.drawDebugFrame(
+          this.x - offsetX,
+          this.y - offsetY,
+          this.lookDirection
+        );
+      }
     }
   }
 

@@ -41,4 +41,42 @@ export class Renderer {
     // Відновлюємо попередній стан контексту
     this.ctx.restore();
   }
+
+  drawDebugFrame(x, y, direction = null) {
+    const f = this.animator.activeFrame;
+    this.ctx.save();
+    const flipHorizontal = direction && direction.dx < 0;
+    const centerOffsetX = f.frameCenter.x - f.x;
+    const centerOffsetY = f.frameCenter.y - f.y;
+    this.ctx.translate(x + centerOffsetX, y + centerOffsetY);
+    if (flipHorizontal) {
+      this.ctx.scale(-1, 1);
+    }
+    // Рамка кадру (зелена)
+    this.ctx.save();
+    this.ctx.strokeStyle = "rgba(0,255,0,0.7)";
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(-centerOffsetX, -centerOffsetY, f.width, f.height);
+    this.ctx.restore();
+    // Центр кадру (синя)
+    this.ctx.save();
+    this.ctx.fillStyle = "rgba(0,0,255,0.8)";
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+    this.ctx.fill();
+    this.ctx.restore();
+    // BulletPoint (червона)
+    if (f.bulletPoint) {
+      let bpX = f.bulletPoint.x - f.frameCenter.x;
+      let bpY = f.bulletPoint.y - f.frameCenter.y;
+      if (flipHorizontal) bpX *= -1;
+      this.ctx.save();
+      this.ctx.fillStyle = "rgba(255,0,0,0.8)";
+      this.ctx.beginPath();
+      this.ctx.arc(bpX, bpY, 6, 0, 2 * Math.PI);
+      this.ctx.fill();
+      this.ctx.restore();
+    }
+    this.ctx.restore();
+  }
 }
