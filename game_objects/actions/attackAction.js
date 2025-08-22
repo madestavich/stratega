@@ -148,11 +148,6 @@ export class AttackAction {
     ) {
       gameObject.isAttacking = true;
 
-      // Завжди дивимось на ціль атаки (універсально)
-      if (typeof gameObject.setLookDirectionToTarget === "function") {
-        gameObject.setLookDirectionToTarget(gameObject.attackTarget);
-      }
-
       // Вибір правильної анімації в залежності від типу атаки
       if (
         gameObject.isRangedAttack &&

@@ -215,15 +215,4 @@ export class GameObject {
       this.lookDirection = { dx: -1, dy: 0 };
     }
   }
-
-  // Встановлює напрямок погляду на ціль (універсально для атаки)
-  setLookDirectionToTarget(target) {
-    if (!target) return;
-    const dx = target.gridCol - this.gridCol;
-    const dy = target.gridRow - this.gridRow;
-    // Нормалізуємо до -1, 0, 1
-    const dirX = dx === 0 ? 0 : dx > 0 ? 1 : -1;
-    const dirY = dy === 0 ? 0 : dy > 0 ? 1 : -1;
-    this.lookDirection = { dx: dirX, dy: dirY };
-  }
 }
