@@ -120,6 +120,10 @@ export class AttackAction {
         animator.frameIndex === animator.activeAnimation.frames.length - 1;
 
       if (isLastFrame) {
+        // Always update lookDirection before attack
+        if (gameObject.attackTarget) {
+          this.setLookDirection(gameObject, gameObject.attackTarget);
+        }
         // For ranged attack, spawn a projectile
         if (gameObject.isRangedAttack && gameObject.attackTarget) {
           this.spawnProjectile(gameObject, gameObject.attackTarget);
