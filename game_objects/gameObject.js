@@ -106,10 +106,29 @@ export class GameObject {
         this.moveDirection
       );
       if (window.gameManager && window.gameManager.debugMode) {
+        // Глобальна точка bulletPoint для debug
+        let bulletPointGlobal = null;
+        if (currentFrame.bulletPoint) {
+          let bulletPointX = currentFrame.bulletPoint.x;
+          if (this.lookDirection && this.lookDirection.x < 0) {
+            bulletPointX =
+              currentFrame.frameCenter.x -
+              (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
+          }
+          const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
+          const bulletOffsetY =
+            currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
+          bulletPointGlobal = {
+            x: this.x + bulletOffsetX,
+            y: this.y + bulletOffsetY,
+          };
+        }
         this.renderer.drawDebugFrame(
           this.x - offsetX,
           this.y - offsetY,
-          this.moveDirection
+          this.moveDirection,
+          bulletPointGlobal,
+          this.lookDirection
         );
       }
     } else {
@@ -119,9 +138,27 @@ export class GameObject {
         this.lookDirection
       );
       if (window.gameManager && window.gameManager.debugMode) {
+        let bulletPointGlobal = null;
+        if (currentFrame.bulletPoint) {
+          let bulletPointX = currentFrame.bulletPoint.x;
+          if (this.lookDirection && this.lookDirection.x < 0) {
+            bulletPointX =
+              currentFrame.frameCenter.x -
+              (currentFrame.bulletPoint.x - currentFrame.frameCenter.x);
+          }
+          const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
+          const bulletOffsetY =
+            currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
+          bulletPointGlobal = {
+            x: this.x + bulletOffsetX,
+            y: this.y + bulletOffsetY,
+          };
+        }
         this.renderer.drawDebugFrame(
           this.x - offsetX,
           this.y - offsetY,
+          this.lookDirection,
+          bulletPointGlobal,
           this.lookDirection
         );
       }

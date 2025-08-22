@@ -42,7 +42,13 @@ export class Renderer {
     this.ctx.restore();
   }
 
-  drawDebugFrame(x, y, direction = null) {
+  drawDebugFrame(
+    x,
+    y,
+    direction = null,
+    bulletPointGlobal = null,
+    lookDirection = null
+  ) {
     const f = this.animator.activeFrame;
     this.ctx.save();
     const flipHorizontal = direction && direction.dx < 0;
@@ -65,7 +71,7 @@ export class Renderer {
     this.ctx.arc(0, 0, 6, 0, 2 * Math.PI);
     this.ctx.fill();
     this.ctx.restore();
-    // BulletPoint (червона)
+    // BulletPoint (червона, локальна)
     if (f.bulletPoint) {
       let bpX = f.bulletPoint.x - f.frameCenter.x;
       let bpY = f.bulletPoint.y - f.frameCenter.y;
@@ -75,6 +81,32 @@ export class Renderer {
       this.ctx.beginPath();
       this.ctx.arc(bpX, bpY, 6, 0, 2 * Math.PI);
       this.ctx.fill();
+      this.ctx.restore();
+    }
+    // BulletPoint (глобальна, якщо передано)
+    if (bulletPointGlobal) {
+      this.ctx.save();
+      this.ctx.fillStyle = "rgba(255,0,0,0.4)";
+      this.ctx.beginPath();
+      this.ctx.arc(
+        bulletPointGlobal.x - x,
+        bulletPointGlobal.y - y,
+        8,
+        0,
+        2 * Math.PI
+      );
+      this.ctx.fill();
+      this.ctx.restore();
+    }
+    // Візуалізація напрямку погляду
+    if (lookDirection && (lookDirection.x !== 0 || lookDirection.y !== 0)) {
+      this.ctx.save();
+      this.ctx.strokeStyle = "rgba(255,165,0,0.9)";
+      this.ctx.lineWidth = 3;
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(40 * lookDirection.x, 40 * lookDirection.y);
+      this.ctx.stroke();
       this.ctx.restore();
     }
     this.ctx.restore();
