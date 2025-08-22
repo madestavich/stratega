@@ -195,7 +195,7 @@ export class AttackAction {
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
 
       // Calculate the final world position
-      bulletX = gameObject.x + bulletOffsetX * 2;
+      bulletX = gameObject.x + bulletOffsetX;
       bulletY = gameObject.y + bulletOffsetY;
     } else {
       // Fallback to object center if no bullet point defined
