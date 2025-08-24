@@ -187,14 +187,30 @@ export class AttackAction {
     let bulletX, bulletY;
 
     if (currentFrame.bulletPoint) {
-      // ДЛЯ СПАВНУ СНАРЯДІВ: НЕ ДЗЕРКАЛИМО bulletPoint тому що Canvas сам інвертує координати
-      // Дзеркалення потрібне тільки для debug відображення в gameObject.render()
       let bulletPointX = currentFrame.bulletPoint.x;
+      const isFlipped = gameObject.isSpriteFlippedHorizontally();
 
-      // Логування для команди 2
-      if (gameObject.team === 2) {
+      console.log(
+        `DEBUG spawnProjectile: team=${gameObject.team}, isFlipped=${isFlipped}`
+      );
+      console.log(
+        `DEBUG original bulletPoint=(${currentFrame.bulletPoint.x},${currentFrame.bulletPoint.y}), frameCenter=(${currentFrame.frameCenter.x},${currentFrame.frameCenter.y})`
+      );
+
+      // Якщо спрайт відзеркалений, рахуємо офсет з урахуванням ширини кадру
+      if (isFlipped) {
+        // Відстань від лівої стінки до bulletPoint
+        const distanceFromLeft = currentFrame.bulletPoint.x - 0; // припускаємо що кадр починається з 0
+        // Ширина кадру (припускаємо що це frameCenter.x * 2)
+        const frameWidth = currentFrame.frameCenter.x * 2;
+        // Відстань від правої стінки до bulletPoint
+        const distanceFromRight = frameWidth - currentFrame.bulletPoint.x;
+
+        // Для відзеркаленого спрайту bulletPoint має бути на відстані distanceFromLeft від правої стінки
+        bulletPointX = distanceFromRight;
+
         console.log(
-          `DEBUG team2 spawnProjectile: NOT mirroring bulletPoint for spawn (Canvas will handle it), using original bulletPointX=${bulletPointX}`
+          `DEBUG mirrored: frameWidth=${frameWidth}, distanceFromLeft=${distanceFromLeft}, distanceFromRight=${distanceFromRight}, new bulletPointX=${bulletPointX}`
         );
       }
 
@@ -202,9 +218,13 @@ export class AttackAction {
       const bulletOffsetY =
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
 
+      console.log(`DEBUG bulletOffset=(${bulletOffsetX},${bulletOffsetY})`);
+
       // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX;
       bulletY = gameObject.y + bulletOffsetY;
+
+      console.log(`DEBUG final bullet position=(${bulletX},${bulletY})`);
     } else {
       // Fallback to object center if no bullet point defined
       bulletX = gameObject.x;
