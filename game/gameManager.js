@@ -138,7 +138,7 @@ class GameManager {
     const playerTeam = this.isRoomCreator ? 1 : 2;
     this.player = new Player({
       nickname: "Player1",
-      race: "castle", // Use one of the races from races.json
+      race: "rampart", // Use one of the races from races.json
       team: playerTeam,
       coins: 100,
     });
