@@ -190,13 +190,6 @@ export class AttackAction {
       let bulletPointX = currentFrame.bulletPoint.x;
       const isFlipped = gameObject.isSpriteFlippedHorizontally();
 
-      console.log(
-        `DEBUG spawnProjectile: team=${gameObject.team}, isFlipped=${isFlipped}`
-      );
-      console.log(
-        `DEBUG original bulletPoint=(${currentFrame.bulletPoint.x},${currentFrame.bulletPoint.y}), frameCenter=(${currentFrame.frameCenter.x},${currentFrame.frameCenter.y})`
-      );
-
       // Якщо спрайт відзеркалений, рахуємо офсет з урахуванням ширини кадру
       if (isFlipped) {
         // Відстань від лівої стінки до bulletPoint
@@ -206,23 +199,15 @@ export class AttackAction {
 
         // Для відзеркаленого спрайту bulletPoint має бути на відстані distanceFromLeft від правої стінки
         bulletPointX = distanceFromRight;
-
-        console.log(
-          `DEBUG mirrored: frameWidth=${frameWidth}, distanceFromLeft=${distanceFromLeft}, distanceFromRight=${distanceFromRight}, new bulletPointX=${bulletPointX}`
-        );
       }
 
       const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
       const bulletOffsetY =
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
 
-      console.log(`DEBUG bulletOffset=(${bulletOffsetX},${bulletOffsetY})`);
-
       // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX;
       bulletY = gameObject.y + bulletOffsetY;
-
-      console.log(`DEBUG final bullet position=(${bulletX},${bulletY})`);
     } else {
       // Fallback to object center if no bullet point defined
       bulletX = gameObject.x;
