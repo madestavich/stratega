@@ -199,14 +199,10 @@ export class AttackAction {
 
       // Якщо спрайт відзеркалений, рахуємо офсет з урахуванням ширини кадру
       if (isFlipped) {
-        console.log("DDDDDDDDDDDDDDDDDDDD");
-
         // Відстань від лівої стінки до bulletPoint
-        const distanceFromLeft = currentFrame.bulletPoint.x - 0; // припускаємо що кадр починається з 0
-        // Ширина кадру (припускаємо що це frameCenter.x * 2)
-        const frameWidth = currentFrame.frameCenter.x * 2;
-        // Відстань від правої стінки до bulletPoint
-        const distanceFromRight = frameWidth - currentFrame.bulletPoint.x;
+        const distanceFromLeft = currentFrame.bulletPoint.x - currentFrame.x; // припускаємо що кадр починається з 0
+        const distanceFromRight =
+          currentFrame.width - currentFrame.bulletPoint.x;
 
         // Для відзеркаленого спрайту bulletPoint має бути на відстані distanceFromLeft від правої стінки
         bulletPointX = distanceFromRight;
