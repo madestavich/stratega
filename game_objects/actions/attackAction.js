@@ -186,14 +186,6 @@ export class AttackAction {
     // Calculate the bullet starting position
     let bulletX, bulletY;
 
-    // DEBUG: Пауза для аналізу bulletPoint - СПОЧАТКУ ПАУЗУ
-    if (window.gameManager && window.gameManager.pauseOnBulletSpawn) {
-      console.log(
-        `🔴 BULLET SPAWN DEBUG: team=${gameObject.team}, BEFORE calculations`
-      );
-      window.gameManager.debugPauseBulletSpawn();
-    }
-
     if (currentFrame.bulletPoint) {
       let bulletPointX = currentFrame.bulletPoint.x;
       const isFlipped = gameObject.isSpriteFlippedHorizontally();
@@ -234,6 +226,30 @@ export class AttackAction {
       // Fallback to object center if no bullet point defined
       bulletX = gameObject.x;
       bulletY = gameObject.y;
+    }
+
+    // DEBUG: Відмальовуємо розрахований bulletPoint і ставимо паузу
+    if (window.gameManager && window.gameManager.pauseOnBulletSpawn) {
+      // Відмальовуємо bulletPoint на Canvas
+      const ctx = gameObject.ctx;
+      ctx.save();
+      ctx.fillStyle =
+        gameObject.team === 1 ? "rgba(0,255,0,0.9)" : "rgba(255,0,0,0.9)"; // Зелений для team 1, червоний для team 2
+      ctx.beginPath();
+      ctx.arc(bulletX, bulletY, 12, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Додаємо контур
+      ctx.strokeStyle =
+        gameObject.team === 1 ? "rgba(0,200,0,1)" : "rgba(200,0,0,1)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.restore();
+
+      console.log(
+        `🔴 BULLET SPAWN DEBUG: team=${gameObject.team}, bulletPoint drawn at (${bulletX},${bulletY})`
+      );
+      window.gameManager.debugPauseBulletSpawn();
     }
 
     // Calculate moveVector towards target

@@ -203,19 +203,13 @@ export class ObjectManager {
           const worldX = obj.x + bulletOffsetX;
           const worldY = obj.y + bulletOffsetY;
 
-          // Малюємо крапок різних кольорів для різних команд
+          // Малюємо дрібні крапки під час анімації (для постійного відображення)
           this.ctx.save();
           this.ctx.fillStyle =
-            obj.team === 1 ? "rgba(0,255,0,0.9)" : "rgba(255,165,0,0.9)"; // Зелений для team 1, помаранчевий для team 2
+            obj.team === 1 ? "rgba(0,255,0,0.6)" : "rgba(255,165,0,0.6)"; // Напівпрозорі
           this.ctx.beginPath();
-          this.ctx.arc(worldX, worldY, 10, 0, 2 * Math.PI);
+          this.ctx.arc(worldX, worldY, 4, 0, 2 * Math.PI); // Дрібні крапки
           this.ctx.fill();
-
-          // Додаємо контур
-          this.ctx.strokeStyle =
-            obj.team === 1 ? "rgba(0,200,0,1)" : "rgba(255,100,0,1)";
-          this.ctx.lineWidth = 2;
-          this.ctx.stroke();
           this.ctx.restore();
         }
       }
