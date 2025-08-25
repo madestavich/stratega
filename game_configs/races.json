@@ -86,7 +86,19 @@
         }
       },
       "tier_two": {},
-      "tier_three": {},
+      "tier_three": {
+        "black_knight": {
+          "gridWidth": 3,
+          "gridHeight": 2,
+          "objectType": "black_knight",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 18,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 65,
+          "attackSpeed": 0.8,
+          "health": 240
+        }
+      },
       "tier_four": {}
     }
   },
