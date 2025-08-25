@@ -122,7 +122,8 @@
             "frameCenter": {
               "x": 642.8985507246377,
               "y": 282.1594202898551
-            }
+            },
+            "bulletPoint": null
           },
           {
             "x": 766.4047619047619,
@@ -364,6 +365,21 @@
               "y": 1580
             },
             "bulletPoint": null
+          }
+        ]
+      },
+      "icon": {
+        "name": "icon",
+        "frames": [
+          {
+            "x": 1097,
+            "y": 791,
+            "width": 58,
+            "height": 64,
+            "frameCenter": {
+              "x": 1126,
+              "y": 855
+            }
           }
         ]
       }
