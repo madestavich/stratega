@@ -99,7 +99,19 @@
           "health": 240
         }
       },
-      "tier_four": {}
+      "tier_four": {
+        "bone_dragon": {
+          "gridWidth": 4,
+          "gridHeight": 3,
+          "objectType": "bone_dragon",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 25,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 120,
+          "attackSpeed": 1,
+          "health": 440
+        }
+      }
     }
   },
   "rampart": {
