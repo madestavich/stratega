@@ -11,6 +11,7 @@ export class SpriteLoader {
       zealot: "/game_configs/units/zealot.json",
       black_knight: "/game_configs/units/black_knight.json",
       bone_dragon: "/game_configs/units/bone_dragon.json",
+      lich: "/game_configs/units/lich.json",
       // Додайте інші спрайти тут
     };
   }
