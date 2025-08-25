@@ -9,6 +9,7 @@ export class SpriteLoader {
       centaur: "/game_configs/units/centaur.json",
       swordsman: "/game_configs/units/swordsman.json",
       zealot: "/game_configs/units/zealot.json",
+      black_knight: "/game_configs/units/black_knight.json",
       // Додайте інші спрайти тут
     };
   }
