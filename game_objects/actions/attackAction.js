@@ -190,66 +190,25 @@ export class AttackAction {
       let bulletPointX = currentFrame.bulletPoint.x;
       const isFlipped = gameObject.isSpriteFlippedHorizontally();
 
-      console.log(
-        `DEBUG spawnProjectile: team=${gameObject.team}, isFlipped=${isFlipped}, original bulletPointX=${bulletPointX}`
-      );
-
       // Якщо спрайт відзеркалений, рахуємо офсет з урахуванням ширини кадру
       if (isFlipped) {
-        // Відстань від лівої стінки до bulletPoint
-        const distanceFromLeft = currentFrame.bulletPoint.x - 0;
-        // Ширина кадру
-        const frameWidth = currentFrame.frameCenter.x * 2;
-        // Відстань від правої стінки до bulletPoint
-        const distanceFromRight = frameWidth - currentFrame.bulletPoint.x;
-
-        // Для відзеркаленого спрайту bulletPoint має бути на відстані distanceFromLeft від правої стінки
-        bulletPointX = distanceFromRight;
-
-        console.log(
-          `DEBUG mirrored: frameWidth=${frameWidth}, distanceFromLeft=${distanceFromLeft}, distanceFromRight=${distanceFromRight}, new bulletPointX=${bulletPointX}`
-        );
+        bulletPointX =
+          currentFrame.bulletPoint.x -
+          currentFrame.width * 2 +
+          (currentFrame.x + currentFrame.width - bulletPointX);
       }
 
       const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
       const bulletOffsetY =
         currentFrame.bulletPoint.y - currentFrame.frameCenter.y;
 
-      console.log(`DEBUG bulletOffset=(${bulletOffsetX},${bulletOffsetY})`);
-
       // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX;
       bulletY = gameObject.y + bulletOffsetY;
-
-      console.log(`DEBUG final bullet position=(${bulletX},${bulletY})`);
     } else {
       // Fallback to object center if no bullet point defined
       bulletX = gameObject.x;
       bulletY = gameObject.y;
-    }
-
-    // DEBUG: Відмальовуємо розрахований bulletPoint і ставимо паузу
-    if (window.gameManager && window.gameManager.pauseOnBulletSpawn) {
-      // Відмальовуємо bulletPoint на Canvas
-      const ctx = gameObject.ctx;
-      ctx.save();
-      ctx.fillStyle =
-        gameObject.team === 1 ? "rgba(0,255,0,0.9)" : "rgba(255,0,0,0.9)"; // Зелений для team 1, червоний для team 2
-      ctx.beginPath();
-      ctx.arc(bulletX, bulletY, 12, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Додаємо контур
-      ctx.strokeStyle =
-        gameObject.team === 1 ? "rgba(0,200,0,1)" : "rgba(200,0,0,1)";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      ctx.restore();
-
-      console.log(
-        `🔴 BULLET SPAWN DEBUG: team=${gameObject.team}, bulletPoint drawn at (${bulletX},${bulletY})`
-      );
-      window.gameManager.debugPauseBulletSpawn();
     }
 
     // Calculate moveVector towards target

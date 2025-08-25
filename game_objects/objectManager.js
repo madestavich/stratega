@@ -169,52 +169,7 @@ export class ObjectManager {
     const sortedObjects = [...this.objects, ...this.enemyObjects].sort(
       (a, b) => a.z - b.z
     );
-
-    for (const obj of sortedObjects) {
-      obj.render();
-
-      // DEBUG: відмальовуємо bulletPoint якщо включений debug режим
-      if (window.gameManager && window.gameManager.debugBulletPoint) {
-        const frame = obj.animator?.activeFrame;
-        const animationName = obj.animator?.activeAnimationName;
-
-        // Додаткове логування для діагностики
-        if (animationName === "attack" && frame?.bulletPoint) {
-          console.log(
-            `DEBUG renderAll: team=${obj.team}, has bulletPoint, drawing...`
-          );
-        }
-
-        if (frame && frame.bulletPoint && animationName === "attack") {
-          // Розраховуємо світову позицію bulletPoint
-          const isFlipped = obj.isSpriteFlippedHorizontally();
-          let bulletPointX = frame.bulletPoint.x;
-
-          if (isFlipped) {
-            const distanceFromLeft = frame.bulletPoint.x - 0;
-            const frameWidth = frame.frameCenter.x * 2;
-            const distanceFromRight = frameWidth - frame.bulletPoint.x;
-            bulletPointX = distanceFromRight;
-          }
-
-          const bulletOffsetX = bulletPointX - frame.frameCenter.x;
-          const bulletOffsetY = frame.bulletPoint.y - frame.frameCenter.y;
-
-          const worldX = obj.x + bulletOffsetX;
-          const worldY = obj.y + bulletOffsetY;
-
-          // Малюємо дрібні крапки під час анімації (для постійного відображення)
-          this.ctx.save();
-          this.ctx.fillStyle =
-            obj.team === 1 ? "rgba(0,255,0,0.6)" : "rgba(255,165,0,0.6)"; // Напівпрозорі
-          this.ctx.beginPath();
-          this.ctx.arc(worldX, worldY, 4, 0, 2 * Math.PI); // Дрібні крапки
-          this.ctx.fill();
-          this.ctx.restore();
-        }
-      }
-    }
-
+    for (const obj of sortedObjects) obj.render();
     for (const particle of this.particles) particle.draw();
   }
 
