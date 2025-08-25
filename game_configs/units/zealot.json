@@ -347,15 +347,14 @@
         "name": "bullet",
         "frames": [
           {
-            "x": 300,
-            "y": 1200,
-            "width": 62,
-            "height": 41,
+            "x": 325,
+            "y": 1203,
+            "width": 35,
+            "height": 35,
             "frameCenter": {
-              "x": 331,
-              "y": 1220
-            },
-            "bulletPoint": null
+              "x": 342,
+              "y": 1238
+            }
           }
         ]
       }
