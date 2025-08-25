@@ -119,7 +119,7 @@
         "actionPriorities": ["attack", "move"],
         "moveSpeed": 7,
         "availableActions": ["move", "attack"],
-        "attackDamage": 50,
+        "attackDamage": 40,
         "attackSpeed": 1,
         "health": 150,
         "isRanged": true,
