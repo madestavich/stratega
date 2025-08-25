@@ -176,11 +176,16 @@ export class ObjectManager {
       // DEBUG: відмальовуємо bulletPoint якщо включений debug режим
       if (window.gameManager && window.gameManager.debugBulletPoint) {
         const frame = obj.animator?.activeFrame;
-        if (
-          frame &&
-          frame.bulletPoint &&
-          obj.animator.activeAnimationName === "attack"
-        ) {
+        const animationName = obj.animator?.activeAnimationName;
+
+        // Додаткове логування для діагностики
+        if (animationName === "attack" && frame?.bulletPoint) {
+          console.log(
+            `DEBUG renderAll: team=${obj.team}, has bulletPoint, drawing...`
+          );
+        }
+
+        if (frame && frame.bulletPoint && animationName === "attack") {
           // Розраховуємо світову позицію bulletPoint
           const isFlipped = obj.isSpriteFlippedHorizontally();
           let bulletPointX = frame.bulletPoint.x;
@@ -198,15 +203,17 @@ export class ObjectManager {
           const worldX = obj.x + bulletOffsetX;
           const worldY = obj.y + bulletOffsetY;
 
-          // Малюємо великий помаранчевий крапок для bulletPoint
+          // Малюємо крапок різних кольорів для різних команд
           this.ctx.save();
-          this.ctx.fillStyle = "rgba(255,165,0,0.9)";
+          this.ctx.fillStyle =
+            obj.team === 1 ? "rgba(0,255,0,0.9)" : "rgba(255,165,0,0.9)"; // Зелений для team 1, помаранчевий для team 2
           this.ctx.beginPath();
-          this.ctx.arc(worldX, worldY, 8, 0, 2 * Math.PI);
+          this.ctx.arc(worldX, worldY, 10, 0, 2 * Math.PI);
           this.ctx.fill();
 
           // Додаємо контур
-          this.ctx.strokeStyle = "rgba(255,100,0,1)";
+          this.ctx.strokeStyle =
+            obj.team === 1 ? "rgba(0,200,0,1)" : "rgba(255,100,0,1)";
           this.ctx.lineWidth = 2;
           this.ctx.stroke();
           this.ctx.restore();
