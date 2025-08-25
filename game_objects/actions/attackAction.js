@@ -194,7 +194,7 @@ export class AttackAction {
       if (isFlipped) {
         bulletPointX =
           currentFrame.bulletPoint.x -
-          currentFrame.width * 2 +
+          currentFrame.width +
           (currentFrame.x + currentFrame.width - bulletPointX);
       }
 
