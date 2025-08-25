@@ -24,6 +24,10 @@ class GameManager {
     this.isRunning = true;
     this.player = null;
 
+    // Debug bulletPoint mode
+    this.debugBulletPoint = true; // Включаємо debug режим для bulletPoint
+    this.pauseOnBulletSpawn = true; // Пауза при спавні снарядів
+
     // Round management
     this.roundTimer = null;
     this.roundTimeLeft = 0;
@@ -62,6 +66,9 @@ class GameManager {
     document.addEventListener("keydown", (e) => {
       if (e.key === "`") {
         this.toggleDebugMode();
+      }
+      if (e.key === "b" || e.key === "B") {
+        this.toggleBulletPointDebug();
       }
     });
 
@@ -887,6 +894,39 @@ class GameManager {
       }
     } catch (error) {
       console.error("Error resetting ready status:", error);
+    }
+  }
+
+  // Debug methods
+  toggleBulletPointDebug() {
+    this.debugBulletPoint = !this.debugBulletPoint;
+    this.pauseOnBulletSpawn = !this.pauseOnBulletSpawn;
+
+    console.log(
+      `🔴 BulletPoint Debug: ${this.debugBulletPoint ? "ON" : "OFF"}`
+    );
+    console.log(
+      `⏸️ Pause on bullet spawn: ${this.pauseOnBulletSpawn ? "ON" : "OFF"}`
+    );
+  }
+
+  debugPauseBulletSpawn() {
+    if (this.pauseOnBulletSpawn) {
+      console.log("🔴 DEBUG: Pausing game for bullet spawn debug");
+      this.isPaused = true;
+
+      // Додаємо клавішу для продовження
+      const resumeHandler = (event) => {
+        if (event.code === "Space") {
+          console.log("🟢 DEBUG: Resuming game (Space pressed)");
+          this.isPaused = false;
+          document.removeEventListener("keydown", resumeHandler);
+          event.preventDefault();
+        }
+      };
+
+      document.addEventListener("keydown", resumeHandler);
+      console.log("💡 Press SPACE to resume game");
     }
   }
 }

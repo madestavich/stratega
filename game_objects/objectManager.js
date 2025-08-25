@@ -169,7 +169,51 @@ export class ObjectManager {
     const sortedObjects = [...this.objects, ...this.enemyObjects].sort(
       (a, b) => a.z - b.z
     );
-    for (const obj of sortedObjects) obj.render();
+
+    for (const obj of sortedObjects) {
+      obj.render();
+
+      // DEBUG: відмальовуємо bulletPoint якщо включений debug режим
+      if (window.gameManager && window.gameManager.debugBulletPoint) {
+        const frame = obj.animator?.activeFrame;
+        if (
+          frame &&
+          frame.bulletPoint &&
+          obj.animator.activeAnimationName === "attack"
+        ) {
+          // Розраховуємо світову позицію bulletPoint
+          const isFlipped = obj.isSpriteFlippedHorizontally();
+          let bulletPointX = frame.bulletPoint.x;
+
+          if (isFlipped) {
+            const distanceFromLeft = frame.bulletPoint.x - 0;
+            const frameWidth = frame.frameCenter.x * 2;
+            const distanceFromRight = frameWidth - frame.bulletPoint.x;
+            bulletPointX = distanceFromRight;
+          }
+
+          const bulletOffsetX = bulletPointX - frame.frameCenter.x;
+          const bulletOffsetY = frame.bulletPoint.y - frame.frameCenter.y;
+
+          const worldX = obj.x + bulletOffsetX;
+          const worldY = obj.y + bulletOffsetY;
+
+          // Малюємо великий помаранчевий крапок для bulletPoint
+          this.ctx.save();
+          this.ctx.fillStyle = "rgba(255,165,0,0.9)";
+          this.ctx.beginPath();
+          this.ctx.arc(worldX, worldY, 8, 0, 2 * Math.PI);
+          this.ctx.fill();
+
+          // Додаємо контур
+          this.ctx.strokeStyle = "rgba(255,100,0,1)";
+          this.ctx.lineWidth = 2;
+          this.ctx.stroke();
+          this.ctx.restore();
+        }
+      }
+    }
+
     for (const particle of this.particles) particle.draw();
   }
 

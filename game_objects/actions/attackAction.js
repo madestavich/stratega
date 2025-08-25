@@ -205,6 +205,16 @@ export class AttackAction {
       // Calculate the final world position
       bulletX = gameObject.x + bulletOffsetX;
       bulletY = gameObject.y + bulletOffsetY;
+
+      console.log(`DEBUG final bullet position=(${bulletX},${bulletY})`);
+
+      // DEBUG: Пауза для аналізу bulletPoint
+      if (window.gameManager && window.gameManager.pauseOnBulletSpawn) {
+        console.log(
+          `🔴 BULLET SPAWN DEBUG: team=${gameObject.team}, isFlipped=${isFlipped}`
+        );
+        window.gameManager.debugPauseBulletSpawn();
+      }
     } else {
       // Fallback to object center if no bullet point defined
       bulletX = gameObject.x;
