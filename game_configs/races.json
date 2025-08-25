@@ -82,7 +82,7 @@
           "availableActions": ["move", "attack"],
           "attackDamage": 15,
           "attackSpeed": 0.8,
-          "health": 45
+          "health": 40
         }
       },
       "tier_two": {},
