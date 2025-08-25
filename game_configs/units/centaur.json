@@ -2,7 +2,7 @@
   "centaur": {
     "name": "centaur",
     "sourceImage": {
-      "link": "../sprites/42168.png",
+      "link": "../sprites/centaur.png",
       "width": 1405,
       "height": 1740
     },

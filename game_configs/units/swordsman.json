@@ -2,7 +2,7 @@
   "swordsman": {
     "name": "swordsman",
     "sourceImage": {
-      "link": "../sprites/42157.png",
+      "link": "../sprites/swordsman.png",
       "width": 830,
       "height": 1232
     },

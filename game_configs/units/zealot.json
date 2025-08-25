@@ -2,7 +2,7 @@
   "zealot": {
     "name": "zealot",
     "sourceImage": {
-      "link": "../sprites/42165.png",
+      "link": "../sprites/zealot.png",
       "width": 775,
       "height": 1250
     },

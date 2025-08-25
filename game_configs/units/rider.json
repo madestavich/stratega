@@ -2,7 +2,7 @@
   "rider": {
     "name": "rider",
     "sourceImage": {
-      "link": "../sprites/45022.png",
+      "link": "../sprites/rider.png",
       "width": 1410,
       "height": 1175
     },

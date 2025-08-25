@@ -2,7 +2,7 @@
   "skeleton": {
     "name": "skeleton",
     "sourceImage": {
-      "link": "../sprites/44965.png",
+      "link": "../sprites/skeleton.png",
       "width": 1125,
       "height": 1235
     },
