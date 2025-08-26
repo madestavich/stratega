@@ -147,7 +147,7 @@
           "gridHeight": 3,
           "objectType": "bone_dragon",
           "actionPriorities": ["attack", "move"],
-          "moveSpeed": 25,
+          "moveSpeed": 30,
           "availableActions": ["move", "attack"],
           "attackDamage": 120,
           "attackSpeed": 1,
