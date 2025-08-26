@@ -1,0 +1,245 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+
+body {
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  user-select: none;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+canvas {
+  display: block;
+  flex: 1;
+}
+
+/* Unit menu styles - Left side */
+.side-menu {
+  width: 20%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+}
+
+.category-tabs {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #444;
+  margin-right: 10px;
+  width: 50px;
+}
+
+.category-tab {
+  height: 120px;
+  width: 40px;
+  cursor: pointer;
+  background-color: #333;
+  margin-bottom: 5px;
+  border-radius: 5px 0 0 5px;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: 10px 0;
+}
+
+/* Right side menu tabs */
+.right-menu .category-tabs {
+  border-right: none;
+  border-left: 1px solid #444;
+  margin-right: 0;
+  margin-left: 10px;
+  order: 2;
+}
+
+.right-menu .category-tab {
+  border-radius: 0 5px 5px 0;
+  transform: rotate(0deg);
+  writing-mode: vertical-rl;
+}
+
+.category-tab:hover {
+  background-color: #555;
+}
+
+.category-tab.active {
+  background-color: #666;
+  font-weight: bold;
+}
+
+.category-content-container {
+  flex: 1;
+}
+
+.category-content {
+  display: none;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 0;
+  height: 100%;
+  align-content: flex-start; /* Ensures items align at the top */
+  overflow-y: auto; /* Adds scrolling if content exceeds height */
+}
+
+.category-content.active {
+  display: flex;
+}
+
+.unit-icon {
+  width: 60px;
+  height: 60px;
+  background-color: #444;
+  border: 2px solid #666;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevents the unit from shrinking */
+}
+
+.unit-icon:hover {
+  border-color: #aaa;
+}
+
+.unit-name {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 3px;
+}
+
+/* Footer styles */
+.footer {
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.ready-button {
+  padding: 10px 40px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ready-button:hover {
+  background-color: #45a049;
+}
+
+.ready-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.round-timer {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: 2px solid #555;
+  min-width: 80px;
+  text-align: center;
+}
+
+.round-timer.warning {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Round Winner Modal */
+.round-winner-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.round-winner-content {
+  background-color: #2c3e50;
+  padding: 40px 60px;
+  border-radius: 15px;
+  text-align: center;
+  border: 3px solid #f39c12;
+  box-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
+}
+
+.round-winner-title {
+  color: #f39c12;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.round-winner-subtitle {
+  color: #ecf0f1;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.round-winner-nickname {
+  color: #e74c3c;
+  font-size: 48px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px #e74c3c;
+  }
+  to {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px #e74c3c,
+      0 0 30px #e74c3c;
+  }
+}
