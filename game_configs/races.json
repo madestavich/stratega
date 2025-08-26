@@ -151,7 +151,7 @@
           "availableActions": ["move", "attack"],
           "attackDamage": 120,
           "attackSpeed": 1,
-          "health": 440
+          "health": 640
         }
       }
     }
