@@ -12,7 +12,7 @@ body {
   flex-direction: column;
   height: 100vh;
   user-select: none;
-  background: url("../textures/Shroud.png") repeat;
+  /* background: url("../textures/Shroud.png") repeat; */
 }
 
 .main-content {
