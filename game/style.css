@@ -12,6 +12,7 @@ body {
   flex-direction: column;
   height: 100vh;
   user-select: none;
+  background: url("../textures/Shroud.png") repeat;
 }
 
 .main-content {
@@ -23,18 +24,24 @@ body {
 canvas {
   display: block;
   flex: 1;
+  border: 3px solid transparent;
+  border-image: url("../textures/Border-blue.png") 15 repeat;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 /* Unit menu styles - Left side */
 .side-menu {
   width: 20%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: url("../textures/Leather-extra-dark.png") repeat;
+  border: 5px solid transparent;
+  border-image: url("../textures/Border-blue.png") 20 repeat;
   color: white;
   padding: 10px;
   z-index: 100;
   display: flex;
   flex-direction: row;
+  position: relative;
 }
 
 .category-tabs {
@@ -49,10 +56,12 @@ canvas {
   height: 120px;
   width: 40px;
   cursor: pointer;
-  background-color: #333;
+  background: url("../textures/Leather-blue.png") repeat;
+  border: 2px solid transparent;
+  border-image: url("../textures/Border-small.png") 15 repeat;
   margin-bottom: 5px;
   border-radius: 5px 0 0 5px;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,6 +69,8 @@ canvas {
   text-orientation: mixed;
   transform: rotate(180deg);
   padding: 10px 0;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Right side menu tabs */
@@ -75,19 +86,52 @@ canvas {
   border-radius: 0 5px 5px 0;
   transform: rotate(0deg);
   writing-mode: vertical-rl;
+  background: url("../textures/Leather-blue.png") repeat;
+  border: 2px solid transparent;
+  border-image: url("../textures/Border-small.png") 15 repeat;
+}
+
+.right-menu .category-tab:hover {
+  background: url("../textures/Leather-middle.png") repeat;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
+  transform: scale(1.05);
+}
+
+.right-menu .category-tab.active {
+  background: url("../textures/Leather.png") repeat;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
+  color: #ffd700;
 }
 
 .category-tab:hover {
-  background-color: #555;
+  background: url("../textures/Leather-middle.png") repeat;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
+  transform: rotate(180deg) scale(1.05);
 }
 
 .category-tab.active {
-  background-color: #666;
+  background: url("../textures/Leather.png") repeat;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
   font-weight: bold;
+  color: #ffd700;
 }
 
 .category-content-container {
   flex: 1;
+  position: relative;
+}
+
+.category-content-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("../textures/Leather-middle.png") repeat;
+  opacity: 0.3;
+  z-index: -1;
+  border-radius: 5px;
 }
 
 .category-content {
@@ -107,74 +151,98 @@ canvas {
 .unit-icon {
   width: 60px;
   height: 60px;
-  background-color: #444;
-  border: 2px solid #666;
-  border-radius: 5px;
+  background: url("../textures/Marble-dark.png") repeat;
+  border: 3px solid transparent;
+  border-image: url("../textures/Border-small.png") 10 repeat;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
   flex-direction: column;
-  flex-shrink: 0; /* Prevents the unit from shrinking */
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .unit-icon:hover {
-  border-color: #aaa;
+  border-image: url("../textures/Border-gold.png") 10 repeat;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
 }
 
 .unit-name {
   font-size: 10px;
   text-align: center;
   margin-top: 3px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  color: #ffffff;
 }
 
 /* Footer styles */
 .footer {
   height: 60px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: url("../textures/Leather-extra-dark.png") repeat;
+  border-top: 5px solid transparent;
+  border-image: url("../textures/Border-blue.png") 20 repeat;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 20px;
+  position: relative;
 }
 
 .ready-button {
   padding: 10px 40px;
-  background-color: #4caf50;
+  background: url("../textures/Leather.png") repeat;
   color: white;
-  border: none;
-  border-radius: 5px;
+  border: 3px solid transparent;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
+  border-radius: 8px;
   font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .ready-button:hover {
-  background-color: #45a049;
+  background: url("../textures/Leather-blue.png") repeat;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 .ready-button:disabled {
-  background-color: #666;
+  background: url("../textures/Marble-dark.png") repeat;
+  border-image: url("../textures/Border-small.png") 15 repeat;
   cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
 }
 
 .round-timer {
   color: white;
   font-size: 24px;
   font-weight: bold;
-  background-color: rgba(255, 255, 255, 0.1);
+  background: url("../textures/Marble-dark.png") repeat;
+  border: 3px solid transparent;
+  border-image: url("../textures/Border-blue.png") 15 repeat;
   padding: 8px 16px;
-  border-radius: 5px;
-  border: 2px solid #555;
+  border-radius: 8px;
   min-width: 80px;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .round-timer.warning {
   color: #ff6b6b;
-  border-color: #ff6b6b;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
   animation: pulse 1s infinite;
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
 }
 
 @keyframes pulse {
@@ -196,7 +264,9 @@ canvas {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background: url("../textures/Shroud.png") repeat;
+  background-color: rgba(0, 0, 0, 0.9);
+  background-blend-mode: multiply;
   display: none;
   justify-content: center;
   align-items: center;
@@ -204,12 +274,15 @@ canvas {
 }
 
 .round-winner-content {
-  background-color: #2c3e50;
+  background: url("../textures/Leather-extra-dark.png") repeat;
   padding: 40px 60px;
   border-radius: 15px;
   text-align: center;
-  border: 3px solid #f39c12;
-  box-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
+  border: 5px solid transparent;
+  border-image: url("../textures/Border-gold.png") 20 repeat;
+  box-shadow: 0 0 50px rgba(243, 156, 18, 0.8),
+    inset 0 0 30px rgba(0, 0, 0, 0.5);
+  position: relative;
 }
 
 .round-winner-title {
