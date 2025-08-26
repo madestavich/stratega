@@ -14,6 +14,7 @@ export class SpriteLoader {
       lich: "/game_configs/units/lich.json",
       vampire: "/game_configs/units/vampire.json",
       walking_dead: "/game_configs/units/walking_dead.json",
+      wight: "/game_configs/units/wight.json",
       // Додайте інші спрайти тут
     };
   }
