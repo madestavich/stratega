@@ -13,6 +13,7 @@ export class SpriteLoader {
       bone_dragon: "/game_configs/units/bone_dragon.json",
       lich: "/game_configs/units/lich.json",
       vampire: "/game_configs/units/vampire.json",
+      walking_dead: "/game_configs/units/walking_dead.json",
       // Додайте інші спрайти тут
     };
   }
