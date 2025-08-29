@@ -17,6 +17,7 @@ export class SpriteLoader {
       zealot: "/game_configs/units/zealot.json",
       angel: "/game_configs/units/angel.json",
       cavalier: "/game_configs/units/cavalier.json",
+      griffin: "/game_configs/units/griffin.json",
       //! rampart
       centaur: "/game_configs/units/centaur.json",
       //! neutral
