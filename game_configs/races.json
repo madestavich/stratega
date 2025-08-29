@@ -1,8 +1,7 @@
 {
   "castle": {
     "units": {
-      "tier_one": {},
-      "tier_two": {
+      "tier_one": {
         "archer": {
           "gridWidth": 1,
           "gridHeight": 1,
@@ -23,7 +22,7 @@
           }
         }
       },
-      "tier_three": {
+      "tier_two": {
         "swordsman": {
           "gridWidth": 2,
           "gridHeight": 2,
@@ -31,9 +30,22 @@
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 12,
           "availableActions": ["move", "attack"],
+          "attackDamage": 35,
+          "attackSpeed": 0.8,
+          "health": 180
+        }
+      },
+      "tier_three": {
+        "cavalier": {
+          "gridWidth": 3,
+          "gridHeight": 2,
+          "objectType": "cavalier",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 22,
+          "availableActions": ["move", "attack"],
           "attackDamage": 75,
           "attackSpeed": 0.8,
-          "health": 240
+          "health": 340
         },
         "zealot": {
           "gridWidth": 2,

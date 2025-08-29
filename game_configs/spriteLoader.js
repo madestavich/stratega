@@ -3,21 +3,24 @@ export class SpriteLoader {
     this.configLoader = configLoader;
     this.loadedSprites = new Set();
     this.spriteConfigMap = {
-      // Мапа всіх доступних спрайтів
-      rider: "/game_configs/units/rider.json",
+      //! necropolis
       skeleton: "/game_configs/units/skeleton.json",
-      centaur: "/game_configs/units/centaur.json",
-      swordsman: "/game_configs/units/swordsman.json",
-      zealot: "/game_configs/units/zealot.json",
       black_knight: "/game_configs/units/black_knight.json",
       bone_dragon: "/game_configs/units/bone_dragon.json",
       lich: "/game_configs/units/lich.json",
       vampire: "/game_configs/units/vampire.json",
       walking_dead: "/game_configs/units/walking_dead.json",
       wight: "/game_configs/units/wight.json",
+      //! castle
       archer: "/game_configs/units/archer.json",
+      swordsman: "/game_configs/units/swordsman.json",
+      zealot: "/game_configs/units/zealot.json",
       angel: "/game_configs/units/angel.json",
-      // Додайте інші спрайти тут
+      cavalier: "/game_configs/units/cavalier.json",
+      //! rampart
+      centaur: "/game_configs/units/centaur.json",
+      //! neutral
+      rider: "/game_configs/units/rider.json",
     };
   }
 
