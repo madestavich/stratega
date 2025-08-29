@@ -65,6 +65,13 @@ export class SpriteLoader {
    */
   async loadRaceSprites(race) {
     try {
+      // Якщо раса "all", завантажуємо всі доступні спрайти
+      if (race === "all") {
+        const allSpriteKeys = Object.keys(this.spriteConfigMap);
+        await this.loadSprites(allSpriteKeys);
+        return;
+      }
+
       // Завантажуємо конфігурацію рас, якщо потрібно
       const response = await fetch("/game_configs/races.json");
       const racesConfig = await response.json();
