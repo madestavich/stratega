@@ -15,6 +15,8 @@ export class SpriteLoader {
       vampire: "/game_configs/units/vampire.json",
       walking_dead: "/game_configs/units/walking_dead.json",
       wight: "/game_configs/units/wight.json",
+      archer: "/game_configs/units/archer.json",
+      angel: "/game_configs/units/angel.json",
       // Додайте інші спрайти тут
     };
   }
