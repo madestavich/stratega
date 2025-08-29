@@ -12,7 +12,6 @@ body {
   flex-direction: column;
   height: 100vh;
   user-select: none;
-  /* background: url("../textures/Shroud.png") repeat; */
 }
 
 .main-content {
@@ -25,7 +24,7 @@ canvas {
   display: block;
   flex: 1;
   border: 3px solid transparent;
-  border-image: url("../textures/Border-blue.png") 15 repeat;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -33,9 +32,9 @@ canvas {
 .side-menu {
   width: 20%;
   height: 100%;
-  background: url("../textures/Leather-extra-dark.png") repeat;
+  background: url("../textures/Leather-red-medium.png") repeat;
   border: 5px solid transparent;
-  border-image: url("../textures/Border-blue.png") 20 repeat;
+  border-image: url("../textures/Border-gold.png") 20 repeat;
   color: white;
   padding: 10px;
   z-index: 100;
@@ -47,8 +46,6 @@ canvas {
 .category-tabs {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #444;
-  margin-right: 10px;
   width: 50px;
 }
 
@@ -56,11 +53,8 @@ canvas {
   height: 120px;
   width: 40px;
   cursor: pointer;
-  background: url("../textures/Leather-blue.png") repeat;
-  border: 2px solid transparent;
-  border-image: url("../textures/Border-small.png") 15 repeat;
+  background: url("../textures/Leather.png") repeat;
   margin-bottom: 5px;
-  border-radius: 5px 0 0 5px;
   transition: all 0.3s;
   display: flex;
   align-items: center;
@@ -68,49 +62,41 @@ canvas {
   writing-mode: vertical-rl;
   text-orientation: mixed;
   transform: rotate(180deg);
-  padding: 10px 0;
   font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+  border: 3px solid transparent;
 }
 
-/* Right side menu tabs */
 .right-menu .category-tabs {
   border-right: none;
-  border-left: 1px solid #444;
   margin-right: 0;
   margin-left: 10px;
   order: 2;
 }
 
 .right-menu .category-tab {
-  border-radius: 0 5px 5px 0;
   transform: rotate(0deg);
   writing-mode: vertical-rl;
-  background: url("../textures/Leather-blue.png") repeat;
-  border: 2px solid transparent;
-  border-image: url("../textures/Border-small.png") 15 repeat;
 }
 
 .right-menu .category-tab:hover {
   background: url("../textures/Leather-middle.png") repeat;
-  border-image: url("../textures/Border-gold.png") 15 repeat;
-  transform: scale(1.05);
+  transform: scale(1);
 }
 
 .right-menu .category-tab.active {
-  background: url("../textures/Leather.png") repeat;
+  background: url("../textures/Leather-middle.png") repeat;
   border-image: url("../textures/Border-gold.png") 15 repeat;
   color: #ffd700;
 }
 
 .category-tab:hover {
   background: url("../textures/Leather-middle.png") repeat;
-  border-image: url("../textures/Border-gold.png") 15 repeat;
-  transform: rotate(180deg) scale(1.05);
+  transform: rotate(180deg);
 }
 
 .category-tab.active {
-  background: url("../textures/Leather.png") repeat;
+  background: url("../textures/Leather-middle.png") repeat;
   border-image: url("../textures/Border-gold.png") 15 repeat;
   font-weight: bold;
   color: #ffd700;
@@ -138,7 +124,7 @@ canvas {
   display: none;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 10px 0;
+  padding: 5px;
   height: 100%;
   align-content: flex-start; /* Ensures items align at the top */
   overflow-y: auto; /* Adds scrolling if content exceeds height */
@@ -151,9 +137,6 @@ canvas {
 .unit-icon {
   width: 60px;
   height: 60px;
-  background: url("../textures/Marble-dark.png") repeat;
-  border: 3px solid transparent;
-  border-image: url("../textures/Border-small.png") 10 repeat;
   border-radius: 8px;
   cursor: pointer;
   display: flex;
@@ -167,26 +150,16 @@ canvas {
 }
 
 .unit-icon:hover {
-  border-image: url("../textures/Border-gold.png") 10 repeat;
-  transform: scale(1.1);
+  transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-}
-
-.unit-name {
-  font-size: 10px;
-  text-align: center;
-  margin-top: 3px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  color: #ffffff;
 }
 
 /* Footer styles */
 .footer {
   height: 60px;
-  background: url("../textures/Leather-extra-dark.png") repeat;
+  background: url("../textures/Leather-red-dark-darker.png") repeat;
   border-top: 5px solid transparent;
-  border-image: url("../textures/Border-blue.png") 20 repeat;
+  border-image: url("../textures/Border-gold.png") 20 repeat;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -211,7 +184,6 @@ canvas {
 
 .ready-button:hover {
   background: url("../textures/Leather-blue.png") repeat;
-  transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
@@ -227,9 +199,9 @@ canvas {
   color: white;
   font-size: 24px;
   font-weight: bold;
-  background: url("../textures/Marble-dark.png") repeat;
+  background: url("../textures/Leather-red-light.png") repeat;
   border: 3px solid transparent;
-  border-image: url("../textures/Border-blue.png") 15 repeat;
+  border-image: url("../textures/Border-small.png") 15 repeat;
   padding: 8px 16px;
   border-radius: 8px;
   min-width: 80px;
@@ -240,7 +212,7 @@ canvas {
 
 .round-timer.warning {
   color: #ff6b6b;
-  border-image: url("../textures/Border-gold.png") 15 repeat;
+  border-image: url("../textures/Border-small.png") 15 repeat;
   animation: pulse 1s infinite;
   box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
 }
@@ -265,7 +237,7 @@ canvas {
   width: 100%;
   height: 100%;
   background: url("../textures/Shroud.png") repeat;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.7);
   background-blend-mode: multiply;
   display: none;
   justify-content: center;
