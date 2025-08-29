@@ -40,23 +40,49 @@ export class InterfaceManager {
       // Завантажуємо всі спрайти
       await this.spriteLoader.loadRaceSprites("all");
 
-      // Створюємо юніти для всіх доступних спрайтів
-      const allSpriteKeys = Object.keys(this.spriteLoader.spriteConfigMap);
+      // Завантажуємо конфігурацію всіх рас для правильного розподілу
+      const response = await fetch("/game_configs/races.json");
+      const racesConfig = await response.json();
 
-      // Розподіляємо юніти по рівнях (можна змінити логіку розподілу)
-      allSpriteKeys.forEach((unitKey, index) => {
-        const tierIndex = index % 4; // Розподіляємо по 4 рівнях
-        const containerKeys = ["level1", "level2", "level3", "level4"];
-        const container = this.unitContainers[containerKeys[tierIndex]];
+      // Збираємо всі юніти з їх тірами
+      const unitsByTier = {
+        tier_one: [],
+        tier_two: [],
+        tier_three: [],
+        tier_four: [],
+      };
 
-        if (container) {
-          const unitElement = this.createUnitElement({
-            name: this.formatUnitName(unitKey),
-            key: unitKey,
+      // Проходимо по всім расам і збираємо юніти по тірам
+      Object.values(racesConfig).forEach((race) => {
+        if (race.units) {
+          Object.entries(race.units).forEach(([tier, units]) => {
+            if (unitsByTier[tier]) {
+              Object.keys(units).forEach((unitKey) => {
+                if (!unitsByTier[tier].includes(unitKey)) {
+                  unitsByTier[tier].push(unitKey);
+                }
+              });
+            }
           });
-          container.appendChild(unitElement);
         }
       });
+
+      // Розподіляємо юніти по правильних тірах
+      Object.entries(unitsByTier).forEach(([tier, unitKeys]) => {
+        const containerKey = this.tierMapping[tier];
+        const container = this.unitContainers[containerKey];
+
+        if (container) {
+          unitKeys.forEach((unitKey) => {
+            const unitElement = this.createUnitElement({
+              name: this.formatUnitName(unitKey),
+              key: unitKey,
+            });
+            container.appendChild(unitElement);
+          });
+        }
+      });
+
       return;
     }
 
