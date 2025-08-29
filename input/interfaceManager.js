@@ -30,6 +30,36 @@ export class InterfaceManager {
       return;
     }
 
+    // Якщо раса "all", завантажуємо всі доступні юніти
+    if (player.race === "all") {
+      // Clear existing units
+      Object.values(this.unitContainers).forEach((container) => {
+        if (container) container.innerHTML = "";
+      });
+
+      // Завантажуємо всі спрайти
+      await this.spriteLoader.loadRaceSprites("all");
+
+      // Створюємо юніти для всіх доступних спрайтів
+      const allSpriteKeys = Object.keys(this.spriteLoader.spriteConfigMap);
+
+      // Розподіляємо юніти по рівнях (можна змінити логіку розподілу)
+      allSpriteKeys.forEach((unitKey, index) => {
+        const tierIndex = index % 4; // Розподіляємо по 4 рівнях
+        const containerKeys = ["level1", "level2", "level3", "level4"];
+        const container = this.unitContainers[containerKeys[tierIndex]];
+
+        if (container) {
+          const unitElement = this.createUnitElement({
+            name: this.formatUnitName(unitKey),
+            key: unitKey,
+          });
+          container.appendChild(unitElement);
+        }
+      });
+      return;
+    }
+
     const racesConfig = this.configLoader.racesConfig;
     if (!racesConfig || !racesConfig[player.race]) {
       console.error(`Race configuration not found for: ${player.race}`);
