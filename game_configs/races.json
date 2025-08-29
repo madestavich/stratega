@@ -2,6 +2,17 @@
   "castle": {
     "units": {
       "tier_one": {
+        "pikeman": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "pikeman",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 10,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 12,
+          "attackSpeed": 1,
+          "health": 40
+        },
         "archer": {
           "gridWidth": 1,
           "gridHeight": 1,

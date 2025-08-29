@@ -12,6 +12,7 @@ export class SpriteLoader {
       walking_dead: "/game_configs/units/walking_dead.json",
       wight: "/game_configs/units/wight.json",
       //! castle
+      pikeman: "/game_configs/units/pikeman.json",
       archer: "/game_configs/units/archer.json",
       swordsman: "/game_configs/units/swordsman.json",
       zealot: "/game_configs/units/zealot.json",
