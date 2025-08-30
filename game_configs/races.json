@@ -271,6 +271,17 @@
           "attackDamage": 50,
           "attackSpeed": 1.3,
           "health": 240
+        },
+        "unicorn": {
+          "gridWidth": 3,
+          "gridHeight": 2,
+          "objectType": "unicorn",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 25,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 80,
+          "attackSpeed": 1,
+          "health": 320
         }
       },
       "tier_four": {
