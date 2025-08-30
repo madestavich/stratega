@@ -501,6 +501,12 @@ class GameManager {
     this.roundTimeLeft = 0;
     this.updateTimerDisplay(); // Скидаємо таймер візуально
 
+    // Clear all remaining particles to prevent them from being stuck in mid-air
+    if (this.objectManager.particles) {
+      this.objectManager.particles.length = 0;
+      console.log("Cleared all remaining particles");
+    }
+
     // Pause the game
     this.isPaused = true;
 
