@@ -25,6 +25,7 @@ export class SpriteLoader {
       pegasus: "/game_configs/units/pegasus.json",
       green_dragon: "/game_configs/units/green_dragon.json",
       unicorn: "/game_configs/units/unicorn.json",
+      dendroid_guard: "/game_configs/units/dendroid_guard.json",
       //! neutral
       rider: "/game_configs/units/rider.json",
     };
