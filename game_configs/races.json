@@ -243,14 +243,49 @@
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 22,
           "availableActions": ["move", "attack"],
-          "attackDamage": 20,
+          "attackDamage": 15,
           "attackSpeed": 0.8,
           "health": 80
+        },
+        "dwarf": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "dwarf",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 7,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 20,
+          "attackSpeed": 0.6,
+          "health": 140
         }
       },
       "tier_two": {},
-      "tier_three": {},
-      "tier_four": {}
+      "tier_three": {
+        "pegasus": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "pegasus",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 27,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 50,
+          "attackSpeed": 1.3,
+          "health": 240
+        }
+      },
+      "tier_four": {
+        "green_dragon": {
+          "gridWidth": 3,
+          "gridHeight": 3,
+          "objectType": "green_dragon",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 32,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 150,
+          "attackSpeed": 1,
+          "health": 540
+        }
+      }
     }
   },
   "stronghold": {

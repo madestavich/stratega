@@ -21,6 +21,9 @@ export class SpriteLoader {
       griffin: "/game_configs/units/griffin.json",
       //! rampart
       centaur: "/game_configs/units/centaur.json",
+      dwarf: "/game_configs/units/dwarf.json",
+      pegasus: "/game_configs/units/pegasus.json",
+      green_dragon: "/game_configs/units/green_dragon.json",
       //! neutral
       rider: "/game_configs/units/rider.json",
     };
