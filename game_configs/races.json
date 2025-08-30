@@ -71,7 +71,7 @@
         },
         "zealot": {
           "gridWidth": 2,
-          "gridHeight": 1,
+          "gridHeight": 2,
           "objectType": "zealot",
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 8,
@@ -275,7 +275,7 @@
       "tier_two": {
         "rider": {
           "gridWidth": 3,
-          "gridHeight": 2,
+          "gridHeight": 1,
           "objectType": "rider",
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 25,
