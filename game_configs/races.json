@@ -259,7 +259,19 @@
           "health": 140
         }
       },
-      "tier_two": {},
+      "tier_two": {
+        "dendroid_guard": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "dendroid_guard",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 6,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 30,
+          "attackSpeed": 0.9,
+          "health": 300
+        }
+      },
       "tier_three": {
         "pegasus": {
           "gridWidth": 2,
