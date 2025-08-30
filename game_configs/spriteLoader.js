@@ -24,6 +24,7 @@ export class SpriteLoader {
       dwarf: "/game_configs/units/dwarf.json",
       pegasus: "/game_configs/units/pegasus.json",
       green_dragon: "/game_configs/units/green_dragon.json",
+      unicorn: "/game_configs/units/unicorn.json",
       //! neutral
       rider: "/game_configs/units/rider.json",
     };
