@@ -192,10 +192,7 @@ export class AttackAction {
 
       // Якщо спрайт відзеркалений, рахуємо офсет з урахуванням ширини кадру
       if (isFlipped) {
-        bulletPointX =
-          currentFrame.bulletPoint.x -
-          currentFrame.width +
-          (currentFrame.x + currentFrame.width - bulletPointX);
+        bulletPointX = currentFrame.bulletPoint.x - currentFrame.width;
       }
 
       const bulletOffsetX = bulletPointX - currentFrame.frameCenter.x;
