@@ -23,6 +23,7 @@ export class SpriteLoader {
       centaur: "/game_configs/units/centaur.json",
       dwarf: "/game_configs/units/dwarf.json",
       pegasus: "/game_configs/units/pegasus.json",
+      wood_elf: "/game_configs/units/wood_elf.json",
       green_dragon: "/game_configs/units/green_dragon.json",
       unicorn: "/game_configs/units/unicorn.json",
       dendroid_guard: "/game_configs/units/dendroid_guard.json",
