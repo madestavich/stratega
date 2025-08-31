@@ -29,6 +29,14 @@ export class SpriteLoader {
       dendroid_guard: "/game_configs/units/dendroid_guard.json",
       //! neutral
       rider: "/game_configs/units/rider.json",
+      //! conflux
+      psychic_elemental: "/game_configs/units/psychic_elemental.json",
+      fire_elemental: "/game_configs/units/fire_elemental.json",
+      pixie: "/game_configs/units/pixie.json",
+      air_elemental: "/game_configs/units/air_elemental.json",
+      earth_elemental: "/game_configs/units/earth_elemental.json",
+      firebird: "/game_configs/units/firebird.json",
+      water_elemental: "/game_configs/units/water_elemental.json",
     };
   }
 

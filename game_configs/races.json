@@ -106,10 +106,91 @@
   },
   "conflux": {
     "units": {
-      "tier_one": {},
-      "tier_two": {},
-      "tier_three": {},
-      "tier_four": {}
+      "tier_one": {
+        "pixie": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "pixie",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 16,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 13,
+          "attackSpeed": 0.8,
+          "health": 30
+        },
+        "air_elemental": {
+          "gridWidth": 2,
+          "gridHeight": 1,
+          "objectType": "air_elemental",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 12,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 20,
+          "attackSpeed": 1,
+          "health": 60
+        }
+      },
+      "tier_two": {
+        "fire_elemental": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "fire_elemental",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 18,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 30,
+          "attackSpeed": 0.9,
+          "health": 120
+        },
+        "water_elemental": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "water_elemental",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 12,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 20,
+          "attackSpeed": 1,
+          "health": 160
+        }
+      },
+      "tier_three": {
+        "earth_elemental": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "earth_elemental",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 10,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 45,
+          "attackSpeed": 1,
+          "health": 300
+        },
+        "psychic_elemental": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "psychic_elemental",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 11,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 55,
+          "attackSpeed": 1,
+          "health": 260
+        }
+      },
+      "tier_four": {
+        "firebird": {
+          "gridWidth": 3,
+          "gridHeight": 3,
+          "objectType": "firebird",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 28,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 150,
+          "attackSpeed": 1,
+          "health": 500
+        }
+      }
     }
   },
   "dungeon": {
