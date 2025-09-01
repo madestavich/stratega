@@ -3,6 +3,5 @@
 .idea
 .DS_Store
 
-
 # Ігнорувати всі config.php у будь-якій папці
 **/config.php
