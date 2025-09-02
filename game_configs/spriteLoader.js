@@ -39,6 +39,7 @@ export class SpriteLoader {
       water_elemental: "/game_configs/units/water_elemental.json",
       //!dungeon
       beholder: "/game_configs/units/beholder.json",
+      harpy: "/game_configs/units/harpy.json",
     };
   }
 

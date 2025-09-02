@@ -195,7 +195,19 @@
   },
   "dungeon": {
     "units": {
-      "tier_one": {},
+      "tier_one": {
+        "harpy": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "harpy",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 16,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 15,
+          "attackSpeed": 1,
+          "health": 35
+        }
+      },
       "tier_two": {
         "beholder": {
           "gridWidth": 2,
