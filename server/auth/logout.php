@@ -12,4 +12,4 @@ echo json_encode([
     'success' => true,
     'message' => 'Вихід успішний'
 ]);
-?>
+

@@ -680,4 +680,4 @@ function getRoomPlayers($data) {
         throw new Exception('Кімнату не знайдено');
     }
 }
-?>
+
