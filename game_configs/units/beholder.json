@@ -307,7 +307,7 @@
           }
         ]
       },
-      "ranged_attack": {
+      "range_attack": {
         "name": "ranged_attack",
         "frames": [
           {
