@@ -196,7 +196,27 @@
   "dungeon": {
     "units": {
       "tier_one": {},
-      "tier_two": {},
+      "tier_two": {
+        "beholder": {
+          "gridWidth": 2,
+          "gridHeight": 1,
+          "objectType": "beholder",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 13,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 26,
+          "attackSpeed": 1,
+          "health": 130,
+          "isRanged": true,
+          "minRangeDistance": 12,
+          "maxRangeDistance": 26,
+          "bulletConfig": {
+            "bulletType": "bullet",
+            "moveSpeed": 60,
+            "bulletDamage": 26
+          }
+        }
+      },
       "tier_three": {},
       "tier_four": {}
     }

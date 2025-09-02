@@ -37,6 +37,8 @@ export class SpriteLoader {
       earth_elemental: "/game_configs/units/earth_elemental.json",
       firebird: "/game_configs/units/firebird.json",
       water_elemental: "/game_configs/units/water_elemental.json",
+      //!dungeon
+      beholder: "/game_configs/units/beholder.json",
     };
   }
 
