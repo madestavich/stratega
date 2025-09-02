@@ -206,7 +206,7 @@
           "availableActions": ["move", "attack"],
           "attackDamage": 26,
           "attackSpeed": 1,
-          "health": 130,
+          "health": 120,
           "isRanged": true,
           "minRangeDistance": 12,
           "maxRangeDistance": 26,
