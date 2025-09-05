@@ -42,6 +42,8 @@ export class SpriteLoader {
       harpy: "/game_configs/units/harpy.json",
       manticore: "/game_configs/units/manticore.json",
       medusa: "/game_configs/units/medusa.json",
+      minotaur: "/game_configs/units/minotaur.json",
+      troglodyte: "/game_configs/units/troglodyte.json",
     };
   }
 
