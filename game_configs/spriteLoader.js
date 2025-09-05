@@ -40,6 +40,7 @@ export class SpriteLoader {
       //!dungeon
       beholder: "/game_configs/units/beholder.json",
       harpy: "/game_configs/units/harpy.json",
+      manticore: "/game_configs/units/manticore.json",
     };
   }
 

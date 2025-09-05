@@ -229,7 +229,19 @@
           }
         }
       },
-      "tier_three": {},
+      "tier_three": {
+        "manticore": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "manticore",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 26,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 55,
+          "attackSpeed": 1,
+          "health": 240
+        }
+      },
       "tier_four": {}
     }
   },
