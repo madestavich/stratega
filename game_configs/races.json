@@ -210,22 +210,41 @@
       },
       "tier_two": {
         "beholder": {
-          "gridWidth": 2,
+          "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "beholder",
           "actionPriorities": ["attack", "move"],
-          "moveSpeed": 13,
+          "moveSpeed": 12,
           "availableActions": ["move", "attack"],
-          "attackDamage": 26,
+          "attackDamage": 16,
           "attackSpeed": 1,
           "health": 125,
           "isRanged": true,
           "minRangeDistance": 12,
-          "maxRangeDistance": 26,
+          "maxRangeDistance": 24,
           "bulletConfig": {
             "bulletType": "bullet",
             "moveSpeed": 60,
             "bulletDamage": 26
+          }
+        },
+        "medusa": {
+          "gridWidth": 2,
+          "gridHeight": 1,
+          "objectType": "medusa",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 10,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 26,
+          "attackSpeed": 1.2,
+          "health": 125,
+          "isRanged": true,
+          "minRangeDistance": 10,
+          "maxRangeDistance": 27,
+          "bulletConfig": {
+            "bulletType": "bullet",
+            "moveSpeed": 55,
+            "bulletDamage": 30
           }
         }
       },

@@ -41,6 +41,7 @@ export class SpriteLoader {
       beholder: "/game_configs/units/beholder.json",
       harpy: "/game_configs/units/harpy.json",
       manticore: "/game_configs/units/manticore.json",
+      medusa: "/game_configs/units/medusa.json",
     };
   }
 
