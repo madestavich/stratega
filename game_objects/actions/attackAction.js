@@ -172,12 +172,17 @@ export class AttackAction {
 
   // Update method called by ActionManager
   update(gameObject, deltaTime) {
-    // Update attack cooldown
+    if (gameObject.isDead) {
+      return false;
+    }
+    // Зменшуємо час перезарядки атаки, якщо він є
     if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
       gameObject.attackCooldown -= deltaTime;
-      if (gameObject.attackCooldown < 0) {
-        gameObject.attackCooldown = 0;
-      }
+    }
+
+    // Оновлюємо ціль атаки, якщо об'єкт не атакує в даний момент
+    if (!gameObject.isAttacking && !gameObject.isDead) {
+      this.updateAttackTarget(gameObject);
     }
   }
 
@@ -306,7 +311,6 @@ export class AttackAction {
     return bestTarget;
   }
 
-  // Update method to be called from ActionManager's update
   update(gameObject, deltaTime) {
     if (gameObject.isDead) {
       return false;
@@ -319,152 +323,6 @@ export class AttackAction {
     // Оновлюємо ціль атаки, якщо об'єкт не атакує в даний момент
     if (!gameObject.isAttacking && !gameObject.isDead) {
       this.updateAttackTarget(gameObject);
-    }
-  }
-
-  findNearestEnemy(gameObject) {
-    let nearestEnemy = null;
-    let minDistance = Infinity;
-    for (const obj of this.getAllObjects()) {
-      // Skip if dead, no team, or same team
-      if (obj.isDead || !obj.team || obj.team === gameObject.team) {
-        continue;
-      }
-      const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestEnemy = obj;
-      }
-    }
-    return nearestEnemy;
-  }
-
-  getMinDistanceBetweenObjects(object1, object2) {
-    let minDistance = Infinity;
-
-    // Get all cells occupied by object1
-    for (let col1 = 0; col1 < object1.gridWidth; col1++) {
-      for (let row1 = 0; row1 < object1.gridHeight; row1++) {
-        let cell1Col, cell1Row;
-
-        // Calculate actual cell position based on expansion direction
-        switch (object1.expansionDirection) {
-          case "bottomRight":
-            cell1Col = object1.gridCol + col1;
-            cell1Row = object1.gridRow + row1;
-            break;
-          case "topRight":
-            cell1Col = object1.gridCol + col1;
-            cell1Row = object1.gridRow - row1;
-            break;
-          case "bottomLeft":
-            cell1Col = object1.gridCol - col1;
-            cell1Row = object1.gridRow + row1;
-            break;
-          case "topLeft":
-            cell1Col = object1.gridCol - col1;
-            cell1Row = object1.gridRow - row1;
-            break;
-          default:
-            cell1Col = object1.gridCol + col1;
-            cell1Row = object1.gridRow + row1;
-        }
-
-        // Get all cells occupied by object2
-        for (let col2 = 0; col2 < object2.gridWidth; col2++) {
-          for (let row2 = 0; row2 < object2.gridHeight; row2++) {
-            let cell2Col, cell2Row;
-
-            // Calculate actual cell position based on expansion direction
-            switch (object2.expansionDirection) {
-              case "bottomRight":
-                cell2Col = object2.gridCol + col2;
-                cell2Row = object2.gridRow + row2;
-                break;
-              case "topRight":
-                cell2Col = object2.gridCol + col2;
-                cell2Row = object2.gridRow - row2;
-                break;
-              case "bottomLeft":
-                cell2Col = object2.gridCol - col2;
-                cell2Row = object2.gridRow + row2;
-                break;
-              case "topLeft":
-                cell2Col = object2.gridCol - col2;
-                cell2Row = object2.gridRow - row2;
-                break;
-              default:
-                cell2Col = object2.gridCol + col2;
-                cell2Row = object2.gridRow + row2;
-            }
-
-            // Calculate distance between these two cells
-            const distance = this.calculateDistance(
-              cell1Col,
-              cell1Row,
-              cell2Col,
-              cell2Row
-            );
-
-            if (distance < minDistance) {
-              minDistance = distance;
-            }
-          }
-        }
-      }
-    }
-
-    return minDistance;
-  }
-
-  isEnemyInRange(attacker, target) {
-    const attackRange = attacker.attackRange || 1;
-    const distance = this.getMinDistanceBetweenObjects(attacker, target);
-    return distance <= attackRange;
-  }
-
-  calculateDistance(col1, row1, col2, row2) {
-    // Use Chebyshev distance for grid-based movement with diagonals
-    return Math.max(Math.abs(col1 - col2), Math.abs(row1 - row2));
-  }
-
-  setLookDirection(gameObject, target) {
-    // Calculate direction vector
-    const dx = target.gridCol - gameObject.gridCol;
-    const dy = target.gridRow - gameObject.gridRow;
-
-    // Normalize to -1, 0, or 1 while preserving direction
-    const dirX = dx === 0 ? 0 : dx > 0 ? 1 : -1;
-    const dirY = dy === 0 ? 0 : dy > 0 ? 1 : -1;
-
-    // Set look direction including diagonals
-    gameObject.lookDirection = { dx: dirX, dy: dirY };
-  }
-
-  dealDamage(attacker, target) {
-    // Skip if no target or target is already dead
-    if (!target || target.isDead || target.health === undefined) {
-      return;
-    }
-
-    // Apply damage
-    const damage = attacker.attackDamage || 10;
-    target.health -= damage;
-
-    // Check if target is defeated
-    if (target.health <= 0 && !target.isDead) {
-      // Set the isDead flag
-      target.isDead = true;
-      target.canAct = false;
-      attacker.isAttacking = false;
-
-      // Play death animation if available
-      if (
-        target.animator &&
-        target.animator.activeSpritesheet.animations.death
-      ) {
-        target.animator.setAnimation("death", false);
-      }
     }
   }
 
@@ -523,21 +381,27 @@ export class AttackAction {
     }
 
     // Якщо ціль не в діапазоні атаки, оновлюємо moveTarget
-    gameObject.moveTarget = {
-      col: gameObject.attackTarget.gridCol,
-      row: gameObject.attackTarget.gridRow,
-    };
+    if (
+      !gameObject.moveTarget ||
+      gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
+      gameObject.moveTarget.row !== gameObject.attackTarget.gridRow
+    ) {
+      gameObject.moveTarget = {
+        col: gameObject.attackTarget.gridCol,
+        row: gameObject.attackTarget.gridRow,
+      };
+    }
 
     // Якщо об'єкт не рухається, спробуємо почати рух
-    if (!gameObject.isMoving && this.moveAction) {
+    if (!gameObject.isMoving && this.moveAction && gameObject.moveTarget) {
       const canMove = this.moveAction.setMoveTarget(
         gameObject,
-        gameObject.attackTarget.gridCol,
-        gameObject.attackTarget.gridRow,
+        gameObject.moveTarget.col,
+        gameObject.moveTarget.row,
         [0] // allowedObstacleTypes
       );
 
-      // Якщо не можемо рухатися до поточної цілі, шукаємо альтернативну
+      // Якщо не можемо рухатися до поточної цілі
       if (!canMove) {
         // Спробуємо знайти іншу ціль, до якої можна дістатися
         const alternativeTarget = this.findAlternativeTarget(gameObject);
@@ -549,22 +413,42 @@ export class AttackAction {
           };
 
           // Спробуємо рухатися до альтернативної цілі
-          this.moveAction.setMoveTarget(
+          const canMoveToAlternative = this.moveAction.setMoveTarget(
             gameObject,
             alternativeTarget.gridCol,
             alternativeTarget.gridRow,
             [0]
           );
+
+          // Якщо все ще не можемо рухатися, скидаємо moveTarget і спробуємо через кілька кадрів
+          if (!canMoveToAlternative) {
+            gameObject.moveTarget = null;
+            // Встановлюємо затримку перед наступною спробою
+            gameObject.retryMoveDelay = 500; // 500ms затримка
+          }
+        } else {
+          // Якщо альтернативна ціль не знайдена, скидаємо moveTarget і встановлюємо затримку
+          gameObject.moveTarget = null;
+          gameObject.retryMoveDelay = 1000; // 1 секунда затримка
         }
 
-        // Встановлюємо анімацію "idle" тільки якщо все ще не можемо рухатися
+        // Встановлюємо анімацію "idle"
         if (
-          !gameObject.isMoving &&
           gameObject.animator &&
           gameObject.animator.activeAnimation.name !== "idle"
         ) {
           gameObject.animator.setAnimation("idle");
         }
+      }
+    }
+
+    // Обробляємо затримку перед повторною спробою руху
+    if (gameObject.retryMoveDelay && gameObject.retryMoveDelay > 0) {
+      gameObject.retryMoveDelay -= 16; // Приблизно 60 FPS
+      if (gameObject.retryMoveDelay <= 0) {
+        gameObject.retryMoveDelay = 0;
+        // Скидаємо moveTarget, щоб спробувати знову
+        gameObject.moveTarget = null;
       }
     }
 
