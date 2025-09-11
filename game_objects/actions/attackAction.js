@@ -537,10 +537,29 @@ export class AttackAction {
         [0] // allowedObstacleTypes
       );
 
-      // Якщо не можемо рухатися, просто стоїмо на місці
+      // Якщо не можемо рухатися до поточної цілі, шукаємо альтернативну
       if (!canMove) {
-        // Встановлюємо анімацію "idle"
+        // Спробуємо знайти іншу ціль, до якої можна дістатися
+        const alternativeTarget = this.findAlternativeTarget(gameObject);
+        if (alternativeTarget) {
+          gameObject.attackTarget = alternativeTarget;
+          gameObject.moveTarget = {
+            col: alternativeTarget.gridCol,
+            row: alternativeTarget.gridRow,
+          };
+
+          // Спробуємо рухатися до альтернативної цілі
+          this.moveAction.setMoveTarget(
+            gameObject,
+            alternativeTarget.gridCol,
+            alternativeTarget.gridRow,
+            [0]
+          );
+        }
+
+        // Встановлюємо анімацію "idle" тільки якщо все ще не можемо рухатися
         if (
+          !gameObject.isMoving &&
           gameObject.animator &&
           gameObject.animator.activeAnimation.name !== "idle"
         ) {
@@ -550,5 +569,44 @@ export class AttackAction {
     }
 
     return false;
+  }
+
+  // Додайте цей новий метод
+  findAlternativeTarget(gameObject) {
+    const enemies = this.getAllObjects().filter(
+      (obj) => !obj.isDead && obj.team && obj.team !== gameObject.team
+    );
+
+    // Сортуємо ворогів за відстанню
+    enemies.sort((a, b) => {
+      const distA = this.getMinDistanceBetweenObjects(gameObject, a);
+      const distB = this.getMinDistanceBetweenObjects(gameObject, b);
+      return distA - distB;
+    });
+
+    // Перевіряємо кожного ворога, чи можемо до нього дістатися
+    for (const enemy of enemies) {
+      // Спробуємо знайти шлях до цього ворога
+      if (this.pathfinder || this.moveAction.ensurePathfinder(gameObject)) {
+        const pathfinder = this.pathfinder || this.moveAction.pathfinder;
+        const path = pathfinder.findPath(
+          gameObject.gridCol,
+          gameObject.gridRow,
+          enemy.gridCol,
+          enemy.gridRow,
+          gameObject.gridWidth,
+          gameObject.gridHeight,
+          gameObject.expansionDirection,
+          gameObject,
+          [0]
+        );
+
+        if (path && path.length > 0) {
+          return enemy;
+        }
+      }
+    }
+
+    return null;
   }
 }
