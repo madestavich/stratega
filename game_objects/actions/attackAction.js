@@ -150,6 +150,9 @@ export class AttackAction {
       gameObject.attackTarget &&
       !gameObject.attackTarget.isDead
     ) {
+      // Set look direction before starting attack animation
+      this.setLookDirection(gameObject, gameObject.attackTarget);
+
       gameObject.isAttacking = true;
 
       // Вибір правильної анімації в залежності від типу атаки
