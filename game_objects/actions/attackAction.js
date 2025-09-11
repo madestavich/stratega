@@ -167,17 +167,6 @@ export class AttackAction {
     return false;
   }
 
-  // Update method called by ActionManager
-  update(gameObject, deltaTime) {
-    // Update attack cooldown
-    if (gameObject.attackCooldown && gameObject.attackCooldown > 0) {
-      gameObject.attackCooldown -= deltaTime;
-      if (gameObject.attackCooldown < 0) {
-        gameObject.attackCooldown = 0;
-      }
-    }
-  }
-
   // Method to spawn a projectile
   spawnProjectile(gameObject, target) {
     // Get the current frame
