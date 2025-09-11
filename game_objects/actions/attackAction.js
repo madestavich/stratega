@@ -16,12 +16,30 @@ export class AttackAction {
     if (gameObject.isDead) {
       return false;
     }
+
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
-      // If it's the last frame of attack animation, we'll handle damage in execute
       const animator = gameObject.animator;
       const isLastFrame =
         animator.frameIndex === animator.activeAnimation.frames.length - 1;
+
+      // ВИПРАВЛЕННЯ: Якщо ціль атаки мертва або відсутня, примусово завершуємо атаку
+      if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
+        // Скидаємо стан атаки
+        gameObject.isAttacking = false;
+        gameObject.isRangedAttack = false;
+        gameObject.attackTarget = null;
+
+        // Встановлюємо анімацію idle
+        if (
+          gameObject.animator &&
+          gameObject.animator.activeAnimation.name !== "idle"
+        ) {
+          gameObject.animator.setAnimation("idle", true);
+        }
+
+        return false; // Завершуємо атаку достроково
+      }
 
       return isLastFrame; // Can execute to finish the attack
     }
