@@ -44,6 +44,7 @@ export class SpriteLoader {
       medusa: "/game_configs/units/medusa.json",
       minotaur: "/game_configs/units/minotaur.json",
       troglodyte: "/game_configs/units/troglodyte.json",
+      red_dragon: "/game_configs/units/red_dragon.json",
     };
   }
 

@@ -283,7 +283,19 @@
           "health": 340
         }
       },
-      "tier_four": {}
+      "tier_four": {
+        "red_dragon": {
+          "gridWidth": 3,
+          "gridHeight": 3,
+          "objectType": "red_dragon",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 30,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 160,
+          "attackSpeed": 1,
+          "health": 500
+        }
+      }
     }
   },
   "fortress": {
