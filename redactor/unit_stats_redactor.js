@@ -247,6 +247,34 @@ function onRangedChange(panelId) {
   }
 }
 
+// Save to localStorage for persistence
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem("racesData", JSON.stringify(racesData));
+    localStorage.setItem("lastSaved", new Date().toISOString());
+    return true;
+  } catch (error) {
+    console.error("Failed to save to localStorage:", error);
+    return false;
+  }
+}
+
+// Load from localStorage
+function loadFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem("racesData");
+    if (saved) {
+      racesData = JSON.parse(saved);
+      const lastSaved = localStorage.getItem("lastSaved");
+      console.log("Loaded from localStorage, last saved:", lastSaved);
+      return true;
+    }
+  } catch (error) {
+    console.error("Failed to load from localStorage:", error);
+  }
+  return false;
+}
+
 // Save unit changes
 function saveUnit(panelId) {
   const currentUnit = panels[panelId].currentUnit;
@@ -323,7 +351,77 @@ function saveUnit(panelId) {
     panels[panelId].currentUnitName
   ] = currentUnit;
 
-  alert(`Panel ${panelId}: Unit stats saved successfully!`);
+  // Save to localStorage
+  if (saveToLocalStorage()) {
+    alert(
+      `Panel ${panelId}: Unit stats saved successfully!\n\nData saved to browser storage. Use "Download Modified JSON" to get the file.`
+    );
+  } else {
+    alert(
+      `Panel ${panelId}: Unit stats updated in memory, but failed to save to browser storage.`
+    );
+  }
+
+  // Update save indicator
+  updateSaveIndicator();
+}
+
+// Update save indicator
+function updateSaveIndicator() {
+  const lastSaved = localStorage.getItem("lastSaved");
+  if (lastSaved) {
+    const saveTime = new Date(lastSaved).toLocaleString();
+    document.title = `Unit Stats Redactor - Last saved: ${saveTime}`;
+  }
+}
+
+// Download modified JSON file
+function downloadModifiedJSON() {
+  const dataStr = JSON.stringify(racesData, null, 2);
+  const dataBlob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "races_modified.json";
+  link.click();
+  URL.revokeObjectURL(url);
+
+  alert(
+    "Modified JSON file downloaded!\n\nTo apply changes to your game:\n1. Replace the original races.json with this file\n2. Or copy the contents to your races.json file"
+  );
+}
+
+// Save changes to clipboard as JSON patch
+function saveChangesToClipboard(panelId) {
+  const currentUnit = panels[panelId].currentUnit;
+  if (!currentUnit) return;
+
+  const unitPath = `racesData.${panels[panelId].currentRace}.units.${panels[panelId].currentTier}.${panels[panelId].currentUnitName}`;
+  const changeLog = {
+    timestamp: new Date().toISOString(),
+    unitPath: unitPath,
+    changes: currentUnit,
+  };
+
+  const changeText = `// Unit changes for ${panels[panelId].currentUnitName}
+// Timestamp: ${changeLog.timestamp}
+// Path: ${unitPath}
+
+${JSON.stringify(currentUnit, null, 2)}
+
+// To apply: Replace the unit object at the specified path with this data`;
+
+  navigator.clipboard
+    .writeText(changeText)
+    .then(() => {
+      alert(
+        `Panel ${panelId}: Unit changes copied to clipboard!\n\nYou can paste this into a text file for manual application.`
+      );
+    })
+    .catch((err) => {
+      console.error("Failed to copy: ", err);
+      alert(`Panel ${panelId}: Failed to copy changes to clipboard`);
+    });
 }
 
 // Copy unit data to clipboard
@@ -404,21 +502,36 @@ ${
   alert("Comparison logged to console. Press F12 to view detailed comparison.");
 }
 
-// Export JSON data
+// Export JSON data (alias for downloadModifiedJSON)
 function exportData() {
-  const dataStr = JSON.stringify(racesData, null, 2);
-  const dataBlob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "races_modified.json";
-  link.click();
-  URL.revokeObjectURL(url);
+  downloadModifiedJSON();
 }
+
+// Check for unsaved changes
+function hasUnsavedChanges() {
+  const lastSaved = localStorage.getItem("lastSaved");
+  return !lastSaved; // Simple check - could be more sophisticated
+}
+
+// Warning before leaving page
+window.addEventListener("beforeunload", function (e) {
+  if (hasUnsavedChanges()) {
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
 
 // Event listeners
 document.addEventListener("DOMContentLoaded", function () {
-  loadRacesData();
+  // Try to load from localStorage first
+  if (!loadFromLocalStorage()) {
+    loadRacesData();
+  } else {
+    populateRaceFilter(1);
+    populateRaceFilter(2);
+    updateSaveIndicator();
+    console.log("Loaded data from browser storage");
+  }
 
   // Panel 1 event listeners
   document
@@ -461,12 +574,6 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData();
     }
     if (e.ctrlKey && e.key === "c" && e.altKey) {
-      e.preventDefault();
-      // Copy unit data from both panels
-      if (panels[1].currentUnit) copyUnit(1);
-      if (panels[2].currentUnit) copyUnit(2);
-    }
-    if (e.ctrlKey && e.key === "d") {
       e.preventDefault();
       compareUnits();
     }

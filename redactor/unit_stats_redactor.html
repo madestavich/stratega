@@ -45,7 +45,7 @@
       }
       .filters {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         gap: 15px;
         margin-bottom: 20px;
         padding: 15px;
@@ -104,7 +104,8 @@
         margin-top: 10px;
       }
       .button-group {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 10px;
         margin-top: 15px;
       }
@@ -116,7 +117,6 @@
         border-radius: 5px;
         cursor: pointer;
         font-size: 14px;
-        flex: 1;
       }
       .save-button:hover {
         background: #0056b3;
@@ -132,6 +132,20 @@
       }
       .copy-button:hover {
         background: #5a6268;
+      }
+      .clipboard-button {
+        background: #17a2b8;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        grid-column: span 2;
+        margin-top: 5px;
+      }
+      .clipboard-button:hover {
+        background: #138496;
       }
       .export-section {
         margin-top: 40px;
@@ -166,6 +180,14 @@
       .comparison-button:hover {
         background: #e8590c;
       }
+      .save-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 0.9em;
+      }
       @media (max-width: 1200px) {
         .main-container {
           grid-template-columns: 1fr;
@@ -177,6 +199,13 @@
     <h1 style="text-align: center; margin-bottom: 30px">
       Unit Stats Redactor - Dual Panel
     </h1>
+
+    <div class="save-info">
+      <strong>💾 Save Info:</strong> Changes are saved to browser storage. Use
+      "Download Modified JSON" to get the actual file for your game.
+      <br /><strong>Keyboard shortcuts:</strong> Ctrl+S (Save), Ctrl+E (Export),
+      Ctrl+Alt+C (Compare)
+    </div>
 
     <div class="main-container">
       <!-- Panel 1 -->
@@ -298,10 +327,16 @@
 
             <div class="button-group">
               <button class="save-button" onclick="saveUnit(1)">
-                Save Changes
+                💾 Save Changes
               </button>
               <button class="copy-button" onclick="copyUnit(1)">
-                Copy Stats
+                📋 Copy Stats
+              </button>
+              <button
+                class="clipboard-button"
+                onclick="saveChangesToClipboard(1)"
+              >
+                📄 Copy Changes
               </button>
             </div>
           </div>
@@ -427,10 +462,16 @@
 
             <div class="button-group">
               <button class="save-button" onclick="saveUnit(2)">
-                Save Changes
+                💾 Save Changes
               </button>
               <button class="copy-button" onclick="copyUnit(2)">
-                Copy Stats
+                📋 Copy Stats
+              </button>
+              <button
+                class="clipboard-button"
+                onclick="saveChangesToClipboard(2)"
+              >
+                📄 Copy Changes
               </button>
             </div>
           </div>
@@ -439,10 +480,12 @@
     </div>
 
     <div class="export-section">
-      <h3>Actions</h3>
-      <button class="export-button" onclick="exportData()">Export JSON</button>
+      <h3>Final Actions</h3>
+      <button class="export-button" onclick="downloadModifiedJSON()">
+        ⬇️ Download Modified JSON
+      </button>
       <button class="comparison-button" onclick="compareUnits()">
-        Compare Units
+        ⚖️ Compare Units
       </button>
     </div>
 
