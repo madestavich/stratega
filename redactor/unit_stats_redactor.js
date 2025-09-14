@@ -1,27 +1,37 @@
 let racesData = {};
-let currentUnit = null;
-let currentRace = null;
-let currentTier = null;
-let currentUnitName = null;
+let panels = {
+  1: {
+    currentUnit: null,
+    currentRace: null,
+    currentTier: null,
+    currentUnitName: null,
+  },
+  2: {
+    currentUnit: null,
+    currentRace: null,
+    currentTier: null,
+    currentUnitName: null,
+  },
+};
 
 // Load races data
 async function loadRacesData() {
   try {
     const response = await fetch("../game_configs/races.json");
     racesData = await response.json();
-    populateRaceFilter();
+    populateRaceFilter(1);
+    populateRaceFilter(2);
   } catch (error) {
     console.error("Error loading races data:", error);
-    // Fallback - you can paste the races data here if needed
     alert(
       "Could not load races.json. Make sure the file exists in the correct path."
     );
   }
 }
 
-// Populate race filter
-function populateRaceFilter() {
-  const raceFilter = document.getElementById("raceFilter");
+// Populate race filter for specific panel
+function populateRaceFilter(panelId) {
+  const raceFilter = document.getElementById(`raceFilter${panelId}`);
   raceFilter.innerHTML = '<option value="">Select Race</option>';
 
   Object.keys(racesData).forEach((race) => {
@@ -38,28 +48,28 @@ function populateRaceFilter() {
 }
 
 // Handle race selection
-function onRaceChange() {
-  const raceFilter = document.getElementById("raceFilter");
-  const tierFilter = document.getElementById("tierFilter");
-  const unitFilter = document.getElementById("unitFilter");
+function onRaceChange(panelId) {
+  const raceFilter = document.getElementById(`raceFilter${panelId}`);
+  const tierFilter = document.getElementById(`tierFilter${panelId}`);
+  const unitFilter = document.getElementById(`unitFilter${panelId}`);
 
-  currentRace = raceFilter.value;
+  panels[panelId].currentRace = raceFilter.value;
 
-  if (!currentRace) {
+  if (!panels[panelId].currentRace) {
     tierFilter.innerHTML = '<option value="">Select Tier</option>';
     unitFilter.innerHTML = '<option value="">Select Unit</option>';
-    hideUnitEditor();
+    hideUnitEditor(panelId);
     return;
   }
 
-  populateTierFilter(currentRace);
+  populateTierFilter(panelId, panels[panelId].currentRace);
   unitFilter.innerHTML = '<option value="">Select Unit</option>';
-  hideUnitEditor();
+  hideUnitEditor(panelId);
 }
 
 // Populate tier filter
-function populateTierFilter(race) {
-  const tierFilter = document.getElementById("tierFilter");
+function populateTierFilter(panelId, race) {
+  const tierFilter = document.getElementById(`tierFilter${panelId}`);
   tierFilter.innerHTML = '<option value="">Select Tier</option>';
 
   const units = racesData[race].units;
@@ -76,25 +86,29 @@ function populateTierFilter(race) {
 }
 
 // Handle tier selection
-function onTierChange() {
-  const tierFilter = document.getElementById("tierFilter");
-  const unitFilter = document.getElementById("unitFilter");
+function onTierChange(panelId) {
+  const tierFilter = document.getElementById(`tierFilter${panelId}`);
+  const unitFilter = document.getElementById(`unitFilter${panelId}`);
 
-  currentTier = tierFilter.value;
+  panels[panelId].currentTier = tierFilter.value;
 
-  if (!currentTier) {
+  if (!panels[panelId].currentTier) {
     unitFilter.innerHTML = '<option value="">Select Unit</option>';
-    hideUnitEditor();
+    hideUnitEditor(panelId);
     return;
   }
 
-  populateUnitFilter(currentRace, currentTier);
-  hideUnitEditor();
+  populateUnitFilter(
+    panelId,
+    panels[panelId].currentRace,
+    panels[panelId].currentTier
+  );
+  hideUnitEditor(panelId);
 }
 
 // Populate unit filter
-function populateUnitFilter(race, tier) {
-  const unitFilter = document.getElementById("unitFilter");
+function populateUnitFilter(panelId, race, tier) {
+  const unitFilter = document.getElementById(`unitFilter${panelId}`);
   unitFilter.innerHTML = '<option value="">Select Unit</option>';
 
   const units = racesData[race].units[tier];
@@ -109,81 +123,94 @@ function populateUnitFilter(race, tier) {
 }
 
 // Handle unit selection
-function onUnitChange() {
-  const unitFilter = document.getElementById("unitFilter");
-  currentUnitName = unitFilter.value;
+function onUnitChange(panelId) {
+  const unitFilter = document.getElementById(`unitFilter${panelId}`);
+  panels[panelId].currentUnitName = unitFilter.value;
 
-  if (!currentUnitName) {
-    hideUnitEditor();
+  if (!panels[panelId].currentUnitName) {
+    hideUnitEditor(panelId);
     return;
   }
 
-  currentUnit = racesData[currentRace].units[currentTier][currentUnitName];
-  showUnitEditor();
+  panels[panelId].currentUnit =
+    racesData[panels[panelId].currentRace].units[panels[panelId].currentTier][
+      panels[panelId].currentUnitName
+    ];
+  showUnitEditor(panelId);
 }
 
 // Show unit editor
-function showUnitEditor() {
-  const unitEditor = document.getElementById("unitEditor");
-  unitEditor.style.display = "grid";
+function showUnitEditor(panelId) {
+  const unitEditor = document.getElementById(`unitEditor${panelId}`);
+  unitEditor.style.display = "block";
 
   // Update unit info
-  document.getElementById("unitName").textContent = currentUnitName
+  document.getElementById(`unitName${panelId}`).textContent = panels[
+    panelId
+  ].currentUnitName
     .replace(/_/g, " ")
     .replace(/\b\w/g, (l) => l.toUpperCase());
-  document.getElementById("unitRace").textContent =
-    currentRace.charAt(0).toUpperCase() + currentRace.slice(1);
-  document.getElementById("unitTier").textContent = currentTier
+  document.getElementById(`unitRace${panelId}`).textContent =
+    panels[panelId].currentRace.charAt(0).toUpperCase() +
+    panels[panelId].currentRace.slice(1);
+  document.getElementById(`unitTier${panelId}`).textContent = panels[
+    panelId
+  ].currentTier
     .replace("_", " ")
     .replace(/\b\w/g, (l) => l.toUpperCase());
 
   // Populate form fields
-  populateUnitForm();
+  populateUnitForm(panelId);
 }
 
 // Hide unit editor
-function hideUnitEditor() {
-  const unitEditor = document.getElementById("unitEditor");
+function hideUnitEditor(panelId) {
+  const unitEditor = document.getElementById(`unitEditor${panelId}`);
   unitEditor.style.display = "none";
 }
 
 // Populate unit form with current unit data
-function populateUnitForm() {
+function populateUnitForm(panelId) {
+  const currentUnit = panels[panelId].currentUnit;
   if (!currentUnit) return;
 
   // Basic stats
-  document.getElementById("gridWidth").value = currentUnit.gridWidth || 1;
-  document.getElementById("gridHeight").value = currentUnit.gridHeight || 1;
-  document.getElementById("moveSpeed").value = currentUnit.moveSpeed || 10;
-  document.getElementById("attackDamage").value =
+  document.getElementById(`gridWidth${panelId}`).value =
+    currentUnit.gridWidth || 1;
+  document.getElementById(`gridHeight${panelId}`).value =
+    currentUnit.gridHeight || 1;
+  document.getElementById(`moveSpeed${panelId}`).value =
+    currentUnit.moveSpeed || 10;
+  document.getElementById(`attackDamage${panelId}`).value =
     currentUnit.attackDamage || 10;
-  document.getElementById("attackSpeed").value = currentUnit.attackSpeed || 1;
-  document.getElementById("health").value = currentUnit.health || 50;
+  document.getElementById(`attackSpeed${panelId}`).value =
+    currentUnit.attackSpeed || 1;
+  document.getElementById(`health${panelId}`).value = currentUnit.health || 50;
 
   // Ranged settings
   const isRanged = currentUnit.isRanged || false;
-  document.getElementById("isRanged").checked = isRanged;
+  document.getElementById(`isRanged${panelId}`).checked = isRanged;
 
-  const rangedConfig = document.getElementById("rangedConfig");
+  const rangedConfig = document.getElementById(`rangedConfig${panelId}`);
   if (isRanged) {
     rangedConfig.style.display = "block";
-    document.getElementById("minRangeDistance").value =
+    document.getElementById(`minRangeDistance${panelId}`).value =
       currentUnit.minRangeDistance || 1;
-    document.getElementById("maxRangeDistance").value =
+    document.getElementById(`maxRangeDistance${panelId}`).value =
       currentUnit.maxRangeDistance || 10;
 
     // Bullet config
     if (currentUnit.bulletConfig) {
-      document.getElementById("bulletType").value =
+      document.getElementById(`bulletType${panelId}`).value =
         currentUnit.bulletConfig.bulletType || "bullet";
-      document.getElementById("bulletMoveSpeed").value =
+      document.getElementById(`bulletMoveSpeed${panelId}`).value =
         currentUnit.bulletConfig.moveSpeed || 30;
-      document.getElementById("bulletDamage").value =
+      document.getElementById(`bulletDamage${panelId}`).value =
         currentUnit.bulletConfig.bulletDamage || currentUnit.attackDamage || 20;
     } else {
-      document.getElementById("bulletType").value = "bullet";
-      document.getElementById("bulletMoveSpeed").value = 30;
-      document.getElementById("bulletDamage").value =
+      document.getElementById(`bulletType${panelId}`).value = "bullet";
+      document.getElementById(`bulletMoveSpeed${panelId}`).value = 30;
+      document.getElementById(`bulletDamage${panelId}`).value =
         currentUnit.attackDamage || 20;
     }
   } else {
@@ -192,28 +219,28 @@ function populateUnitForm() {
 }
 
 // Handle ranged checkbox change
-function onRangedChange() {
-  const isRanged = document.getElementById("isRanged").checked;
-  const rangedConfig = document.getElementById("rangedConfig");
+function onRangedChange(panelId) {
+  const isRanged = document.getElementById(`isRanged${panelId}`).checked;
+  const rangedConfig = document.getElementById(`rangedConfig${panelId}`);
 
   if (isRanged) {
     rangedConfig.style.display = "block";
     // Set default values if not already set
-    if (!document.getElementById("minRangeDistance").value) {
-      document.getElementById("minRangeDistance").value = 3;
+    if (!document.getElementById(`minRangeDistance${panelId}`).value) {
+      document.getElementById(`minRangeDistance${panelId}`).value = 3;
     }
-    if (!document.getElementById("maxRangeDistance").value) {
-      document.getElementById("maxRangeDistance").value = 15;
+    if (!document.getElementById(`maxRangeDistance${panelId}`).value) {
+      document.getElementById(`maxRangeDistance${panelId}`).value = 15;
     }
-    if (!document.getElementById("bulletType").value) {
-      document.getElementById("bulletType").value = "bullet";
+    if (!document.getElementById(`bulletType${panelId}`).value) {
+      document.getElementById(`bulletType${panelId}`).value = "bullet";
     }
-    if (!document.getElementById("bulletMoveSpeed").value) {
-      document.getElementById("bulletMoveSpeed").value = 30;
+    if (!document.getElementById(`bulletMoveSpeed${panelId}`).value) {
+      document.getElementById(`bulletMoveSpeed${panelId}`).value = 30;
     }
-    if (!document.getElementById("bulletDamage").value) {
-      document.getElementById("bulletDamage").value =
-        document.getElementById("attackDamage").value || 20;
+    if (!document.getElementById(`bulletDamage${panelId}`).value) {
+      document.getElementById(`bulletDamage${panelId}`).value =
+        document.getElementById(`attackDamage${panelId}`).value || 20;
     }
   } else {
     rangedConfig.style.display = "none";
@@ -221,16 +248,27 @@ function onRangedChange() {
 }
 
 // Save unit changes
-function saveUnit() {
+function saveUnit(panelId) {
+  const currentUnit = panels[panelId].currentUnit;
   if (!currentUnit) return;
 
   // Validate inputs
-  const gridWidth = parseInt(document.getElementById("gridWidth").value);
-  const gridHeight = parseInt(document.getElementById("gridHeight").value);
-  const moveSpeed = parseInt(document.getElementById("moveSpeed").value);
-  const attackDamage = parseInt(document.getElementById("attackDamage").value);
-  const attackSpeed = parseFloat(document.getElementById("attackSpeed").value);
-  const health = parseInt(document.getElementById("health").value);
+  const gridWidth = parseInt(
+    document.getElementById(`gridWidth${panelId}`).value
+  );
+  const gridHeight = parseInt(
+    document.getElementById(`gridHeight${panelId}`).value
+  );
+  const moveSpeed = parseInt(
+    document.getElementById(`moveSpeed${panelId}`).value
+  );
+  const attackDamage = parseInt(
+    document.getElementById(`attackDamage${panelId}`).value
+  );
+  const attackSpeed = parseFloat(
+    document.getElementById(`attackSpeed${panelId}`).value
+  );
+  const health = parseInt(document.getElementById(`health${panelId}`).value);
 
   if (
     gridWidth < 1 ||
@@ -253,21 +291,25 @@ function saveUnit() {
   currentUnit.health = health;
 
   // Update ranged settings
-  const isRanged = document.getElementById("isRanged").checked;
+  const isRanged = document.getElementById(`isRanged${panelId}`).checked;
   if (isRanged) {
     currentUnit.isRanged = true;
     currentUnit.minRangeDistance = parseInt(
-      document.getElementById("minRangeDistance").value
+      document.getElementById(`minRangeDistance${panelId}`).value
     );
     currentUnit.maxRangeDistance = parseInt(
-      document.getElementById("maxRangeDistance").value
+      document.getElementById(`maxRangeDistance${panelId}`).value
     );
 
     // Update bullet config
     currentUnit.bulletConfig = {
-      bulletType: document.getElementById("bulletType").value,
-      moveSpeed: parseInt(document.getElementById("bulletMoveSpeed").value),
-      bulletDamage: parseInt(document.getElementById("bulletDamage").value),
+      bulletType: document.getElementById(`bulletType${panelId}`).value,
+      moveSpeed: parseInt(
+        document.getElementById(`bulletMoveSpeed${panelId}`).value
+      ),
+      bulletDamage: parseInt(
+        document.getElementById(`bulletDamage${panelId}`).value
+      ),
     };
   } else {
     delete currentUnit.isRanged;
@@ -277,9 +319,89 @@ function saveUnit() {
   }
 
   // Update the races data
-  racesData[currentRace].units[currentTier][currentUnitName] = currentUnit;
+  racesData[panels[panelId].currentRace].units[panels[panelId].currentTier][
+    panels[panelId].currentUnitName
+  ] = currentUnit;
 
-  alert("Unit stats saved successfully!");
+  alert(`Panel ${panelId}: Unit stats saved successfully!`);
+}
+
+// Copy unit data to clipboard
+function copyUnit(panelId) {
+  const currentUnit = panels[panelId].currentUnit;
+  if (!currentUnit) return;
+
+  const unitData = JSON.stringify(currentUnit, null, 2);
+  navigator.clipboard
+    .writeText(unitData)
+    .then(() => {
+      alert(`Panel ${panelId}: Unit data copied to clipboard!`);
+    })
+    .catch((err) => {
+      console.error("Failed to copy: ", err);
+      alert(`Panel ${panelId}: Failed to copy unit data`);
+    });
+}
+
+// Compare units between panels
+function compareUnits() {
+  const unit1 = panels[1].currentUnit;
+  const unit2 = panels[2].currentUnit;
+
+  if (!unit1 || !unit2) {
+    alert("Please select units in both panels to compare");
+    return;
+  }
+
+  const comparison = {
+    unit1: {
+      name: panels[1].currentUnitName,
+      race: panels[1].currentRace,
+      tier: panels[1].currentTier,
+      stats: unit1,
+    },
+    unit2: {
+      name: panels[2].currentUnitName,
+      race: panels[2].currentRace,
+      tier: panels[2].currentTier,
+      stats: unit2,
+    },
+  };
+
+  const comparisonText = `
+UNIT COMPARISON
+===============
+
+Panel 1: ${comparison.unit1.name} (${comparison.unit1.race} - ${
+    comparison.unit1.tier
+  })
+Panel 2: ${comparison.unit2.name} (${comparison.unit2.race} - ${
+    comparison.unit2.tier
+  })
+
+Grid Size: ${unit1.gridWidth}x${unit1.gridHeight} vs ${unit2.gridWidth}x${
+    unit2.gridHeight
+  }
+Health: ${unit1.health} vs ${unit2.health}
+Attack Damage: ${unit1.attackDamage} vs ${unit2.attackDamage}
+Attack Speed: ${unit1.attackSpeed} vs ${unit2.attackSpeed}
+Move Speed: ${unit1.moveSpeed} vs ${unit2.moveSpeed}
+Ranged: ${unit1.isRanged ? "Yes" : "No"} vs ${unit2.isRanged ? "Yes" : "No"}
+
+${
+  unit1.isRanged
+    ? `Range: ${unit1.minRangeDistance}-${unit1.maxRangeDistance}`
+    : ""
+}
+${
+  unit2.isRanged
+    ? `Range: ${unit2.minRangeDistance}-${unit2.maxRangeDistance}`
+    : ""
+}
+`;
+
+  console.log(comparisonText);
+  alert("Comparison logged to console. Press F12 to view detailed comparison.");
 }
 
 // Export JSON data
@@ -294,76 +416,59 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-// Copy current unit
-function copyUnit() {
-  if (!currentUnit) return;
-
-  const unitData = JSON.stringify(currentUnit, null, 2);
-  navigator.clipboard
-    .writeText(unitData)
-    .then(() => {
-      alert("Unit data copied to clipboard!");
-    })
-    .catch((err) => {
-      console.error("Failed to copy: ", err);
-      alert("Failed to copy unit data");
-    });
-}
-
-// Reset unit to original values
-function resetUnit() {
-  if (
-    !currentUnit ||
-    !confirm("Are you sure you want to reset this unit to original values?")
-  )
-    return;
-
-  // Reload the unit from the original data
-  onUnitChange();
-}
-
 // Event listeners
 document.addEventListener("DOMContentLoaded", function () {
   loadRacesData();
 
+  // Panel 1 event listeners
   document
-    .getElementById("raceFilter")
-    .addEventListener("change", onRaceChange);
+    .getElementById("raceFilter1")
+    .addEventListener("change", () => onRaceChange(1));
   document
-    .getElementById("tierFilter")
-    .addEventListener("change", onTierChange);
+    .getElementById("tierFilter1")
+    .addEventListener("change", () => onTierChange(1));
   document
-    .getElementById("unitFilter")
-    .addEventListener("change", onUnitChange);
+    .getElementById("unitFilter1")
+    .addEventListener("change", () => onUnitChange(1));
   document
-    .getElementById("isRanged")
-    .addEventListener("change", onRangedChange);
+    .getElementById("isRanged1")
+    .addEventListener("change", () => onRangedChange(1));
 
-  // Add keyboard shortcuts
+  // Panel 2 event listeners
+  document
+    .getElementById("raceFilter2")
+    .addEventListener("change", () => onRaceChange(2));
+  document
+    .getElementById("tierFilter2")
+    .addEventListener("change", () => onTierChange(2));
+  document
+    .getElementById("unitFilter2")
+    .addEventListener("change", () => onUnitChange(2));
+  document
+    .getElementById("isRanged2")
+    .addEventListener("change", () => onRangedChange(2));
+
+  // Keyboard shortcuts
   document.addEventListener("keydown", function (e) {
     if (e.ctrlKey && e.key === "s") {
       e.preventDefault();
-      saveUnit();
+      // Save both panels if they have units selected
+      if (panels[1].currentUnit) saveUnit(1);
+      if (panels[2].currentUnit) saveUnit(2);
     }
     if (e.ctrlKey && e.key === "e") {
       e.preventDefault();
       exportData();
     }
+    if (e.ctrlKey && e.key === "c" && e.altKey) {
+      e.preventDefault();
+      // Copy unit data from both panels
+      if (panels[1].currentUnit) copyUnit(1);
+      if (panels[2].currentUnit) copyUnit(2);
+    }
+    if (e.ctrlKey && e.key === "d") {
+      e.preventDefault();
+      compareUnits();
+    }
   });
 });
-
-// Helper function to format numbers
-function formatNumber(value, decimals = 0) {
-  return parseFloat(value).toFixed(decimals);
-}
-
-// Validation functions
-function validatePositiveInteger(value) {
-  const num = parseInt(value);
-  return !isNaN(num) && num > 0;
-}
-
-function validatePositiveFloat(value) {
-  const num = parseFloat(value);
-  return !isNaN(num) && num > 0;
-}

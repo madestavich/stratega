@@ -7,20 +7,46 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        max-width: 1200px;
+        max-width: 1600px;
         margin: 0 auto;
         padding: 20px;
         background-color: #f5f5f5;
       }
-      .container {
+      .main-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .editor-panel {
         background: white;
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+      }
+      .panel-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+      }
+      .panel-number {
+        background: #007bff;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.9em;
+      }
       .filters {
         display: flex;
-        gap: 20px;
+        flex-direction: column;
+        gap: 15px;
         margin-bottom: 20px;
         padding: 15px;
         background: #f8f9fa;
@@ -44,14 +70,12 @@
       }
       .unit-editor {
         display: none;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-top: 20px;
       }
       .unit-info {
         background: #f8f9fa;
         padding: 15px;
         border-radius: 5px;
+        margin-bottom: 15px;
       }
       .stats-editor {
         display: grid;
@@ -79,149 +103,347 @@
         border-radius: 5px;
         margin-top: 10px;
       }
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
       .save-button {
         background: #007bff;
         color: white;
-        padding: 10px 20px;
+        padding: 8px 15px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        font-size: 16px;
-        margin-top: 20px;
+        font-size: 14px;
+        flex: 1;
       }
       .save-button:hover {
         background: #0056b3;
       }
+      .copy-button {
+        background: #6c757d;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .copy-button:hover {
+        background: #5a6268;
+      }
+      .export-section {
+        margin-top: 40px;
+        text-align: center;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
       .export-button {
         background: #28a745;
         color: white;
-        padding: 10px 20px;
+        padding: 12px 30px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         font-size: 16px;
-        margin-top: 20px;
       }
       .export-button:hover {
         background: #1e7e34;
       }
+      .comparison-button {
+        background: #fd7e14;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 10px;
+      }
+      .comparison-button:hover {
+        background: #e8590c;
+      }
+      @media (max-width: 1200px) {
+        .main-container {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Unit Stats Redactor</h1>
+    <h1 style="text-align: center; margin-bottom: 30px">
+      Unit Stats Redactor - Dual Panel
+    </h1>
 
-      <div class="filters">
-        <div class="filter-group">
-          <label for="raceFilter">Race:</label>
-          <select id="raceFilter">
-            <option value="">Select Race</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="tierFilter">Tier:</label>
-          <select id="tierFilter">
-            <option value="">Select Tier</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="unitFilter">Unit:</label>
-          <select id="unitFilter">
-            <option value="">Select Unit</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="unit-editor" id="unitEditor">
-        <div class="unit-info">
-          <h3 id="unitName">Unit Name</h3>
-          <p><strong>Race:</strong> <span id="unitRace"></span></p>
-          <p><strong>Tier:</strong> <span id="unitTier"></span></p>
+    <div class="main-container">
+      <!-- Panel 1 -->
+      <div class="editor-panel">
+        <div class="panel-header">
+          <div class="panel-title">Unit Editor</div>
+          <div class="panel-number">Panel 1</div>
         </div>
 
-        <div class="stats-editor">
-          <h3>Basic Stats</h3>
+        <div class="filters">
+          <div class="filter-group">
+            <label for="raceFilter1">Race:</label>
+            <select id="raceFilter1">
+              <option value="">Select Race</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="tierFilter1">Tier:</label>
+            <select id="tierFilter1">
+              <option value="">Select Tier</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="unitFilter1">Unit:</label>
+            <select id="unitFilter1">
+              <option value="">Select Unit</option>
+            </select>
+          </div>
+        </div>
 
-          <div class="stat-group">
-            <label class="stat-label">Grid Width:</label>
-            <input type="number" id="gridWidth" min="1" max="5" />
+        <div class="unit-editor" id="unitEditor1">
+          <div class="unit-info">
+            <h3 id="unitName1">Unit Name</h3>
+            <p><strong>Race:</strong> <span id="unitRace1"></span></p>
+            <p><strong>Tier:</strong> <span id="unitTier1"></span></p>
           </div>
 
-          <div class="stat-group">
-            <label class="stat-label">Grid Height:</label>
-            <input type="number" id="gridHeight" min="1" max="5" />
-          </div>
-
-          <div class="stat-group">
-            <label class="stat-label">Move Speed:</label>
-            <input type="number" id="moveSpeed" min="1" max="50" />
-          </div>
-
-          <div class="stat-group">
-            <label class="stat-label">Attack Damage:</label>
-            <input type="number" id="attackDamage" min="1" max="500" />
-          </div>
-
-          <div class="stat-group">
-            <label class="stat-label">Attack Speed:</label>
-            <input
-              type="number"
-              id="attackSpeed"
-              step="0.1"
-              min="0.1"
-              max="5"
-            />
-          </div>
-
-          <div class="stat-group">
-            <label class="stat-label">Health:</label>
-            <input type="number" id="health" min="1" max="1000" />
-          </div>
-
-          <div class="stat-group">
-            <label class="stat-label">Is Ranged:</label>
-            <input type="checkbox" id="isRanged" />
-          </div>
-
-          <div class="ranged-config" id="rangedConfig" style="display: none">
-            <h4>Ranged Configuration</h4>
+          <div class="stats-editor">
+            <h3>Basic Stats</h3>
 
             <div class="stat-group">
-              <label class="stat-label">Min Range Distance:</label>
-              <input type="number" id="minRangeDistance" min="1" max="50" />
+              <label class="stat-label">Grid Width:</label>
+              <input type="number" id="gridWidth1" min="1" max="5" />
             </div>
 
             <div class="stat-group">
-              <label class="stat-label">Max Range Distance:</label>
-              <input type="number" id="maxRangeDistance" min="1" max="50" />
+              <label class="stat-label">Grid Height:</label>
+              <input type="number" id="gridHeight1" min="1" max="5" />
             </div>
 
-            <div class="bullet-config">
-              <h5>Bullet Configuration</h5>
+            <div class="stat-group">
+              <label class="stat-label">Move Speed:</label>
+              <input type="number" id="moveSpeed1" min="1" max="50" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Attack Damage:</label>
+              <input type="number" id="attackDamage1" min="1" max="500" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Attack Speed:</label>
+              <input
+                type="number"
+                id="attackSpeed1"
+                step="0.1"
+                min="0.1"
+                max="5"
+              />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Health:</label>
+              <input type="number" id="health1" min="1" max="1000" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Is Ranged:</label>
+              <input type="checkbox" id="isRanged1" />
+            </div>
+
+            <div class="ranged-config" id="rangedConfig1" style="display: none">
+              <h4>Ranged Configuration</h4>
 
               <div class="stat-group">
-                <label class="stat-label">Bullet Type:</label>
-                <input type="text" id="bulletType" value="bullet" />
+                <label class="stat-label">Min Range Distance:</label>
+                <input type="number" id="minRangeDistance1" min="1" max="50" />
               </div>
 
               <div class="stat-group">
-                <label class="stat-label">Bullet Speed:</label>
-                <input type="number" id="bulletMoveSpeed" min="1" max="100" />
+                <label class="stat-label">Max Range Distance:</label>
+                <input type="number" id="maxRangeDistance1" min="1" max="50" />
               </div>
 
-              <div class="stat-group">
-                <label class="stat-label">Bullet Damage:</label>
-                <input type="number" id="bulletDamage" min="1" max="500" />
+              <div class="bullet-config">
+                <h5>Bullet Configuration</h5>
+
+                <div class="stat-group">
+                  <label class="stat-label">Bullet Type:</label>
+                  <input type="text" id="bulletType1" value="bullet" />
+                </div>
+
+                <div class="stat-group">
+                  <label class="stat-label">Bullet Speed:</label>
+                  <input
+                    type="number"
+                    id="bulletMoveSpeed1"
+                    min="1"
+                    max="100"
+                  />
+                </div>
+
+                <div class="stat-group">
+                  <label class="stat-label">Bullet Damage:</label>
+                  <input type="number" id="bulletDamage1" min="1" max="500" />
+                </div>
               </div>
+            </div>
+
+            <div class="button-group">
+              <button class="save-button" onclick="saveUnit(1)">
+                Save Changes
+              </button>
+              <button class="copy-button" onclick="copyUnit(1)">
+                Copy Stats
+              </button>
             </div>
           </div>
-
-          <button class="save-button" onclick="saveUnit()">Save Changes</button>
-          <button class="export-button" onclick="exportData()">
-            Export JSON
-          </button>
         </div>
       </div>
+
+      <!-- Panel 2 -->
+      <div class="editor-panel">
+        <div class="panel-header">
+          <div class="panel-title">Unit Editor</div>
+          <div class="panel-number">Panel 2</div>
+        </div>
+
+        <div class="filters">
+          <div class="filter-group">
+            <label for="raceFilter2">Race:</label>
+            <select id="raceFilter2">
+              <option value="">Select Race</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="tierFilter2">Tier:</label>
+            <select id="tierFilter2">
+              <option value="">Select Tier</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="unitFilter2">Unit:</label>
+            <select id="unitFilter2">
+              <option value="">Select Unit</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="unit-editor" id="unitEditor2">
+          <div class="unit-info">
+            <h3 id="unitName2">Unit Name</h3>
+            <p><strong>Race:</strong> <span id="unitRace2"></span></p>
+            <p><strong>Tier:</strong> <span id="unitTier2"></span></p>
+          </div>
+
+          <div class="stats-editor">
+            <h3>Basic Stats</h3>
+
+            <div class="stat-group">
+              <label class="stat-label">Grid Width:</label>
+              <input type="number" id="gridWidth2" min="1" max="5" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Grid Height:</label>
+              <input type="number" id="gridHeight2" min="1" max="5" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Move Speed:</label>
+              <input type="number" id="moveSpeed2" min="1" max="50" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Attack Damage:</label>
+              <input type="number" id="attackDamage2" min="1" max="500" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Attack Speed:</label>
+              <input
+                type="number"
+                id="attackSpeed2"
+                step="0.1"
+                min="0.1"
+                max="5"
+              />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Health:</label>
+              <input type="number" id="health2" min="1" max="1000" />
+            </div>
+
+            <div class="stat-group">
+              <label class="stat-label">Is Ranged:</label>
+              <input type="checkbox" id="isRanged2" />
+            </div>
+
+            <div class="ranged-config" id="rangedConfig2" style="display: none">
+              <h4>Ranged Configuration</h4>
+
+              <div class="stat-group">
+                <label class="stat-label">Min Range Distance:</label>
+                <input type="number" id="minRangeDistance2" min="1" max="50" />
+              </div>
+
+              <div class="stat-group">
+                <label class="stat-label">Max Range Distance:</label>
+                <input type="number" id="maxRangeDistance2" min="1" max="50" />
+              </div>
+
+              <div class="bullet-config">
+                <h5>Bullet Configuration</h5>
+
+                <div class="stat-group">
+                  <label class="stat-label">Bullet Type:</label>
+                  <input type="text" id="bulletType2" value="bullet" />
+                </div>
+
+                <div class="stat-group">
+                  <label class="stat-label">Bullet Speed:</label>
+                  <input
+                    type="number"
+                    id="bulletMoveSpeed2"
+                    min="1"
+                    max="100"
+                  />
+                </div>
+
+                <div class="stat-group">
+                  <label class="stat-label">Bullet Damage:</label>
+                  <input type="number" id="bulletDamage2" min="1" max="500" />
+                </div>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button class="save-button" onclick="saveUnit(2)">
+                Save Changes
+              </button>
+              <button class="copy-button" onclick="copyUnit(2)">
+                Copy Stats
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="export-section">
+      <h3>Actions</h3>
+      <button class="export-button" onclick="exportData()">Export JSON</button>
+      <button class="comparison-button" onclick="compareUnits()">
+        Compare Units
+      </button>
     </div>
 
     <script src="unit_stats_redactor.js"></script>
