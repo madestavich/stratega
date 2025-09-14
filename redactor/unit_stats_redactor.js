@@ -391,39 +391,6 @@ function downloadModifiedJSON() {
   );
 }
 
-// Save changes to clipboard as JSON patch
-function saveChangesToClipboard(panelId) {
-  const currentUnit = panels[panelId].currentUnit;
-  if (!currentUnit) return;
-
-  const unitPath = `racesData.${panels[panelId].currentRace}.units.${panels[panelId].currentTier}.${panels[panelId].currentUnitName}`;
-  const changeLog = {
-    timestamp: new Date().toISOString(),
-    unitPath: unitPath,
-    changes: currentUnit,
-  };
-
-  const changeText = `// Unit changes for ${panels[panelId].currentUnitName}
-// Timestamp: ${changeLog.timestamp}
-// Path: ${unitPath}
-
-${JSON.stringify(currentUnit, null, 2)}
-
-// To apply: Replace the unit object at the specified path with this data`;
-
-  navigator.clipboard
-    .writeText(changeText)
-    .then(() => {
-      alert(
-        `Panel ${panelId}: Unit changes copied to clipboard!\n\nYou can paste this into a text file for manual application.`
-      );
-    })
-    .catch((err) => {
-      console.error("Failed to copy: ", err);
-      alert(`Panel ${panelId}: Failed to copy changes to clipboard`);
-    });
-}
-
 // Copy unit data to clipboard
 function copyUnit(panelId) {
   const currentUnit = panels[panelId].currentUnit;
