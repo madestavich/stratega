@@ -154,6 +154,47 @@ canvas {
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
 }
 
+.unit-info {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 200px;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.unit-info-title {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+  color: #ffd700;
+  border-bottom: 1px solid #444;
+  padding-bottom: 4px;
+}
+
+.unit-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.unit-stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.stat-label {
+  color: #ccc;
+}
+
+.stat-value {
+  color: #fff;
+  font-weight: bold;
+}
+
 /* Footer styles */
 .footer {
   height: 60px;
