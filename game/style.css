@@ -163,16 +163,6 @@ canvas {
   font-family: Arial, sans-serif;
 }
 
-.unit-info-title {
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 8px;
-  color: #ffd700;
-  border-bottom: 1px solid #444;
-  padding-bottom: 4px;
-}
-
 .unit-info-content {
   display: flex;
   flex-direction: row;
