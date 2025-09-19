@@ -14,7 +14,6 @@ export class ConfigLoader {
       try {
         // Create absolute URL
         const absolutePath = `${baseUrl}${path}`;
-        console.log(`Loading config ${key} from:`, absolutePath);
 
         const res = await fetch(absolutePath);
         if (!res.ok) {
@@ -32,7 +31,6 @@ export class ConfigLoader {
         // If it's a relative path, make it absolute
         if (!spritePath.startsWith("http")) {
           spritePath = `${baseUrl}/sprites/${spritePath.split("/").pop()}`;
-          console.log(`Adjusted sprite path to: ${spritePath}`);
         }
 
         const img = new Image();
@@ -62,7 +60,6 @@ export class ConfigLoader {
         : "";
 
       const racesConfigPath = `${baseUrl}/game_configs/races.json`;
-      console.log("Attempting to load races config from:", racesConfigPath);
 
       const response = await fetch(racesConfigPath);
       if (!response.ok) {
