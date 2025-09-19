@@ -193,7 +193,7 @@ canvas {
   border-top: 5px solid transparent;
   border-image: url("../textures/Border-gold.png") 20 repeat;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 20px;
   position: relative;
