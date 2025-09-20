@@ -2,6 +2,7 @@ export class InterfaceManager {
   constructor(spriteLoader, configLoader) {
     this.spriteLoader = spriteLoader;
     this.configLoader = configLoader;
+    this.selectedUnitKey = null; // Додаємо змінну для збереження вибраного юніта
     this.unitContainers = {
       level1: document.getElementById("level1-units"),
       level2: document.getElementById("level2-units"),
@@ -279,7 +280,10 @@ export class InterfaceManager {
         container.addEventListener("mouseout", (e) => {
           const unitIcon = e.target.closest(".unit-icon");
           if (unitIcon) {
-            this.clearUnitInfo();
+            // Очищаємо інформацію тільки якщо цей юніт не вибраний
+            if (this.selectedUnitKey !== unitIcon.dataset.unitKey) {
+              this.clearUnitInfo();
+            }
           }
         });
 
@@ -287,8 +291,20 @@ export class InterfaceManager {
           const unitIcon = e.target.closest(".unit-icon");
           if (unitIcon) {
             this.selectUnit(unitIcon.dataset.unitKey);
+          } else {
+            // Клік в порожнє місце - скасовуємо вибір
+            this.deselectUnit();
           }
         });
+      }
+    });
+
+    // Додаємо можливість скасування вибору при кліку поза меню юнітів
+    document.addEventListener("click", (e) => {
+      // Перевіряємо чи клік був поза меню юнітів
+      const isInsideUnitMenu = e.target.closest("#unitMenu");
+      if (!isInsideUnitMenu && this.selectedUnitKey) {
+        this.deselectUnit();
       }
     });
   }
@@ -380,6 +396,11 @@ export class InterfaceManager {
    * Clear unit information display
    */
   clearUnitInfo() {
+    // Не очищаємо якщо є вибраний юніт
+    if (this.selectedUnitKey) {
+      return;
+    }
+
     const costElement = document.getElementById("unit-cost");
     const attackElement = document.getElementById("unit-attack");
     const rangedAttackElement = document.getElementById("unit-ranged-attack");
@@ -402,6 +423,9 @@ export class InterfaceManager {
    * @param {string} unitKey - The unit key to select
    */
   selectUnit(unitKey) {
+    // Зберігаємо вибраний юніт
+    this.selectedUnitKey = unitKey;
+
     // Remove previous selection highlighting
     document.querySelectorAll(".unit-icon.selected").forEach((icon) => {
       icon.classList.remove("selected");
@@ -415,5 +439,20 @@ export class InterfaceManager {
 
     // Show unit info persistently
     this.showUnitInfo(unitKey);
+  }
+
+  /**
+   * Deselect current unit (clear selection)
+   */
+  deselectUnit() {
+    this.selectedUnitKey = null;
+
+    // Remove selection highlighting
+    document.querySelectorAll(".unit-icon.selected").forEach((icon) => {
+      icon.classList.remove("selected");
+    });
+
+    // Clear unit info
+    this.clearUnitInfo();
   }
 }
