@@ -280,8 +280,10 @@ export class InterfaceManager {
         container.addEventListener("mouseout", (e) => {
           const unitIcon = e.target.closest(".unit-icon");
           if (unitIcon) {
-            // Очищаємо інформацію тільки якщо цей юніт не вибраний
-            if (this.selectedUnitKey !== unitIcon.dataset.unitKey) {
+            // При виведенні миші відновлюємо параметри вибраного юніта або очищаємо
+            if (this.selectedUnitKey) {
+              this.showUnitInfo(this.selectedUnitKey);
+            } else {
               this.clearUnitInfo();
             }
           }
@@ -290,7 +292,14 @@ export class InterfaceManager {
         container.addEventListener("click", (e) => {
           const unitIcon = e.target.closest(".unit-icon");
           if (unitIcon) {
-            this.selectUnit(unitIcon.dataset.unitKey);
+            const unitKey = unitIcon.dataset.unitKey;
+            // Якщо клікнули на вже вибраного юніта - скасовуємо вибір
+            if (this.selectedUnitKey === unitKey) {
+              this.deselectUnit();
+            } else {
+              // Інакше вибираємо новий юніт
+              this.selectUnit(unitKey);
+            }
           } else {
             // Клік в порожнє місце - скасовуємо вибір
             this.deselectUnit();
@@ -452,7 +461,28 @@ export class InterfaceManager {
       icon.classList.remove("selected");
     });
 
-    // Clear unit info
-    this.clearUnitInfo();
+    // Очищаємо параметри тільки після скасування вибору
+    this.forceClearUnitInfo();
+  }
+
+  /**
+   * Force clear unit information display (ignoring selection)
+   */
+  forceClearUnitInfo() {
+    const costElement = document.getElementById("unit-cost");
+    const attackElement = document.getElementById("unit-attack");
+    const rangedAttackElement = document.getElementById("unit-ranged-attack");
+    const rangedAttackStat = document.getElementById("ranged-attack-stat");
+    const attackSpeedElement = document.getElementById("unit-attack-speed");
+    const hpElement = document.getElementById("unit-hp");
+    const moveSpeedElement = document.getElementById("unit-move-speed");
+
+    if (costElement) costElement.textContent = "-";
+    if (attackElement) attackElement.textContent = "-";
+    if (rangedAttackElement) rangedAttackElement.textContent = "-";
+    if (rangedAttackStat) rangedAttackStat.style.display = "none";
+    if (attackSpeedElement) attackSpeedElement.textContent = "-";
+    if (hpElement) hpElement.textContent = "-";
+    if (moveSpeedElement) moveSpeedElement.textContent = "-";
   }
 }
