@@ -177,7 +177,7 @@ canvas {
   align-items: center;
   font-size: 13px;
   padding: 4px 8px;
-  background: url("../textures/Leather-middle.png") repeat;
+  background: url("../textures/Leather-middle-brightened.png") repeat;
   border: 2px solid transparent;
   border-radius: 4px;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
