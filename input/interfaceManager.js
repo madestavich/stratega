@@ -18,6 +18,7 @@ export class InterfaceManager {
     };
 
     this.initTabSwitching();
+    this.initUnitInfoDisplay();
   }
 
   /**
@@ -259,5 +260,160 @@ export class InterfaceManager {
         document.getElementById(`${category}-panel`).classList.add("active");
       });
     });
+  }
+
+  /**
+   * Initialize unit info display functionality
+   */
+  initUnitInfoDisplay() {
+    // Add event listeners to unit containers for hover/click events
+    Object.values(this.unitContainers).forEach((container) => {
+      if (container) {
+        container.addEventListener("mouseover", (e) => {
+          const unitIcon = e.target.closest(".unit-icon");
+          if (unitIcon) {
+            this.showUnitInfo(unitIcon.dataset.unitKey);
+          }
+        });
+
+        container.addEventListener("mouseout", (e) => {
+          const unitIcon = e.target.closest(".unit-icon");
+          if (unitIcon) {
+            this.clearUnitInfo();
+          }
+        });
+
+        container.addEventListener("click", (e) => {
+          const unitIcon = e.target.closest(".unit-icon");
+          if (unitIcon) {
+            this.selectUnit(unitIcon.dataset.unitKey);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Show unit information in the footer
+   * @param {string} unitKey - The unit key to display info for
+   */
+  showUnitInfo(unitKey) {
+    if (!unitKey) return;
+
+    // Get unit configuration from races config
+    const unitConfig = this.getUnitConfig(unitKey);
+    if (!unitConfig) {
+      console.warn(`Unit config not found for: ${unitKey}`);
+      return;
+    }
+
+    // Update unit info display
+    this.updateUnitInfoDisplay(unitConfig);
+  }
+
+  /**
+   * Get unit configuration from races config
+   * @param {string} unitKey - The unit key
+   * @returns {Object|null} Unit configuration object
+   */
+  getUnitConfig(unitKey) {
+    const racesConfig = this.configLoader.racesConfig;
+    if (!racesConfig) return null;
+
+    // Search through all races and tiers to find the unit
+    for (const [raceName, raceData] of Object.entries(racesConfig)) {
+      if (raceData.units) {
+        for (const [tierName, tierUnits] of Object.entries(raceData.units)) {
+          if (tierUnits[unitKey]) {
+            return tierUnits[unitKey];
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Update the unit info display with unit stats
+   * @param {Object} unitConfig - Unit configuration object
+   */
+  updateUnitInfoDisplay(unitConfig) {
+    // Get all stat elements
+    const costElement = document.getElementById("unit-cost");
+    const attackElement = document.getElementById("unit-attack");
+    const rangedAttackElement = document.getElementById("unit-ranged-attack");
+    const rangedAttackStat = document.getElementById("ranged-attack-stat");
+    const attackSpeedElement = document.getElementById("unit-attack-speed");
+    const hpElement = document.getElementById("unit-hp");
+    const moveSpeedElement = document.getElementById("unit-move-speed");
+
+    if (
+      !costElement ||
+      !attackElement ||
+      !attackSpeedElement ||
+      !hpElement ||
+      !moveSpeedElement
+    ) {
+      console.warn("Unit info elements not found in DOM");
+      return;
+    }
+
+    // Update basic stats
+    costElement.textContent = unitConfig.cost || "-";
+    attackElement.textContent = unitConfig.attackDamage || "-";
+    attackSpeedElement.textContent = unitConfig.attackSpeed || "-";
+    hpElement.textContent = unitConfig.health || "-";
+    moveSpeedElement.textContent = unitConfig.moveSpeed || "-";
+
+    // Handle ranged attack display
+    if (unitConfig.isRanged && unitConfig.bulletConfig) {
+      rangedAttackElement.textContent =
+        unitConfig.bulletConfig.bulletDamage || "-";
+      rangedAttackStat.style.display = "block";
+    } else {
+      rangedAttackStat.style.display = "none";
+    }
+  }
+
+  /**
+   * Clear unit information display
+   */
+  clearUnitInfo() {
+    const costElement = document.getElementById("unit-cost");
+    const attackElement = document.getElementById("unit-attack");
+    const rangedAttackElement = document.getElementById("unit-ranged-attack");
+    const rangedAttackStat = document.getElementById("ranged-attack-stat");
+    const attackSpeedElement = document.getElementById("unit-attack-speed");
+    const hpElement = document.getElementById("unit-hp");
+    const moveSpeedElement = document.getElementById("unit-move-speed");
+
+    if (costElement) costElement.textContent = "-";
+    if (attackElement) attackElement.textContent = "-";
+    if (rangedAttackElement) rangedAttackElement.textContent = "-";
+    if (rangedAttackStat) rangedAttackStat.style.display = "none";
+    if (attackSpeedElement) attackSpeedElement.textContent = "-";
+    if (hpElement) hpElement.textContent = "-";
+    if (moveSpeedElement) moveSpeedElement.textContent = "-";
+  }
+
+  /**
+   * Select a unit (for persistent display or other actions)
+   * @param {string} unitKey - The unit key to select
+   */
+  selectUnit(unitKey) {
+    // Remove previous selection highlighting
+    document.querySelectorAll(".unit-icon.selected").forEach((icon) => {
+      icon.classList.remove("selected");
+    });
+
+    // Add selection highlighting to clicked unit
+    const unitIcon = document.querySelector(`[data-unit-key="${unitKey}"]`);
+    if (unitIcon) {
+      unitIcon.classList.add("selected");
+    }
+
+    // Show unit info persistently
+    this.showUnitInfo(unitKey);
   }
 }
