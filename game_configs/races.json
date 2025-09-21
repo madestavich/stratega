@@ -516,26 +516,6 @@
       "tier_four": {}
     }
   },
-  "cove": {
-    "units": {
-      "tier_one": {
-        "seaman": {
-          "gridWidth": 1,
-          "gridHeight": 1,
-          "objectType": "seaman",
-          "actionPriorities": ["attack", "move"],
-          "moveSpeed": 9,
-          "availableActions": ["move", "attack"],
-          "attackDamage": 17,
-          "attackSpeed": 1,
-          "health": 60
-        }
-      },
-      "tier_two": {},
-      "tier_three": {},
-      "tier_four": {}
-    }
-  },
   "neutral": {
     "units": {
       "tier_one": {},
