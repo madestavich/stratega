@@ -46,7 +46,7 @@ export class SpriteLoader {
       troglodyte: "/game_configs/units/troglodyte.json",
       red_dragon: "/game_configs/units/red_dragon.json",
       //! cove
-      seaman: "/game_configs/units/seaman.json",
+      // seaman: "/game_configs/units/seaman.json",
     };
   }
 
