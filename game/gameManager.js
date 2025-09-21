@@ -6,6 +6,7 @@ import { InputManager } from "../import.js";
 import { SpriteLoader } from "../import.js";
 import { Player } from "../import.js";
 import { InterfaceManager } from "../import.js";
+import { MapRenderer } from "../game_map/mapRender.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -37,6 +38,10 @@ class GameManager {
 
     this.configLoader = new ConfigLoader();
     this.spriteLoader = new SpriteLoader(this.configLoader);
+
+    // Initialize map renderer with default map
+    this.mapRenderer = new MapRenderer("default_map.png");
+
     this.gridManager = new GridManager(ctx, {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
@@ -158,6 +163,9 @@ class GameManager {
 
   render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Render map background first (lowest layer)
+    this.mapRenderer.renderBackground(ctx, canvas.width, canvas.height);
 
     // Draw debug paths when debug mode is enabled
     if (this.debugMode) {
