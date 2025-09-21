@@ -17,7 +17,7 @@ export class MapRenderer {
     this.mapImage.onerror = () => {
       console.error(`Failed to load map: ${this.mapName}`);
     };
-    this.mapImage.src = `background/maps/${this.mapName}`;
+    this.mapImage.src = `../background/maps/${this.mapName}`;
   }
 
   /**
