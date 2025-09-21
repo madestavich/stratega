@@ -41,7 +41,7 @@ class GameManager {
       pixelWidth: canvas.width,
       pixelHeight: canvas.height,
       rows: 80,
-      cols: 60,
+      cols: 70,
     });
     this.objectManager = new ObjectManager(
       ctx,
