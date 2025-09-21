@@ -5,6 +5,7 @@ export class GridManager {
     this.pixelHeight = config.pixelHeight;
     this.rows = config.rows;
     this.cols = config.cols;
+    this.skyRows = config.skyRows || 0; // Кількість рядків зверху зарезервованих під небо
     this.cellWidth = this.pixelWidth / this.cols;
     this.cellHeight = this.pixelHeight / this.rows;
 
@@ -122,7 +123,7 @@ export class GridManager {
     for (let row = startRow; row < startRow + gridHeight; row++) {
       for (let col = startCol; col < startCol + gridWidth; col++) {
         if (
-          row < 0 ||
+          row < this.skyRows || // Перевірка чи не знаходиться в зоні неба
           row >= this.rows ||
           col < 0 ||
           col >= this.cols ||
