@@ -245,9 +245,6 @@ canvas {
   gap: 8px;
   padding: 6px 10px;
   background: url("../textures/Leather-middle-brightened.png") repeat;
-  border: 2px solid transparent;
-  border-image: url("../textures/Border-small.png") 12 repeat;
-  border-radius: 8px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
