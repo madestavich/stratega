@@ -4,7 +4,8 @@
   "main": "deploy.js",
   "type": "module",
   "scripts": {
-    "deploy": "node deploy.js"
+    "deploy": "node deploy.js",
+    "rollback": "node rollback.js"
   },
   "author": "",
   "license": "ISC",
