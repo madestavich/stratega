@@ -95,6 +95,24 @@ try {
         case 'get_room_players':
             getRoomPlayers($input);
             break;
+        case 'get_player_money':
+            getPlayerMoney($input);
+            break;
+        case 'save_player_money':
+            savePlayerMoney($input);
+            break;
+        case 'get_player_unit_limit':
+            getPlayerUnitLimit($input);
+            break;
+        case 'save_player_unit_limit':
+            savePlayerUnitLimit($input);
+            break;
+        case 'get_max_unit_limit':
+            getMaxUnitLimit($input);
+            break;
+        case 'save_max_unit_limit':
+            saveMaxUnitLimit($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -678,6 +696,216 @@ function getRoomPlayers($data) {
         ]);
     } else {
         throw new Exception('Кімнату не знайдено');
+    }
+}
+
+// Get player money
+function getPlayerMoney($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room and determine player number
+    $stmt = $conn->prepare("SELECT creator_id, player1_money, player2_money FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    // Determine which player's money to return
+    $money = ($room['creator_id'] == $user_id) ? $room['player1_money'] : $room['player2_money'];
+    
+    echo json_encode([
+        'success' => true,
+        'money' => $money ?? 0
+    ]);
+}
+
+// Save player money
+function savePlayerMoney($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    $money = $data['money'] ?? 0;
+    
+    // Get room and determine player number
+    $stmt = $conn->prepare("SELECT creator_id FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    // Determine which player field to update
+    $money_field = ($room['creator_id'] == $user_id) ? 'player1_money' : 'player2_money';
+    
+    // Update player money
+    $stmt = $conn->prepare("UPDATE game_rooms SET $money_field = ? WHERE id = ?");
+    $stmt->bind_param("ii", $money, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Гроші збережено успішно',
+            'money' => $money
+        ]);
+    } else {
+        throw new Exception('Помилка збереження грошей');
+    }
+}
+
+// Get player unit limit
+function getPlayerUnitLimit($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room and determine player number
+    $stmt = $conn->prepare("SELECT creator_id, player1_unit_limit, player2_unit_limit FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    // Determine which player's unit limit to return
+    $unit_limit = ($room['creator_id'] == $user_id) ? $room['player1_unit_limit'] : $room['player2_unit_limit'];
+    
+    echo json_encode([
+        'success' => true,
+        'unit_limit' => $unit_limit ?? 0
+    ]);
+}
+
+// Save player unit limit
+function savePlayerUnitLimit($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    $unit_limit = $data['unit_limit'] ?? 0;
+    
+    // Get room and determine player number
+    $stmt = $conn->prepare("SELECT creator_id FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    // Determine which player field to update
+    $limit_field = ($room['creator_id'] == $user_id) ? 'player1_unit_limit' : 'player2_unit_limit';
+    
+    // Update player unit limit
+    $stmt = $conn->prepare("UPDATE game_rooms SET $limit_field = ? WHERE id = ?");
+    $stmt->bind_param("ii", $unit_limit, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Ліміт юнітів збережено успішно',
+            'unit_limit' => $unit_limit
+        ]);
+    } else {
+        throw new Exception('Помилка збереження ліміту юнітів');
+    }
+}
+
+// Get max unit limit
+function getMaxUnitLimit($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room max unit limit
+    $stmt = $conn->prepare("SELECT max_unit_limit FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'max_unit_limit' => $room['max_unit_limit'] ?? 0
+    ]);
+}
+
+// Save max unit limit (only creator can set this)
+function saveMaxUnitLimit($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    $max_unit_limit = $data['max_unit_limit'] ?? 0;
+    
+    // Verify that user is the room creator
+    $stmt = $conn->prepare("SELECT creator_id FROM game_rooms WHERE id = ? AND creator_id = ?");
+    $stmt->bind_param("ii", $room_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Тільки створювач кімнати може встановлювати максимальний ліміт юнітів');
+    }
+    
+    // Update max unit limit
+    $stmt = $conn->prepare("UPDATE game_rooms SET max_unit_limit = ? WHERE id = ?");
+    $stmt->bind_param("ii", $max_unit_limit, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Максимальний ліміт юнітів збережено успішно',
+            'max_unit_limit' => $max_unit_limit
+        ]);
+    } else {
+        throw new Exception('Помилка збереження максимального ліміту юнітів');
     }
 }
 
