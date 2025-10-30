@@ -47,6 +47,9 @@ export class SpriteLoader {
       red_dragon: "/game_configs/units/red_dragon.json",
       //! cove
       // seaman: "/game_configs/units/seaman.json",
+      //! fortress
+      gnoll: "/game_configs/units/gnoll.json",
+      basilisk: "/game_configs/units/basilisk.json",
     };
   }
 
