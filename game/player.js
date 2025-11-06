@@ -6,9 +6,9 @@ export class Player {
     this.coins = config.coins || 100;
 
     // Resource management
-    this.money = 1000;
-    this.unitLimit = 0; // Current number of units
-    this.maxUnitLimit = 20; // Maximum allowed units
+    this.money;
+    this.unitLimit; // Current number of units
+    this.maxUnitLimit; // Maximum allowed units
 
     // Reference to gameManager for DB operations
     this.gameManager = config.gameManager || null;

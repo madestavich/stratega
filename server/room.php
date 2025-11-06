@@ -146,11 +146,15 @@ function createRoom($data) {
     
     $game_status = 'waiting';
     
+    // Default resource values
+    $default_money = 1000;
+    $default_max_unit_limit = 20;
+    
     // Debug logging
     error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, game_status=$game_status");
     
-    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time) VALUES (?, NOW(), ?, ?, ?, ?)");
-    $stmt->bind_param("isssi", $creator_id, $room_type, $password, $game_status, $round_time);
+    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?)");
+    $stmt->bind_param("isssiiii", $creator_id, $room_type, $password, $game_status, $round_time, $default_money, $default_money, $default_max_unit_limit);
     
     if ($stmt->execute()) {
         $room_id = $conn->insert_id;
