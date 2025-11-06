@@ -147,9 +147,14 @@ class GameManager {
       race: "all", // Use one of the races from races.json
       team: playerTeam,
       coins: 100,
+      gameManager: this,
+      roomId: roomInfo?.room_id || this.objectManager.currentRoomId,
     });
 
     console.log(`Player created with team: ${playerTeam}`);
+
+    // Initialize player resources from database
+    await this.player.initializeResources();
 
     this.interfaceManager.updatePlayerInterface(this.player);
 

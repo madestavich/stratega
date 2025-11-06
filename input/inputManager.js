@@ -222,6 +222,16 @@ export class InputManager {
         return;
       }
 
+      // Check if player can purchase this unit
+      if (!this.gameManager.player.canPurchaseUnit(unitConfig)) {
+        const reason =
+          this.gameManager.player.getPurchaseBlockReason(unitConfig);
+        console.warn(`Cannot place unit: ${reason}`);
+        // TODO: Show error message in UI
+        alert(reason); // Temporary UI feedback
+        return;
+      }
+
       // Створюємо тимчасовий об'єкт для перевірки розміщення
       const tempObject = {
         gridCol: gridCoords.col,
@@ -261,6 +271,14 @@ export class InputManager {
         return; // Виходимо з функції, не створюючи юніта
       }
 
+      // Purchase unit (deduct money and increment unit count)
+      const purchased = await this.gameManager.player.purchaseUnit(unitConfig);
+      if (!purchased) {
+        console.error("Failed to purchase unit");
+        return;
+      }
+
+      // Create the unit
       const newUnit = await this.gameManager.objectManager.createObject(
         this.selectedUnitKey,
         { ...unitConfig }, // Create a copy to avoid modifying the original
@@ -268,7 +286,11 @@ export class InputManager {
         gridCoords.col,
         gridCoords.row
       );
+
       if (newUnit) {
+        console.log(
+          `Unit created successfully! Remaining resources: Money=${this.gameManager.player.money}, Units=${this.gameManager.player.unitLimit}/${this.gameManager.player.maxUnitLimit}`
+        );
       }
 
       // Update grid with ALL objects (including enemy units) to ensure proper collision detection

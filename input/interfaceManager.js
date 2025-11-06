@@ -216,6 +216,36 @@ export class InterfaceManager {
    */
   async updatePlayerInterface(player) {
     await this.populateUnitTabs(player);
+    this.updatePlayerResources(player);
+  }
+
+  /**
+   * Update player resources display (money and unit limit)
+   * @param {Player} player - The player object
+   */
+  updatePlayerResources(player) {
+    // Update gold amount
+    const goldElement = document.getElementById("gold-amount");
+    if (goldElement) {
+      goldElement.textContent = player.money || 0;
+    }
+
+    // Update unit limit
+    const unitLimitElement = document.getElementById("unit-limit");
+    if (unitLimitElement) {
+      const current = player.unitLimit || 0;
+      const max = player.maxUnitLimit || 0;
+      unitLimitElement.textContent = `${current}/${max}`;
+
+      // Add warning styling if near limit
+      if (max > 0 && current >= max) {
+        unitLimitElement.style.color = "#ff4444";
+      } else if (max > 0 && current >= max * 0.8) {
+        unitLimitElement.style.color = "#ffaa00";
+      } else {
+        unitLimitElement.style.color = "";
+      }
+    }
   }
 
   // Add this method to the existing InterfaceManager class
