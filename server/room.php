@@ -159,8 +159,8 @@ function createRoom($data) {
     
     $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)");
     // Types: i=integer, s=string
-    // creator_id(i), room_type(s), password(s), game_status(s), round_time(i), starting_money(i), starting_money(i), max_unit_limit(i), round_income(i)
-    $stmt->bind_param("isssiiiiii", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income);
+    // Параметри: creator_id(i), room_type(s), password(s), game_status(s), round_time(i), player1_money(i), player2_money(i), max_unit_limit(i), round_income(i)
+    $stmt->bind_param("isssiiiii", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income);
     
     if ($stmt->execute()) {
         $room_id = $conn->insert_id;
