@@ -37,10 +37,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Check if user is logged in
   checkLoginStatus();
-  
+
   // Load rooms list
   loadRooms();
-  
+
   // Periodically refresh rooms list every 10 seconds
   setInterval(loadRooms, 10000);
 
@@ -86,7 +86,10 @@ document.addEventListener("DOMContentLoaded", function () {
       loginModal.style.display = "none";
       resetLoginForm();
     }
-    if (event.target === createRoomModal && mouseDownTarget === createRoomModal) {
+    if (
+      event.target === createRoomModal &&
+      mouseDownTarget === createRoomModal
+    ) {
       createRoomModal.style.display = "none";
       resetCreateRoomForm();
     }
@@ -250,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Room type change handler - show/hide password field
   const roomTypeSelect = document.getElementById("room-type");
   const passwordGroup = document.getElementById("password-group");
-  
+
   roomTypeSelect.addEventListener("change", function () {
     if (this.value === "private") {
       passwordGroup.style.display = "block";
@@ -261,22 +264,43 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Unit limit slider handler - update displayed value
+  const unitLimitSlider = document.getElementById("max-unit-limit");
+  const unitLimitValue = document.getElementById("unit-limit-value");
+
+  if (unitLimitSlider && unitLimitValue) {
+    unitLimitSlider.addEventListener("input", function () {
+      unitLimitValue.textContent = this.value;
+    });
+  }
+
   // Create room form submission
   createRoomForm.addEventListener("submit", function (event) {
     event.preventDefault();
-    
+
     const roomType = document.getElementById("room-type").value;
     const roomPassword = document.getElementById("room-password").value;
     const roundTime = document.getElementById("round-time").value;
-    
+    const startingMoney = document.getElementById("starting-money").value;
+    const roundIncome = document.getElementById("round-income").value;
+    const maxUnitLimit = document.getElementById("max-unit-limit").value;
+
     // Validate password for private room
     if (roomType === "private" && !roomPassword.trim()) {
-      document.getElementById("room-password-error").textContent = "Пароль обов'язковий для приватної кімнати";
+      document.getElementById("room-password-error").textContent =
+        "Пароль обов'язковий для приватної кімнати";
       document.getElementById("room-password-error").style.display = "block";
       return;
     }
-    
-    createRoom(roomType, roomPassword, roundTime);
+
+    createRoom(
+      roomType,
+      roomPassword,
+      roundTime,
+      startingMoney,
+      roundIncome,
+      maxUnitLimit
+    );
   });
 
   // Helper functions
@@ -384,39 +408,50 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  function createRoom(roomType, roomPassword, roundTime) {
+  function createRoom(
+    roomType,
+    roomPassword,
+    roundTime,
+    startingMoney,
+    roundIncome,
+    maxUnitLimit
+  ) {
     // Clear any previous errors
     document.getElementById("room-password-error").style.display = "none";
-    
+
     // First check if user is already in a room
     fetch("server/room.php?action=get_rooms")
       .then((response) => response.json())
       .then((data) => {
         if (data.rooms && window.currentUser) {
           // Check if current user is already in any room
-          const userInRoom = data.rooms.find(room => 
-            room.creator_id === window.currentUser.id || 
-            room.second_player_id === window.currentUser.id
+          const userInRoom = data.rooms.find(
+            (room) =>
+              room.creator_id === window.currentUser.id ||
+              room.second_player_id === window.currentUser.id
           );
-          
+
           if (userInRoom) {
             alert("Ви вже берете участь в іншій кімнаті");
             return;
           }
         }
-        
+
         // Create room with parameters
         const roomData = {
           action: "create_room",
           room_type: roomType,
-          round_time: parseInt(roundTime)
+          round_time: parseInt(roundTime),
+          starting_money: parseInt(startingMoney),
+          round_income: parseInt(roundIncome),
+          max_unit_limit: parseInt(maxUnitLimit),
         };
-        
+
         // Add password if room is private
         if (roomType === "private" && roomPassword) {
           roomData.password = roomPassword;
         }
-        
+
         fetch("server/room.php", {
           method: "POST",
           headers: {
@@ -430,7 +465,7 @@ document.addEventListener("DOMContentLoaded", function () {
               alert("Кімнату створено успішно! ID кімнати: " + data.room_id);
               createRoomModal.style.display = "none";
               resetCreateRoomForm();
-              
+
               // Redirect to game if redirect URL is provided
               if (data.redirect) {
                 window.location.href = data.redirect;
@@ -438,7 +473,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 loadRooms(); // Refresh room list
               }
             } else {
-              alert("Помилка створення кімнати: " + (data.error || "Невідома помилка"));
+              alert(
+                "Помилка створення кімнати: " +
+                  (data.error || "Невідома помилка")
+              );
             }
           })
           .catch((error) => {
@@ -468,15 +506,17 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         const roomsList = document.getElementById("rooms-list");
-        
+
         if (data.rooms && data.rooms.length > 0) {
           let roomsHTML = "";
-          
+
           data.rooms.forEach((room) => {
-            const roomTypeText = room.room_type === "private" ? "🔒 Приватна" : "🌐 Публічна";
-            const statusText = room.game_status === "waiting" ? "Очікування" : "В грі";
+            const roomTypeText =
+              room.room_type === "private" ? "🔒 Приватна" : "🌐 Публічна";
+            const statusText =
+              room.game_status === "waiting" ? "Очікування" : "В грі";
             const playerCount = room.second_player_name ? "2/2" : "1/2";
-            
+
             roomsHTML += `
               <div class="room-item" data-room-id="${room.id}">
                 <div class="room-info">
@@ -485,46 +525,54 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span class="room-players">${playerCount}</span>
                   </div>
                   <div class="room-details">
-                    <span class="room-creator">Створив: ${room.creator_name}</span>
+                    <span class="room-creator">Створив: ${
+                      room.creator_name
+                    }</span>
                     <span class="room-status">${statusText}</span>
                   </div>
                 </div>
-                ${room.game_status === "waiting" && (!window.currentUser || window.currentUser.id !== room.creator_id) ? 
-                  `<button class="join-room-btn" onclick="joinRoom(${room.id}, '${room.room_type}')">Приєднатися</button>` : 
-                  ""}
+                ${
+                  room.game_status === "waiting" &&
+                  (!window.currentUser ||
+                    window.currentUser.id !== room.creator_id)
+                    ? `<button class="join-room-btn" onclick="joinRoom(${room.id}, '${room.room_type}')">Приєднатися</button>`
+                    : ""
+                }
               </div>
             `;
           });
-          
+
           roomsList.innerHTML = roomsHTML;
         } else {
-          roomsList.innerHTML = '<div class="no-rooms-message">Немає активних кімнат</div>';
+          roomsList.innerHTML =
+            '<div class="no-rooms-message">Немає активних кімнат</div>';
         }
       })
       .catch((error) => {
         console.error("Error loading rooms:", error);
-        document.getElementById("rooms-list").innerHTML = '<div class="error-message">Помилка завантаження кімнат</div>';
+        document.getElementById("rooms-list").innerHTML =
+          '<div class="error-message">Помилка завантаження кімнат</div>';
       });
   }
 
-  window.joinRoom = function(roomId, roomType) {
+  window.joinRoom = function (roomId, roomType) {
     if (!window.currentUser) {
       alert("Спочатку увійдіть в систему");
       return;
     }
-    
+
     let password = "";
     if (roomType === "private") {
       password = prompt("Введіть пароль для приватної кімнати:");
       if (!password) return;
     }
-    
+
     const joinData = {
       action: "join_room",
       room_id: roomId,
-      password: password
+      password: password,
     };
-    
+
     fetch("server/room.php", {
       method: "POST",
       headers: {
@@ -536,7 +584,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         if (data.success) {
           alert("Успішно приєдналися до кімнати!");
-          
+
           // Redirect to game if redirect URL is provided
           if (data.redirect) {
             window.location.href = data.redirect;
@@ -551,5 +599,5 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error joining room:", error);
         alert("Сталася помилка при приєднанні до кімнати");
       });
-  }
+  };
 });

@@ -897,6 +897,11 @@ class GameManager {
       if (result.success) {
         console.log("Ready status reset for new round");
 
+        // Add round income to player at the start of new round
+        if (this.player) {
+          await this.player.addRoundIncome();
+        }
+
         // Reset UI button
         const readyButton = document.getElementById("ready-button");
         if (readyButton) {

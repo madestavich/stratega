@@ -113,6 +113,9 @@ try {
         case 'save_max_unit_limit':
             saveMaxUnitLimit($input);
             break;
+        case 'get_round_income':
+            getRoundIncome($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -146,15 +149,16 @@ function createRoom($data) {
     
     $game_status = 'waiting';
     
-    // Default resource values
-    $default_money = 1000;
-    $default_max_unit_limit = 20;
+    // Game economy settings with defaults
+    $starting_money = $data['starting_money'] ?? 1000;
+    $round_income = $data['round_income'] ?? 200;
+    $max_unit_limit = $data['max_unit_limit'] ?? 20;
     
     // Debug logging
-    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, game_status=$game_status");
+    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit");
     
-    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?)");
-    $stmt->bind_param("isssiiii", $creator_id, $room_type, $password, $game_status, $round_time, $default_money, $default_money, $default_max_unit_limit);
+    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)");
+    $stmt->bind_param("isssiiiiii", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income);
     
     if ($stmt->execute()) {
         $room_id = $conn->insert_id;
@@ -911,5 +915,33 @@ function saveMaxUnitLimit($data) {
     } else {
         throw new Exception('Помилка збереження максимального ліміту юнітів');
     }
+}
+
+// Get round income
+function getRoundIncome($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room round income
+    $stmt = $conn->prepare("SELECT round_income FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена або немає доступу');
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'round_income' => $room['round_income'] ?? 0
+    ]);
 }
 

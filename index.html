@@ -163,6 +163,41 @@
               <option value="60">60 секунд</option>
             </select>
           </div>
+          <div class="form-group">
+            <label for="starting-money">Стартові гроші</label>
+            <select id="starting-money" name="starting-money" required>
+              <option value="500">500 золота</option>
+              <option value="1000" selected>1000 золота</option>
+              <option value="1500">1500 золота</option>
+              <option value="2000">2000 золота</option>
+              <option value="3000">3000 золота</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="round-income">Дохід за раунд</label>
+            <select id="round-income" name="round-income" required>
+              <option value="0">Без доходу</option>
+              <option value="100">100 золота</option>
+              <option value="200" selected>200 золота</option>
+              <option value="300">300 золота</option>
+              <option value="500">500 золота</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="max-unit-limit"
+              >Максимум юнітів: <span id="unit-limit-value">40</span></label
+            >
+            <input
+              type="range"
+              id="max-unit-limit"
+              name="max-unit-limit"
+              min="20"
+              max="300"
+              value="40"
+              step="10"
+              required
+            />
+          </div>
           <button type="submit" class="submit-button">Створити кімнату</button>
         </form>
       </div>

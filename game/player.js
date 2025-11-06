@@ -9,6 +9,7 @@ export class Player {
     this.money;
     this.unitLimit; // Current number of units
     this.maxUnitLimit; // Maximum allowed units
+    this.roundIncome = 0; // Income per round
 
     // Reference to gameManager for DB operations
     this.gameManager = config.gameManager || null;
@@ -67,8 +68,22 @@ export class Player {
         this.maxUnitLimit = maxLimitData.max_unit_limit || 0;
       }
 
+      // Load round income
+      const incomeResponse = await fetch(
+        "../server/room.php?action=get_round_income",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ room_id: this.roomId }),
+        }
+      );
+      const incomeData = await incomeResponse.json();
+      if (incomeData.success) {
+        this.roundIncome = incomeData.round_income || 0;
+      }
+
       console.log(
-        `Player resources initialized: Money=${this.money}, Units=${this.unitLimit}/${this.maxUnitLimit}`
+        `Player resources initialized: Money=${this.money}, Units=${this.unitLimit}/${this.maxUnitLimit}, Income=${this.roundIncome}`
       );
     } catch (error) {
       console.error("Error initializing player resources:", error);
@@ -150,6 +165,18 @@ export class Player {
     if (this.gameManager && this.gameManager.interfaceManager) {
       this.gameManager.interfaceManager.updatePlayerResources(this);
     }
+  }
+
+  // Add round income to player (called at the start of each round)
+  async addRoundIncome() {
+    if (this.roundIncome > 0) {
+      await this.addMoney(this.roundIncome);
+      console.log(
+        `Round income added: +${this.roundIncome} gold. Total: ${this.money}`
+      );
+      return this.roundIncome;
+    }
+    return 0;
   }
 
   // Set max unit limit (usually done by room creator)
