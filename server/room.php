@@ -158,6 +158,8 @@ function createRoom($data) {
     error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit");
     
     $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)");
+    // Types: i=integer, s=string
+    // creator_id(i), room_type(s), password(s), game_status(s), round_time(i), starting_money(i), starting_money(i), max_unit_limit(i), round_income(i)
     $stmt->bind_param("isssiiiiii", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income);
     
     if ($stmt->execute()) {
