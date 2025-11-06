@@ -148,7 +148,7 @@ class GameManager {
       team: playerTeam,
       coins: 100,
       gameManager: this,
-      roomId: roomInfo?.room_id || this.objectManager.currentRoomId,
+      roomId: roomInfo?.roomId || this.objectManager.currentRoomId,
     });
 
     console.log(`Player created with team: ${playerTeam}`);
