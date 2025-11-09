@@ -102,7 +102,7 @@ export class AttackAction {
     }
 
     // Check if unit is ranged and no enemies are within minRangeDistance
-    if (gameObject.isRanged) {
+    if (gameObject.isRanged && gameObject.canShootRanged()) {
       // Find enemy in range attack distance
       const rangedTarget = this.findRangedTarget(gameObject);
 
@@ -145,6 +145,8 @@ export class AttackAction {
         // For ranged attack, spawn a projectile
         if (gameObject.isRangedAttack && gameObject.attackTarget) {
           this.spawnProjectile(gameObject, gameObject.attackTarget);
+          // Витрачаємо постріл
+          gameObject.useShot();
         } else {
           // For melee attack, deal damage directly
           this.dealDamage(gameObject, gameObject.attackTarget);
@@ -499,7 +501,7 @@ export class AttackAction {
     }
 
     // Перевіряємо, чи ціль в діапазоні дальньої атаки
-    if (gameObject.isRanged) {
+    if (gameObject.isRanged && gameObject.canShootRanged()) {
       const distance = this.getMinDistanceBetweenObjects(
         gameObject,
         gameObject.attackTarget

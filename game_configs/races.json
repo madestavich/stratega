@@ -6,15 +6,9 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "pikeman",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 10,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 15,
           "attackSpeed": 1,
           "health": 40,
@@ -24,19 +18,14 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "archer",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 8,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 10,
           "attackSpeed": 1,
           "health": 40,
           "isRanged": true,
+          "maxShots": 10,
           "minRangeDistance": 6,
           "maxRangeDistance": 25,
           "bulletConfig": {
@@ -52,15 +41,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "swordsman",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 12,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 35,
           "attackSpeed": 0.8,
           "health": 180,
@@ -70,15 +53,9 @@
           "gridWidth": 2,
           "gridHeight": 1,
           "objectType": "griffin",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 26,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 28,
           "attackSpeed": 1,
           "health": 130,
@@ -90,15 +67,9 @@
           "gridWidth": 3,
           "gridHeight": 2,
           "objectType": "cavalier",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 22,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 75,
           "attackSpeed": 0.8,
           "health": 340,
@@ -108,19 +79,14 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "zealot",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 8,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 20,
           "attackSpeed": 1,
           "health": 100,
           "isRanged": true,
+          "maxShots": 10,
           "minRangeDistance": 3,
           "maxRangeDistance": 18,
           "bulletConfig": {
@@ -136,15 +102,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "angel",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 24,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 155,
           "attackSpeed": 0.8,
           "health": 440,
@@ -160,15 +120,9 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "pixie",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 16,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 13,
           "attackSpeed": 0.8,
           "health": 30,
@@ -178,15 +132,9 @@
           "gridWidth": 2,
           "gridHeight": 1,
           "objectType": "air_elemental",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 12,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 24,
           "attackSpeed": 1,
           "health": 60,
@@ -198,15 +146,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "fire_elemental",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 18,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 30,
           "attackSpeed": 0.9,
           "health": 120,
@@ -216,15 +158,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "water_elemental",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 12,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 20,
           "attackSpeed": 1,
           "health": 160,
@@ -236,15 +172,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "earth_elemental",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 10,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 45,
           "attackSpeed": 1,
           "health": 300,
@@ -254,15 +184,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "psychic_elemental",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 11,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 55,
           "attackSpeed": 1,
           "health": 260,
@@ -274,15 +198,9 @@
           "gridWidth": 3,
           "gridHeight": 3,
           "objectType": "firebird",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 28,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 150,
           "attackSpeed": 1,
           "health": 500,
@@ -298,15 +216,9 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "troglodyte",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 10,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 8,
           "attackSpeed": 1,
           "health": 40,
@@ -316,15 +228,9 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "harpy",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 16,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 15,
           "attackSpeed": 1,
           "health": 35,
@@ -336,19 +242,14 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "beholder",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 12,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 16,
           "attackSpeed": 1,
           "health": 125,
           "isRanged": true,
+          "maxShots": 10,
           "minRangeDistance": 12,
           "maxRangeDistance": 24,
           "bulletConfig": {
@@ -362,19 +263,14 @@
           "gridWidth": 2,
           "gridHeight": 1,
           "objectType": "medusa",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 10,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 26,
           "attackSpeed": 1.2,
           "health": 125,
           "isRanged": true,
+          "maxShots": 10,
           "minRangeDistance": 10,
           "maxRangeDistance": 27,
           "bulletConfig": {
@@ -390,15 +286,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "manticore",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 26,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 55,
           "attackSpeed": 1,
           "health": 240,
@@ -408,15 +298,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "minotaur",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 16,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 75,
           "attackSpeed": 1.3,
           "health": 340,
@@ -428,15 +312,9 @@
           "gridWidth": 3,
           "gridHeight": 3,
           "objectType": "red_dragon",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 30,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 160,
           "attackSpeed": 1,
           "health": 500,
@@ -452,15 +330,9 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "gnoll",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 12,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 12,
           "attackSpeed": 1,
           "health": 45,
@@ -473,15 +345,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "basilisk",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 14,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 40,
           "attackSpeed": 1,
           "health": 220,
@@ -506,15 +372,9 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "skeleton",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 10,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 15,
           "attackSpeed": 0.8,
           "health": 40,
@@ -524,15 +384,9 @@
           "gridWidth": 2,
           "gridHeight": 1,
           "objectType": "walking_dead",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 8,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 25,
           "attackSpeed": 0.8,
           "health": 80,
@@ -544,15 +398,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "wight",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 18,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 20,
           "attackSpeed": 0.6,
           "health": 100,
@@ -562,15 +410,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "vampire",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 22,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 35,
           "attackSpeed": 1.2,
           "health": 140,
@@ -582,15 +424,9 @@
           "gridWidth": 3,
           "gridHeight": 2,
           "objectType": "black_knight",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 18,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 65,
           "attackSpeed": 0.8,
           "health": 240,
@@ -600,19 +436,14 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "lich",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 7,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 40,
           "attackSpeed": 1,
           "health": 150,
           "isRanged": true,
+          "maxShots": 10,
           "minRangeDistance": 4,
           "maxRangeDistance": 22,
           "bulletConfig": {
@@ -628,15 +459,9 @@
           "gridWidth": 4,
           "gridHeight": 3,
           "objectType": "bone_dragon",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 30,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 120,
           "attackSpeed": 1,
           "health": 640,
@@ -652,15 +477,9 @@
           "gridWidth": 2,
           "gridHeight": 1,
           "objectType": "centaur",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 22,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 15,
           "attackSpeed": 0.8,
           "health": 50,
@@ -670,15 +489,9 @@
           "gridWidth": 1,
           "gridHeight": 1,
           "objectType": "dwarf",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 7,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 20,
           "attackSpeed": 1.2,
           "health": 75,
@@ -690,15 +503,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "dendroid_guard",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 6,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 30,
           "attackSpeed": 0.9,
           "health": 300,
@@ -708,19 +515,14 @@
           "gridWidth": 2,
           "gridHeight": 1,
           "objectType": "wood_elf",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 10,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 25,
           "attackSpeed": 0.8,
           "health": 75,
           "isRanged": true,
+          "maxShots": 10,
           "minRangeDistance": 10,
           "maxRangeDistance": 28,
           "bulletConfig": {
@@ -736,15 +538,9 @@
           "gridWidth": 2,
           "gridHeight": 2,
           "objectType": "pegasus",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 27,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 50,
           "attackSpeed": 1.3,
           "health": 240,
@@ -754,15 +550,9 @@
           "gridWidth": 3,
           "gridHeight": 2,
           "objectType": "unicorn",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 25,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 80,
           "attackSpeed": 1,
           "health": 320,
@@ -774,15 +564,9 @@
           "gridWidth": 3,
           "gridHeight": 3,
           "objectType": "green_dragon",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 32,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 150,
           "attackSpeed": 1,
           "health": 540,
@@ -807,15 +591,9 @@
           "gridWidth": 3,
           "gridHeight": 1,
           "objectType": "rider",
-          "actionPriorities": [
-            "attack",
-            "move"
-          ],
+          "actionPriorities": ["attack", "move"],
           "moveSpeed": 25,
-          "availableActions": [
-            "move",
-            "attack"
-          ],
+          "availableActions": ["move", "attack"],
           "attackDamage": 55,
           "attackSpeed": 0.8,
           "health": 140,

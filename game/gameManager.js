@@ -464,6 +464,9 @@ class GameManager {
     // Unpause the game - existing logic in update() will handle the rest
     this.isPaused = false;
 
+    // Поновлюємо постріли всім ренджед юнітам на початку гри
+    this.refillAllUnitsShots();
+
     // Start checking for round end conditions (all units of one player dead)
     this.battleCheckInterval = setInterval(() => {
       this.checkBattleEnd();
@@ -871,6 +874,9 @@ class GameManager {
     // Pause the game
     this.isPaused = true;
 
+    // Поновлюємо постріли всім ренджед юнітам перед новим раундом
+    this.refillAllUnitsShots();
+
     // Reset ready status for new round
     await this.resetReadyStatus();
 
@@ -913,6 +919,27 @@ class GameManager {
     } catch (error) {
       console.error("Error resetting ready status:", error);
     }
+  }
+
+  // Поновлює постріли всім ренджед юнітам (на початку гри або раунду)
+  refillAllUnitsShots() {
+    console.log("Refilling shots for all ranged units...");
+
+    // Поновлюємо постріли для юнітів гравця
+    for (const unit of this.objectManager.objects) {
+      if (unit.isRanged && unit.maxShots !== null) {
+        unit.refillShots();
+      }
+    }
+
+    // Поновлюємо постріли для юнітів ворога
+    for (const unit of this.objectManager.enemyObjects) {
+      if (unit.isRanged && unit.maxShots !== null) {
+        unit.refillShots();
+      }
+    }
+
+    console.log("Shots refilled for all ranged units");
   }
 }
 

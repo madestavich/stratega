@@ -41,6 +41,8 @@ export class GameObject {
     this.isRangedAttack = false; // Чи об'єкт атакує здалеку
     this.minRangeDistance = objectConfig.minRangeDistance || null;
     this.maxRangeDistance = objectConfig.maxRangeDistance || null;
+    this.maxShots = objectConfig.maxShots || null; // Максимальна кількість пострілів
+    this.remainingShots = this.maxShots; // Поточна кількість пострілів
     this.bulletConfig = objectConfig.bulletConfig || null; // Конфігурація кулі
 
     if (this.isRanged) {
@@ -118,6 +120,21 @@ export class GameObject {
           bulletPointGlobal,
           this.lookDirection
         );
+        // Відображення кількості пострілів для ренджед юнітів
+        if (this.isRanged && this.maxShots !== null) {
+          this.ctx.save();
+          this.ctx.fillStyle = this.remainingShots > 0 ? "yellow" : "red";
+          this.ctx.strokeStyle = "black";
+          this.ctx.lineWidth = 2;
+          this.ctx.font = "bold 16px Arial";
+          this.ctx.textAlign = "center";
+          const text = `${this.remainingShots}/${this.maxShots}`;
+          const textX = this.x;
+          const textY = this.y - offsetY - currentFrame.height / 2 - 10;
+          this.ctx.strokeText(text, textX, textY);
+          this.ctx.fillText(text, textX, textY);
+          this.ctx.restore();
+        }
       }
     } else {
       this.renderer.draw(
@@ -149,6 +166,21 @@ export class GameObject {
           bulletPointGlobal,
           this.lookDirection
         );
+        // Відображення кількості пострілів для ренджед юнітів
+        if (this.isRanged && this.maxShots !== null) {
+          this.ctx.save();
+          this.ctx.fillStyle = this.remainingShots > 0 ? "yellow" : "red";
+          this.ctx.strokeStyle = "black";
+          this.ctx.lineWidth = 2;
+          this.ctx.font = "bold 16px Arial";
+          this.ctx.textAlign = "center";
+          const text = `${this.remainingShots}/${this.maxShots}`;
+          const textX = this.x;
+          const textY = this.y - offsetY - currentFrame.height / 2 - 10;
+          this.ctx.strokeText(text, textX, textY);
+          this.ctx.fillText(text, textX, textY);
+          this.ctx.restore();
+        }
       }
     }
   }
@@ -219,6 +251,36 @@ export class GameObject {
       this.lookDirection = { dx: 1, dy: 0 };
     } else if (this.team === 2) {
       this.lookDirection = { dx: -1, dy: 0 };
+    }
+  }
+
+  // Перевіряє чи юніт може стріляти здалеку (є стріли)
+  canShootRanged() {
+    return (
+      this.isRanged && this.remainingShots !== null && this.remainingShots > 0
+    );
+  }
+
+  // Витрачає один постріл
+  useShot() {
+    if (this.remainingShots !== null && this.remainingShots > 0) {
+      this.remainingShots--;
+    }
+  }
+
+  // Поновлює постріли (для початку раунду або особливих здібностей)
+  refillShots(amount = null) {
+    if (this.maxShots === null) return; // Якщо юніт не має обмежень на постріли
+
+    if (amount === null) {
+      // Повне поновлення
+      this.remainingShots = this.maxShots;
+    } else {
+      // Часткове поновлення
+      this.remainingShots = Math.min(
+        this.remainingShots + amount,
+        this.maxShots
+      );
     }
   }
 }
