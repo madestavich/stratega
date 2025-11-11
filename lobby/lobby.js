@@ -250,18 +250,10 @@ class LobbyManager {
       this.elements.raceSelectionDisabled.style.display = "none";
       this.elements.raceGrid.style.display = "grid";
 
-      // Get opponent's selected race
-      const opponentRace = this.getOpponentRace();
-
-      // Enable/disable race cards based on ready status and opponent selection
+      // Enable/disable race cards based on ready status
       const raceCards = document.querySelectorAll(".race-card");
       raceCards.forEach((card) => {
-        const cardRace = card.dataset.race;
-        
-        // Disable if:
-        // 1. Player is ready
-        // 2. This race is selected by opponent
-        if (this.isReady || (opponentRace && cardRace === opponentRace)) {
+        if (this.isReady) {
           card.classList.add("disabled");
         } else {
           card.classList.remove("disabled");
@@ -271,24 +263,6 @@ class LobbyManager {
       this.elements.raceSelectionDisabled.style.display = "block";
       this.elements.raceGrid.style.display = "none";
     }
-  }
-
-  getOpponentRace() {
-    if (!this.lobbyState || !this.lobbyState.players) return null;
-    
-    const { players } = this.lobbyState;
-    
-    // If I'm host, get guest's race
-    if (this.isHost && players.guest) {
-      return players.guest.race;
-    }
-    
-    // If I'm guest, get host's race
-    if (!this.isHost && players.host) {
-      return players.host.race;
-    }
-    
-    return null;
   }
 
   updateSelectedRace() {
