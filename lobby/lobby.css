@@ -2,51 +2,32 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Arial", sans-serif;
 }
 
 body {
-  font-family: "Arial", sans-serif;
-  background: url("../textures/Marble-dark.png");
-  background-size: 200px 200px;
-  background-repeat: repeat;
-  color: #fff;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  overflow: hidden;
-}
-
-.lobby-container {
-  width: 100%;
-  max-width: 1600px;
-  height: 95vh;
-  max-height: 95vh;
-  background: url("../textures/Leather-middle.png");
-  background-size: 150px 150px;
+  background: url("../textures/Leather-extra-dark.png");
   background-repeat: repeat;
-  border-radius: 0;
-  border: 12px solid transparent;
-  border-image: url("../textures/Border-gold.png") 30 round;
-  padding: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-  position: relative;
+  color: #f0f0f0;
+  border: 8px solid;
+  border-image: url("../textures/Border-gold.png") 14 repeat;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
+.lobby-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem;
+  gap: 1rem;
+  overflow: hidden;
+}
+
 .lobby-container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .lobby-container > * {
@@ -56,32 +37,28 @@ body {
 
 /* Header */
 .lobby-header {
-  text-align: center;
-  margin-bottom: 15px;
-  padding: 15px;
-  background: url("../textures/Leather-red-dark.png");
-  background-size: 150px 150px;
-  background-repeat: repeat;
-  border: 8px solid transparent;
-  border-image: url("../textures/Border-gold.png") 20 round;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  background: url("../textures/Leather-blue.png");
+  padding: 1rem;
+  border: 28px solid;
+  border-image: url("../textures/Border-blue.png") 50 round;
   flex-shrink: 0;
 }
 
 .lobby-header h1 {
   font-size: 2rem;
-  color: #ffd700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5);
-  margin-bottom: 8px;
   font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .room-info {
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 2rem;
   font-size: 1rem;
-  color: #f0e68c;
+  color: #e0c080;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -89,36 +66,25 @@ body {
 .lobby-content {
   display: grid;
   grid-template-columns: 1fr 1.5fr 1fr;
-  gap: 15px;
+  gap: 1rem;
   flex: 1;
   overflow: hidden;
   min-height: 0;
 }
 
 .lobby-section {
-  background: url("../textures/Leather-blue.png");
-  background-size: 120px 120px;
-  background-repeat: repeat;
-  border: 8px solid transparent;
-  border-image: url("../textures/Border-blue.png") 20 round;
-  padding: 15px;
-  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.5);
-  position: relative;
+  background: url("../textures/Leather.png");
+  border: 4px solid;
+  border-image: url("../textures/Border-blue.png") 4 repeat;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .lobby-section::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .lobby-section > * {
@@ -128,10 +94,10 @@ body {
 
 .lobby-section h2 {
   font-size: 1.3rem;
-  margin-bottom: 12px;
-  color: #ffd700;
+  margin-bottom: 1rem;
+  color: #e0c080;
   text-align: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   font-weight: bold;
   flex-shrink: 0;
 }
@@ -140,35 +106,23 @@ body {
 .players-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .player-card {
-  background: url("../textures/Leather-red-light.png");
-  background-size: 100px 100px;
-  background-repeat: repeat;
-  border: 6px solid transparent;
-  border-image: url("../textures/Border-small.png") 15 round;
-  padding: 12px;
+  background: rgba(20, 20, 30, 0.7);
+  border: 2px solid;
+  border-image: url("../textures/Border-small.png") 2 repeat;
+  padding: 1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-  position: relative;
   flex-shrink: 0;
 }
 
 .player-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .player-card > * {
@@ -177,18 +131,18 @@ body {
 }
 
 .player-card.host-card {
-  border-image: url("../textures/Border-gold.png") 15 round;
+  border: 2px solid;
+  border-image: url("../textures/Border-gold.png") 2 repeat;
 }
 
 .player-card.guest-card {
-  border-image: url("../textures/Border-blue.png") 15 round;
+  border: 2px solid;
+  border-image: url("../textures/Border-blue.png") 2 repeat;
 }
 
 .player-card.ready {
-  background: url("../textures/Leather-middle-brightened.png");
-  background-size: 100px 100px;
-  background-repeat: repeat;
-  box-shadow: 0 0 20px rgba(46, 213, 115, 0.6), 0 4px 8px rgba(0, 0, 0, 0.6);
+  background: rgba(46, 213, 115, 0.2);
+  box-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
 }
 
 .player-header {
@@ -201,7 +155,7 @@ body {
 .player-role {
   font-size: 0.9rem;
   font-weight: bold;
-  color: #ffd700;
+  color: #e0c080;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -222,12 +176,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url("../textures/Leather-extra-dark.png");
-  background-size: 80px 80px;
-  background-repeat: repeat;
-  border: 4px solid transparent;
-  border-image: url("../textures/Border-small.png") 10 round;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  background: url("../textures/Leather-blue.png");
+  border: 1px solid #1a5278;
+  border-radius: 4px;
   flex-shrink: 0;
 }
 
@@ -236,16 +187,15 @@ body {
 }
 
 .player-username {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   margin-bottom: 5px;
-  color: #f0e68c;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  color: #f0f0f0;
 }
 
 .player-race {
   font-size: 0.9rem;
-  color: #d4af37;
+  color: #e0c080;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -253,7 +203,7 @@ body {
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -262,40 +212,37 @@ body {
 .setting-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
 .setting-group label {
   font-size: 1rem;
-  color: #f0e68c;
+  color: #e0c080;
   font-weight: 500;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .setting-input,
 .setting-slider {
-  padding: 8px 12px;
-  background: url("../textures/Leather-extra-dark.png");
-  background-size: 80px 80px;
-  background-repeat: repeat;
-  border: 4px solid transparent;
-  border-image: url("../textures/Border-small.png") 10 round;
-  color: #f0e68c;
+  padding: 0.5rem;
+  background: rgba(20, 20, 30, 0.7);
+  border: 2px solid;
+  border-image: url("../textures/Border-small.png") 2 repeat;
+  color: #f0f0f0;
   font-size: 0.95rem;
   outline: none;
   transition: all 0.3s ease;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
 .setting-input:hover,
 .setting-input:focus {
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .setting-input option {
-  background: #1a1a2e;
-  color: #f0e68c;
+  background: #1a1a2a;
+  color: #f0f0f0;
 }
 
 .setting-input:disabled,
@@ -306,72 +253,59 @@ body {
 
 .setting-slider {
   padding: 0;
-  height: 10px;
+  height: 6px;
   -webkit-appearance: none;
   appearance: none;
-  background: url("../textures/Leather-extra-dark.png");
-  background-size: 80px 80px;
-  background-repeat: repeat;
+  background: rgba(20, 20, 30, 0.7);
   outline: none;
-  border: 4px solid transparent;
-  border-image: url("../textures/Border-small.png") 10 round;
+  border: 2px solid;
+  border-image: url("../textures/Border-small.png") 2 repeat;
 }
 
 .setting-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  background: url("../textures/Leather-red-medium.png");
-  background-size: 60px 60px;
-  background-repeat: repeat;
+  width: 16px;
+  height: 16px;
+  background: url("../textures/Leather-blue.png");
   cursor: pointer;
-  border: 3px solid #ffd700;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  border: 2px solid #3498db;
   transition: all 0.3s ease;
 }
 
 .setting-slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
 }
 
 .setting-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: url("../textures/Leather-red-medium.png");
-  background-size: 60px 60px;
-  background-repeat: repeat;
+  width: 16px;
+  height: 16px;
+  background: url("../textures/Leather-blue.png");
   cursor: pointer;
-  border: 3px solid #ffd700;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  border: 2px solid #3498db;
   transition: all 0.3s ease;
 }
 
 .setting-slider::-moz-range-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
 }
 
 .info-message {
-  padding: 10px;
-  background: url("../textures/Leather-red-dark-darker.png");
-  background-size: 100px 100px;
-  background-repeat: repeat;
-  border: 4px solid transparent;
-  border-image: url("../textures/Border-gold.png") 10 round;
-  color: #ffd700;
+  padding: 0.5rem;
+  background: rgba(20, 20, 30, 0.7);
+  border: 2px solid;
+  border-image: url("../textures/Border-small.png") 2 repeat;
+  color: #e0c080;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
 /* Race Section */
 .race-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 0.5rem;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -379,31 +313,18 @@ body {
 }
 
 .race-card {
-  background: url("../textures/Leather-red-light-stronger.png");
-  background-size: 100px 100px;
-  background-repeat: repeat;
-  border: 6px solid transparent;
-  border-image: url("../textures/Border-small.png") 15 round;
-  padding: 15px;
+  background: rgba(20, 20, 30, 0.7);
+  border: 2px solid;
+  border-image: url("../textures/Border-blue.png") 2 repeat;
+  padding: 1rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-  position: relative;
   flex-shrink: 0;
 }
 
 .race-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 0;
-  transition: all 0.3s ease;
+  display: none;
 }
 
 .race-card > * {
@@ -412,21 +333,22 @@ body {
 }
 
 .race-card:hover::before {
-  background: rgba(0, 0, 0, 0.1);
+  display: none;
 }
 
 .race-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
 }
 
 .race-card.selected {
-  border-image: url("../textures/Border-gold.png") 15 round;
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 4px 8px rgba(0, 0, 0, 0.6);
+  border: 2px solid;
+  border-image: url("../textures/Border-gold.png") 2 repeat;
+  background: rgba(52, 152, 219, 0.2);
 }
 
 .race-card.selected::before {
-  background: rgba(255, 215, 0, 0.2);
+  display: none;
 }
 
 .race-card.disabled {
@@ -444,8 +366,7 @@ body {
   font-size: 1rem;
   font-weight: bold;
   text-transform: capitalize;
-  color: #f0e68c;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  color: #f0f0f0;
 }
 
 /* Footer Controls */
@@ -453,79 +374,62 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  margin-top: 15px;
-  background: url("../textures/Leather-red-dark.png");
-  background-size: 150px 150px;
-  background-repeat: repeat;
-  border: 8px solid transparent;
-  border-image: url("../textures/Border-gold.png") 20 round;
-  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  background: url("../textures/Leather-blue.png");
+  border: 28px solid;
+  border-image: url("../textures/Border-blue.png") 50 round;
   flex-shrink: 0;
 }
 
 .control-button {
-  padding: 12px 30px;
-  font-size: 1rem;
-  font-weight: bold;
-  border: 6px solid transparent;
+  background: url("../textures/Leather-middle.png");
+  color: white;
+  padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  background-repeat: repeat;
-  color: #fff;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 3px solid;
+  border-image: url("../textures/Border-small.png") 3 round;
+  font-weight: bold;
 }
 
 .leave-button {
-  background: url("../textures/Leather-red-dark-darker.png");
-  background-size: 100px 100px;
-  background-repeat: repeat;
-  border-image: url("../textures/Border-small.png") 15 round;
+  background: url("../textures/Leather-extra-dark.png");
 }
 
 .leave-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 107, 107, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .ready-controls {
   display: flex;
-  gap: 15px;
+  gap: 1rem;
 }
 
 .ready-button {
-  background: url("../textures/Leather-middle-brightened.png");
-  background-size: 100px 100px;
-  background-repeat: repeat;
-  border-image: url("../textures/Border-blue.png") 15 round;
-  color: #e0ffe0;
+  background: url("../textures/Leather-blue.png");
+  color: white;
 }
 
 .ready-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(81, 207, 102, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .ready-button.active {
-  background: url("../textures/Leather-red-medium.png");
-  background-size: 100px 100px;
-  background-repeat: repeat;
-  border-image: url("../textures/Border-gold.png") 15 round;
-  color: #ffe0a0;
+  background: url("../textures/Leather.png");
+  color: #f1c40f;
 }
 
 .start-button {
-  background: url("../textures/Leather-blue.png");
-  background-size: 120px 120px;
-  background-repeat: repeat;
-  border-image: url("../textures/Border-gold.png") 15 round;
-  color: #ffd700;
+  background: url("../textures/Leather-middle.png");
+  color: white;
 }
 
 .start-button:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .start-button:disabled {
@@ -541,9 +445,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("../textures/Shroud.png");
-  background-size: 256px 256px;
-  background-repeat: repeat;
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -554,11 +456,10 @@ body {
 .loading-spinner {
   width: 60px;
   height: 60px;
-  border: 5px solid rgba(255, 215, 0, 0.2);
-  border-top-color: #ffd700;
+  border: 5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 @keyframes spin {
@@ -570,9 +471,7 @@ body {
 .loading-text {
   margin-top: 20px;
   font-size: 1.2rem;
-  color: #ffd700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5);
-  font-weight: bold;
+  color: white;
 }
 
 /* Responsive */
