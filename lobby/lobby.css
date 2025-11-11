@@ -7,27 +7,34 @@
 body {
   font-family: "Arial", sans-serif;
   background: url("../textures/Marble-dark.png");
-  background-size: cover;
-  background-attachment: fixed;
+  background-size: 200px 200px;
+  background-repeat: repeat;
   color: #fff;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
+  overflow: hidden;
 }
 
 .lobby-container {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1600px;
+  height: 95vh;
+  max-height: 95vh;
   background: url("../textures/Leather-middle.png");
-  background-size: cover;
+  background-size: 150px 150px;
+  background-repeat: repeat;
   border-radius: 0;
   border: 12px solid transparent;
   border-image: url("../textures/Border-gold.png") 30 round;
-  padding: 40px;
+  padding: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .lobby-container::before {
@@ -50,20 +57,22 @@ body {
 /* Header */
 .lobby-header {
   text-align: center;
-  margin-bottom: 30px;
-  padding: 20px;
+  margin-bottom: 15px;
+  padding: 15px;
   background: url("../textures/Leather-red-dark.png");
-  background-size: cover;
+  background-size: 150px 150px;
+  background-repeat: repeat;
   border: 8px solid transparent;
   border-image: url("../textures/Border-gold.png") 20 round;
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
 }
 
 .lobby-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   color: #ffd700;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-weight: bold;
 }
 
@@ -80,18 +89,24 @@ body {
 .lobby-content {
   display: grid;
   grid-template-columns: 1fr 1.5fr 1fr;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 15px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .lobby-section {
   background: url("../textures/Leather-blue.png");
-  background-size: cover;
+  background-size: 120px 120px;
+  background-repeat: repeat;
   border: 8px solid transparent;
   border-image: url("../textures/Border-blue.png") 20 round;
-  padding: 25px;
+  padding: 15px;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.5);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .lobby-section::before {
@@ -112,30 +127,36 @@ body {
 }
 
 .lobby-section h2 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
+  font-size: 1.3rem;
+  margin-bottom: 12px;
   color: #ffd700;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   font-weight: bold;
+  flex-shrink: 0;
 }
 
 /* Players Section */
 .players-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .player-card {
   background: url("../textures/Leather-red-light.png");
-  background-size: cover;
+  background-size: 100px 100px;
+  background-repeat: repeat;
   border: 6px solid transparent;
   border-image: url("../textures/Border-small.png") 15 round;
-  padding: 15px;
+  padding: 12px;
   transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
   position: relative;
+  flex-shrink: 0;
 }
 
 .player-card::before {
@@ -165,7 +186,8 @@ body {
 
 .player-card.ready {
   background: url("../textures/Leather-middle-brightened.png");
-  background-size: cover;
+  background-size: 100px 100px;
+  background-repeat: repeat;
   box-shadow: 0 0 20px rgba(46, 213, 115, 0.6), 0 4px 8px rgba(0, 0, 0, 0.6);
 }
 
@@ -194,17 +216,19 @@ body {
 }
 
 .player-avatar {
-  font-size: 3rem;
-  width: 60px;
-  height: 60px;
+  font-size: 2.5rem;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: url("../textures/Leather-extra-dark.png");
-  background-size: cover;
+  background-size: 80px 80px;
+  background-repeat: repeat;
   border: 4px solid transparent;
   border-image: url("../textures/Border-small.png") 10 round;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  flex-shrink: 0;
 }
 
 .player-details {
@@ -229,13 +253,17 @@ body {
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .setting-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .setting-group label {
@@ -247,13 +275,14 @@ body {
 
 .setting-input,
 .setting-slider {
-  padding: 10px 15px;
+  padding: 8px 12px;
   background: url("../textures/Leather-extra-dark.png");
-  background-size: cover;
+  background-size: 80px 80px;
+  background-repeat: repeat;
   border: 4px solid transparent;
   border-image: url("../textures/Border-small.png") 10 round;
   color: #f0e68c;
-  font-size: 1rem;
+  font-size: 0.95rem;
   outline: none;
   transition: all 0.3s ease;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
@@ -277,11 +306,12 @@ body {
 
 .setting-slider {
   padding: 0;
-  height: 12px;
+  height: 10px;
   -webkit-appearance: none;
   appearance: none;
   background: url("../textures/Leather-extra-dark.png");
-  background-size: cover;
+  background-size: 80px 80px;
+  background-repeat: repeat;
   outline: none;
   border: 4px solid transparent;
   border-image: url("../textures/Border-small.png") 10 round;
@@ -290,10 +320,11 @@ body {
 .setting-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   background: url("../textures/Leather-red-medium.png");
-  background-size: cover;
+  background-size: 60px 60px;
+  background-repeat: repeat;
   cursor: pointer;
   border: 3px solid #ffd700;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
@@ -306,10 +337,11 @@ body {
 }
 
 .setting-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   background: url("../textures/Leather-red-medium.png");
-  background-size: cover;
+  background-size: 60px 60px;
+  background-repeat: repeat;
   cursor: pointer;
   border: 3px solid #ffd700;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
@@ -322,14 +354,15 @@ body {
 }
 
 .info-message {
-  padding: 12px;
+  padding: 10px;
   background: url("../textures/Leather-red-dark-darker.png");
-  background-size: cover;
+  background-size: 100px 100px;
+  background-repeat: repeat;
   border: 4px solid transparent;
   border-image: url("../textures/Border-gold.png") 10 round;
   color: #ffd700;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
 }
@@ -338,20 +371,26 @@ body {
 .race-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  gap: 10px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  align-content: start;
 }
 
 .race-card {
   background: url("../textures/Leather-red-light-stronger.png");
-  background-size: cover;
+  background-size: 100px 100px;
+  background-repeat: repeat;
   border: 6px solid transparent;
   border-image: url("../textures/Border-small.png") 15 round;
-  padding: 20px;
+  padding: 15px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
   position: relative;
+  flex-shrink: 0;
 }
 
 .race-card::before {
@@ -397,8 +436,8 @@ body {
 }
 
 .race-icon {
-  font-size: 3rem;
-  margin-bottom: 10px;
+  font-size: 2.5rem;
+  margin-bottom: 8px;
 }
 
 .race-name {
@@ -414,31 +453,34 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  margin-top: 20px;
+  padding: 12px 20px;
+  margin-top: 15px;
   background: url("../textures/Leather-red-dark.png");
-  background-size: cover;
+  background-size: 150px 150px;
+  background-repeat: repeat;
   border: 8px solid transparent;
   border-image: url("../textures/Border-gold.png") 20 round;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
 }
 
 .control-button {
-  padding: 15px 40px;
-  font-size: 1.1rem;
+  padding: 12px 30px;
+  font-size: 1rem;
   font-weight: bold;
   border: 6px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  background-size: cover;
+  background-repeat: repeat;
   color: #fff;
 }
 
 .leave-button {
   background: url("../textures/Leather-red-dark-darker.png");
-  background-size: cover;
+  background-size: 100px 100px;
+  background-repeat: repeat;
   border-image: url("../textures/Border-small.png") 15 round;
 }
 
@@ -454,7 +496,8 @@ body {
 
 .ready-button {
   background: url("../textures/Leather-middle-brightened.png");
-  background-size: cover;
+  background-size: 100px 100px;
+  background-repeat: repeat;
   border-image: url("../textures/Border-blue.png") 15 round;
   color: #e0ffe0;
 }
@@ -466,14 +509,16 @@ body {
 
 .ready-button.active {
   background: url("../textures/Leather-red-medium.png");
-  background-size: cover;
+  background-size: 100px 100px;
+  background-repeat: repeat;
   border-image: url("../textures/Border-gold.png") 15 round;
   color: #ffe0a0;
 }
 
 .start-button {
   background: url("../textures/Leather-blue.png");
-  background-size: cover;
+  background-size: 120px 120px;
+  background-repeat: repeat;
   border-image: url("../textures/Border-gold.png") 15 round;
   color: #ffd700;
 }
@@ -497,7 +542,8 @@ body {
   width: 100%;
   height: 100%;
   background: url("../textures/Shroud.png");
-  background-size: cover;
+  background-size: 256px 256px;
+  background-repeat: repeat;
   display: flex;
   flex-direction: column;
   justify-content: center;
