@@ -264,16 +264,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Unit limit slider handler - update displayed value
-  const unitLimitSlider = document.getElementById("max-unit-limit");
-  const unitLimitValue = document.getElementById("unit-limit-value");
-
-  if (unitLimitSlider && unitLimitValue) {
-    unitLimitSlider.addEventListener("input", function () {
-      unitLimitValue.textContent = this.value;
-    });
-  }
-
   // Create room form submission
   createRoomForm.addEventListener("submit", function (event) {
     event.preventDefault();
