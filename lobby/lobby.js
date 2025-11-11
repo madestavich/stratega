@@ -131,7 +131,8 @@ class LobbyManager {
 
       if (data.logged_in && data.user) {
         this.currentUser = data.user;
-        this.isHost = players.host.id === data.user.id;
+        // Convert both to numbers for comparison
+        this.isHost = parseInt(players.host.id) === parseInt(data.user.id);
 
         console.log("User role determined:", {
           userId: data.user.id,
