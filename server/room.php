@@ -196,7 +196,7 @@ function createRoom($data) {
             'success' => true,
             'room_id' => $room_id,
             'message' => 'Кімнату створено успішно',
-            'redirect' => 'lobby/lobby.html?room_id=' . $room_id
+            'redirect' => '/lobby/lobby.html?room_id=' . $room_id
         ]);
     } else {
         throw new Exception('Помилка створення кімнати');
@@ -252,7 +252,7 @@ function joinRoom($data) {
         echo json_encode([
             'success' => true,
             'message' => 'Успішно приєдналися до кімнати',
-            'redirect' => 'lobby/lobby.html?room_id=' . $room_id
+            'redirect' => '/lobby/lobby.html?room_id=' . $room_id
         ]);
     } else {
         throw new Exception('Помилка приєднання до кімнати');

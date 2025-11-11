@@ -9,6 +9,7 @@ deployment:
 
     - /bin/cp -R sprites $DEPLOYPATH
     - /bin/cp -R input $DEPLOYPATH
+    - /bin/cp -R lobby $DEPLOYPATH
     - /bin/cp -R game_objects $DEPLOYPATH
     - /bin/cp -R game_map $DEPLOYPATH
     - /bin/cp -R game_configs $DEPLOYPATH
