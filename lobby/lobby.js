@@ -132,14 +132,22 @@ class LobbyManager {
       });
       const data = await res.json();
 
+      console.log("check_login.php response:", data);
+      console.log("players.host:", players.host);
+
       if (data.logged_in && data.user) {
         this.currentUser = data.user;
         // Convert both to numbers for comparison
-        this.isHost = parseInt(players.host.id) === parseInt(data.user.id);
+        const userId = parseInt(data.user.id);
+        const hostId = parseInt(players.host.id);
+        this.isHost = userId === hostId;
 
-        console.log("User role determined:", {
-          userId: data.user.id,
-          hostId: players.host.id,
+        console.log("User role comparison:", {
+          userId: userId,
+          hostId: hostId,
+          userIdType: typeof userId,
+          hostIdType: typeof hostId,
+          areEqual: userId === hostId,
           isHost: this.isHost,
         });
 
