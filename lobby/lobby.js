@@ -52,6 +52,8 @@ class LobbyManager {
       // Load initial lobby state (this will determine user role)
       await this.loadLobbyState();
 
+      console.log("Before setupEventListeners, isHost:", this.isHost);
+
       // Setup event listeners AFTER role is determined
       this.setupEventListeners();
 
@@ -318,21 +320,26 @@ class LobbyManager {
         });
       });
 
-      this.elements.gameMode.addEventListener("change", () =>
-        this.saveSettings()
-      );
-      this.elements.roundTime.addEventListener("change", () =>
-        this.saveSettings()
-      );
-      this.elements.startingMoney.addEventListener("change", () =>
-        this.saveSettings()
-      );
-      this.elements.roundIncome.addEventListener("change", () =>
-        this.saveSettings()
-      );
-      this.elements.maxUnitLimit.addEventListener("change", () =>
-        this.saveSettings()
-      );
+      this.elements.gameMode.addEventListener("change", () => {
+        console.log("Game mode changed, calling saveSettings");
+        this.saveSettings();
+      });
+      this.elements.roundTime.addEventListener("change", () => {
+        console.log("Round time changed, calling saveSettings");
+        this.saveSettings();
+      });
+      this.elements.startingMoney.addEventListener("change", () => {
+        console.log("Starting money changed, calling saveSettings");
+        this.saveSettings();
+      });
+      this.elements.roundIncome.addEventListener("change", () => {
+        console.log("Round income changed, calling saveSettings");
+        this.saveSettings();
+      });
+      this.elements.maxUnitLimit.addEventListener("change", () => {
+        console.log("Max unit limit changed, calling saveSettings");
+        this.saveSettings();
+      });
     }
 
     // Race selection
