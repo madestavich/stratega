@@ -96,7 +96,7 @@ class LobbyManager {
     }
   }
 
-  updateUI() {
+  async updateUI() {
     if (!this.lobbyState) return;
 
     const { players, settings } = this.lobbyState;
@@ -107,10 +107,9 @@ class LobbyManager {
       settings.room_type === "public" ? "Публічна" : "Приватна"
     }`;
 
-    // Determine if current user is host
+    // Determine if current user is host - WAIT for this to complete
     if (players.host && players.host.id) {
-      // We need to get current user ID from session
-      this.checkUserRole(players);
+      await this.checkUserRole(players);
     }
 
     // Update players
@@ -123,38 +122,52 @@ class LobbyManager {
     this.updateRaceSelection(settings.game_mode);
   }
 
-  checkUserRole(players) {
-    // Check if we can determine the user role
-    // This is a simplified check - in production, you'd get this from session
-    fetch("../server/auth/check_login.php", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.logged_in && data.user) {
-          this.currentUser = data.user;
-          this.isHost = players.host.id === data.user.id;
-
-          // Update UI based on role
-          if (this.isHost) {
-            this.elements.startButton.style.display = "inline-block";
-          } else {
-            this.enableSettingsLock();
-          }
-
-          // Update ready status based on player
-          if (this.isHost) {
-            this.isReady = players.host.ready;
-            this.selectedRace = players.host.race;
-          } else if (players.guest) {
-            this.isReady = players.guest.ready;
-            this.selectedRace = players.guest.race;
-          }
-
-          this.updateReadyButton();
-          this.updateSelectedRace();
-        }
+  async checkUserRole(players) {
+    try {
+      const res = await fetch("../server/auth/check_login.php", {
+        credentials: "include",
       });
+      const data = await res.json();
+
+      if (data.logged_in && data.user) {
+        this.currentUser = data.user;
+        this.isHost = players.host.id === data.user.id;
+
+        console.log("User role determined:", {
+          userId: data.user.id,
+          hostId: players.host.id,
+          isHost: this.isHost,
+        });
+
+        // Update UI based on role
+        if (this.isHost) {
+          this.elements.startButton.style.display = "inline-block";
+          // Enable settings for host
+          this.elements.settingsLockedMessage.style.display = "none";
+          this.elements.gameMode.disabled = false;
+          this.elements.roundTime.disabled = false;
+          this.elements.startingMoney.disabled = false;
+          this.elements.roundIncome.disabled = false;
+          this.elements.maxUnitLimit.disabled = false;
+        } else {
+          this.enableSettingsLock();
+        }
+
+        // Update ready status based on player
+        if (this.isHost) {
+          this.isReady = players.host.ready;
+          this.selectedRace = players.host.race;
+        } else if (players.guest) {
+          this.isReady = players.guest.ready;
+          this.selectedRace = players.guest.race;
+        }
+
+        this.updateReadyButton();
+        this.updateSelectedRace();
+      }
+    } catch (error) {
+      console.error("Error checking user role:", error);
+    }
   }
 
   updatePlayers(players) {
