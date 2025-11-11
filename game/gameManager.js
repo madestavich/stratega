@@ -135,11 +135,17 @@ class GameManager {
 
       // Після визначення ролі гравця оновлюємо напрямок погляду для всіх юнітів
       try {
-        console.log("START: About to update look direction for objects, count:", this.objectManager.objects.length);
+        console.log(
+          "START: About to update look direction for objects, count:",
+          this.objectManager.objects.length
+        );
         for (const unit of this.objectManager.objects) {
           unit.setLookDirectionByTeam();
         }
-        console.log("START: About to update look direction for enemyObjects, count:", this.objectManager.enemyObjects.length);
+        console.log(
+          "START: About to update look direction for enemyObjects, count:",
+          this.objectManager.enemyObjects.length
+        );
         for (const unit of this.objectManager.enemyObjects) {
           unit.setLookDirectionByTeam();
         }
@@ -152,7 +158,10 @@ class GameManager {
     }
 
     // Load room settings from lobby
-    console.log("START: About to call getRoomSettings, currentRoomId =", this.objectManager.currentRoomId);
+    console.log(
+      "START: About to call getRoomSettings, currentRoomId =",
+      this.objectManager.currentRoomId
+    );
     const roomSettings = await this.getRoomSettings();
     console.log("Room settings loaded:", roomSettings);
 
@@ -335,7 +344,10 @@ class GameManager {
   }
 
   async getRoomSettings() {
-    console.log("getRoomSettings: called with currentRoomId =", this.objectManager.currentRoomId);
+    console.log(
+      "getRoomSettings: called with currentRoomId =",
+      this.objectManager.currentRoomId
+    );
     try {
       const response = await fetch("../server/room.php", {
         method: "POST",
