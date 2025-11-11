@@ -7,6 +7,7 @@ class LobbyManager {
     this.pollInterval = null;
     this.isReady = false;
     this.selectedRace = null;
+    this.isEditingSettings = false; // Flag to prevent overwriting during editing
 
     // DOM elements
     this.elements = {
@@ -221,6 +222,9 @@ class LobbyManager {
   }
 
   updateSettings(settings) {
+    // Don't update if user is actively editing
+    if (this.isEditingSettings) return;
+
     this.elements.gameMode.value = settings.game_mode || "all_races";
     this.elements.roundTime.value = settings.round_time || 45;
     this.elements.startingMoney.value = settings.starting_money || 1000;
@@ -292,6 +296,28 @@ class LobbyManager {
     // Settings changes (only for host)
     if (this.isHost) {
       console.log("Adding host-only event listeners");
+
+      // Track when user starts editing
+      const settingsInputs = [
+        this.elements.gameMode,
+        this.elements.roundTime,
+        this.elements.startingMoney,
+        this.elements.roundIncome,
+        this.elements.maxUnitLimit,
+      ];
+
+      settingsInputs.forEach((input) => {
+        input.addEventListener("focus", () => {
+          this.isEditingSettings = true;
+        });
+
+        input.addEventListener("blur", () => {
+          setTimeout(() => {
+            this.isEditingSettings = false;
+          }, 100);
+        });
+      });
+
       this.elements.gameMode.addEventListener("change", () =>
         this.saveSettings()
       );
@@ -364,9 +390,13 @@ class LobbyManager {
       if (!data.success) {
         throw new Error(data.error);
       }
+
+      // Settings saved successfully, allow updates again
+      this.isEditingSettings = false;
     } catch (error) {
       console.error("Error saving settings:", error);
       alert("Помилка збереження налаштувань: " + error.message);
+      this.isEditingSettings = false;
     }
   }
 
