@@ -280,10 +280,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const roomType = document.getElementById("room-type").value;
     const roomPassword = document.getElementById("room-password").value;
-    const roundTime = document.getElementById("round-time").value;
-    const startingMoney = document.getElementById("starting-money").value;
-    const roundIncome = document.getElementById("round-income").value;
-    const maxUnitLimit = document.getElementById("max-unit-limit").value;
 
     // Validate password for private room
     if (roomType === "private" && !roomPassword.trim()) {
@@ -293,14 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    createRoom(
-      roomType,
-      roomPassword,
-      roundTime,
-      startingMoney,
-      roundIncome,
-      maxUnitLimit
-    );
+    createRoom(roomType, roomPassword);
   });
 
   // Helper functions
@@ -408,14 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  function createRoom(
-    roomType,
-    roomPassword,
-    roundTime,
-    startingMoney,
-    roundIncome,
-    maxUnitLimit
-  ) {
+  function createRoom(roomType, roomPassword) {
     // Clear any previous errors
     document.getElementById("room-password-error").style.display = "none";
 
@@ -437,14 +419,10 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }
 
-        // Create room with parameters
+        // Create room with only type and password (all other settings will be defaults)
         const roomData = {
           action: "create_room",
           room_type: roomType,
-          round_time: parseInt(roundTime),
-          starting_money: parseInt(startingMoney),
-          round_income: parseInt(roundIncome),
-          max_unit_limit: parseInt(maxUnitLimit),
         };
 
         // Add password if room is private

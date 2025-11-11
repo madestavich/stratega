@@ -164,20 +164,18 @@ function createRoom($data) {
     
     $room_type = $data['room_type'] ?? 'public';
     $password = isset($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
-    $round_time = $data['round_time'] ?? 45; // Default 45 seconds
+    
+    // Fixed default values - all settings will be configured in lobby
+    $round_time = 45; // 45 seconds
+    $starting_money = 1000; // 1000 gold
+    $round_income = 200; // 200 gold per round
+    $max_unit_limit = 40; // 40 units max
+    $game_mode = 'all_races'; // All races available by default
     
     $game_status = 'waiting';
     
-    // Game economy settings with defaults
-    $starting_money = $data['starting_money'] ?? 1000;
-    $round_income = $data['round_income'] ?? 200;
-    $max_unit_limit = $data['max_unit_limit'] ?? 20;
-    
-    // New lobby settings
-    $game_mode = $data['game_mode'] ?? 'all_races'; // Default to all_races mode
-    
     // Debug logging
-    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit, game_mode=$game_mode");
+    error_log("Creating room with defaults: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit, game_mode=$game_mode");
     
     $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income, game_mode, host_ready, guest_ready) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, 0, 0)");
     
