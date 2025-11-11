@@ -152,10 +152,18 @@ class GameManager {
         ? roomSettings.player1_race
         : roomSettings.player2_race;
 
+      console.log(
+        `Classic mode - isRoomCreator: ${this.isRoomCreator}, player1_race: ${roomSettings.player1_race}, player2_race: ${roomSettings.player2_race}, selected race: ${playerRace}`
+      );
+
       if (!playerRace) {
         console.warn("Race not selected in classic mode, defaulting to 'all'");
         playerRace = "all";
+      } else {
+        console.log(`Player race set to: ${playerRace}`);
       }
+    } else {
+      console.log(`All races mode - player can use any race`);
     }
 
     // Create player with correct team based on room role
