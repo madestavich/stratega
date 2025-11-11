@@ -6,7 +6,9 @@
 
 body {
   font-family: "Arial", sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: url("../textures/Marble-dark.png");
+  background-size: cover;
+  background-attachment: fixed;
   color: #fff;
   min-height: 100vh;
   display: flex;
@@ -18,29 +20,51 @@ body {
 .lobby-container {
   width: 100%;
   max-width: 1400px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 30px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
+  background: url("../textures/Leather-middle.png");
+  background-size: cover;
+  border-radius: 0;
+  border: 12px solid transparent;
+  border-image: url("../textures/Border-gold.png") 30 round;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  position: relative;
+}
+
+.lobby-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lobby-container > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Header */
 .lobby-header {
   text-align: center;
   margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  background: url("../textures/Leather-red-dark.png");
+  background-size: cover;
+  border: 8px solid transparent;
+  border-image: url("../textures/Border-gold.png") 20 round;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .lobby-header h1 {
   font-size: 2.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5);
   margin-bottom: 10px;
+  font-weight: bold;
 }
 
 .room-info {
@@ -48,7 +72,8 @@ body {
   justify-content: center;
   gap: 30px;
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #f0e68c;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Content Layout */
@@ -60,17 +85,39 @@ body {
 }
 
 .lobby-section {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 15px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: url("../textures/Leather-blue.png");
+  background-size: cover;
+  border: 8px solid transparent;
+  border-image: url("../textures/Border-blue.png") 20 round;
+  padding: 25px;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.lobby-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lobby-section > * {
+  position: relative;
+  z-index: 1;
 }
 
 .lobby-section h2 {
   font-size: 1.5rem;
   margin-bottom: 20px;
-  color: #667eea;
+  color: #ffd700;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-weight: bold;
 }
 
 /* Players Section */
@@ -81,24 +128,45 @@ body {
 }
 
 .player-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: url("../textures/Leather-red-light.png");
+  background-size: cover;
+  border: 6px solid transparent;
+  border-image: url("../textures/Border-small.png") 15 round;
   padding: 15px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.player-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.player-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .player-card.host-card {
-  border-color: rgba(255, 215, 0, 0.3);
+  border-image: url("../textures/Border-gold.png") 15 round;
 }
 
 .player-card.guest-card {
-  border-color: rgba(100, 149, 237, 0.3);
+  border-image: url("../textures/Border-blue.png") 15 round;
 }
 
 .player-card.ready {
-  border-color: rgba(46, 213, 115, 0.6);
-  background: rgba(46, 213, 115, 0.1);
+  background: url("../textures/Leather-middle-brightened.png");
+  background-size: cover;
+  box-shadow: 0 0 20px rgba(46, 213, 115, 0.6), 0 4px 8px rgba(0, 0, 0, 0.6);
 }
 
 .player-header {
@@ -111,7 +179,8 @@ body {
 .player-role {
   font-size: 0.9rem;
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffd700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .ready-indicator {
@@ -131,8 +200,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
+  background: url("../textures/Leather-extra-dark.png");
+  background-size: cover;
+  border: 4px solid transparent;
+  border-image: url("../textures/Border-small.png") 10 round;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
 .player-details {
@@ -143,11 +215,14 @@ body {
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 5px;
+  color: #f0e68c;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .player-race {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: #d4af37;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Settings Section */
@@ -165,31 +240,33 @@ body {
 
 .setting-group label {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #f0e68c;
   font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .setting-input,
 .setting-slider {
   padding: 10px 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #fff;
+  background: url("../textures/Leather-extra-dark.png");
+  background-size: cover;
+  border: 4px solid transparent;
+  border-image: url("../textures/Border-small.png") 10 round;
+  color: #f0e68c;
   font-size: 1rem;
   outline: none;
   transition: all 0.3s ease;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
 .setting-input:hover,
 .setting-input:focus {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #667eea;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.4);
 }
 
 .setting-input option {
   background: #1a1a2e;
-  color: #fff;
+  color: #f0e68c;
 }
 
 .setting-input:disabled,
@@ -200,53 +277,61 @@ body {
 
 .setting-slider {
   padding: 0;
-  height: 8px;
+  height: 12px;
   -webkit-appearance: none;
   appearance: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: url("../textures/Leather-extra-dark.png");
+  background-size: cover;
   outline: none;
-  border-radius: 5px;
+  border: 4px solid transparent;
+  border-image: url("../textures/Border-small.png") 10 round;
 }
 
 .setting-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #667eea;
+  width: 24px;
+  height: 24px;
+  background: url("../textures/Leather-red-medium.png");
+  background-size: cover;
   cursor: pointer;
-  border-radius: 50%;
+  border: 3px solid #ffd700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
   transition: all 0.3s ease;
 }
 
 .setting-slider::-webkit-slider-thumb:hover {
-  background: #764ba2;
   transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
 }
 
 .setting-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: #667eea;
+  width: 24px;
+  height: 24px;
+  background: url("../textures/Leather-red-medium.png");
+  background-size: cover;
   cursor: pointer;
-  border-radius: 50%;
-  border: none;
+  border: 3px solid #ffd700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
   transition: all 0.3s ease;
 }
 
 .setting-slider::-moz-range-thumb:hover {
-  background: #764ba2;
   transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
 }
 
 .info-message {
   padding: 12px;
-  background: rgba(255, 193, 7, 0.1);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 8px;
-  color: #ffc107;
+  background: url("../textures/Leather-red-dark-darker.png");
+  background-size: cover;
+  border: 4px solid transparent;
+  border-image: url("../textures/Border-gold.png") 10 round;
+  color: #ffd700;
   text-align: center;
   font-size: 0.9rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
 /* Race Section */
@@ -257,25 +342,52 @@ body {
 }
 
 .race-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  background: url("../textures/Leather-red-light-stronger.png");
+  background-size: cover;
+  border: 6px solid transparent;
+  border-image: url("../textures/Border-small.png") 15 round;
   padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.race-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 0;
+  transition: all 0.3s ease;
+}
+
+.race-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.race-card:hover::before {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .race-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #667eea;
   transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 .race-card.selected {
-  background: rgba(102, 126, 234, 0.2);
-  border-color: #667eea;
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+  border-image: url("../textures/Border-gold.png") 15 round;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+.race-card.selected::before {
+  background: rgba(255, 215, 0, 0.2);
 }
 
 .race-card.disabled {
@@ -293,6 +405,8 @@ body {
   font-size: 1rem;
   font-weight: bold;
   text-transform: capitalize;
+  color: #f0e68c;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Footer Controls */
@@ -300,29 +414,37 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20px;
-  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  margin-top: 20px;
+  background: url("../textures/Leather-red-dark.png");
+  background-size: cover;
+  border: 8px solid transparent;
+  border-image: url("../textures/Border-gold.png") 20 round;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
 }
 
 .control-button {
   padding: 15px 40px;
   font-size: 1.1rem;
   font-weight: bold;
-  border: none;
-  border-radius: 10px;
+  border: 6px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  background-size: cover;
+  color: #fff;
 }
 
 .leave-button {
-  background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
-  color: #fff;
+  background: url("../textures/Leather-red-dark-darker.png");
+  background-size: cover;
+  border-image: url("../textures/Border-small.png") 15 round;
 }
 
 .leave-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 107, 107, 0.4);
 }
 
 .ready-controls {
@@ -331,27 +453,34 @@ body {
 }
 
 .ready-button {
-  background: linear-gradient(135deg, #51cf66 0%, #2b8a3e 100%);
-  color: #fff;
+  background: url("../textures/Leather-middle-brightened.png");
+  background-size: cover;
+  border-image: url("../textures/Border-blue.png") 15 round;
+  color: #e0ffe0;
 }
 
 .ready-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(81, 207, 102, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(81, 207, 102, 0.4);
 }
 
 .ready-button.active {
-  background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+  background: url("../textures/Leather-red-medium.png");
+  background-size: cover;
+  border-image: url("../textures/Border-gold.png") 15 round;
+  color: #ffe0a0;
 }
 
 .start-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  background: url("../textures/Leather-blue.png");
+  background-size: cover;
+  border-image: url("../textures/Border-gold.png") 15 round;
+  color: #ffd700;
 }
 
 .start-button:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.6);
 }
 
 .start-button:disabled {
@@ -367,22 +496,23 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: url("../textures/Shroud.png");
+  background-size: cover;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(5px);
 }
 
 .loading-spinner {
   width: 60px;
   height: 60px;
-  border: 5px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #667eea;
+  border: 5px solid rgba(255, 215, 0, 0.2);
+  border-top-color: #ffd700;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 @keyframes spin {
@@ -394,7 +524,9 @@ body {
 .loading-text {
   margin-top: 20px;
   font-size: 1.2rem;
-  color: #fff;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5);
+  font-weight: bold;
 }
 
 /* Responsive */
