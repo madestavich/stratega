@@ -88,7 +88,7 @@ class LobbyManager {
       }
 
       this.lobbyState = data;
-      this.updateUI();
+      await this.updateUI();
 
       // Check if game has started
       if (data.game_status === "in_progress") {
