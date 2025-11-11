@@ -378,6 +378,8 @@ class LobbyManager {
         max_unit_limit: parseInt(this.elements.maxUnitLimit.value),
       };
 
+      console.log("Saving settings to DB:", settings);
+
       const response = await fetch("../server/room.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -386,6 +388,7 @@ class LobbyManager {
       });
 
       const data = await response.json();
+      console.log("Save settings response:", data);
 
       if (!data.success) {
         throw new Error(data.error);
@@ -393,6 +396,7 @@ class LobbyManager {
 
       // Settings saved successfully, allow updates again
       this.isEditingSettings = false;
+      console.log("Settings saved successfully to DB");
     } catch (error) {
       console.error("Error saving settings:", error);
       alert("Помилка збереження налаштувань: " + error.message);

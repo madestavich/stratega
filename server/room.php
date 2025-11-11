@@ -986,6 +986,8 @@ function updateRoomSettings($data) {
     $user_id = $_SESSION['user_id'];
     $room_id = $data['room_id'] ?? 0;
     
+    error_log("updateRoomSettings called: user_id=$user_id, room_id=$room_id, data=" . json_encode($data));
+    
     // Check if user is the host
     $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND creator_id = ?");
     $stmt->bind_param("ii", $room_id, $user_id);
@@ -994,6 +996,7 @@ function updateRoomSettings($data) {
     $room = $result->fetch_assoc();
     
     if (!$room) {
+        error_log("updateRoomSettings failed: User $user_id is not host of room $room_id");
         throw new Exception('Тільки хост може змінювати налаштування');
     }
     
@@ -1004,15 +1007,19 @@ function updateRoomSettings($data) {
     $round_income = $data['round_income'] ?? $room['round_income'];
     $max_unit_limit = $data['max_unit_limit'] ?? $room['max_unit_limit'];
     
+    error_log("updateRoomSettings values: game_mode=$game_mode, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit");
+    
     $stmt = $conn->prepare("UPDATE game_rooms SET game_mode = ?, round_time = ?, player1_money = ?, player2_money = ?, round_income = ?, max_unit_limit = ? WHERE id = ?");
     $stmt->bind_param("siiiiii", $game_mode, $round_time, $starting_money, $starting_money, $round_income, $max_unit_limit, $room_id);
     
     if ($stmt->execute()) {
+        error_log("updateRoomSettings success: Room $room_id updated");
         echo json_encode([
             'success' => true,
             'message' => 'Налаштування оновлено'
         ]);
     } else {
+        error_log("updateRoomSettings SQL error: " . $stmt->error);
         throw new Exception('Помилка оновлення налаштувань');
     }
 }
