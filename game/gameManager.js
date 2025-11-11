@@ -134,11 +134,18 @@ class GameManager {
       );
 
       // Після визначення ролі гравця оновлюємо напрямок погляду для всіх юнітів
-      for (const unit of this.objectManager.objects) {
-        unit.setLookDirectionByTeam();
-      }
-      for (const unit of this.objectManager.enemyObjects) {
-        unit.setLookDirectionByTeam();
+      try {
+        console.log("START: About to update look direction for objects, count:", this.objectManager.objects.length);
+        for (const unit of this.objectManager.objects) {
+          unit.setLookDirectionByTeam();
+        }
+        console.log("START: About to update look direction for enemyObjects, count:", this.objectManager.enemyObjects.length);
+        for (const unit of this.objectManager.enemyObjects) {
+          unit.setLookDirectionByTeam();
+        }
+        console.log("START: Look direction update completed");
+      } catch (error) {
+        console.error("START: Error updating look direction:", error);
       }
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
