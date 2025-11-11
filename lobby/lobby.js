@@ -48,10 +48,10 @@ class LobbyManager {
     this.showLoading(true);
 
     try {
-      // Load initial lobby state
+      // Load initial lobby state (this will determine user role)
       await this.loadLobbyState();
 
-      // Setup event listeners
+      // Setup event listeners AFTER role is determined
       this.setupEventListeners();
 
       // Start polling
@@ -281,8 +281,16 @@ class LobbyManager {
   }
 
   setupEventListeners() {
+    console.log("Setting up event listeners, isHost:", this.isHost);
+
+    // Slider update for everyone (visual feedback)
+    this.elements.maxUnitLimit.addEventListener("input", (e) => {
+      this.elements.unitLimitValue.textContent = e.target.value;
+    });
+
     // Settings changes (only for host)
     if (this.isHost) {
+      console.log("Adding host-only event listeners");
       this.elements.gameMode.addEventListener("change", () =>
         this.saveSettings()
       );
@@ -295,9 +303,6 @@ class LobbyManager {
       this.elements.roundIncome.addEventListener("change", () =>
         this.saveSettings()
       );
-      this.elements.maxUnitLimit.addEventListener("input", (e) => {
-        this.elements.unitLimitValue.textContent = e.target.value;
-      });
       this.elements.maxUnitLimit.addEventListener("change", () =>
         this.saveSettings()
       );
