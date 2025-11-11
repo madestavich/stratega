@@ -179,10 +179,16 @@ function createRoom($data) {
     // Debug logging
     error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit, game_mode=$game_mode");
     
-    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income, game_mode, host_ready, guest_ready) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, 0, 0)");
+    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income, game_mode, host_ready, guest_ready) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, 0, 0)");
+    
+    if (!$stmt) {
+        error_log("MySQL prepare error: " . $conn->error);
+        throw new Exception('Помилка підготовки SQL запиту: ' . $conn->error);
+    }
+    
     // Types: i=integer, s=string
     // Параметри: creator_id(i), room_type(s), password(s), game_status(s), round_time(i), player1_money(i), player2_money(i), max_unit_limit(i), round_income(i), game_mode(s)
-    $stmt->bind_param("isssiiiis", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income, $game_mode);
+    $stmt->bind_param("isssiiiiis", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income, $game_mode);
     
     if ($stmt->execute()) {
         $room_id = $conn->insert_id;
