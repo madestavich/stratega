@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Лоббі - Stratega</title>
+    <link rel="stylesheet" href="lobby.css" />
+  </head>
+  <body>
+    <div class="lobby-container">
+      <!-- Header -->
+      <div class="lobby-header">
+        <h1>Лоббі Гри</h1>
+        <div class="room-info">
+          <span id="room-id">ID: -</span>
+          <span id="room-type">Тип: -</span>
+        </div>
+      </div>
+
+      <div class="lobby-content">
+        <!-- Left Panel: Players -->
+        <div class="lobby-section players-section">
+          <h2>Гравці</h2>
+          <div class="players-list">
+            <!-- Host Player -->
+            <div class="player-card host-card">
+              <div class="player-header">
+                <span class="player-role">👑 Хост</span>
+                <span id="host-ready" class="ready-indicator">⏳</span>
+              </div>
+              <div class="player-info">
+                <div class="player-avatar">🎮</div>
+                <div class="player-details">
+                  <div id="host-username" class="player-username">
+                    Завантаження...
+                  </div>
+                  <div id="host-race" class="player-race">Раса: -</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guest Player -->
+            <div class="player-card guest-card">
+              <div class="player-header">
+                <span class="player-role">⚔️ Гість</span>
+                <span id="guest-ready" class="ready-indicator">⏳</span>
+              </div>
+              <div class="player-info">
+                <div class="player-avatar">🎮</div>
+                <div class="player-details">
+                  <div id="guest-username" class="player-username">
+                    Очікування гравця...
+                  </div>
+                  <div id="guest-race" class="player-race">Раса: -</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Panel: Settings -->
+        <div class="lobby-section settings-section">
+          <h2>Налаштування Гри</h2>
+          <div class="settings-form">
+            <!-- Game Mode -->
+            <div class="setting-group">
+              <label for="game-mode">Режим гри:</label>
+              <select id="game-mode" class="setting-input">
+                <option value="all_races">Всі раси</option>
+                <option value="classic">Класичний (вибір раси)</option>
+              </select>
+            </div>
+
+            <!-- Round Time -->
+            <div class="setting-group">
+              <label for="round-time">Час раунду:</label>
+              <select id="round-time" class="setting-input">
+                <option value="30">30 секунд</option>
+                <option value="45">45 секунд</option>
+                <option value="60">60 секунд</option>
+              </select>
+            </div>
+
+            <!-- Starting Money -->
+            <div class="setting-group">
+              <label for="starting-money">Стартові гроші:</label>
+              <select id="starting-money" class="setting-input">
+                <option value="500">500 золота</option>
+                <option value="1000">1000 золота</option>
+                <option value="1500">1500 золота</option>
+                <option value="2000">2000 золота</option>
+                <option value="3000">3000 золота</option>
+              </select>
+            </div>
+
+            <!-- Round Income -->
+            <div class="setting-group">
+              <label for="round-income">Дохід за раунд:</label>
+              <select id="round-income" class="setting-input">
+                <option value="0">Без доходу</option>
+                <option value="100">100 золота</option>
+                <option value="200">200 золота</option>
+                <option value="300">300 золота</option>
+                <option value="500">500 золота</option>
+              </select>
+            </div>
+
+            <!-- Max Unit Limit -->
+            <div class="setting-group">
+              <label for="max-unit-limit"
+                >Максимум юнітів: <span id="unit-limit-value">40</span></label
+              >
+              <input
+                type="range"
+                id="max-unit-limit"
+                class="setting-slider"
+                min="20"
+                max="300"
+                value="40"
+                step="10"
+              />
+            </div>
+
+            <div
+              id="settings-locked-message"
+              class="info-message"
+              style="display: none"
+            >
+              <small>⚠️ Тільки хост може змінювати налаштування</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Race Selection -->
+        <div class="lobby-section race-section">
+          <h2>Вибір Раси</h2>
+          <div id="race-selection-container">
+            <div
+              id="race-selection-disabled"
+              class="info-message"
+              style="display: none"
+            >
+              Режим "Всі раси" - вибір раси недоступний
+            </div>
+            <div id="race-grid" class="race-grid">
+              <!-- Races will be added dynamically -->
+              <div class="race-card" data-race="castle">
+                <div class="race-icon">🏰</div>
+                <div class="race-name">Castle</div>
+              </div>
+              <div class="race-card" data-race="rampart">
+                <div class="race-icon">🌲</div>
+                <div class="race-name">Rampart</div>
+              </div>
+              <div class="race-card" data-race="necropolis">
+                <div class="race-icon">💀</div>
+                <div class="race-name">Necropolis</div>
+              </div>
+              <div class="race-card" data-race="dungeon">
+                <div class="race-icon">🐉</div>
+                <div class="race-name">Dungeon</div>
+              </div>
+              <div class="race-card" data-race="conflux">
+                <div class="race-icon">⚡</div>
+                <div class="race-name">Conflux</div>
+              </div>
+              <div class="race-card" data-race="fortress">
+                <div class="race-icon">🏔️</div>
+                <div class="race-name">Fortress</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer: Control Buttons -->
+      <div class="lobby-footer">
+        <button id="leave-button" class="control-button leave-button">
+          ❌ Покинути кімнату
+        </button>
+
+        <div class="ready-controls">
+          <button id="ready-button" class="control-button ready-button">
+            ✓ Готовий
+          </button>
+          <button
+            id="start-button"
+            class="control-button start-button"
+            style="display: none"
+            disabled
+          >
+            🚀 Запустити гру
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Завантаження...</div>
+    </div>
+
+    <script src="lobby.js"></script>
+  </body>
+</html>

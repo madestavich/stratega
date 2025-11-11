@@ -513,8 +513,17 @@ document.addEventListener("DOMContentLoaded", function () {
           data.rooms.forEach((room) => {
             const roomTypeText =
               room.room_type === "private" ? "🔒 Приватна" : "🌐 Публічна";
-            const statusText =
-              room.game_status === "waiting" ? "Очікування" : "В грі";
+
+            // Оновлена логіка статусу
+            let statusText = "";
+            if (room.game_status === "waiting") {
+              statusText = "Очікування";
+            } else if (room.game_status === "in_progress") {
+              statusText = "В грі";
+            } else if (room.game_status === "finished") {
+              statusText = "Завершено";
+            }
+
             const playerCount = room.second_player_name ? "2/2" : "1/2";
 
             roomsHTML += `

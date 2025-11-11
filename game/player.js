@@ -5,15 +5,19 @@ export class Player {
     this.team = config.team;
     this.coins = config.coins || 100;
 
-    // Resource management
-    this.money;
-    this.unitLimit; // Current number of units
-    this.maxUnitLimit; // Maximum allowed units
-    this.roundIncome = 0; // Income per round
+    // Resource management - initialize with room settings or defaults
+    this.money = config.startingMoney || 1000;
+    this.unitLimit = 0; // Current number of units (will be loaded from DB)
+    this.maxUnitLimit = config.maxUnitLimit || 40; // Maximum allowed units
+    this.roundIncome = config.roundIncome || 200; // Income per round
 
     // Reference to gameManager for DB operations
     this.gameManager = config.gameManager || null;
     this.roomId = config.roomId || null;
+
+    console.log(
+      `Player initialized with: money=${this.money}, maxUnitLimit=${this.maxUnitLimit}, roundIncome=${this.roundIncome}`
+    );
   }
 
   // Initialize player resources from database
@@ -26,7 +30,7 @@ export class Player {
     }
 
     try {
-      // Load money
+      // Load money (use DB value if exists, otherwise keep constructor value)
       const moneyResponse = await fetch(
         "../server/room.php?action=get_player_money",
         {
@@ -36,11 +40,12 @@ export class Player {
         }
       );
       const moneyData = await moneyResponse.json();
-      if (moneyData.success) {
-        this.money = moneyData.money || 0;
+      if (moneyData.success && moneyData.money !== undefined) {
+        // Only override if DB has a value
+        this.money = moneyData.money;
       }
 
-      // Load unit limit
+      // Load unit limit (current units placed)
       const limitResponse = await fetch(
         "../server/room.php?action=get_player_unit_limit",
         {
@@ -54,7 +59,8 @@ export class Player {
         this.unitLimit = limitData.unit_limit || 0;
       }
 
-      // Load max unit limit
+      // Max unit limit already set from constructor (room settings),
+      // but verify with DB to ensure consistency
       const maxLimitResponse = await fetch(
         "../server/room.php?action=get_max_unit_limit",
         {
@@ -64,11 +70,12 @@ export class Player {
         }
       );
       const maxLimitData = await maxLimitResponse.json();
-      if (maxLimitData.success) {
-        this.maxUnitLimit = maxLimitData.max_unit_limit || 0;
+      if (maxLimitData.success && maxLimitData.max_unit_limit) {
+        this.maxUnitLimit = maxLimitData.max_unit_limit;
       }
 
-      // Load round income
+      // Round income already set from constructor (room settings),
+      // but verify with DB to ensure consistency
       const incomeResponse = await fetch(
         "../server/room.php?action=get_round_income",
         {
@@ -78,8 +85,8 @@ export class Player {
         }
       );
       const incomeData = await incomeResponse.json();
-      if (incomeData.success) {
-        this.roundIncome = incomeData.round_income || 0;
+      if (incomeData.success && incomeData.round_income !== undefined) {
+        this.roundIncome = incomeData.round_income;
       }
 
       console.log(

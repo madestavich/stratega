@@ -116,6 +116,25 @@ try {
         case 'get_round_income':
             getRoundIncome($input);
             break;
+        // New lobby endpoints
+        case 'update_room_settings':
+            updateRoomSettings($input);
+            break;
+        case 'select_race':
+            selectRace($input);
+            break;
+        case 'toggle_ready_lobby':
+            toggleReadyLobby($input);
+            break;
+        case 'start_game_from_lobby':
+            startGameFromLobby($input);
+            break;
+        case 'get_lobby_state':
+            getLobbyState($input);
+            break;
+        case 'leave_room':
+            leaveRoom($input);
+            break;
         default:
             throw new Exception('Невідома дія');
     }
@@ -154,13 +173,16 @@ function createRoom($data) {
     $round_income = $data['round_income'] ?? 200;
     $max_unit_limit = $data['max_unit_limit'] ?? 20;
     
-    // Debug logging
-    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit");
+    // New lobby settings
+    $game_mode = $data['game_mode'] ?? 'all_races'; // Default to all_races mode
     
-    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?)");
+    // Debug logging
+    error_log("Creating room with: creator_id=$creator_id, room_type=$room_type, round_time=$round_time, starting_money=$starting_money, round_income=$round_income, max_unit_limit=$max_unit_limit, game_mode=$game_mode");
+    
+    $stmt = $conn->prepare("INSERT INTO game_rooms (creator_id, created_at, room_type, password, game_status, round_time, player1_money, player2_money, player1_unit_limit, player2_unit_limit, max_unit_limit, round_income, game_mode, host_ready, guest_ready) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, 0, 0)");
     // Types: i=integer, s=string
-    // Параметри: creator_id(i), room_type(s), password(s), game_status(s), round_time(i), player1_money(i), player2_money(i), max_unit_limit(i), round_income(i)
-    $stmt->bind_param("isssiiiii", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income);
+    // Параметри: creator_id(i), room_type(s), password(s), game_status(s), round_time(i), player1_money(i), player2_money(i), max_unit_limit(i), round_income(i), game_mode(s)
+    $stmt->bind_param("isssiiiis", $creator_id, $room_type, $password, $game_status, $round_time, $starting_money, $starting_money, $max_unit_limit, $round_income, $game_mode);
     
     if ($stmt->execute()) {
         $room_id = $conn->insert_id;
@@ -168,7 +190,7 @@ function createRoom($data) {
             'success' => true,
             'room_id' => $room_id,
             'message' => 'Кімнату створено успішно',
-            'redirect' => 'game/game.html'
+            'redirect' => 'lobby/lobby.html?room_id=' . $room_id
         ]);
     } else {
         throw new Exception('Помилка створення кімнати');
@@ -216,15 +238,15 @@ function joinRoom($data) {
         throw new Exception('Невірний пароль');
     }
     
-    // Приєднуємо гравця до кімнати
-    $stmt = $conn->prepare("UPDATE game_rooms SET second_player_id = ?, game_status = 'in_progress' WHERE id = ?");
+    // Приєднуємо гравця до кімнати (статус залишається 'waiting' для лоббі)
+    $stmt = $conn->prepare("UPDATE game_rooms SET second_player_id = ? WHERE id = ?");
     $stmt->bind_param("ii", $user_id, $room_id);
     
     if ($stmt->execute()) {
         echo json_encode([
             'success' => true,
             'message' => 'Успішно приєдналися до кімнати',
-            'redirect' => 'game/game.html'
+            'redirect' => 'lobby/lobby.html?room_id=' . $room_id
         ]);
     } else {
         throw new Exception('Помилка приєднання до кімнати');
@@ -946,4 +968,296 @@ function getRoundIncome($data) {
         'round_income' => $room['round_income'] ?? 0
     ]);
 }
+
+// ========== NEW LOBBY FUNCTIONS ==========
+
+// Update room settings (only host can update)
+function updateRoomSettings($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Check if user is the host
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND creator_id = ?");
+    $stmt->bind_param("ii", $room_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Тільки хост може змінювати налаштування');
+    }
+    
+    // Update settings
+    $game_mode = $data['game_mode'] ?? $room['game_mode'];
+    $round_time = $data['round_time'] ?? $room['round_time'];
+    $starting_money = $data['starting_money'] ?? $room['player1_money'];
+    $round_income = $data['round_income'] ?? $room['round_income'];
+    $max_unit_limit = $data['max_unit_limit'] ?? $room['max_unit_limit'];
+    
+    $stmt = $conn->prepare("UPDATE game_rooms SET game_mode = ?, round_time = ?, player1_money = ?, player2_money = ?, round_income = ?, max_unit_limit = ? WHERE id = ?");
+    $stmt->bind_param("siiiiii", $game_mode, $round_time, $starting_money, $starting_money, $round_income, $max_unit_limit, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Налаштування оновлено'
+        ]);
+    } else {
+        throw new Exception('Помилка оновлення налаштувань');
+    }
+}
+
+// Select race for player
+function selectRace($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    $race = $data['race'] ?? null;
+    
+    // Get room and determine player role
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Check if game mode allows race selection
+    if ($room['game_mode'] === 'all_races') {
+        throw new Exception('В режимі "Всі раси" вибір раси недоступний');
+    }
+    
+    // Determine which player field to update
+    $race_field = ($room['creator_id'] == $user_id) ? 'player1_race' : 'player2_race';
+    
+    // Update race
+    $stmt = $conn->prepare("UPDATE game_rooms SET $race_field = ? WHERE id = ?");
+    $stmt->bind_param("si", $race, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Расу обрано'
+        ]);
+    } else {
+        throw new Exception('Помилка вибору раси');
+    }
+}
+
+// Toggle ready status in lobby
+function toggleReadyLobby($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    $ready = $data['ready'] ?? false;
+    
+    // Get room and determine player role
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Check race selection if classic mode
+    if ($room['game_mode'] === 'classic') {
+        $race_field = ($room['creator_id'] == $user_id) ? 'player1_race' : 'player2_race';
+        if (empty($room[$race_field]) && $ready) {
+            throw new Exception('Спочатку оберіть расу');
+        }
+    }
+    
+    // Determine which ready field to update
+    $ready_field = ($room['creator_id'] == $user_id) ? 'host_ready' : 'guest_ready';
+    $ready_value = $ready ? 1 : 0;
+    
+    // Update ready status
+    $stmt = $conn->prepare("UPDATE game_rooms SET $ready_field = ? WHERE id = ?");
+    $stmt->bind_param("ii", $ready_value, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'ready' => $ready
+        ]);
+    } else {
+        throw new Exception('Помилка зміни статусу готовності');
+    }
+}
+
+// Start game from lobby (only host)
+function startGameFromLobby($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Check if user is the host
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND creator_id = ?");
+    $stmt->bind_param("ii", $room_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Тільки хост може запустити гру');
+    }
+    
+    // Check if both players are ready
+    if ($room['host_ready'] != 1 || $room['guest_ready'] != 1) {
+        throw new Exception('Обидва гравці повинні бути готові');
+    }
+    
+    // Check if second player joined
+    if (!$room['second_player_id']) {
+        throw new Exception('Очікується другий гравець');
+    }
+    
+    // Change status to 'in_progress'
+    $stmt = $conn->prepare("UPDATE game_rooms SET game_status = 'in_progress' WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Гру запущено'
+        ]);
+    } else {
+        throw new Exception('Помилка запуску гри');
+    }
+}
+
+// Get lobby state (for polling)
+function getLobbyState($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get full room info with player usernames
+    $stmt = $conn->prepare("
+        SELECT 
+            gr.*,
+            u1.username as host_username,
+            u2.username as guest_username
+        FROM game_rooms gr
+        LEFT JOIN users u1 ON gr.creator_id = u1.id
+        LEFT JOIN users u2 ON gr.second_player_id = u2.id
+        WHERE gr.id = ? AND (gr.creator_id = ? OR gr.second_player_id = ?)
+    ");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Build response
+    $response = [
+        'success' => true,
+        'game_status' => $room['game_status'],
+        'players' => [
+            'host' => [
+                'id' => $room['creator_id'],
+                'username' => $room['host_username'],
+                'ready' => (bool)$room['host_ready'],
+                'race' => $room['player1_race']
+            ],
+            'guest' => $room['second_player_id'] ? [
+                'id' => $room['second_player_id'],
+                'username' => $room['guest_username'],
+                'ready' => (bool)$room['guest_ready'],
+                'race' => $room['player2_race']
+            ] : null
+        ],
+        'settings' => [
+            'game_mode' => $room['game_mode'],
+            'room_type' => $room['room_type'],
+            'round_time' => $room['round_time'],
+            'starting_money' => $room['player1_money'],
+            'round_income' => $room['round_income'],
+            'max_unit_limit' => $room['max_unit_limit']
+        ]
+    ];
+    
+    echo json_encode($response);
+}
+
+// Leave room
+function leaveRoom($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room
+    $stmt = $conn->prepare("SELECT * FROM game_rooms WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    $stmt->bind_param("iii", $room_id, $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // If user is host, delete the room
+    if ($room['creator_id'] == $user_id) {
+        $stmt = $conn->prepare("DELETE FROM game_rooms WHERE id = ?");
+        $stmt->bind_param("i", $room_id);
+        $stmt->execute();
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Кімнату видалено'
+        ]);
+    } else {
+        // If user is guest, just remove them from room
+        $stmt = $conn->prepare("UPDATE game_rooms SET second_player_id = NULL, guest_ready = 0, player2_race = NULL WHERE id = ?");
+        $stmt->bind_param("i", $room_id);
+        $stmt->execute();
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Ви покинули кімнату'
+        ]);
+    }
+}
+
 

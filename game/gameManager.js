@@ -140,25 +140,51 @@ class GameManager {
       console.log("DEBUG: roomInfo is null/undefined");
     }
 
+    // Load room settings from lobby
+    const roomSettings = await this.getRoomSettings();
+    console.log("Room settings loaded:", roomSettings);
+
+    // Determine player race based on game mode
+    let playerRace = "all"; // Default
+    if (roomSettings.game_mode === "classic") {
+      // Get race from room settings
+      playerRace = this.isRoomCreator
+        ? roomSettings.player1_race
+        : roomSettings.player2_race;
+
+      if (!playerRace) {
+        console.warn("Race not selected in classic mode, defaulting to 'all'");
+        playerRace = "all";
+      }
+    }
+
     // Create player with correct team based on room role
     const playerTeam = this.isRoomCreator ? 1 : 2;
     this.player = new Player({
       nickname: "Player1",
-      race: "all", // Use one of the races from races.json
+      race: playerRace,
       team: playerTeam,
       coins: 100,
       gameManager: this,
       roomId: roomInfo?.roomId || this.objectManager.currentRoomId,
+      // Pass room settings to player
+      startingMoney: roomSettings.starting_money || 1000,
+      roundIncome: roomSettings.round_income || 200,
+      maxUnitLimit: roomSettings.max_unit_limit || 40,
     });
 
-    console.log(`Player created with team: ${playerTeam}`);
+    console.log(`Player created with team: ${playerTeam}, race: ${playerRace}`);
 
-    // Initialize player resources from database
+    // Initialize player resources from database (will override with DB values if they exist)
     await this.player.initializeResources();
 
     this.interfaceManager.updatePlayerInterface(this.player);
 
-    // Get round duration from server first
+    // Set round duration from room settings
+    this.roundDuration = roomSettings.round_time || 45;
+    console.log(`Round duration set to: ${this.roundDuration} seconds`);
+
+    // Get round duration from server first (for sync)
     await this.getRoundDuration();
 
     // Start round management
@@ -285,6 +311,58 @@ class GameManager {
       this.checkStatusInterval = setInterval(() => {
         this.checkRoundStatus();
       }, 1000);
+    }
+  }
+
+  async getRoomSettings() {
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "get_lobby_state",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        return {
+          game_mode: result.settings.game_mode || "all_races",
+          round_time: result.settings.round_time || 45,
+          starting_money: result.settings.starting_money || 1000,
+          round_income: result.settings.round_income || 200,
+          max_unit_limit: result.settings.max_unit_limit || 40,
+          player1_race: result.players.host?.race || null,
+          player2_race: result.players.guest?.race || null,
+        };
+      } else {
+        console.warn("Failed to load room settings, using defaults");
+        return {
+          game_mode: "all_races",
+          round_time: 45,
+          starting_money: 1000,
+          round_income: 200,
+          max_unit_limit: 40,
+          player1_race: null,
+          player2_race: null,
+        };
+      }
+    } catch (error) {
+      console.error("Error loading room settings:", error);
+      return {
+        game_mode: "all_races",
+        round_time: 45,
+        starting_money: 1000,
+        round_income: 200,
+        max_unit_limit: 40,
+        player1_race: null,
+        player2_race: null,
+      };
     }
   }
 
