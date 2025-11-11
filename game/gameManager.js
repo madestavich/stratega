@@ -117,11 +117,15 @@ class GameManager {
   }
 
   async start() {
+    console.log("START: gameManager.start() called");
     await this.configLoader.loadRacesConfig();
+    console.log("START: racesConfig loaded");
     await this.objectManager.initializeGame();
+    console.log("START: initializeGame completed");
 
     // Determine if current player is room creator
     const roomInfo = await this.objectManager.getCurrentRoomId();
+    console.log("START: roomInfo =", roomInfo);
     if (roomInfo) {
       this.isRoomCreator = roomInfo.isCreator;
       console.log(
@@ -141,6 +145,7 @@ class GameManager {
     }
 
     // Load room settings from lobby
+    console.log("START: About to call getRoomSettings, currentRoomId =", this.objectManager.currentRoomId);
     const roomSettings = await this.getRoomSettings();
     console.log("Room settings loaded:", roomSettings);
 
@@ -323,6 +328,7 @@ class GameManager {
   }
 
   async getRoomSettings() {
+    console.log("getRoomSettings: called with currentRoomId =", this.objectManager.currentRoomId);
     try {
       const response = await fetch("../server/room.php", {
         method: "POST",
@@ -336,10 +342,12 @@ class GameManager {
         }),
       });
 
+      console.log("getRoomSettings: response status =", response.status);
       const result = await response.json();
+      console.log("getRoomSettings: result =", result);
 
       if (result.success) {
-        return {
+        const settings = {
           game_mode: result.settings.game_mode || "all_races",
           round_time: result.settings.round_time || 45,
           starting_money: result.settings.starting_money || 1000,
@@ -348,6 +356,8 @@ class GameManager {
           player1_race: result.players.host?.race || null,
           player2_race: result.players.guest?.race || null,
         };
+        console.log("getRoomSettings: returning settings =", settings);
+        return settings;
       } else {
         console.warn("Failed to load room settings, using defaults");
         return {
