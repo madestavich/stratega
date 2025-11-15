@@ -38,6 +38,7 @@ class GameManager {
     this.battleDisconnected = false;
     this.battleCheckInterval = null;
     this.waitingForBattleEnd = false;
+    this.allowReload = false; // Flag to allow automatic reload
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -78,7 +79,7 @@ class GameManager {
 
     // Prevent page refresh during battle
     window.addEventListener("beforeunload", (e) => {
-      if (!this.isPaused && !this.battleDisconnected) {
+      if (!this.isPaused && !this.battleDisconnected && !this.allowReload) {
         e.preventDefault();
         e.returnValue =
           "Бій активний! Якщо ви оновите сторінку, вам доведеться чекати завершення бою противником.";
@@ -820,10 +821,12 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
-        // Hide modal after 3 seconds and continue to next phase
-        setTimeout(async () => {
+        // Hide modal after 3 seconds and reload page to reset everything
+        setTimeout(() => {
           modal.style.display = "none";
-          await this.startNextRoundPreparation();
+          console.log("Reloading page to start next round...");
+          this.allowReload = true; // Allow reload without warning
+          window.location.reload();
         }, 3000);
       }
     } catch (error) {
@@ -939,7 +942,7 @@ class GameManager {
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
         this.render();
-        
+
         // Update animations on each render
         const allObjects = [
           ...this.objectManager.objects,
@@ -962,7 +965,7 @@ class GameManager {
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
-      
+
       // Final render
       this.render();
       console.log("Animations and positions fully updated");
