@@ -39,6 +39,9 @@ class GameManager {
     this.battleCheckInterval = null;
     this.waitingForBattleEnd = false;
 
+    // Flag to allow reload without warning
+    this.allowReload = false;
+
     //! ініціалізація об'єктів і інших менеджерів
 
     this.configLoader = new ConfigLoader();
@@ -78,6 +81,11 @@ class GameManager {
 
     // Prevent page refresh during battle
     window.addEventListener("beforeunload", (e) => {
+      // Allow reload if explicitly permitted (e.g., after round ends)
+      if (this.allowReload) {
+        return;
+      }
+
       if (!this.isPaused && !this.battleDisconnected) {
         e.preventDefault();
         e.returnValue =
@@ -828,10 +836,13 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
-        // Hide modal after 3 seconds and continue to next phase
-        setTimeout(async () => {
+        // Hide modal after 3 seconds and reload page for fresh state
+        setTimeout(() => {
           modal.style.display = "none";
-          await this.startNextRoundPreparation();
+          // Allow reload without warning
+          this.allowReload = true;
+          // Reload page to reset everything to fresh state
+          window.location.reload();
         }, 3000);
       }
     } catch (error) {
