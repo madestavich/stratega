@@ -865,6 +865,13 @@ class GameManager {
           return;
         }
 
+        // Check if we already showed modal for this round
+        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${result.current_round}`;
+        if (localStorage.getItem(storageKey)) {
+          console.log("Winner modal already shown for this round");
+          return;
+        }
+
         // Update modal content
         const modal = document.getElementById("round-winner-modal");
         const roundNumber = document.getElementById("round-number");
@@ -877,12 +884,12 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
+        // Mark that we showed modal for this round
+        localStorage.setItem(storageKey, "true");
+
         // Hide modal after 3 seconds and reload page for fresh state
         setTimeout(async () => {
           modal.style.display = "none";
-
-          // Clear winner to prevent re-showing on reload
-          await this.clearWinner();
 
           // Reset ready status before reload
           await this.resetReadyStatus();
