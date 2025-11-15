@@ -748,19 +748,19 @@ class GameManager {
       `Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`
     );
 
-    // Only the winner should try to record the result
-    if (winnerId === "current_player") {
-      console.log("I won! Recording result in database...");
-      const incrementSuccess = await this.incrementRound(actualWinnerId);
-      if (incrementSuccess) {
+    // Record the result in database
+    console.log("Recording battle result in database...");
+    const incrementSuccess = await this.incrementRound(actualWinnerId);
+
+    if (incrementSuccess) {
+      // Show modal based on who won
+      if (winnerId === "current_player") {
+        console.log("I won! Showing winner modal...");
+        await this.showWinnerModalAndContinue();
+      } else {
+        console.log("I lost. Showing winner modal...");
         await this.showWinnerModalAndContinue();
       }
-    } else {
-      console.log("I lost. Waiting for winner to record result...");
-      // Wait a moment for the winner to record, then show modal
-      setTimeout(async () => {
-        await this.showWinnerModalAndContinue();
-      }, 1000); // Wait 1 second for winner to record result
     }
   }
 
