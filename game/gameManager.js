@@ -201,14 +201,12 @@ class GameManager {
       console.log("DEBUG: roomInfo is null/undefined");
     }
 
-    // Check if we're loading after showing winner
-    const winnerInfoStr = localStorage.getItem(
-      `winner_info_${this.objectManager.currentRoomId}`
+    // Check if we should show winner modal after reload
+    const showWinnerAfterReload = localStorage.getItem(
+      `show_winner_after_reload_${this.objectManager.currentRoomId}`
     );
-    if (winnerInfoStr) {
+    if (showWinnerAfterReload === "true") {
       console.log("Reloading after winner - showing winner modal during load");
-
-      const winnerInfo = JSON.parse(winnerInfoStr);
 
       // Hide loading screen and show winner modal
       const loadingScreen = document.getElementById("loading-screen");
@@ -216,18 +214,22 @@ class GameManager {
         loadingScreen.style.display = "none";
       }
 
-      // Show winner modal with saved data
-      const modal = document.getElementById("round-winner-modal");
-      const roundNumber = document.getElementById("round-number");
-      const winnerNickname = document.getElementById("winner-nickname");
+      // Get fresh winner data from server
+      const winnerInfo = await this.getWinnerInfo();
+      if (winnerInfo && winnerInfo.success) {
+        const modal = document.getElementById("round-winner-modal");
+        const roundNumber = document.getElementById("round-number");
+        const winnerNickname = document.getElementById("winner-nickname");
 
-      roundNumber.textContent = `Раунд ${winnerInfo.round}`;
-      winnerNickname.textContent = winnerInfo.nickname || "Невідомий гравець";
-      modal.style.display = "flex";
+        roundNumber.textContent = `Раунд ${winnerInfo.current_round}`;
+        winnerNickname.textContent =
+          winnerInfo.winner_nickname || "Невідомий гравець";
+        modal.style.display = "flex";
+      }
 
-      // Clear the data
+      // Clear the flag
       localStorage.removeItem(
-        `winner_info_${this.objectManager.currentRoomId}`
+        `show_winner_after_reload_${this.objectManager.currentRoomId}`
       );
     }
 
@@ -318,10 +320,16 @@ class GameManager {
       }, 300);
     }
 
-    // Also hide winner modal if it's visible (after reload from round end)
+    // Smoothly fade out winner modal if it's visible (after reload from round end)
     const winnerModal = document.getElementById("round-winner-modal");
     if (winnerModal && winnerModal.style.display === "flex") {
-      winnerModal.style.display = "none";
+      // Add fade-out class for smooth transition
+      winnerModal.classList.add("fade-out");
+      // Wait for animation to complete, then hide
+      setTimeout(() => {
+        winnerModal.style.display = "none";
+        winnerModal.classList.remove("fade-out");
+      }, 1000); // Match CSS transition duration
     }
 
     // Also hide waiting overlay if it's visible (should be hidden already)
@@ -936,13 +944,10 @@ class GameManager {
         // Mark that we showed modal for this round
         localStorage.setItem(storageKey, "true");
 
-        // Save winner info to show after reload
+        // Save flag to show winner modal after reload (will fetch fresh data from server)
         localStorage.setItem(
-          `winner_info_${this.objectManager.currentRoomId}`,
-          JSON.stringify({
-            round: result.current_round,
-            nickname: result.winner_nickname,
-          })
+          `show_winner_after_reload_${this.objectManager.currentRoomId}`,
+          "true"
         );
 
         // Reset ready status before reload
@@ -1256,15 +1261,21 @@ class GameManager {
     this.waitingForBattleEnd = true;
     this.isPaused = true;
 
-    // Hide loading screen if still visible
-    this.hideLoadingScreen();
+    // Show waiting message first (before hiding loading screen to prevent flash)
+    this.showWaitingForBattleMessage();
+
+    // Then hide loading screen
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) {
+      loadingScreen.classList.add("hidden");
+      setTimeout(() => {
+        loadingScreen.remove();
+      }, 300);
+    }
 
     // Mark current player as not in battle
     console.log("Setting current player as NOT in battle...");
     await this.setBattleState(false);
-
-    // Show waiting message
-    this.showWaitingForBattleMessage();
 
     // Start checking for battle completion
     this.battleCompletionCheckInterval = setInterval(async () => {

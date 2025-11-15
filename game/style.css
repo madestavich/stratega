@@ -473,6 +473,12 @@ canvas {
   justify-content: center;
   align-items: center;
   z-index: 10001; /* Higher than waiting overlay */
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
+
+.round-winner-modal.fade-out {
+  opacity: 0;
 }
 
 .round-winner-content {
