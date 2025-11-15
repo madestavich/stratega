@@ -271,7 +271,21 @@ class GameManager {
     // Start round management
     await this.startRoundTimer();
 
+    // Hide loading screen after everything is ready
+    this.hideLoadingScreen();
+
     requestAnimationFrame((t) => this.loop(t));
+  }
+
+  hideLoadingScreen() {
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) {
+      loadingScreen.classList.add("hidden");
+      // Remove from DOM after animation completes
+      setTimeout(() => {
+        loadingScreen.remove();
+      }, 300);
+    }
   }
 
   render() {
@@ -1186,6 +1200,9 @@ class GameManager {
     this.battleDisconnected = true;
     this.waitingForBattleEnd = true;
     this.isPaused = true;
+
+    // Hide loading screen if still visible
+    this.hideLoadingScreen();
 
     // Mark current player as not in battle
     console.log("Setting current player as NOT in battle...");
