@@ -837,8 +837,12 @@ class GameManager {
         modal.style.display = "flex";
 
         // Hide modal after 3 seconds and reload page for fresh state
-        setTimeout(() => {
+        setTimeout(async () => {
           modal.style.display = "none";
+
+          // Clear winner to prevent modal re-showing on reload
+          await this.clearWinner();
+
           // Allow reload without warning
           this.allowReload = true;
           // Reload page to reset everything to fresh state
@@ -1113,6 +1117,29 @@ class GameManager {
       return result.success;
     } catch (error) {
       console.error("Error setting battle state:", error);
+      return false;
+    }
+  }
+
+  // Clear winner to prevent modal re-showing on reload
+  async clearWinner() {
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "clear_winner",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error("Error clearing winner:", error);
       return false;
     }
   }

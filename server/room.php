@@ -125,6 +125,9 @@ try {
         case 'check_battle_completion':
             checkBattleCompletion($input);
             break;
+        case 'clear_winner':
+            clearWinner($input);
+            break;
         // New lobby endpoints
         case 'update_room_settings':
             updateRoomSettings($input);
@@ -567,8 +570,8 @@ function resetReadyStatus($data) {
     $user_id = $_SESSION['user_id'];
     $room_id = $data['room_id'] ?? 0;
     
-    // Reset both players ready status and clear round timer, also reset battle state
-    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    // Reset both players ready status and clear round timer, also reset battle state AND winner
+    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0, winner_id = NULL WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
     $stmt->bind_param("iii", $room_id, $user_id, $user_id);
     
     if ($stmt->execute()) {
@@ -1434,6 +1437,30 @@ function checkBattleCompletion($data) {
         'winner_id' => $room['winner_id'], // Using existing winner_id field
         'current_round' => $room['current_round']
     ]);
+}
+
+// Clear winner after modal is shown to prevent re-showing on reload
+function clearWinner($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Clear winner_id to prevent modal re-showing on reload
+    $stmt = $conn->prepare("UPDATE game_rooms SET winner_id = NULL WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Winner cleared'
+        ]);
+    } else {
+        throw new Exception('Помилка очищення переможця');
+    }
 }
 
 
