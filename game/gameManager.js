@@ -857,10 +857,25 @@ class GameManager {
       }
 
       if (result.success) {
-        // If there's no winner (already cleared), don't show modal
+        // If there's no winner, don't show modal
         if (!result.winner_id) {
-          console.log("No winner set - modal already shown and cleared");
+          console.log(
+            "No winner set - battle still in progress or already cleared"
+          );
           return;
+        }
+
+        // Check if modal was recently shown (within last 5 seconds) to prevent double-show
+        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${result.current_round}`;
+        const lastShownTime = localStorage.getItem(storageKey);
+        if (lastShownTime) {
+          const timeSinceShown = Date.now() - parseInt(lastShownTime);
+          if (timeSinceShown < 5000) {
+            console.log(
+              `Winner modal was shown ${timeSinceShown}ms ago - skipping to avoid duplicate`
+            );
+            return;
+          }
         }
 
         // Update modal content
@@ -875,12 +890,12 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
+        // Save timestamp when modal was shown
+        localStorage.setItem(storageKey, Date.now().toString());
+
         // Hide modal after 3 seconds and reload page for fresh state
         setTimeout(async () => {
           modal.style.display = "none";
-
-          // Clear winner on server to prevent re-showing
-          await this.clearWinner();
 
           // Reset ready status before reload
           await this.resetReadyStatus();
