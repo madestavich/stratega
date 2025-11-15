@@ -38,7 +38,6 @@ class GameManager {
     this.battleDisconnected = false;
     this.battleCheckInterval = null;
     this.waitingForBattleEnd = false;
-    this.allowReload = false; // Flag to allow automatic reload
 
     //! ініціалізація об'єктів і інших менеджерів
 
@@ -79,7 +78,7 @@ class GameManager {
 
     // Prevent page refresh during battle
     window.addEventListener("beforeunload", (e) => {
-      if (!this.isPaused && !this.battleDisconnected && !this.allowReload) {
+      if (!this.isPaused && !this.battleDisconnected) {
         e.preventDefault();
         e.returnValue =
           "Бій активний! Якщо ви оновите сторінку, вам доведеться чекати завершення бою противником.";
@@ -821,12 +820,10 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
-        // Hide modal after 3 seconds and reload page to reset everything
-        setTimeout(() => {
+        // Hide modal after 3 seconds and continue to next phase
+        setTimeout(async () => {
           modal.style.display = "none";
-          console.log("Reloading page to start next round...");
-          this.allowReload = true; // Allow reload without warning
-          window.location.reload();
+          await this.startNextRoundPreparation();
         }, 3000);
       }
     } catch (error) {
@@ -837,22 +834,19 @@ class GameManager {
   async startNextRoundPreparation() {
     console.log("Starting next round preparation...");
 
+    // Reload player resources from database BEFORE reset
+    if (this.player) {
+      await this.player.initializeResources();
+      console.log("Player resources reloaded from database");
+    }
+
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
 
-    // Оновлюємо напрямок погляду для всіх юнітів на початку нового раунду
-    for (const unit of this.objectManager.objects) {
-      unit.setLookDirectionByTeam();
-    }
-    for (const unit of this.objectManager.enemyObjects) {
-      unit.setLookDirectionByTeam();
-    }
-
-    // Reload player resources from database to sync money and unit limit
+    // Update interface AFTER reset
     if (this.player) {
-      await this.player.initializeResources();
       this.interfaceManager.updatePlayerInterface(this.player);
-      console.log("Player resources reloaded and interface updated");
+      console.log("Interface updated with fresh data");
     }
 
     // Reset ready status for new round
@@ -869,110 +863,36 @@ class GameManager {
   }
 
   async resetUnitsToStartingPositions() {
-    // Reset ALL player units (alive and dead) - move them back to their original starting positions
+    console.log("Resetting units to starting positions...");
+
+    // Simply reload all units from database - this will reset positions, health, everything
+    await this.objectManager.loadObjects();
+
+    // Ensure all units have correct look direction
     for (const unit of this.objectManager.objects) {
-      // Reset to original starting position
-      unit.gridCol = unit.startingGridCol;
-      unit.gridRow = unit.startingGridRow;
-
-      // Reset health and other stats to full (resurrect if dead)
-      unit.isDead = false;
-      unit.currentHealth = unit.maxHealth;
-
-      // Скидаємо всі напрямки і цілі
-      unit.moveDirection = null;
-      unit.moveTarget = null;
-      unit.attackTarget = null;
-
-      // Force update visual position from grid coordinates
-      unit.updatePositionFromGrid();
-
-      // Reset animation to idle - force restart animation
+      unit.setLookDirectionByTeam();
+      // Make sure animation is playing
       if (unit.animator) {
-        unit.animator.currentFrame = 0; // Reset frame counter
-        unit.animator.hasFinished = false; // Ensure animation is active
         unit.animator.setAnimation("idle", true);
       }
-
-      // Встановлюємо правильний напрямок погляду відповідно до команди
-      unit.setLookDirectionByTeam();
     }
-
-    // Reset ALL enemy units (alive and dead) - move them back to their original starting positions
     for (const unit of this.objectManager.enemyObjects) {
-      // Reset to original starting position
-      unit.gridCol = unit.startingGridCol;
-      unit.gridRow = unit.startingGridRow;
-
-      // Reset health and other stats to full (resurrect if dead)
-      unit.isDead = false;
-      unit.currentHealth = unit.maxHealth;
-
-      // Скидаємо всі напрямки і цілі
-      unit.moveDirection = null;
-      unit.moveTarget = null;
-      unit.attackTarget = null;
-
-      // Force update visual position from grid coordinates
-      unit.updatePositionFromGrid();
-
-      // Reset animation to idle - force restart animation
+      unit.setLookDirectionByTeam();
+      // Make sure animation is playing
       if (unit.animator) {
-        unit.animator.currentFrame = 0; // Reset frame counter
-        unit.animator.hasFinished = false; // Ensure animation is active
         unit.animator.setAnimation("idle", true);
       }
-
-      // Встановлюємо правильний напрямок погляду відповідно до команди
-      unit.setLookDirectionByTeam();
     }
 
-    // Update grid after position reset and resurrection
+    // Update grid
     this.objectManager.updateGridWithAllObjects();
+
     console.log(
-      "All units moved back to their original starting positions and resurrected with full health"
+      `Units reloaded from database: ${this.objectManager.objects.length} player, ${this.objectManager.enemyObjects.length} enemy`
     );
 
-    // Force clear canvas and re-render everything
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Force multiple renders to ensure positions and animations update
-    for (let i = 0; i < 5; i++) {
-      setTimeout(() => {
-        this.render();
-
-        // Update animations on each render
-        const allObjects = [
-          ...this.objectManager.objects,
-          ...this.objectManager.enemyObjects,
-        ];
-        for (const obj of allObjects) {
-          if (obj.animator && !obj.animator.hasFinished) {
-            obj.animator.nextFrame();
-          }
-        }
-      }, i * 50); // Render every 50ms for smooth transition
-    }
-
-    // Final update after all renders
-    setTimeout(() => {
-      // Ще раз оновлюємо напрямок погляду після всіх рендерів
-      for (const unit of this.objectManager.objects) {
-        unit.setLookDirectionByTeam();
-      }
-      for (const unit of this.objectManager.enemyObjects) {
-        unit.setLookDirectionByTeam();
-      }
-
-      // Final render
-      this.render();
-      console.log("Animations and positions fully updated");
-    }, 300);
-
-    // Save the reset state to database
-    await this.objectManager.saveObjects();
+    // Force render
+    this.render();
     console.log("=== RESET COMPLETE ===");
   }
 
