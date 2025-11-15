@@ -201,36 +201,33 @@ class GameManager {
       console.log("DEBUG: roomInfo is null/undefined");
     }
 
-    // Check if we're loading after showing winner modal
-    const showWinnerDuringLoad = localStorage.getItem(
-      `show_winner_during_load_${this.objectManager.currentRoomId}`
+    // Check if we're loading after showing winner
+    const winnerInfoStr = localStorage.getItem(
+      `winner_info_${this.objectManager.currentRoomId}`
     );
-    if (showWinnerDuringLoad === "true") {
-      console.log(
-        "Reloading after winner modal - showing winner modal during load"
-      );
+    if (winnerInfoStr) {
+      console.log("Reloading after winner - showing winner modal during load");
+
+      const winnerInfo = JSON.parse(winnerInfoStr);
+
       // Hide loading screen and show winner modal
       const loadingScreen = document.getElementById("loading-screen");
       if (loadingScreen) {
         loadingScreen.style.display = "none";
       }
 
-      // Get and show winner modal with data from server
-      const winnerInfo = await this.getWinnerInfo();
-      if (winnerInfo && winnerInfo.success) {
-        const modal = document.getElementById("round-winner-modal");
-        const roundNumber = document.getElementById("round-number");
-        const winnerNickname = document.getElementById("winner-nickname");
+      // Show winner modal with saved data
+      const modal = document.getElementById("round-winner-modal");
+      const roundNumber = document.getElementById("round-number");
+      const winnerNickname = document.getElementById("winner-nickname");
 
-        roundNumber.textContent = `Раунд ${winnerInfo.current_round}`;
-        winnerNickname.textContent =
-          winnerInfo.winner_nickname || "Невідомий гравець";
-        modal.style.display = "flex";
-      }
+      roundNumber.textContent = `Раунд ${winnerInfo.round}`;
+      winnerNickname.textContent = winnerInfo.nickname || "Невідомий гравець";
+      modal.style.display = "flex";
 
-      // Clear the flag
+      // Clear the data
       localStorage.removeItem(
-        `show_winner_during_load_${this.objectManager.currentRoomId}`
+        `winner_info_${this.objectManager.currentRoomId}`
       );
     }
 
@@ -936,38 +933,26 @@ class GameManager {
           return;
         }
 
-        // Update modal content
-        const modal = document.getElementById("round-winner-modal");
-        const roundNumber = document.getElementById("round-number");
-        const winnerNickname = document.getElementById("winner-nickname");
-
-        roundNumber.textContent = `Раунд ${result.current_round}`;
-        winnerNickname.textContent =
-          result.winner_nickname || "Невідомий гравець";
-
-        // Show modal
-        modal.style.display = "flex";
-
         // Mark that we showed modal for this round
         localStorage.setItem(storageKey, "true");
 
-        // Mark that we're reloading after winner modal (to keep it visible)
+        // Save winner info to show after reload
         localStorage.setItem(
-          `show_winner_during_load_${this.objectManager.currentRoomId}`,
-          "true"
+          `winner_info_${this.objectManager.currentRoomId}`,
+          JSON.stringify({
+            round: result.current_round,
+            nickname: result.winner_nickname,
+          })
         );
 
-        // Wait 3 seconds then reload (modal will stay visible until game loads)
-        setTimeout(async () => {
-          // Reset ready status before reload
-          await this.resetReadyStatus();
+        // Reset ready status before reload
+        await this.resetReadyStatus();
 
-          // Allow reload without warning
-          this.allowReload = true;
+        // Allow reload without warning
+        this.allowReload = true;
 
-          // Reload - winner modal will be shown instead of loading screen
-          window.location.reload();
-        }, 3000);
+        // Reload immediately - winner modal will be shown during loading
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error showing winner modal:", error);
