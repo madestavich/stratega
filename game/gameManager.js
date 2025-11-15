@@ -857,15 +857,9 @@ class GameManager {
       }
 
       if (result.success) {
-        // Check if we already showed modal for this round (unique per session/tab)
-        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${result.current_round}`;
-        const alreadyShown = sessionStorage.getItem(storageKey);
-        if (alreadyShown === "true") {
-          console.log(
-            "Winner modal already shown for round",
-            result.current_round,
-            "in this session"
-          );
+        // If there's no winner (already cleared), don't show modal
+        if (!result.winner_id) {
+          console.log("No winner set - modal already shown and cleared");
           return;
         }
 
@@ -881,12 +875,12 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
-        // Mark that we showed modal for this round in this session
-        sessionStorage.setItem(storageKey, "true");
-
         // Hide modal after 3 seconds and reload page for fresh state
         setTimeout(async () => {
           modal.style.display = "none";
+
+          // Clear winner on server to prevent re-showing
+          await this.clearWinner();
 
           // Reset ready status before reload
           await this.resetReadyStatus();
