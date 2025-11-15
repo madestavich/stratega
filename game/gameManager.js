@@ -34,6 +34,11 @@ class GameManager {
     this.isPaused = true; // Game starts paused during unit placement
     this.isRoomCreator; // Will be set during initialization
 
+    // Battle disconnection handling
+    this.battleDisconnected = false;
+    this.battleCheckInterval = null;
+    this.waitingForBattleEnd = false;
+
     //! ініціалізація об'єктів і інших менеджерів
 
     this.configLoader = new ConfigLoader();
@@ -68,6 +73,16 @@ class GameManager {
     document.addEventListener("keydown", (e) => {
       if (e.key === "`") {
         this.toggleDebugMode();
+      }
+    });
+
+    // Prevent page refresh during battle
+    window.addEventListener("beforeunload", (e) => {
+      if (!this.isPaused && !this.battleDisconnected) {
+        e.preventDefault();
+        e.returnValue =
+          "Бій активний! Якщо ви оновите сторінку, вам доведеться чекати завершення бою противником.";
+        return e.returnValue;
       }
     });
 
@@ -155,6 +170,14 @@ class GameManager {
       }
     } else {
       console.log("DEBUG: roomInfo is null/undefined");
+    }
+
+    // Check if we reconnected during battle
+    const battleState = await this.checkBattleState();
+    if (battleState && battleState.battle_started) {
+      console.log("Reconnected during battle - entering waiting mode");
+      await this.handleBattleDisconnection(battleState);
+      return; // Don't continue normal initialization
     }
 
     // Load room settings from lobby
@@ -542,6 +565,9 @@ class GameManager {
     console.log("DEBUG: startGame called, isPaused:", this.isPaused);
     console.trace("startGame call stack");
 
+    // Mark current player as in battle
+    await this.setBattleState(true);
+
     // Stop round placement timer and status checking
     if (this.checkStatusInterval) {
       clearInterval(this.checkStatusInterval);
@@ -626,6 +652,9 @@ class GameManager {
 
   async endRound(winnerId = null) {
     console.log("Round ended! Processing winner...");
+
+    // Mark player as no longer in battle
+    await this.setBattleState(false);
 
     // НЕ зупиняємо checkStatusInterval - потрібна синхронізація з сервером
 
@@ -1055,6 +1084,136 @@ class GameManager {
     }
 
     console.log("Shots refilled for all ranged units");
+  }
+
+  // Check battle state on reconnect
+  async checkBattleState() {
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "get_battle_state",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+      return result.success ? result : null;
+    } catch (error) {
+      console.error("Error checking battle state:", error);
+      return null;
+    }
+  }
+
+  // Set battle state
+  async setBattleState(inBattle) {
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "set_battle_state",
+          room_id: this.objectManager.currentRoomId,
+          in_battle: inBattle,
+        }),
+      });
+
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error("Error setting battle state:", error);
+      return false;
+    }
+  }
+
+  // Handle case when player refreshed during battle
+  async handleBattleDisconnection(battleState) {
+    this.battleDisconnected = true;
+    this.waitingForBattleEnd = true;
+    this.isPaused = true;
+
+    // Mark current player as not in battle
+    await this.setBattleState(false);
+
+    // Show waiting message
+    this.showWaitingForBattleMessage();
+
+    // Start checking for battle completion
+    this.battleCompletionCheckInterval = setInterval(async () => {
+      const completionState = await this.checkBattleCompletion();
+      if (completionState && completionState.battle_completed) {
+        console.log("Battle completed by other player!");
+        clearInterval(this.battleCompletionCheckInterval);
+        this.battleCompletionCheckInterval = null;
+
+        // Hide waiting message
+        this.hideWaitingForBattleMessage();
+
+        // Show winner and continue to next round
+        await this.showWinnerModalAndContinue();
+      }
+    }, 2000); // Check every 2 seconds
+  }
+
+  // Check if battle is completed
+  async checkBattleCompletion() {
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "check_battle_completion",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+      return result.success ? result : null;
+    } catch (error) {
+      console.error("Error checking battle completion:", error);
+      return null;
+    }
+  }
+
+  // Show waiting message
+  showWaitingForBattleMessage() {
+    // Create overlay if it doesn't exist
+    let overlay = document.getElementById("battle-waiting-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "battle-waiting-overlay";
+      overlay.className = "battle-waiting-overlay";
+      overlay.innerHTML = `
+        <div class="battle-waiting-content">
+          <div class="battle-waiting-title">Очікування завершення бою</div>
+          <div class="battle-waiting-subtitle">Ви оновили сторінку під час бою</div>
+          <div class="battle-waiting-text">Будь ласка, зачекайте поки інший гравець завершить бій...</div>
+          <div class="battle-waiting-spinner"></div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+    overlay.style.display = "flex";
+  }
+
+  // Hide waiting message
+  hideWaitingForBattleMessage() {
+    const overlay = document.getElementById("battle-waiting-overlay");
+    if (overlay) {
+      overlay.style.display = "none";
+    }
+    this.battleDisconnected = false;
+    this.waitingForBattleEnd = false;
   }
 }
 

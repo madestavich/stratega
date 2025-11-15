@@ -545,3 +545,70 @@ canvas {
     height: 14px;
   }
 }
+
+/* Battle waiting overlay */
+.battle-waiting-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.battle-waiting-content {
+  background: url("../textures/Leather-red-medium.png") repeat;
+  border: 10px solid transparent;
+  border-image: url("../textures/Border-gold.png") 20 repeat;
+  padding: 40px 60px;
+  text-align: center;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.battle-waiting-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.battle-waiting-subtitle {
+  font-size: 18px;
+  color: #ff6b6b;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.battle-waiting-text {
+  font-size: 16px;
+  color: #ffffff;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.battle-waiting-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 215, 0, 0.3);
+  border-top: 5px solid #ffd700;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

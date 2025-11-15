@@ -116,6 +116,15 @@ try {
         case 'get_round_income':
             getRoundIncome($input);
             break;
+        case 'set_battle_state':
+            setBattleState($input);
+            break;
+        case 'get_battle_state':
+            getBattleState($input);
+            break;
+        case 'check_battle_completion':
+            checkBattleCompletion($input);
+            break;
         // New lobby endpoints
         case 'update_room_settings':
             updateRoomSettings($input);
@@ -558,8 +567,8 @@ function resetReadyStatus($data) {
     $user_id = $_SESSION['user_id'];
     $room_id = $data['room_id'] ?? 0;
     
-    // Reset both players ready status and clear round timer
-    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    // Reset both players ready status and clear round timer, also reset battle state
+    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
     $stmt->bind_param("iii", $room_id, $user_id, $user_id);
     
     if ($stmt->execute()) {
@@ -640,7 +649,8 @@ function incrementRound($data) {
     $current_round_before = $current_room['current_round'];
     
     // Increment round number and set winner only if not already incremented
-    $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ? WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
+    // Also reset battle state (no need to save last_round_winner_id - using winner_id)
+    $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
     $stmt->bind_param("iiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before);
     
     if ($stmt->execute() && $stmt->affected_rows > 0) {
@@ -1285,5 +1295,145 @@ function leaveRoom($data) {
         ]);
     }
 }
+
+// Battle state management functions
+
+// Set battle state (mark player as in battle)
+function setBattleState($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    $in_battle = $data['in_battle'] ?? false;
+    
+    // Get room info
+    $stmt = $conn->prepare("SELECT creator_id, second_player_id FROM game_rooms WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Determine which player field to update
+    if ($room['creator_id'] == $user_id) {
+        $field = 'player1_in_battle';
+    } else if ($room['second_player_id'] == $user_id) {
+        $field = 'player2_in_battle';
+    } else {
+        throw new Exception('Ви не є учасником цієї кімнати');
+    }
+    
+    // Update battle state
+    $stmt = $conn->prepare("UPDATE game_rooms SET $field = ?, battle_started = 1 WHERE id = ?");
+    $in_battle_int = $in_battle ? 1 : 0;
+    $stmt->bind_param("ii", $in_battle_int, $room_id);
+    $stmt->execute();
+    
+    echo json_encode([
+        'success' => true,
+        'in_battle' => $in_battle
+    ]);
+}
+
+// Get battle state
+function getBattleState($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    $stmt = $conn->prepare("
+        SELECT 
+            battle_started,
+            player1_in_battle,
+            player2_in_battle,
+            winner_id,
+            creator_id,
+            second_player_id,
+            current_round
+        FROM game_rooms 
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Check if current user is in battle
+    $is_current_user_in_battle = false;
+    if ($room['creator_id'] == $user_id) {
+        $is_current_user_in_battle = (bool)$room['player1_in_battle'];
+    } else if ($room['second_player_id'] == $user_id) {
+        $is_current_user_in_battle = (bool)$room['player2_in_battle'];
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'battle_started' => (bool)$room['battle_started'],
+        'player1_in_battle' => (bool)$room['player1_in_battle'],
+        'player2_in_battle' => (bool)$room['player2_in_battle'],
+        'is_current_user_in_battle' => $is_current_user_in_battle,
+        'winner_id' => $room['winner_id'], // Using existing winner_id field
+        'current_round' => $room['current_round']
+    ]);
+}
+
+// Check if battle is completed (called by waiting player)
+function checkBattleCompletion($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $room_id = $data['room_id'] ?? 0;
+    
+    $stmt = $conn->prepare("
+        SELECT 
+            battle_started,
+            player1_in_battle,
+            player2_in_battle,
+            winner_id,
+            current_round
+        FROM game_rooms 
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Battle is completed when battle was started but both players are no longer in battle
+    $battle_completed = $room['battle_started'] && 
+                       !$room['player1_in_battle'] && 
+                       !$room['player2_in_battle'];
+    
+    echo json_encode([
+        'success' => true,
+        'battle_completed' => $battle_completed,
+        'winner_id' => $room['winner_id'], // Using existing winner_id field
+        'current_round' => $room['current_round']
+    ]);
+}
+
 
 
