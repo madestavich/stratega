@@ -472,7 +472,7 @@ canvas {
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 10001; /* Higher than waiting overlay */
 }
 
 .round-winner-content {

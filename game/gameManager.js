@@ -883,6 +883,9 @@ class GameManager {
         setTimeout(async () => {
           modal.style.display = "none";
 
+          // Hide waiting overlay if it's visible (for reconnect scenario)
+          this.hideWaitingForBattleMessage();
+
           // Reset ready status before reload
           await this.resetReadyStatus();
 
@@ -1217,8 +1220,8 @@ class GameManager {
         clearInterval(this.battleCompletionCheckInterval);
         this.battleCompletionCheckInterval = null;
 
-        // Hide waiting message
-        this.hideWaitingForBattleMessage();
+        // DON'T hide waiting overlay - show winner modal on top of it
+        // This prevents white screen flash
 
         // Show winner and continue to next round
         await this.showWinnerModalAndContinue();
