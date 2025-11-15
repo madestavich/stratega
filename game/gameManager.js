@@ -845,6 +845,13 @@ class GameManager {
       unit.setLookDirectionByTeam();
     }
 
+    // Reload player resources from database to sync money and unit limit
+    if (this.player) {
+      await this.player.initializeResources();
+      this.interfaceManager.updatePlayerInterface(this.player);
+      console.log("Player resources reloaded and interface updated");
+    }
+
     // Reset ready status for new round
     await this.resetReadyStatus();
 
@@ -877,8 +884,10 @@ class GameManager {
       // Force update visual position from grid coordinates
       unit.updatePositionFromGrid();
 
-      // Reset animation to idle
+      // Reset animation to idle - force restart animation
       if (unit.animator) {
+        unit.animator.currentFrame = 0; // Reset frame counter
+        unit.animator.hasFinished = false; // Ensure animation is active
         unit.animator.setAnimation("idle", true);
       }
 
@@ -904,8 +913,10 @@ class GameManager {
       // Force update visual position from grid coordinates
       unit.updatePositionFromGrid();
 
-      // Reset animation to idle
+      // Reset animation to idle - force restart animation
       if (unit.animator) {
+        unit.animator.currentFrame = 0; // Reset frame counter
+        unit.animator.hasFinished = false; // Ensure animation is active
         unit.animator.setAnimation("idle", true);
       }
 
@@ -924,14 +935,26 @@ class GameManager {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Force multiple renders to ensure positions update
-    this.render();
-    setTimeout(() => {
-      this.render();
-    }, 100);
-    setTimeout(() => {
-      this.render();
+    // Force multiple renders to ensure positions and animations update
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        this.render();
+        
+        // Update animations on each render
+        const allObjects = [
+          ...this.objectManager.objects,
+          ...this.objectManager.enemyObjects,
+        ];
+        for (const obj of allObjects) {
+          if (obj.animator && !obj.animator.hasFinished) {
+            obj.animator.nextFrame();
+          }
+        }
+      }, i * 50); // Render every 50ms for smooth transition
+    }
 
+    // Final update after all renders
+    setTimeout(() => {
       // Ще раз оновлюємо напрямок погляду після всіх рендерів
       for (const unit of this.objectManager.objects) {
         unit.setLookDirectionByTeam();
@@ -939,7 +962,11 @@ class GameManager {
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
-    }, 200);
+      
+      // Final render
+      this.render();
+      console.log("Animations and positions fully updated");
+    }, 300);
 
     // Save the reset state to database
     await this.objectManager.saveObjects();
@@ -1050,6 +1077,9 @@ class GameManager {
         // Add round income to player at the start of new round
         if (this.player) {
           await this.player.addRoundIncome();
+          // Force update interface after adding income
+          this.interfaceManager.updatePlayerInterface(this.player);
+          console.log("Round income added and interface updated");
         }
 
         // Reset UI button
