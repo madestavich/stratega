@@ -91,7 +91,10 @@ class LobbyManager {
       await this.updateUI();
 
       // Check if game has started - redirect to game
-      if (data.game_status === "in_progress" || data.game_status === "finished") {
+      if (
+        data.game_status === "in_progress" ||
+        data.game_status === "finished"
+      ) {
         console.log("Game already started, redirecting to game...");
         // Stop polling to prevent further requests
         if (this.pollingInterval) {
