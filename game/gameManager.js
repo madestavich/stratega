@@ -865,19 +865,6 @@ class GameManager {
           return;
         }
 
-        // Check if modal was recently shown (within last 5 seconds) to prevent double-show
-        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${result.current_round}`;
-        const lastShownTime = localStorage.getItem(storageKey);
-        if (lastShownTime) {
-          const timeSinceShown = Date.now() - parseInt(lastShownTime);
-          if (timeSinceShown < 5000) {
-            console.log(
-              `Winner modal was shown ${timeSinceShown}ms ago - skipping to avoid duplicate`
-            );
-            return;
-          }
-        }
-
         // Update modal content
         const modal = document.getElementById("round-winner-modal");
         const roundNumber = document.getElementById("round-number");
@@ -890,12 +877,12 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
-        // Save timestamp when modal was shown
-        localStorage.setItem(storageKey, Date.now().toString());
-
         // Hide modal after 3 seconds and reload page for fresh state
         setTimeout(async () => {
           modal.style.display = "none";
+
+          // Clear winner to prevent re-showing on reload
+          await this.clearWinner();
 
           // Reset ready status before reload
           await this.resetReadyStatus();
