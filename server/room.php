@@ -1000,6 +1000,11 @@ function updateRoomSettings($data) {
         throw new Exception('Тільки хост може змінювати налаштування');
     }
     
+    // Check if game already started
+    if ($room['game_status'] === 'in_progress' || $room['game_status'] === 'finished') {
+        throw new Exception('Не можна змінювати налаштування після запуску гри');
+    }
+    
     // Update settings
     $game_mode = $data['game_mode'] ?? $room['game_mode'];
     $round_time = $data['round_time'] ?? $room['round_time'];
@@ -1047,6 +1052,11 @@ function selectRace($data) {
         throw new Exception('Кімната не знайдена');
     }
     
+    // Check if game already started
+    if ($room['game_status'] === 'in_progress' || $room['game_status'] === 'finished') {
+        throw new Exception('Не можна змінювати расу після запуску гри');
+    }
+    
     // Check if game mode allows race selection
     if ($room['game_mode'] === 'all_races') {
         throw new Exception('В режимі "Всі раси" вибір раси недоступний');
@@ -1090,6 +1100,11 @@ function toggleReadyLobby($data) {
     
     if (!$room) {
         throw new Exception('Кімната не знайдена');
+    }
+    
+    // Check if game already started
+    if ($room['game_status'] === 'in_progress' || $room['game_status'] === 'finished') {
+        throw new Exception('Гра вже запущена');
     }
     
     // Check race selection if classic mode

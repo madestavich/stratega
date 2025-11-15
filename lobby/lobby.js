@@ -90,9 +90,15 @@ class LobbyManager {
       this.lobbyState = data;
       await this.updateUI();
 
-      // Check if game has started
-      if (data.game_status === "in_progress") {
+      // Check if game has started - redirect to game
+      if (data.game_status === "in_progress" || data.game_status === "finished") {
+        console.log("Game already started, redirecting to game...");
+        // Stop polling to prevent further requests
+        if (this.pollingInterval) {
+          clearInterval(this.pollingInterval);
+        }
         window.location.href = `../game/game.html?room_id=${this.roomId}`;
+        return;
       }
     } catch (error) {
       throw error;
@@ -406,6 +412,12 @@ class LobbyManager {
       console.log("Save settings response:", data);
 
       if (!data.success) {
+        // If game already started, redirect to game
+        if (data.error && data.error.includes("після запуску гри")) {
+          alert(data.error);
+          window.location.href = `../game/game.html?room_id=${this.roomId}`;
+          return;
+        }
         throw new Error(data.error);
       }
 
@@ -443,6 +455,12 @@ class LobbyManager {
         this.selectedRace = race;
         this.updateSelectedRace();
       } else {
+        // If game already started, redirect to game
+        if (data.error && data.error.includes("після запуску гри")) {
+          alert(data.error);
+          window.location.href = `../game/game.html?room_id=${this.roomId}`;
+          return;
+        }
         throw new Error(data.error);
       }
     } catch (error) {
@@ -481,6 +499,12 @@ class LobbyManager {
         this.updateReadyButton();
         this.updateRaceSelection(this.lobbyState.settings.game_mode);
       } else {
+        // If game already started, redirect to game
+        if (data.error && data.error.includes("запущена")) {
+          alert(data.error);
+          window.location.href = `../game/game.html?room_id=${this.roomId}`;
+          return;
+        }
         throw new Error(data.error);
       }
     } catch (error) {
