@@ -33,6 +33,7 @@ class GameManager {
     this.checkStatusInterval = null;
     this.isPaused = true; // Game starts paused during unit placement
     this.isRoomCreator; // Will be set during initialization
+    this.currentUserId = null; // Current user ID - will be set during initialization
 
     // Battle disconnection handling
     this.battleDisconnected = false;
@@ -163,6 +164,14 @@ class GameManager {
     console.log("START: roomInfo =", roomInfo);
     if (roomInfo) {
       this.isRoomCreator = roomInfo.isCreator;
+
+      // Get current user ID
+      const roomPlayers = await this.getRoomPlayers();
+      if (roomPlayers) {
+        this.currentUserId = roomPlayers.current_user_id;
+        console.log("Current user ID:", this.currentUserId);
+      }
+
       console.log(
         `Player is ${this.isRoomCreator ? "host (creator)" : "guest (player 2)"}
       `
@@ -834,10 +843,9 @@ class GameManager {
       }
 
       if (result.success) {
-        // Check if we already showed modal for this round
-        const lastShownRound = localStorage.getItem(
-          `winner_shown_${this.objectManager.currentRoomId}`
-        );
+        // Check if we already showed modal for this round (unique per user)
+        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${this.currentUserId}`;
+        const lastShownRound = localStorage.getItem(storageKey);
         if (
           lastShownRound &&
           parseInt(lastShownRound) === result.current_round
@@ -862,10 +870,7 @@ class GameManager {
         modal.style.display = "flex";
 
         // Mark that we showed modal for this round
-        localStorage.setItem(
-          `winner_shown_${this.objectManager.currentRoomId}`,
-          result.current_round
-        );
+        localStorage.setItem(storageKey, result.current_round);
 
         // Hide modal after 3 seconds and reload page for fresh state
         setTimeout(async () => {
