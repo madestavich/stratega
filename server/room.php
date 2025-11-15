@@ -89,9 +89,6 @@ try {
         case 'increment_round':
             incrementRound($input);
             break;
-        case 'get_winner_info':
-            getWinnerInfo($input);
-            break;
         case 'get_room_players':
             getRoomPlayers($input);
             break;
@@ -683,41 +680,6 @@ function incrementRound($data) {
     }
 }
 
-function getWinnerInfo($data) {
-    global $conn;
-    
-    if (!isset($_SESSION['user_id'])) {
-        throw new Exception('Користувач не авторизований');
-    }
-    
-    $room_id = $data['room_id'] ?? 0;
-    
-    // Get winner information
-    $stmt = $conn->prepare("SELECT gr.current_round, gr.winner_id, u.username as winner_nickname FROM game_rooms gr LEFT JOIN users u ON gr.winner_id = u.id WHERE gr.id = ?");
-    
-    if (!$stmt) {
-        throw new Exception('Помилка підготовки запиту: ' . $conn->error);
-    }
-    
-    $stmt->bind_param("i", $room_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $room = $result->fetch_assoc();
-    
-    error_log("getWinnerInfo - room_id: $room_id, winner_id: " . ($room['winner_id'] ?? 'NULL') . ", winner_nickname: " . ($room['winner_nickname'] ?? 'NULL'));
-    
-    if ($room) {
-        echo json_encode([
-            'success' => true,
-            'current_round' => $room['current_round'],
-            'winner_id' => $room['winner_id'],
-            'winner_nickname' => $room['winner_nickname']
-        ]);
-    } else {
-        throw new Exception('Кімнату не знайдено');
-    }
-}
-
 function getRoomPlayers($data) {
     global $conn;
     
@@ -1231,6 +1193,8 @@ function getLobbyState($data) {
     $response = [
         'success' => true,
         'game_status' => $room['game_status'],
+        'current_round' => $room['current_round'],
+        'winner_id' => $room['winner_id'],
         'players' => [
             'host' => [
                 'id' => $room['creator_id'],

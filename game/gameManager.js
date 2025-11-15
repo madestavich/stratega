@@ -153,52 +153,40 @@ class GameManager {
   }
 
   async start() {
-    console.log("START: gameManager.start() called");
     await this.configLoader.loadRacesConfig();
-    console.log("START: racesConfig loaded");
     await this.objectManager.initializeGame();
-    console.log("START: initializeGame completed");
 
     // Determine if current player is room creator
     const roomInfo = await this.objectManager.getCurrentRoomId();
-    console.log("START: roomInfo =", roomInfo);
     if (roomInfo) {
       this.isRoomCreator = roomInfo.isCreator;
 
-      // Get current user ID
-      const roomPlayers = await this.getRoomPlayers();
-      if (roomPlayers) {
-        this.currentUserId = roomPlayers.current_user_id;
-        console.log("Current user ID:", this.currentUserId);
+      // Get room players info and save nicknames to localStorage
+      const lobbyState = await this.getRoomSettings();
+      if (lobbyState) {
+        const playerNicknames = {};
+        if (lobbyState.player1_id && lobbyState.player1_nickname) {
+          playerNicknames[lobbyState.player1_id] = lobbyState.player1_nickname;
+        }
+        if (lobbyState.player2_id && lobbyState.player2_nickname) {
+          playerNicknames[lobbyState.player2_id] = lobbyState.player2_nickname;
+        }
+        localStorage.setItem(
+          `player_nicknames_${this.objectManager.currentRoomId}`,
+          JSON.stringify(playerNicknames)
+        );
+        this.currentUserId = this.isRoomCreator
+          ? lobbyState.player1_id
+          : lobbyState.player2_id;
       }
-
-      console.log(
-        `Player is ${this.isRoomCreator ? "host (creator)" : "guest (player 2)"}
-      `
-      );
 
       // Після визначення ролі гравця оновлюємо напрямок погляду для всіх юнітів
-      try {
-        console.log(
-          "START: About to update look direction for objects, count:",
-          this.objectManager.objects.length
-        );
-        for (const unit of this.objectManager.objects) {
-          unit.setLookDirectionByTeam();
-        }
-        console.log(
-          "START: About to update look direction for enemyObjects, count:",
-          this.objectManager.enemyObjects.length
-        );
-        for (const unit of this.objectManager.enemyObjects) {
-          unit.setLookDirectionByTeam();
-        }
-        console.log("START: Look direction update completed");
-      } catch (error) {
-        console.error("START: Error updating look direction:", error);
+      for (const unit of this.objectManager.objects) {
+        unit.setLookDirectionByTeam();
       }
-    } else {
-      console.log("DEBUG: roomInfo is null/undefined");
+      for (const unit of this.objectManager.enemyObjects) {
+        unit.setLookDirectionByTeam();
+      }
     }
 
     // Check if we should show winner modal after reload
@@ -206,35 +194,38 @@ class GameManager {
       `show_winner_after_reload_${this.objectManager.currentRoomId}`
     );
     if (showWinnerAfterReload === "true") {
-      console.log("Reloading after winner - showing winner modal during load");
+      // Get winner data from localStorage and room settings
+      const playerNicknames = JSON.parse(
+        localStorage.getItem(
+          `player_nicknames_${this.objectManager.currentRoomId}`
+        ) || "{}"
+      );
 
-      // Get fresh winner data from server
-      const winnerInfo = await this.getWinnerInfo();
-      console.log("Winner info from server:", winnerInfo);
-      if (winnerInfo && winnerInfo.success) {
-        const modal = document.getElementById("round-winner-modal");
-        const roundNumber = document.getElementById("round-number");
-        const winnerNickname = document.getElementById("winner-nickname");
+      const roomSettings = await this.getRoomSettings();
+      const winnerId = roomSettings.winner_id;
+      const currentRound = roomSettings.current_round;
+      const winnerNickname = playerNicknames[winnerId] || "Невідомий гравець";
 
-        roundNumber.textContent = `Раунд ${winnerInfo.current_round}`;
-        winnerNickname.textContent =
-          winnerInfo.winner_nickname || "Невідомий гравець";
-        console.log("Set winner nickname to:", winnerInfo.winner_nickname);
+      const modal = document.getElementById("round-winner-modal");
+      const roundNumber = document.getElementById("round-number");
+      const winnerNicknameEl = document.getElementById("winner-nickname");
 
-        // Show winner modal FIRST
-        modal.style.display = "flex";
+      roundNumber.textContent = `Раунд ${currentRound}`;
+      winnerNicknameEl.textContent = winnerNickname;
 
-        // Then fade out loading screen with delay to prevent white flash
-        setTimeout(() => {
-          const loadingScreen = document.getElementById("loading-screen");
-          if (loadingScreen) {
-            loadingScreen.classList.add("hidden");
-            setTimeout(() => {
-              loadingScreen.remove();
-            }, 300);
-          }
-        }, 100);
-      }
+      // Show winner modal FIRST
+      modal.style.display = "flex";
+
+      // Then fade out loading screen with delay to prevent white flash
+      setTimeout(() => {
+        const loadingScreen = document.getElementById("loading-screen");
+        if (loadingScreen) {
+          loadingScreen.classList.add("hidden");
+          setTimeout(() => {
+            loadingScreen.remove();
+          }, 300);
+        }
+      }, 100);
 
       // Clear the flag
       localStorage.removeItem(
@@ -266,18 +257,9 @@ class GameManager {
         ? roomSettings.player1_race
         : roomSettings.player2_race;
 
-      console.log(
-        `Classic mode - isRoomCreator: ${this.isRoomCreator}, player1_race: ${roomSettings.player1_race}, player2_race: ${roomSettings.player2_race}, selected race: ${playerRace}`
-      );
-
       if (!playerRace) {
-        console.warn("Race not selected in classic mode, defaulting to 'all'");
         playerRace = "all";
-      } else {
-        console.log(`Player race set to: ${playerRace}`);
       }
-    } else {
-      console.log(`All races mode - player can use any race`);
     }
 
     // Create player with correct team based on room role
@@ -470,10 +452,6 @@ class GameManager {
   }
 
   async getRoomSettings() {
-    console.log(
-      "getRoomSettings: called with currentRoomId =",
-      this.objectManager.currentRoomId
-    );
     try {
       const response = await fetch("../server/room.php", {
         method: "POST",
@@ -487,9 +465,7 @@ class GameManager {
         }),
       });
 
-      console.log("getRoomSettings: response status =", response.status);
       const result = await response.json();
-      console.log("getRoomSettings: result =", result);
 
       if (result.success) {
         const settings = {
@@ -500,11 +476,15 @@ class GameManager {
           max_unit_limit: result.settings.max_unit_limit || 40,
           player1_race: result.players.host?.race || null,
           player2_race: result.players.guest?.race || null,
+          player1_id: result.players.host?.id || null,
+          player2_id: result.players.guest?.id || null,
+          player1_nickname: result.players.host?.username || null,
+          player2_nickname: result.players.guest?.username || null,
+          current_round: result.current_round || 1,
+          winner_id: result.winner_id || null,
         };
-        console.log("getRoomSettings: returning settings =", settings);
         return settings;
       } else {
-        console.warn("Failed to load room settings, using defaults");
         return {
           game_mode: "all_races",
           round_time: 45,
@@ -513,6 +493,12 @@ class GameManager {
           max_unit_limit: 40,
           player1_race: null,
           player2_race: null,
+          player1_id: null,
+          player2_id: null,
+          player1_nickname: null,
+          player2_nickname: null,
+          current_round: 1,
+          winner_id: null,
         };
       }
     } catch (error) {
@@ -525,6 +511,12 @@ class GameManager {
         max_unit_limit: 40,
         player1_race: null,
         player2_race: null,
+        player1_id: null,
+        player2_id: null,
+        player1_nickname: null,
+        player2_nickname: null,
+        current_round: 1,
+        winner_id: null,
       };
     }
   }
@@ -809,18 +801,11 @@ class GameManager {
     );
 
     // Record the result in database
-    console.log("Recording battle result in database...");
     const incrementSuccess = await this.incrementRound(actualWinnerId);
 
     if (incrementSuccess) {
       // Show modal based on who won
-      if (winnerId === "current_player") {
-        console.log("I won! Showing winner modal...");
-        await this.showWinnerModalAndContinue();
-      } else {
-        console.log("I lost. Showing winner modal...");
-        await this.showWinnerModalAndContinue();
-      }
+      await this.showWinnerModalAndContinue();
     }
   }
 
@@ -845,34 +830,7 @@ class GameManager {
     }
   }
 
-  async getWinnerInfo() {
-    try {
-      const response = await fetch("../server/room.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          action: "get_winner_info",
-          room_id: this.objectManager.currentRoomId,
-        }),
-      });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error("Error getting winner info:", error);
-      return null;
-    }
-  }
-
   async incrementRound(winnerId) {
-    console.log("incrementRound called with winnerId:", winnerId);
     try {
       const response = await fetch("../server/room.php", {
         method: "POST",
@@ -913,81 +871,46 @@ class GameManager {
 
   async showWinnerModalAndContinue() {
     try {
-      // Get winner info from database
-      const response = await fetch("../server/room.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          action: "get_winner_info",
-          room_id: this.objectManager.currentRoomId,
-        }),
-      });
+      // Get current round from room settings
+      const roomSettings = await this.getRoomSettings();
+      const currentRound = roomSettings.current_round || 1;
 
-      // Check if response is ok
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Server error:", response.status, errorText);
+      // Check if we already showed modal for this round
+      const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${currentRound}`;
+      if (localStorage.getItem(storageKey)) {
         return;
       }
 
-      // Try to parse JSON
-      let result;
-      try {
-        const responseText = await response.text();
-        result = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error("JSON parse error:", parseError);
-        return;
-      }
+      // Mark that we showed modal for this round
+      localStorage.setItem(storageKey, "true");
 
-      if (result.success) {
-        // Check if we already showed modal for this round
-        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${result.current_round}`;
-        if (localStorage.getItem(storageKey)) {
-          console.log("Winner modal already shown for this round");
-          return;
-        }
+      // Save flag to show winner modal after reload
+      localStorage.setItem(
+        `show_winner_after_reload_${this.objectManager.currentRoomId}`,
+        "true"
+      );
 
-        // Mark that we showed modal for this round
-        localStorage.setItem(storageKey, "true");
+      // Reset ready status before reload
+      await this.resetReadyStatus();
 
-        // Save flag to show winner modal after reload (will fetch fresh data from server)
-        localStorage.setItem(
-          `show_winner_after_reload_${this.objectManager.currentRoomId}`,
-          "true"
-        );
+      // Allow reload without warning
+      this.allowReload = true;
 
-        // Reset ready status before reload
-        await this.resetReadyStatus();
-
-        // Allow reload without warning
-        this.allowReload = true;
-
-        // Reload immediately - winner modal will be shown during loading
-        window.location.reload();
-      }
+      // Reload immediately - winner modal will be shown during loading
+      window.location.reload();
     } catch (error) {
       console.error("Error showing winner modal:", error);
     }
   }
 
   async startNextRoundPreparation() {
-    console.log("Starting next round preparation...");
-
     // Reset ready status FIRST
     await this.resetReadyStatus();
 
     // Reload player resources from database
     if (this.player) {
       await this.player.initializeResources();
-      console.log("Player resources reloaded from database");
-
-      // Add round income after loading resources
       await this.player.addRoundIncome();
-      console.log("Round income added");
     }
 
     // Reset all units to starting positions
