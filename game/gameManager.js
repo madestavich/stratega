@@ -131,6 +131,14 @@ class GameManager {
     }
   }
 
+  async reloadUnitIcons() {
+    console.log("Reloading unit icons for interface...");
+    if (this.player && this.player.race) {
+      await this.loadUnitIcons(this.player.race);
+      console.log(`Unit icons reloaded for race: ${this.player.race}`);
+    }
+  }
+
   async start() {
     console.log("START: gameManager.start() called");
     await this.configLoader.loadRacesConfig();
@@ -834,25 +842,32 @@ class GameManager {
   async startNextRoundPreparation() {
     console.log("Starting next round preparation...");
 
-    // Reload player resources from database BEFORE reset
+    // Reset ready status FIRST
+    await this.resetReadyStatus();
+
+    // Reload player resources from database
     if (this.player) {
       await this.player.initializeResources();
       console.log("Player resources reloaded from database");
+
+      // Add round income after loading resources
+      await this.player.addRoundIncome();
+      console.log("Round income added");
     }
 
     // Reset all units to starting positions
     await this.resetUnitsToStartingPositions();
 
-    // Update interface AFTER reset
+    // Reload unit icons for interface
+    await this.reloadUnitIcons();
+
+    // Update interface AFTER everything is reloaded
     if (this.player) {
       this.interfaceManager.updatePlayerInterface(this.player);
-      console.log("Interface updated with fresh data");
+      console.log("Interface fully updated with fresh data");
     }
 
-    // Reset ready status for new round
-    await this.resetReadyStatus();
-
-    // Wait 1 second for ready status reset to propagate to database
+    // Wait 1 second for everything to settle
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Get round duration from server before starting timer
@@ -868,19 +883,27 @@ class GameManager {
     // Simply reload all units from database - this will reset positions, health, everything
     await this.objectManager.loadObjects();
 
-    // Ensure all units have correct look direction
+    // Ensure all units have correct look direction and force restart animations
     for (const unit of this.objectManager.objects) {
       unit.setLookDirectionByTeam();
-      // Make sure animation is playing
+      // Force restart animation
       if (unit.animator) {
+        unit.animator.currentFrame = 0;
+        unit.animator.hasFinished = false;
         unit.animator.setAnimation("idle", true);
+        // Manually trigger first frame
+        unit.animator.nextFrame();
       }
     }
     for (const unit of this.objectManager.enemyObjects) {
       unit.setLookDirectionByTeam();
-      // Make sure animation is playing
+      // Force restart animation
       if (unit.animator) {
+        unit.animator.currentFrame = 0;
+        unit.animator.hasFinished = false;
         unit.animator.setAnimation("idle", true);
+        // Manually trigger first frame
+        unit.animator.nextFrame();
       }
     }
 
@@ -891,8 +914,13 @@ class GameManager {
       `Units reloaded from database: ${this.objectManager.objects.length} player, ${this.objectManager.enemyObjects.length} enemy`
     );
 
-    // Force render
-    this.render();
+    // Force multiple renders to ensure everything updates
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        this.render();
+      }, i * 100);
+    }
+
     console.log("=== RESET COMPLETE ===");
   }
 
@@ -996,14 +1024,6 @@ class GameManager {
 
       if (result.success) {
         console.log("Ready status reset for new round");
-
-        // Add round income to player at the start of new round
-        if (this.player) {
-          await this.player.addRoundIncome();
-          // Force update interface after adding income
-          this.interfaceManager.updatePlayerInterface(this.player);
-          console.log("Round income added and interface updated");
-        }
 
         // Reset UI button
         const readyButton = document.getElementById("ready-button");
