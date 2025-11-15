@@ -883,8 +883,8 @@ class GameManager {
         setTimeout(async () => {
           modal.style.display = "none";
 
-          // Hide waiting overlay if it's visible (for reconnect scenario)
-          this.hideWaitingForBattleMessage();
+          // DON'T hide waiting overlay - let it stay visible during reload
+          // to prevent white screen flash. Loading screen will appear on top.
 
           // Reset ready status before reload
           await this.resetReadyStatus();
