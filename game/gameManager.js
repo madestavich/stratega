@@ -210,6 +210,7 @@ class GameManager {
 
       // Get fresh winner data from server
       const winnerInfo = await this.getWinnerInfo();
+      console.log("Winner info from server:", winnerInfo);
       if (winnerInfo && winnerInfo.success) {
         const modal = document.getElementById("round-winner-modal");
         const roundNumber = document.getElementById("round-number");
@@ -218,6 +219,7 @@ class GameManager {
         roundNumber.textContent = `Раунд ${winnerInfo.current_round}`;
         winnerNickname.textContent =
           winnerInfo.winner_nickname || "Невідомий гравець";
+        console.log("Set winner nickname to:", winnerInfo.winner_nickname);
 
         // Show winner modal FIRST
         modal.style.display = "flex";
@@ -870,6 +872,7 @@ class GameManager {
   }
 
   async incrementRound(winnerId) {
+    console.log("incrementRound called with winnerId:", winnerId);
     try {
       const response = await fetch("../server/room.php", {
         method: "POST",

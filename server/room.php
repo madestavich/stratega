@@ -643,6 +643,8 @@ function incrementRound($data) {
     $room_id = $data['room_id'] ?? 0;
     $winner_id = $data['winner_id'] ?? null;
     
+    error_log("incrementRound called - room_id: $room_id, winner_id: " . ($winner_id ?? 'NULL') . ", user_id: $user_id");
+    
     // Check if round is already incremented (race condition protection)
     $stmt = $conn->prepare("SELECT current_round FROM game_rooms WHERE id = ?");
     $stmt->bind_param("i", $room_id);
@@ -701,6 +703,8 @@ function getWinnerInfo($data) {
     $stmt->execute();
     $result = $stmt->get_result();
     $room = $result->fetch_assoc();
+    
+    error_log("getWinnerInfo - room_id: $room_id, winner_id: " . ($room['winner_id'] ?? 'NULL') . ", winner_nickname: " . ($room['winner_nickname'] ?? 'NULL'));
     
     if ($room) {
         echo json_encode([
