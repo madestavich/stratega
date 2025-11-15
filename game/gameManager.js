@@ -857,16 +857,14 @@ class GameManager {
       }
 
       if (result.success) {
-        // Check if we already showed modal for this round (unique per user)
-        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${this.currentUserId}`;
-        const lastShownRound = localStorage.getItem(storageKey);
-        if (
-          lastShownRound &&
-          parseInt(lastShownRound) === result.current_round
-        ) {
+        // Check if we already showed modal for this round (unique per session/tab)
+        const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${result.current_round}`;
+        const alreadyShown = sessionStorage.getItem(storageKey);
+        if (alreadyShown === "true") {
           console.log(
             "Winner modal already shown for round",
-            result.current_round
+            result.current_round,
+            "in this session"
           );
           return;
         }
@@ -883,8 +881,8 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
-        // Mark that we showed modal for this round
-        localStorage.setItem(storageKey, result.current_round);
+        // Mark that we showed modal for this round in this session
+        sessionStorage.setItem(storageKey, "true");
 
         // Hide modal after 3 seconds and reload page for fresh state
         setTimeout(async () => {
