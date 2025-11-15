@@ -201,6 +201,39 @@ class GameManager {
       console.log("DEBUG: roomInfo is null/undefined");
     }
 
+    // Check if we're loading after showing winner modal
+    const showWinnerDuringLoad = localStorage.getItem(
+      `show_winner_during_load_${this.objectManager.currentRoomId}`
+    );
+    if (showWinnerDuringLoad === "true") {
+      console.log(
+        "Reloading after winner modal - showing winner modal during load"
+      );
+      // Hide loading screen and show winner modal
+      const loadingScreen = document.getElementById("loading-screen");
+      if (loadingScreen) {
+        loadingScreen.style.display = "none";
+      }
+
+      // Get and show winner modal with data from server
+      const winnerInfo = await this.getWinnerInfo();
+      if (winnerInfo && winnerInfo.success) {
+        const modal = document.getElementById("round-winner-modal");
+        const roundNumber = document.getElementById("round-number");
+        const winnerNickname = document.getElementById("winner-nickname");
+
+        roundNumber.textContent = `Раунд ${winnerInfo.current_round}`;
+        winnerNickname.textContent =
+          winnerInfo.winner_nickname || "Невідомий гравець";
+        modal.style.display = "flex";
+      }
+
+      // Clear the flag
+      localStorage.removeItem(
+        `show_winner_during_load_${this.objectManager.currentRoomId}`
+      );
+    }
+
     // Check if we reconnected during battle
     const battleState = await this.checkBattleState();
     if (battleState && battleState.battle_started) {
@@ -278,6 +311,7 @@ class GameManager {
   }
 
   hideLoadingScreen() {
+    // Hide loading screen
     const loadingScreen = document.getElementById("loading-screen");
     if (loadingScreen) {
       loadingScreen.classList.add("hidden");
@@ -285,6 +319,18 @@ class GameManager {
       setTimeout(() => {
         loadingScreen.remove();
       }, 300);
+    }
+
+    // Also hide winner modal if it's visible (after reload from round end)
+    const winnerModal = document.getElementById("round-winner-modal");
+    if (winnerModal && winnerModal.style.display === "flex") {
+      winnerModal.style.display = "none";
+    }
+
+    // Also hide waiting overlay if it's visible (should be hidden already)
+    const waitingOverlay = document.getElementById("battle-waiting-overlay");
+    if (waitingOverlay && waitingOverlay.style.display === "flex") {
+      waitingOverlay.style.display = "none";
     }
   }
 
@@ -785,6 +831,32 @@ class GameManager {
     }
   }
 
+  async getWinnerInfo() {
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "get_winner_info",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error("Error getting winner info:", error);
+      return null;
+    }
+  }
+
   async incrementRound(winnerId) {
     try {
       const response = await fetch("../server/room.php", {
@@ -879,27 +951,22 @@ class GameManager {
         // Mark that we showed modal for this round
         localStorage.setItem(storageKey, "true");
 
-        // Hide modal after 3 seconds and reload page for fresh state
+        // Mark that we're reloading after winner modal (to keep it visible)
+        localStorage.setItem(
+          `show_winner_during_load_${this.objectManager.currentRoomId}`,
+          "true"
+        );
+
+        // Wait 3 seconds then reload (modal will stay visible until game loads)
         setTimeout(async () => {
-          modal.style.display = "none";
-
-          // Show loading screen immediately to prevent any flash
-          const loadingScreen = document.getElementById("loading-screen");
-          if (loadingScreen) {
-            loadingScreen.classList.remove("hidden");
-            loadingScreen.style.display = "flex";
-          }
-
           // Reset ready status before reload
           await this.resetReadyStatus();
 
           // Allow reload without warning
           this.allowReload = true;
 
-          // Small delay to ensure loading screen is visible
-          setTimeout(() => {
-            window.location.reload();
-          }, 50);
+          // Reload - winner modal will be shown instead of loading screen
+          window.location.reload();
         }, 3000);
       }
     } catch (error) {
