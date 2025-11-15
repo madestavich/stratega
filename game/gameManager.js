@@ -208,12 +208,6 @@ class GameManager {
     if (showWinnerAfterReload === "true") {
       console.log("Reloading after winner - showing winner modal during load");
 
-      // Hide loading screen and show winner modal
-      const loadingScreen = document.getElementById("loading-screen");
-      if (loadingScreen) {
-        loadingScreen.style.display = "none";
-      }
-
       // Get fresh winner data from server
       const winnerInfo = await this.getWinnerInfo();
       if (winnerInfo && winnerInfo.success) {
@@ -224,7 +218,20 @@ class GameManager {
         roundNumber.textContent = `Раунд ${winnerInfo.current_round}`;
         winnerNickname.textContent =
           winnerInfo.winner_nickname || "Невідомий гравець";
+
+        // Show winner modal FIRST
         modal.style.display = "flex";
+
+        // Then fade out loading screen with delay to prevent white flash
+        setTimeout(() => {
+          const loadingScreen = document.getElementById("loading-screen");
+          if (loadingScreen) {
+            loadingScreen.classList.add("hidden");
+            setTimeout(() => {
+              loadingScreen.remove();
+            }, 300);
+          }
+        }, 100);
       }
 
       // Clear the flag
