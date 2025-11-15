@@ -1422,10 +1422,11 @@ function checkBattleCompletion($data) {
         throw new Exception('Кімната не знайдена');
     }
     
-    // Battle is completed when battle was started but both players are no longer in battle
-    $battle_completed = $room['battle_started'] && 
-                       !$room['player1_in_battle'] && 
-                       !$room['player2_in_battle'];
+    // Battle is completed when:
+    // 1. Battle was started (or just finished) AND both players are not in battle
+    // 2. OR battle_started is 0 (meaning it was completed and reset by incrementRound)
+    $battle_completed = (!$room['player1_in_battle'] && !$room['player2_in_battle']) ||
+                       (!$room['battle_started'] && $room['winner_id'] !== null);
     
     echo json_encode([
         'success' => true,

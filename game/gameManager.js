@@ -1088,11 +1088,13 @@ class GameManager {
 
   // Handle case when player refreshed during battle
   async handleBattleDisconnection(battleState) {
+    console.log("handleBattleDisconnection called with state:", battleState);
     this.battleDisconnected = true;
     this.waitingForBattleEnd = true;
     this.isPaused = true;
 
     // Mark current player as not in battle
+    console.log("Setting current player as NOT in battle...");
     await this.setBattleState(false);
 
     // Show waiting message
@@ -1101,8 +1103,13 @@ class GameManager {
     // Start checking for battle completion
     this.battleCompletionCheckInterval = setInterval(async () => {
       const completionState = await this.checkBattleCompletion();
+      console.log("Battle completion check:", completionState);
+
       if (completionState && completionState.battle_completed) {
-        console.log("Battle completed by other player!");
+        console.log(
+          "Battle completed by other player! Winner:",
+          completionState.winner_id
+        );
         clearInterval(this.battleCompletionCheckInterval);
         this.battleCompletionCheckInterval = null;
 
@@ -1111,6 +1118,8 @@ class GameManager {
 
         // Show winner and continue to next round
         await this.showWinnerModalAndContinue();
+      } else {
+        console.log("Battle not yet completed, continuing to wait...");
       }
     }, 2000); // Check every 2 seconds
   }
