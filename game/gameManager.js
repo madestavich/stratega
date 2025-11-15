@@ -42,6 +42,9 @@ class GameManager {
     // Flag to allow reload without warning
     this.allowReload = false;
 
+    // Flag to track if battle is in progress
+    this.isBattleInProgress = false;
+
     //! ініціалізація об'єктів і інших менеджерів
 
     this.configLoader = new ConfigLoader();
@@ -86,7 +89,8 @@ class GameManager {
         return;
       }
 
-      if (!this.isPaused && !this.battleDisconnected) {
+      // Show warning if battle is actively running
+      if (this.isBattleInProgress && !this.battleDisconnected) {
         e.preventDefault();
         e.returnValue =
           "Бій активний! Якщо ви оновите сторінку, вам доведеться чекати завершення бою противником.";
@@ -581,6 +585,9 @@ class GameManager {
     console.log("DEBUG: startGame called, isPaused:", this.isPaused);
     console.trace("startGame call stack");
 
+    // Mark that battle is in progress
+    this.isBattleInProgress = true;
+
     // Mark current player as in battle
     await this.setBattleState(true);
 
@@ -686,6 +693,9 @@ class GameManager {
 
     // Pause the game
     this.isPaused = true;
+
+    // Mark that battle is no longer in progress
+    this.isBattleInProgress = false;
 
     // Process round end and show winner modal
     await this.processRoundEnd(winnerId);
@@ -824,6 +834,21 @@ class GameManager {
       }
 
       if (result.success) {
+        // Check if we already showed modal for this round
+        const lastShownRound = localStorage.getItem(
+          `winner_shown_${this.objectManager.currentRoomId}`
+        );
+        if (
+          lastShownRound &&
+          parseInt(lastShownRound) === result.current_round
+        ) {
+          console.log(
+            "Winner modal already shown for round",
+            result.current_round
+          );
+          return;
+        }
+
         // Update modal content
         const modal = document.getElementById("round-winner-modal");
         const roundNumber = document.getElementById("round-number");
@@ -836,12 +861,18 @@ class GameManager {
         // Show modal
         modal.style.display = "flex";
 
+        // Mark that we showed modal for this round
+        localStorage.setItem(
+          `winner_shown_${this.objectManager.currentRoomId}`,
+          result.current_round
+        );
+
         // Hide modal after 3 seconds and reload page for fresh state
         setTimeout(async () => {
           modal.style.display = "none";
 
-          // Clear winner to prevent modal re-showing on reload
-          await this.clearWinner();
+          // Reset ready status before reload
+          await this.resetReadyStatus();
 
           // Allow reload without warning
           this.allowReload = true;
