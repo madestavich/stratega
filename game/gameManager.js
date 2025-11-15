@@ -883,16 +883,23 @@ class GameManager {
         setTimeout(async () => {
           modal.style.display = "none";
 
-          // DON'T hide waiting overlay - let it stay visible during reload
-          // to prevent white screen flash. Loading screen will appear on top.
+          // Show loading screen immediately to prevent any flash
+          const loadingScreen = document.getElementById("loading-screen");
+          if (loadingScreen) {
+            loadingScreen.classList.remove("hidden");
+            loadingScreen.style.display = "flex";
+          }
 
           // Reset ready status before reload
           await this.resetReadyStatus();
 
           // Allow reload without warning
           this.allowReload = true;
-          // Reload page to reset everything to fresh state
-          window.location.reload();
+
+          // Small delay to ensure loading screen is visible
+          setTimeout(() => {
+            window.location.reload();
+          }, 50);
         }, 3000);
       }
     } catch (error) {
