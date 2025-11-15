@@ -656,55 +656,85 @@ canvas {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.85);
+  background: url("../textures/Leather-red-medium.png") repeat;
   display: none;
   justify-content: center;
   align-items: center;
   z-index: 10000;
 }
 
+.battle-waiting-overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: -1;
+}
+
 .battle-waiting-content {
-  background: url("../textures/Leather-red-medium.png") repeat;
-  border: 10px solid transparent;
-  border-image: url("../textures/Border-gold.png") 20 repeat;
-  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  max-width: 500px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .battle-waiting-title {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: bold;
   color: #ffd700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5);
   margin-bottom: 15px;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  animation: textGlow 2s ease-in-out infinite;
 }
 
 .battle-waiting-subtitle {
   font-size: 18px;
   color: #ff6b6b;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .battle-waiting-text {
   font-size: 16px;
-  color: #ffffff;
+  color: #ffd700;
   margin-bottom: 30px;
   line-height: 1.5;
+  padding: 15px 30px;
+  border: 4px solid transparent;
+  border-image: url("../textures/Border-gold.png") 15 repeat;
+  background: rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .battle-waiting-spinner {
+  width: 80px;
+  height: 80px;
+  border: 6px solid transparent;
+  border-image: url("../textures/Border-gold.png") 10 repeat;
+  border-radius: 50%;
+  position: relative;
+  animation: spin 1.5s linear infinite;
+  margin-bottom: 20px;
+}
+
+.battle-waiting-spinner::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 50px;
   height: 50px;
-  border: 5px solid rgba(255, 215, 0, 0.3);
-  border-top: 5px solid #ffd700;
+  background: radial-gradient(circle, #ffd700 0%, #ff8c00 100%);
   border-radius: 50%;
-  margin: 0 auto;
-  animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes spin {
@@ -713,5 +743,28 @@ canvas {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@keyframes textGlow {
+  0%,
+  100% {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.8),
+      0 0 30px rgba(255, 215, 0, 0.4);
   }
 }
