@@ -857,14 +857,6 @@ class GameManager {
       }
 
       if (result.success) {
-        // If there's no winner, don't show modal
-        if (!result.winner_id) {
-          console.log(
-            "No winner set - battle still in progress or already cleared"
-          );
-          return;
-        }
-
         // Check if we already showed modal for this round
         const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${result.current_round}`;
         if (localStorage.getItem(storageKey)) {
