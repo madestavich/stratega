@@ -474,7 +474,7 @@ canvas {
   align-items: center;
   z-index: 10001; /* Higher than waiting overlay */
   opacity: 1;
-  transition: opacity 1s ease-out;
+  transition: opacity 0.3s ease-out;
 }
 
 .round-winner-modal.fade-out {

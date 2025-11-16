@@ -319,12 +319,17 @@ class GameManager {
     // Smoothly fade out winner modal if it's visible (after reload from round end)
     const winnerModal = document.getElementById("round-winner-modal");
     if (winnerModal && winnerModal.style.display === "flex") {
+      console.log(
+        "Winner modal detected, will hide after 1.5s + 0.3s animation"
+      );
       // Keep modal visible for 1.5 seconds before starting fade out
       setTimeout(() => {
+        console.log("Starting fade-out animation");
         // Add fade-out class for smooth transition
         winnerModal.classList.add("fade-out");
         // Wait for animation to complete, then hide and start timer
         setTimeout(() => {
+          console.log("Hiding modal and starting timer");
           winnerModal.style.display = "none";
           winnerModal.classList.remove("fade-out");
 
@@ -338,6 +343,7 @@ class GameManager {
     }
 
     // If no winner modal, start timer immediately
+    console.log("No winner modal, starting timer immediately");
     this.startRoundTimer();
 
     // Also hide waiting overlay if it's visible (should be hidden already)
