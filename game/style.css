@@ -38,36 +38,67 @@
 }
 
 .loading-spinner {
-  width: 80px;
-  height: 80px;
-  border: 6px solid transparent;
-  border-image: url("../textures/Border-gold.png") 10 repeat;
-  border-radius: 50%;
+  width: 100px;
+  height: 100px;
   position: relative;
   margin-bottom: 30px;
-  animation: spin 1.5s linear infinite;
 }
 
 .loading-spinner::before {
   content: "";
   position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  border-top-color: #ffd700;
+  border-right-color: #ff8c00;
+  border-bottom-color: #ffd700;
+  border-left-color: #ff8c00;
+  animation: magicSpin 2s linear infinite;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
+    inset 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.loading-spinner::after {
+  content: "";
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50px;
-  height: 50px;
-  background: radial-gradient(circle, #ffd700 0%, #ff8c00 100%);
+  width: 60%;
+  height: 60%;
+  border: 3px solid transparent;
   border-radius: 50%;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
-  animation: pulse 1.5s ease-in-out infinite;
+  border-top-color: #ff8c00;
+  border-bottom-color: #ffd700;
+  animation: magicSpinReverse 1.5s linear infinite;
+  box-shadow: 0 0 15px rgba(255, 140, 0, 0.6);
 }
 
-@keyframes spin {
+@keyframes magicSpin {
   0% {
     transform: rotate(0deg);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
+      inset 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.9),
+      inset 0 0 30px rgba(255, 215, 0, 0.5);
   }
   100% {
     transform: rotate(360deg);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
+      inset 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+}
+
+@keyframes magicSpinReverse {
+  0% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(0deg);
   }
 }
 
@@ -719,28 +750,42 @@ canvas {
 }
 
 .battle-waiting-spinner {
-  width: 80px;
-  height: 80px;
-  border: 6px solid transparent;
-  border-image: url("../textures/Border-gold.png") 10 repeat;
-  border-radius: 50%;
+  width: 100px;
+  height: 100px;
   position: relative;
-  animation: spin 1.5s linear infinite;
   margin-bottom: 20px;
 }
 
 .battle-waiting-spinner::before {
   content: "";
   position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  border-top-color: #ffd700;
+  border-right-color: #ff8c00;
+  border-bottom-color: #ffd700;
+  border-left-color: #ff8c00;
+  animation: magicSpin 2s linear infinite;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
+    inset 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.battle-waiting-spinner::after {
+  content: "";
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50px;
-  height: 50px;
-  background: radial-gradient(circle, #ffd700 0%, #ff8c00 100%);
+  width: 60%;
+  height: 60%;
+  border: 3px solid transparent;
   border-radius: 50%;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
-  animation: pulse 1.5s ease-in-out infinite;
+  border-top-color: #ff8c00;
+  border-bottom-color: #ffd700;
+  animation: magicSpinReverse 1.5s linear infinite;
+  box-shadow: 0 0 15px rgba(255, 140, 0, 0.6);
 }
 
 @keyframes spin {
