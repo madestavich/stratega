@@ -290,6 +290,16 @@ class GameManager {
     // Initialize player resources from database (will override with DB values if they exist)
     await this.player.initializeResources();
 
+    // Check if we just finished a round (modal will be shown)
+    const shouldAddIncomeAfterBattle = localStorage.getItem(
+      `show_winner_after_reload_${this.objectManager.currentRoomId}`
+    );
+    if (shouldAddIncomeAfterBattle === "true") {
+      // Add round income after battle
+      await this.player.addRoundIncome();
+      console.log("Round income added after battle");
+    }
+
     this.interfaceManager.updatePlayerInterface(this.player);
 
     // Set round duration from room settings
@@ -966,38 +976,6 @@ class GameManager {
     } catch (error) {
       console.error("Error showing winner modal:", error);
     }
-  }
-
-  async startNextRoundPreparation() {
-    // Reset ready status FIRST
-    await this.resetReadyStatus();
-
-    // Reload player resources from database
-    if (this.player) {
-      await this.player.initializeResources();
-      await this.player.addRoundIncome();
-    }
-
-    // Reset all units to starting positions
-    await this.resetUnitsToStartingPositions();
-
-    // Reload unit icons for interface
-    await this.reloadUnitIcons();
-
-    // Update interface AFTER everything is reloaded
-    if (this.player) {
-      this.interfaceManager.updatePlayerInterface(this.player);
-      console.log("Interface fully updated with fresh data");
-    }
-
-    // Wait 1 second for everything to settle
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Get round duration from server before starting timer
-    await this.getRoundDuration();
-
-    // Start new round timer
-    await this.startRoundTimer();
   }
 
   async resetUnitsToStartingPositions() {
