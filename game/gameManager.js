@@ -938,14 +938,6 @@ class GameManager {
       // Allow reload without warning
       this.allowReload = true;
 
-      // TEMPORARILY DISABLED FOR DEBUGGING - TO SEE CONSOLE LOGS
-      console.log(
-        "%c=== RELOAD DISABLED FOR DEBUG ===",
-        "color: red; font-size: 20px; font-weight: bold;"
-      );
-      console.log("Check logs above to see winner_id flow");
-      return; // REMOVE THIS LINE AFTER DEBUGGING
-
       // Reload immediately - winner modal will be shown during loading
       window.location.reload();
     } catch (error) {
