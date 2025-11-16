@@ -189,10 +189,12 @@ class GameManager {
       }
     }
 
-    // Check if we should show winner modal after reload
+    // Check if we should show winner modal after reload AND save flag for later
     const showWinnerAfterReload = localStorage.getItem(
       `show_winner_after_reload_${this.objectManager.currentRoomId}`
     );
+    const shouldAddIncome = showWinnerAfterReload === "true";
+
     if (showWinnerAfterReload === "true") {
       // Get winner data from localStorage and room settings
       const playerNicknames = JSON.parse(
@@ -291,11 +293,8 @@ class GameManager {
     await this.player.initializeResources();
     console.log("After initializeResources, money:", this.player.money);
 
-    // Check if we just finished a round (modal will be shown)
-    const shouldAddIncomeAfterBattle = localStorage.getItem(
-      `show_winner_after_reload_${this.objectManager.currentRoomId}`
-    );
-    if (shouldAddIncomeAfterBattle === "true") {
+    // Check if we just finished a round (use saved flag)
+    if (shouldAddIncome) {
       // Add round income after battle
       console.log("Before addRoundIncome, money:", this.player.money);
       await this.player.addRoundIncome();
