@@ -784,16 +784,24 @@ class GameManager {
       return;
     }
 
+    console.log("=== PROCESS ROUND END DEBUG ===");
+    console.log("winnerId from checkBattleEnd:", winnerId);
+    console.log("roomPlayers:", roomPlayers);
+
     // Convert winner to user ID
     let actualWinnerId = null;
     if (winnerId === "current_player") {
       actualWinnerId = roomPlayers.current_user_id;
+      console.log("Winner is current_player, actualWinnerId:", actualWinnerId);
     } else if (winnerId === "other_player") {
       // Get the other player's ID
       actualWinnerId =
         roomPlayers.creator_id === roomPlayers.current_user_id
           ? roomPlayers.second_player_id
           : roomPlayers.creator_id;
+      console.log("Winner is other_player, actualWinnerId:", actualWinnerId);
+    } else {
+      console.error("UNEXPECTED winnerId value:", winnerId);
     }
 
     console.log(
