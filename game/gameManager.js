@@ -299,17 +299,6 @@ class GameManager {
     // Get round duration from server first (for sync)
     await this.getRoundDuration();
 
-    // Check if winner modal should be shown (before starting timer)
-    const showWinnerAfterReloadCheck = localStorage.getItem(
-      `show_winner_after_reload_${this.objectManager.currentRoomId}`
-    );
-    const shouldShowWinnerModal = showWinnerAfterReloadCheck === "true";
-
-    // Start round management ONLY if not showing winner modal
-    if (!shouldShowWinnerModal) {
-      await this.startRoundTimer();
-    }
-
     // Hide loading screen after everything is ready
     this.hideLoadingScreen();
 
@@ -327,10 +316,19 @@ class GameManager {
       }, 300);
     }
 
+    // Check if winner modal should be shown
+    const showWinnerAfterReloadCheck = localStorage.getItem(
+      `show_winner_after_reload_${this.objectManager.currentRoomId}`
+    );
+
     // Smoothly fade out winner modal if it's visible (after reload from round end)
     const winnerModal = document.getElementById("round-winner-modal");
-    if (winnerModal && winnerModal.style.display === "flex") {
-      // Keep modal visible for 1 second before starting fade out
+    if (
+      winnerModal &&
+      winnerModal.style.display === "flex" &&
+      showWinnerAfterReloadCheck === "true"
+    ) {
+      // Keep modal visible for 1.5 seconds before starting fade out
       setTimeout(() => {
         // Add fade-out class for smooth transition
         winnerModal.classList.add("fade-out");
@@ -341,12 +339,15 @@ class GameManager {
 
           // Start round timer AFTER modal is hidden
           this.startRoundTimer();
-        }, 500); // Fade animation duration (0.5 seconds)
-      }, 1000); // Keep visible for 1 second
+        }, 300); // Fade animation duration (0.3 seconds)
+      }, 1500); // Keep visible for 1.5 seconds
 
-      // Don't start timer immediately - wait for modal to hide
-      return; // Skip normal initialization that would start timer
+      // Don't start timer immediately - modal will start it after hiding
+      return;
     }
+
+    // If no winner modal, start timer immediately
+    this.startRoundTimer();
 
     // Also hide waiting overlay if it's visible (should be hidden already)
     const waitingOverlay = document.getElementById("battle-waiting-overlay");
