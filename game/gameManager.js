@@ -805,17 +805,19 @@ class GameManager {
     console.log("winnerId from checkBattleEnd:", winnerId);
     console.log("roomPlayers:", roomPlayers);
 
+    // Convert current_user_id to number for proper comparison
+    const currentUserId = parseInt(roomPlayers.current_user_id);
+    const creatorId = parseInt(roomPlayers.creator_id);
+    const secondPlayerId = parseInt(roomPlayers.second_player_id);
+
     // Convert winner to user ID
     let actualWinnerId = null;
     if (winnerId === "current_player") {
-      actualWinnerId = roomPlayers.current_user_id;
+      actualWinnerId = currentUserId;
       console.log("Winner is current_player, actualWinnerId:", actualWinnerId);
     } else if (winnerId === "other_player") {
-      // Get the other player's ID
-      actualWinnerId =
-        roomPlayers.creator_id === roomPlayers.current_user_id
-          ? roomPlayers.second_player_id
-          : roomPlayers.creator_id;
+      // Get the other player's ID (the one who is NOT current user)
+      actualWinnerId = currentUserId === creatorId ? secondPlayerId : creatorId;
       console.log("Winner is other_player, actualWinnerId:", actualWinnerId);
     } else {
       console.error("UNEXPECTED winnerId value:", winnerId);
