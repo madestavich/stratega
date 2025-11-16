@@ -721,7 +721,9 @@ class GameManager {
     // Check if one team has no units left
     if (playerUnits.length === 0 || enemyUnits.length === 0) {
       console.log(
-        `Battle ended! Player units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`
+        `%c=== BATTLE ENDED ===%c\nPlayer units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`,
+        "color: red; font-weight: bold; font-size: 16px;",
+        "color: white;"
       );
 
       // Stop battle checking
@@ -735,13 +737,24 @@ class GameManager {
 
       if (playerUnits.length > 0 && enemyUnits.length === 0) {
         winnerId = "current_player"; // Current player wins
+        console.log(
+          "%cWINNER: current_player",
+          "color: green; font-weight: bold;"
+        );
       } else if (enemyUnits.length > 0 && playerUnits.length === 0) {
         winnerId = "other_player"; // Other player wins
+        console.log(
+          "%cWINNER: other_player",
+          "color: green; font-weight: bold;"
+        );
+      } else {
+        console.log(
+          "%cWARNING: Both teams destroyed! winnerId will be NULL",
+          "color: orange; font-weight: bold;"
+        );
       }
 
-      console.log(
-        `Winner determined: ${winnerId} (current player units: ${playerUnits.length}, enemy units: ${enemyUnits.length})`
-      );
+      console.log(`Calling endRound with winnerId: ${winnerId}`);
 
       // End the round with winner info
       this.endRound(winnerId);
@@ -749,7 +762,11 @@ class GameManager {
   }
 
   async endRound(winnerId = null) {
-    console.log("Round ended! Processing winner...");
+    console.log(
+      "%c=== END ROUND CALLED ===",
+      "color: yellow; font-weight: bold; font-size: 16px;"
+    );
+    console.log("winnerId:", winnerId);
 
     // Mark player as no longer in battle
     await this.setBattleState(false);
