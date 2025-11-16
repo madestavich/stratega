@@ -289,6 +289,7 @@ class GameManager {
 
     // Initialize player resources from database (will override with DB values if they exist)
     await this.player.initializeResources();
+    console.log("After initializeResources, money:", this.player.money);
 
     // Check if we just finished a round (modal will be shown)
     const shouldAddIncomeAfterBattle = localStorage.getItem(
@@ -296,11 +297,13 @@ class GameManager {
     );
     if (shouldAddIncomeAfterBattle === "true") {
       // Add round income after battle
+      console.log("Before addRoundIncome, money:", this.player.money);
       await this.player.addRoundIncome();
-      console.log("Round income added after battle");
+      console.log("After addRoundIncome, money:", this.player.money);
     }
 
     this.interfaceManager.updatePlayerInterface(this.player);
+    console.log("After updatePlayerInterface, money:", this.player.money);
 
     // Set round duration from room settings
     this.roundDuration = roomSettings.round_time || 45;
