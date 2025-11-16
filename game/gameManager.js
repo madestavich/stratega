@@ -204,7 +204,15 @@ class GameManager {
       const roomSettings = await this.getRoomSettings();
       const winnerId = roomSettings.winner_id;
       const currentRound = roomSettings.current_round;
-      const winnerNickname = playerNicknames[winnerId] || "Невідомий гравець";
+
+      // Convert winnerId to string for localStorage key lookup
+      const winnerNickname =
+        playerNicknames[String(winnerId)] || "Невідомий гравець";
+
+      console.log("DEBUG WINNER MODAL:");
+      console.log("winnerId:", winnerId, "type:", typeof winnerId);
+      console.log("playerNicknames:", playerNicknames);
+      console.log("winnerNickname:", winnerNickname);
 
       const modal = document.getElementById("round-winner-modal");
       const roundNumber = document.getElementById("round-number");
