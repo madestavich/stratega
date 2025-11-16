@@ -239,6 +239,9 @@ class GameManager {
       localStorage.removeItem(
         `show_winner_after_reload_${this.objectManager.currentRoomId}`
       );
+
+      // Clear winner_id from database after showing modal
+      await this.clearWinner();
     }
 
     // Check if we reconnected during battle
