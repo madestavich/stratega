@@ -856,18 +856,28 @@ class GameManager {
   }
 
   async incrementRound(winnerId) {
+    console.log(
+      "%c=== INCREMENT ROUND CALLED ===",
+      "color: cyan; font-weight: bold; font-size: 14px;"
+    );
+    console.log("winnerId being sent to server:", winnerId);
+    console.log("room_id:", this.objectManager.currentRoomId);
+
     try {
+      const requestBody = {
+        action: "increment_round",
+        room_id: this.objectManager.currentRoomId,
+        winner_id: winnerId,
+      };
+      console.log("Request body:", JSON.stringify(requestBody, null, 2));
+
       const response = await fetch("../server/room.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          action: "increment_round",
-          room_id: this.objectManager.currentRoomId,
-          winner_id: winnerId,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -881,8 +891,13 @@ class GameManager {
       }
 
       const result = await response.json();
+      console.log("Server response:", result);
+
       if (result.success) {
-        console.log(`Round incremented to: ${result.new_round}`);
+        console.log(
+          `%cRound incremented to: ${result.new_round}`,
+          "color: green; font-weight: bold;"
+        );
         return true;
       } else {
         console.error("Failed to increment round:", result.error);
