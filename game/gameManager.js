@@ -299,8 +299,16 @@ class GameManager {
     // Get round duration from server first (for sync)
     await this.getRoundDuration();
 
-    // Start round management
-    await this.startRoundTimer();
+    // Check if winner modal should be shown (before starting timer)
+    const showWinnerAfterReloadCheck = localStorage.getItem(
+      `show_winner_after_reload_${this.objectManager.currentRoomId}`
+    );
+    const shouldShowWinnerModal = showWinnerAfterReloadCheck === "true";
+
+    // Start round management ONLY if not showing winner modal
+    if (!shouldShowWinnerModal) {
+      await this.startRoundTimer();
+    }
 
     // Hide loading screen after everything is ready
     this.hideLoadingScreen();
@@ -322,13 +330,22 @@ class GameManager {
     // Smoothly fade out winner modal if it's visible (after reload from round end)
     const winnerModal = document.getElementById("round-winner-modal");
     if (winnerModal && winnerModal.style.display === "flex") {
-      // Add fade-out class for smooth transition
-      winnerModal.classList.add("fade-out");
-      // Wait for animation to complete, then hide
+      // Keep modal visible for at least 2 seconds before starting fade out
       setTimeout(() => {
-        winnerModal.style.display = "none";
-        winnerModal.classList.remove("fade-out");
-      }, 1000); // Match CSS transition duration
+        // Add fade-out class for smooth transition
+        winnerModal.classList.add("fade-out");
+        // Wait for animation to complete, then hide and start timer
+        setTimeout(() => {
+          winnerModal.style.display = "none";
+          winnerModal.classList.remove("fade-out");
+
+          // Start round timer AFTER modal is hidden
+          this.startRoundTimer();
+        }, 1000); // Fade animation duration
+      }, 2000); // Keep visible for 2 seconds
+
+      // Don't start timer immediately - wait for modal to hide
+      return; // Skip normal initialization that would start timer
     }
 
     // Also hide waiting overlay if it's visible (should be hidden already)
