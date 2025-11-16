@@ -330,7 +330,7 @@ class GameManager {
     // Smoothly fade out winner modal if it's visible (after reload from round end)
     const winnerModal = document.getElementById("round-winner-modal");
     if (winnerModal && winnerModal.style.display === "flex") {
-      // Keep modal visible for at least 2 seconds before starting fade out
+      // Keep modal visible for 1 second before starting fade out
       setTimeout(() => {
         // Add fade-out class for smooth transition
         winnerModal.classList.add("fade-out");
@@ -341,8 +341,8 @@ class GameManager {
 
           // Start round timer AFTER modal is hidden
           this.startRoundTimer();
-        }, 1000); // Fade animation duration
-      }, 2000); // Keep visible for 2 seconds
+        }, 500); // Fade animation duration (0.5 seconds)
+      }, 1000); // Keep visible for 1 second
 
       // Don't start timer immediately - wait for modal to hide
       return; // Skip normal initialization that would start timer
