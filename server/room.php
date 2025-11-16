@@ -652,11 +652,17 @@ function incrementRound($data) {
     
     // Increment round number and set winner only if not already incremented
     // Also reset battle state (no need to save last_round_winner_id - using winner_id)
-    $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
-    $stmt->bind_param("iiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before);
+    if ($winner_id !== null) {
+        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
+        $stmt->bind_param("iiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before);
+    } else {
+        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
+        $stmt->bind_param("iiii", $room_id, $user_id, $user_id, $current_round_before);
+    }
     
     if ($stmt->execute() && $stmt->affected_rows > 0) {
         // Successfully incremented (we were first)
+        error_log("Round incremented successfully - new round: " . ($current_round_before + 1) . ", winner_id set to: " . ($winner_id ?? 'NULL'));
         echo json_encode([
             'success' => true,
             'message' => 'Round incremented',
