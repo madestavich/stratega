@@ -316,18 +316,9 @@ class GameManager {
       }, 300);
     }
 
-    // Check if winner modal should be shown
-    const showWinnerAfterReloadCheck = localStorage.getItem(
-      `show_winner_after_reload_${this.objectManager.currentRoomId}`
-    );
-
     // Smoothly fade out winner modal if it's visible (after reload from round end)
     const winnerModal = document.getElementById("round-winner-modal");
-    if (
-      winnerModal &&
-      winnerModal.style.display === "flex" &&
-      showWinnerAfterReloadCheck === "true"
-    ) {
+    if (winnerModal && winnerModal.style.display === "flex") {
       // Keep modal visible for 1.5 seconds before starting fade out
       setTimeout(() => {
         // Add fade-out class for smooth transition
