@@ -141,3 +141,126 @@ game_rooms (
 - **Stats Editor**: `redactor/unit_stats_redactor.html` - редактор характеристик юнітів
 - **Debug Mode**: Клавіша ` для включення режиму налагодження з візуалізацією сітки
 - **Auto-deployment**: `deploy.js` script для автоматичного деплою на cPanel
+
+## Unit Connection System (Підключення нових юнітів)
+
+Для додавання нового юніта в гру потрібно виконати 3 кроки:
+
+### 1. Створити конфігурацію анімацій (`/game_configs/units/unit_name.json`)
+
+Файл містить структуру анімацій спрайта:
+
+```json
+{
+  "unit_name": {
+    "name": "unit_name",
+    "sourceImage": {
+      "link": "../sprites/unit_name.png",
+      "width": 730,
+      "height": 895
+    },
+    "animations": {
+      "idle": { "name": "idle", "frames": [...] },
+      "move": { "name": "move", "frames": [...] },
+      "attack": { "name": "attack", "frames": [...] },
+      "death": { "name": "death", "frames": [...] },
+      "icon": { "name": "icon", "frames": [...] }
+    }
+  }
+}
+```
+
+**Структура frame:**
+
+- `x, y` - координати на спрайт-шиті
+- `width, height` - розміри фрейму
+- `frameCenter` - центр фрейму для позиціювання
+
+**Інструменти:**
+
+- Використовуйте `redactor/redactor.html` для візуального створення анімацій
+- Спрайт PNG має бути в `/sprites/unit_name.png`
+
+### 2. Додати параметри юніта в races.json (`/game_configs/races.json`)
+
+Вказати расу, тір та характеристики:
+
+```json
+"fortress": {
+  "units": {
+    "tier_one": {
+      "gnoll_marauder": {
+        "gridWidth": 1,              // Ширина на сітці
+        "gridHeight": 1,             // Висота на сітці
+        "objectType": "gnoll_marauder",
+        "actionPriorities": ["attack", "move"],
+        "moveSpeed": 14,             // Швидкість руху
+        "availableActions": ["move", "attack"],
+        "attackDamage": 18,          // Шкода атаки
+        "attackSpeed": 1.1,          // Швидкість атаки
+        "health": 60,                // Здоров'я
+        "cost": 95,                  // Вартість юніта
+        "isRanged": false            // Опціонально: дистанційна атака
+      }
+    }
+  }
+}
+```
+
+**Параметри для ranged units:**
+
+```json
+"isRanged": true,
+"maxShots": 10,
+"minRangeDistance": 6,
+"maxRangeDistance": 25,
+"bulletConfig": {
+  "bulletType": "bullet",
+  "moveSpeed": 40,
+  "bulletDamage": 25
+}
+```
+
+**Інструменти:**
+
+- Використовуйте `redactor/unit_stats_redactor.html` для редагування характеристик
+
+### 3. Зареєструвати спрайт у spriteLoader.js (`/game_configs/spriteLoader.js`)
+
+Додати маппінг у `spriteConfigMap`:
+
+```javascript
+this.spriteConfigMap = {
+  // ... інші юніти
+  //! fortress
+  gnoll: "/game_configs/units/gnoll.json",
+  gnoll_marauder: "/game_configs/units/gnoll_marauder.json",
+  basilisk: "/game_configs/units/basilisk.json",
+};
+```
+
+**Важливо:** Ключ у spriteConfigMap має збігатися з `objectType` у races.json
+
+### Повний чеклист для нового юніта:
+
+- [ ] PNG спрайт у `/sprites/unit_name.png`
+- [ ] JSON анімацій у `/game_configs/units/unit_name.json`
+- [ ] Параметри у `/game_configs/races.json` (правильна раса + тір)
+- [ ] Реєстрація у `/game_configs/spriteLoader.js`
+- [ ] Перевірка: `objectType` однаковий у всіх місцях
+
+### Приклад: Додавання gnoll_marauder
+
+```javascript
+// 1. Створено game_configs/units/gnoll_marauder.json з анімаціями
+// 2. Додано в races.json:
+"fortress": {
+  "units": {
+    "tier_one": {
+      "gnoll_marauder": { /* параметри */ }
+    }
+  }
+}
+// 3. Зареєстровано в spriteLoader.js:
+gnoll_marauder: "/game_configs/units/gnoll_marauder.json"
+```

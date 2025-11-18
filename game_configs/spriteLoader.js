@@ -49,6 +49,7 @@ export class SpriteLoader {
       // seaman: "/game_configs/units/seaman.json",
       //! fortress
       gnoll: "/game_configs/units/gnoll.json",
+      gnoll_marauder: "/game_configs/units/gnoll_marauder.json",
       basilisk: "/game_configs/units/basilisk.json",
     };
   }

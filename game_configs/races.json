@@ -337,6 +337,18 @@
           "attackSpeed": 1,
           "health": 45,
           "cost": 70
+        },
+        "gnoll_marauder": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "gnoll_marauder",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 14,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 18,
+          "attackSpeed": 1.1,
+          "health": 60,
+          "cost": 95
         }
       },
       "tier_two": {},
