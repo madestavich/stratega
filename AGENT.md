@@ -65,11 +65,16 @@ npm run deploy  # Deploys to cPanel hosting via git
 /game_map/                 # Система карти та навігації
 ├── gridManager.js         # Управління ігровою сіткою
 ├── mapRender.js           # Рендеринг фонової карти
-└── pathfinder.js          # Алгоритм пошуку шляху (A*)
+└── pathfinder.js          # Пошук шляху з уникненням перешкод
 
 /input/                    # Система введення
 ├── inputManager.js        # Обробка кліків миші та клавіатури
 └── interfaceManager.js    # Управління ігровим інтерфейсом
+
+/lobby/                    # Лобі для вибору кімнат
+├── lobby.html             # Сторінка лобі
+├── lobby.js               # Логіка лобі
+└── lobby.css              # Стилі лобі
 
 /game_configs/             # Конфігурації гри
 ├── configLoader.js        # Завантажувач конфігурацій
@@ -101,20 +106,49 @@ npm run deploy  # Deploys to cPanel hosting via git
 - **Race System**: Різні раси з унікальними юнітами (Castle, Conflux, Dungeon, Necropolis, Rampart)
 - **Real-time Sync**: Синхронізація стану гри між гравцями через HTTP polling
 - **Animation System**: Повноцінна система анімацій з спрайтами та частинками
-- **Grid-based Movement**: Гексагональна сітка з A\* pathfinding
+- **Grid-based Movement**: Сітчаста система з прямими шляхами та уникненням перешкод
 - **Debug Mode**: Візуалізація сітки та шляхів (клавіша `)
 
 ## Database Schema
 
 ```sql
 -- Основні таблиці
-users (id, username, password_hash, created_at)
+users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(255),
+  password_hash VARCHAR(255),
+  created_at DATETIME
+)
+
 game_rooms (
-  id, creator_id, second_player_id, created_at,
-  current_round, room_type, password, game_status,
-  winner_id, round_state, round_time, round_start_time,
-  player1_objects, player2_objects,
-  player1_ready, player2_ready
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  creator_id INT,
+  second_player_id INT,
+  created_at DATETIME,
+  current_round INT DEFAULT 0,
+  room_type VARCHAR(10) DEFAULT 'public',
+  password VARCHAR(255),
+  game_status VARCHAR(20) DEFAULT 'waiting',
+  winner_id INT,
+  round_state VARCHAR(20),
+  round_time INT,
+  round_start_time DATETIME,
+  player1_objects TEXT,
+  player2_objects TEXT,
+  player1_ready TINYINT(1) DEFAULT 0,
+  player2_ready TINYINT(1) DEFAULT 0,
+  player1_money INT,
+  player2_money INT,
+  player1_unit_limit INT DEFAULT 0,
+  player2_unit_limit INT DEFAULT 0,
+  max_unit_limit INT,
+  round_income INT,
+  game_mode VARCHAR(20),
+  host_ready TINYINT(1) DEFAULT 0,
+  guest_ready TINYINT(1) DEFAULT 0,
+  battle_started TINYINT(1) DEFAULT 0,
+  player1_in_battle TINYINT(1) DEFAULT 0,
+  player2_in_battle TINYINT(1) DEFAULT 0
 )
 ```
 
@@ -163,7 +197,9 @@ game_rooms (
       "idle": { "name": "idle", "frames": [...] },
       "move": { "name": "move", "frames": [...] },
       "attack": { "name": "attack", "frames": [...] },
+      "range_attack": { "name": "range_attack", "frames": [...] },  // Для ranged units
       "death": { "name": "death", "frames": [...] },
+      "bullet": { "name": "bullet", "frames": [...] },  // Для ranged units
       "icon": { "name": "icon", "frames": [...] }
     }
   }
