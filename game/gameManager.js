@@ -1312,9 +1312,9 @@ class GameManager {
         !currentBattleState.player1_in_battle &&
         !currentBattleState.player2_in_battle
       ) {
-        // Both players are waiting! Start battle for everyone
+        // Both players are waiting! Reload page to restart properly
         console.log(
-          "%c=== DEADLOCK DETECTED ===%c\nBoth players in waiting mode. Starting battle...",
+          "%c=== DEADLOCK DETECTED ===%c\nBoth players in waiting mode. Reloading to restart battle...",
           "color: orange; font-weight: bold; font-size: 16px;",
           "color: white;"
         );
@@ -1322,30 +1322,11 @@ class GameManager {
         clearInterval(this.battleCompletionCheckInterval);
         this.battleCompletionCheckInterval = null;
 
-        // Hide waiting overlay
-        this.hideWaitingForBattleMessage();
+        // Allow reload without warning
+        this.allowReload = true;
 
-        // Start battle
-        this.battleDisconnected = false;
-        this.waitingForBattleEnd = false;
-
-        // Reload units and start game
-        await this.objectManager.loadObjects();
-
-        // Update look direction
-        for (const unit of this.objectManager.objects) {
-          unit.setLookDirectionByTeam();
-        }
-        for (const unit of this.objectManager.enemyObjects) {
-          unit.setLookDirectionByTeam();
-        }
-
-        this.objectManager.updateGridWithAllObjects();
-
-        // Start the battle
-        setTimeout(() => {
-          this.startGame();
-        }, 500);
+        // Reload page - will detect bothDisconnected in start() and auto-start battle
+        window.location.reload();
 
         return;
       }
