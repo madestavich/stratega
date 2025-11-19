@@ -1563,9 +1563,9 @@ class GameManager {
       overlay.className = "battle-waiting-overlay";
       overlay.innerHTML = `
         <div class="battle-waiting-content">
-          <div class="loading-spinner"></div>
-          <p>Опонент відключився...</p>
-          <p style="font-size: 14px; opacity: 0.7;">Очікування повернення гравця</p>
+          <div class="battle-waiting-spinner"></div>
+          <h2 class="battle-waiting-title">Опонент відключився</h2>
+          <p class="battle-waiting-subtitle">Очікування повернення гравця...</p>
         </div>
       `;
       document.body.appendChild(overlay);
