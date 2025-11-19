@@ -1313,7 +1313,6 @@ class GameManager {
       overlay.innerHTML = `
         <div class="battle-waiting-content">
           <div class="battle-waiting-title">Очікування завершення бою</div>
-          <div class="battle-waiting-subtitle">Ви оновили сторінку під час бою</div>
           <div class="battle-waiting-text">Будь ласка, зачекайте поки інший гравець завершить бій...</div>
           <div class="battle-waiting-spinner"></div>
         </div>
