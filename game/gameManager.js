@@ -40,6 +40,16 @@ class GameManager {
     this.battleCheckInterval = null;
     this.waitingForBattleEnd = false;
 
+    // Heartbeat system for tracking player online status
+    this.heartbeatInterval = null;
+
+    // Opponent offline tracking
+    this.opponentOffline = false;
+    this.opponentCheckInterval = null;
+
+    // Flag to start battle after load (for deadlock recovery)
+    this.shouldStartBattleAfterLoad = false;
+
     // Flag to allow reload without warning
     this.allowReload = false;
 
@@ -246,9 +256,21 @@ class GameManager {
     // Check if we reconnected during battle
     const battleState = await this.checkBattleState();
     if (battleState && battleState.battle_started) {
-      console.log("Reconnected during battle - entering waiting mode");
-      await this.handleBattleDisconnection(battleState);
-      return; // Don't continue normal initialization
+      console.log("Reconnected during battle - checking for deadlock...");
+
+      // Check if this is a deadlock situation (both players offline)
+      const isDeadlock = await this.checkBattleDeadlock();
+
+      if (isDeadlock) {
+        console.log("Deadlock detected - will restart battle and play it");
+        // Don't show waiting overlay - we'll play the battle ourselves
+        // Set flag that we need to start battle after loading
+        this.shouldStartBattleAfterLoad = true;
+      } else {
+        console.log("Other player is still in battle - entering waiting mode");
+        await this.handleBattleDisconnection(battleState);
+        return; // Don't continue normal initialization
+      }
     }
 
     // Load room settings from lobby
@@ -311,8 +333,25 @@ class GameManager {
     // Get round duration from server first (for sync)
     await this.getRoundDuration();
 
+    // Start heartbeat system
+    this.startHeartbeat();
+
+    // Start checking opponent online status (for unit placement phase)
+    this.startOpponentCheck();
+
     // Hide loading screen after everything is ready
     this.hideLoadingScreen();
+
+    // If we detected deadlock, start battle automatically
+    if (this.shouldStartBattleAfterLoad) {
+      console.log("Starting battle after deadlock recovery...");
+      this.shouldStartBattleAfterLoad = false;
+
+      // Small delay to ensure everything is loaded
+      setTimeout(() => {
+        this.startGame();
+      }, 1000);
+    }
 
     requestAnimationFrame((t) => this.loop(t));
   }
@@ -1330,6 +1369,217 @@ class GameManager {
     }
     this.battleDisconnected = false;
     this.waitingForBattleEnd = false;
+  }
+
+  // ========== HEARTBEAT SYSTEM ==========
+
+  // Start heartbeat - send ping every 5 seconds to update last_active
+  startHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+
+    // Send initial heartbeat
+    this.sendHeartbeat();
+
+    // Send heartbeat every 5 seconds
+    this.heartbeatInterval = setInterval(() => {
+      this.sendHeartbeat();
+    }, 5000);
+
+    console.log("Heartbeat started - sending ping every 5 seconds");
+  }
+
+  // Stop heartbeat
+  stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+      console.log("Heartbeat stopped");
+    }
+  }
+
+  // Send heartbeat ping to server
+  async sendHeartbeat() {
+    if (!this.objectManager.currentRoomId) return;
+
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "heartbeat",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+      // Heartbeat успішний - не логуємо щоб не засмічувати консоль
+    } catch (error) {
+      console.error("Error sending heartbeat:", error);
+    }
+  }
+
+  // Start checking opponent online status (during unit placement only)
+  startOpponentCheck() {
+    if (this.opponentCheckInterval) {
+      clearInterval(this.opponentCheckInterval);
+    }
+
+    // Check immediately
+    this.checkOpponentOnline();
+
+    // Check every 3 seconds
+    this.opponentCheckInterval = setInterval(() => {
+      // Only check during unit placement (when paused)
+      if (this.isPaused && !this.isBattleInProgress) {
+        this.checkOpponentOnline();
+      }
+    }, 3000);
+
+    console.log("Opponent online check started");
+  }
+
+  // Stop checking opponent status
+  stopOpponentCheck() {
+    if (this.opponentCheckInterval) {
+      clearInterval(this.opponentCheckInterval);
+      this.opponentCheckInterval = null;
+      console.log("Opponent online check stopped");
+    }
+  }
+
+  // Check if opponent is online
+  async checkOpponentOnline() {
+    if (!this.objectManager.currentRoomId) return;
+
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "check_players_online",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Determine which player is opponent
+        const isPlayer1 = this.isRoomCreator;
+        const opponentOnline = isPlayer1
+          ? result.player2_online
+          : result.player1_online;
+
+        // Check if opponent status changed
+        if (this.opponentOffline !== !opponentOnline) {
+          this.opponentOffline = !opponentOnline;
+
+          if (this.opponentOffline) {
+            console.log("Opponent went OFFLINE");
+            this.handleOpponentOffline();
+          } else {
+            console.log("Opponent came back ONLINE");
+            this.handleOpponentOnline();
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error checking opponent online:", error);
+    }
+  }
+
+  // Handle opponent going offline during unit placement
+  handleOpponentOffline() {
+    // Pause the round timer
+    if (this.isRoundActive) {
+      console.log("Pausing round timer - opponent offline");
+      // Timer will automatically pause on server side since opponent is not sending heartbeats
+    }
+
+    // Show notification
+    this.showOpponentOfflineMessage();
+  }
+
+  // Handle opponent coming back online
+  handleOpponentOnline() {
+    // Resume round timer if it was active
+    console.log("Opponent back online - resuming game");
+
+    // Hide notification
+    this.hideOpponentOfflineMessage();
+  }
+
+  // Show opponent offline message
+  showOpponentOfflineMessage() {
+    // Create overlay if it doesn't exist
+    let overlay = document.getElementById("opponent-offline-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "opponent-offline-overlay";
+      overlay.className = "battle-waiting-overlay";
+      overlay.innerHTML = `
+        <div class="battle-waiting-content">
+          <div class="loading-spinner"></div>
+          <p>Опонент відключився...</p>
+          <p style="font-size: 14px; opacity: 0.7;">Очікування повернення гравця</p>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+    overlay.style.display = "flex";
+  }
+
+  // Hide opponent offline message
+  hideOpponentOfflineMessage() {
+    const overlay = document.getElementById("opponent-offline-overlay");
+    if (overlay) {
+      overlay.style.display = "none";
+    }
+  }
+
+  // ========== DEADLOCK DETECTION ==========
+
+  // Check for battle deadlock (both players offline during battle)
+  async checkBattleDeadlock() {
+    if (!this.objectManager.currentRoomId) return false;
+
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "detect_battle_deadlock",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.is_deadlock) {
+        console.log(
+          "%c=== BATTLE DEADLOCK DETECTED ===%c\nBoth players were offline during battle. Restarting battle...",
+          "color: red; font-weight: bold; font-size: 16px;",
+          "color: white;"
+        );
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error checking battle deadlock:", error);
+      return false;
+    }
   }
 }
 

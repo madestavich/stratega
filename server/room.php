@@ -125,6 +125,15 @@ try {
         case 'clear_winner':
             clearWinner($input);
             break;
+        case 'heartbeat':
+            heartbeat($input);
+            break;
+        case 'check_players_online':
+            checkPlayersOnline($input);
+            break;
+        case 'detect_battle_deadlock':
+            detectBattleDeadlock($input);
+            break;
         // New lobby endpoints
         case 'update_room_settings':
             updateRoomSettings($input);
@@ -1437,6 +1446,154 @@ function clearWinner($data) {
         throw new Exception('Помилка очищення переможця');
     }
 }
+
+// Heartbeat - оновлює last_active timestamp гравця
+function heartbeat($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Get room info
+    $stmt = $conn->prepare("SELECT creator_id, second_player_id FROM game_rooms WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Determine which player field to update
+    if ($room['creator_id'] == $user_id) {
+        $field = 'player1_last_active';
+    } else if ($room['second_player_id'] == $user_id) {
+        $field = 'player2_last_active';
+    } else {
+        throw new Exception('Ви не є учасником цієї кімнати');
+    }
+    
+    // Update last_active timestamp
+    $stmt = $conn->prepare("UPDATE game_rooms SET $field = NOW() WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    
+    echo json_encode([
+        'success' => true,
+        'timestamp' => date('Y-m-d H:i:s')
+    ]);
+}
+
+// Перевірка чи гравці онлайн (вважається онлайн якщо last_active < 15 секунд тому)
+function checkPlayersOnline($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $room_id = $data['room_id'] ?? 0;
+    
+    $stmt = $conn->prepare("
+        SELECT 
+            creator_id,
+            second_player_id,
+            player1_last_active,
+            player2_last_active,
+            TIMESTAMPDIFF(SECOND, player1_last_active, NOW()) as player1_seconds_ago,
+            TIMESTAMPDIFF(SECOND, player2_last_active, NOW()) as player2_seconds_ago
+        FROM game_rooms 
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Гравець вважається онлайн якщо last_active був менше 15 секунд тому
+    $timeout_seconds = 15;
+    
+    $player1_online = ($room['player1_last_active'] !== null && $room['player1_seconds_ago'] !== null && $room['player1_seconds_ago'] < $timeout_seconds);
+    $player2_online = ($room['player2_last_active'] !== null && $room['player2_seconds_ago'] !== null && $room['player2_seconds_ago'] < $timeout_seconds);
+    
+    echo json_encode([
+        'success' => true,
+        'player1_online' => $player1_online,
+        'player2_online' => $player2_online,
+        'player1_last_active' => $room['player1_last_active'],
+        'player2_last_active' => $room['player2_last_active'],
+        'timeout_seconds' => $timeout_seconds
+    ]);
+}
+
+// Детекція deadlock - коли обидва гравці офлайн під час бою
+function detectBattleDeadlock($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $room_id = $data['room_id'] ?? 0;
+    
+    $stmt = $conn->prepare("
+        SELECT 
+            battle_started,
+            player1_in_battle,
+            player2_in_battle,
+            player1_last_active,
+            player2_last_active,
+            TIMESTAMPDIFF(SECOND, player1_last_active, NOW()) as player1_seconds_ago,
+            TIMESTAMPDIFF(SECOND, player2_last_active, NOW()) as player2_seconds_ago
+        FROM game_rooms 
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room) {
+        throw new Exception('Кімната не знайдена');
+    }
+    
+    // Deadlock якщо:
+    // 1. Бій стартував (battle_started = 1)
+    // 2. Обидва гравці НЕ в бою (in_battle = 0)
+    // 3. Обидва офлайн більше 15 секунд
+    
+    $timeout_seconds = 15;
+    $player1_online = ($room['player1_last_active'] !== null && $room['player1_seconds_ago'] !== null && $room['player1_seconds_ago'] < $timeout_seconds);
+    $player2_online = ($room['player2_last_active'] !== null && $room['player2_seconds_ago'] !== null && $room['player2_seconds_ago'] < $timeout_seconds);
+    
+    $is_deadlock = (
+        $room['battle_started'] == 1 &&
+        $room['player1_in_battle'] == 0 &&
+        $room['player2_in_battle'] == 0 &&
+        !$player1_online &&
+        !$player2_online
+    );
+    
+    echo json_encode([
+        'success' => true,
+        'is_deadlock' => $is_deadlock,
+        'battle_started' => (bool)$room['battle_started'],
+        'player1_in_battle' => (bool)$room['player1_in_battle'],
+        'player2_in_battle' => (bool)$room['player2_in_battle'],
+        'player1_online' => $player1_online,
+        'player2_online' => $player2_online
+    ]);
+}
+
 
 
 
