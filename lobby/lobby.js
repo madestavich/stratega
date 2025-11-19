@@ -46,6 +46,23 @@ class LobbyManager {
       return;
     }
 
+    // Add visibility change listener to check game status when tab becomes visible
+    document.addEventListener("visibilitychange", async () => {
+      if (!document.hidden && this.roomId) {
+        console.log("Tab became visible, checking game status...");
+        const quickCheck = await this.quickGameStatusCheck();
+        if (
+          quickCheck &&
+          (quickCheck.game_status === "in_progress" ||
+            quickCheck.game_status === "finished")
+        ) {
+          console.log("Game in progress, redirecting...");
+          this.stopPolling();
+          window.location.href = `../game/game.html?room_id=${this.roomId}`;
+        }
+      }
+    });
+
     try {
       // First check if game is already in progress (quick check without showing loading)
       const quickCheck = await this.quickGameStatusCheck();
@@ -633,12 +650,53 @@ class LobbyManager {
 }
 
 // Initialize lobby when page loads
+let lobbyManager;
+
 document.addEventListener("DOMContentLoaded", () => {
-  const lobbyManager = new LobbyManager();
+  lobbyManager = new LobbyManager();
   lobbyManager.initialize();
 
   // Cleanup on page unload
   window.addEventListener("beforeunload", () => {
     lobbyManager.stopPolling();
   });
+});
+
+// Handle browser back/forward navigation
+window.addEventListener("pageshow", async (event) => {
+  // If page is loaded from cache (bfcache)
+  if (event.persisted && lobbyManager) {
+    console.log("Page loaded from cache, checking game status...");
+
+    // Quick check if game started
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get("room_id");
+
+    if (roomId) {
+      try {
+        const response = await fetch("../server/room.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            action: "get_lobby_state",
+            room_id: roomId,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (
+          data.success &&
+          (data.game_status === "in_progress" ||
+            data.game_status === "finished")
+        ) {
+          console.log("Game in progress, redirecting from cache...");
+          window.location.href = `../game/game.html?room_id=${roomId}`;
+        }
+      } catch (error) {
+        console.error("Error checking game status on pageshow:", error);
+      }
+    }
+  }
 });
