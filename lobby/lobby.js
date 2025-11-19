@@ -46,9 +46,22 @@ class LobbyManager {
       return;
     }
 
-    this.showLoading(true);
-
     try {
+      // First check if game is already in progress (quick check without showing loading)
+      const quickCheck = await this.quickGameStatusCheck();
+      if (
+        quickCheck &&
+        (quickCheck.game_status === "in_progress" ||
+          quickCheck.game_status === "finished")
+      ) {
+        console.log("Game already in progress, redirecting immediately...");
+        window.location.href = `../game/game.html?room_id=${this.roomId}`;
+        return;
+      }
+
+      // Game not started, show lobby
+      this.showLoading(true);
+
       // Load initial lobby state (this will determine user role)
       await this.loadLobbyState();
 
@@ -97,14 +110,34 @@ class LobbyManager {
       ) {
         console.log("Game already started, redirecting to game...");
         // Stop polling to prevent further requests
-        if (this.pollingInterval) {
-          clearInterval(this.pollingInterval);
+        if (this.pollInterval) {
+          clearInterval(this.pollInterval);
         }
         window.location.href = `../game/game.html?room_id=${this.roomId}`;
         return;
       }
     } catch (error) {
       throw error;
+    }
+  }
+
+  async quickGameStatusCheck() {
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "get_lobby_state",
+          room_id: this.roomId,
+        }),
+      });
+
+      const data = await response.json();
+      return data.success ? data : null;
+    } catch (error) {
+      console.error("Quick status check error:", error);
+      return null;
     }
   }
 
