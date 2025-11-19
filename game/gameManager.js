@@ -263,45 +263,16 @@ class GameManager {
         !battleState.player1_in_battle && !battleState.player2_in_battle;
 
       if (bothDisconnected) {
-        // Both not in battle - could be:
-        // 1. Both just refreshed (deadlock) - both still online via heartbeat
-        // 2. Both left completely - both offline
+        // Both not in battle - both refreshed page or both left
+        console.log(
+          "Both players not in battle - restarting battle for everyone"
+        );
 
-        // Check online status via heartbeat system
-        const deadlockState = await this.checkBattleDeadlock();
-
-        if (deadlockState && deadlockState.is_deadlock) {
-          // TRUE deadlock: both offline for 15+ seconds
-          console.log(
-            "TRUE DEADLOCK: Both players left - first to return will play"
-          );
-          this.shouldStartBattleAfterLoad = true;
-        } else {
-          // Just both refreshed - wait a bit to see who starts playing first
-          console.log(
-            "Both players refreshed - waiting to see who loads first..."
-          );
-
-          // Wait 3 seconds, then check again
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-
-          // Re-check battle state
-          const recheck = await this.checkBattleState();
-          if (
-            recheck &&
-            !recheck.player1_in_battle &&
-            !recheck.player2_in_battle
-          ) {
-            // Still both disconnected - first one here plays
-            console.log("Still both disconnected after 3s - starting battle");
-            this.shouldStartBattleAfterLoad = true;
-          } else {
-            // Someone started playing
-            console.log("Other player started playing - entering waiting mode");
-            await this.handleBattleDisconnection(recheck);
-            return;
-          }
-        }
+        // Everyone who reconnects will restart the battle
+        // This handles both cases:
+        // 1. Both just refreshed F5 -> both will play
+        // 2. Both left and came back -> both will play
+        this.shouldStartBattleAfterLoad = true;
       } else {
         // One player still in battle - wait normally
         console.log("Other player is in battle - entering waiting mode");
