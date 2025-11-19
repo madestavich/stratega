@@ -256,18 +256,55 @@ class GameManager {
     // Check if we reconnected during battle
     const battleState = await this.checkBattleState();
     if (battleState && battleState.battle_started) {
-      console.log("Reconnected during battle - checking for deadlock...");
+      console.log("Reconnected during battle - checking situation...");
 
-      // Check if this is a deadlock situation (both players offline)
-      const isDeadlock = await this.checkBattleDeadlock();
+      // Check if BOTH players are not in battle
+      const bothDisconnected =
+        !battleState.player1_in_battle && !battleState.player2_in_battle;
 
-      if (isDeadlock) {
-        console.log("Deadlock detected - will restart battle and play it");
-        // Don't show waiting overlay - we'll play the battle ourselves
-        // Set flag that we need to start battle after loading
-        this.shouldStartBattleAfterLoad = true;
+      if (bothDisconnected) {
+        // Both not in battle - could be:
+        // 1. Both just refreshed (deadlock) - both still online via heartbeat
+        // 2. Both left completely - both offline
+
+        // Check online status via heartbeat system
+        const deadlockState = await this.checkBattleDeadlock();
+
+        if (deadlockState && deadlockState.is_deadlock) {
+          // TRUE deadlock: both offline for 15+ seconds
+          console.log(
+            "TRUE DEADLOCK: Both players left - first to return will play"
+          );
+          this.shouldStartBattleAfterLoad = true;
+        } else {
+          // Just both refreshed - wait a bit to see who starts playing first
+          console.log(
+            "Both players refreshed - waiting to see who loads first..."
+          );
+
+          // Wait 3 seconds, then check again
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+
+          // Re-check battle state
+          const recheck = await this.checkBattleState();
+          if (
+            recheck &&
+            !recheck.player1_in_battle &&
+            !recheck.player2_in_battle
+          ) {
+            // Still both disconnected - first one here plays
+            console.log("Still both disconnected after 3s - starting battle");
+            this.shouldStartBattleAfterLoad = true;
+          } else {
+            // Someone started playing
+            console.log("Other player started playing - entering waiting mode");
+            await this.handleBattleDisconnection(recheck);
+            return;
+          }
+        }
       } else {
-        console.log("Other player is still in battle - entering waiting mode");
+        // One player still in battle - wait normally
+        console.log("Other player is in battle - entering waiting mode");
         await this.handleBattleDisconnection(battleState);
         return; // Don't continue normal initialization
       }
