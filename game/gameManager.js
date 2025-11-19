@@ -533,6 +533,66 @@ class GameManager {
     }
   }
 
+  async pauseRoundTimer() {
+    if (!this.objectManager.currentRoomId) {
+      console.warn("Cannot pause round timer without room ID");
+      return;
+    }
+
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "pause_round_timer",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        console.log("Round timer paused:", result.time_left, "seconds left");
+      } else {
+        console.error("Failed to pause timer:", result.error);
+      }
+    } catch (error) {
+      console.error("Error pausing timer:", error);
+    }
+  }
+
+  async resumeRoundTimer() {
+    if (!this.objectManager.currentRoomId) {
+      console.warn("Cannot resume round timer without room ID");
+      return;
+    }
+
+    try {
+      const response = await fetch("../server/room.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "resume_round_timer",
+          room_id: this.objectManager.currentRoomId,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        console.log("Round timer resumed:", result.time_left, "seconds left");
+      } else {
+        console.error("Failed to resume timer:", result.error);
+      }
+    } catch (error) {
+      console.error("Error resuming timer:", error);
+    }
+  }
+
   async getRoomSettings() {
     try {
       const response = await fetch("../server/room.php", {
@@ -1533,11 +1593,11 @@ class GameManager {
   }
 
   // Handle opponent going offline during unit placement
-  handleOpponentOffline() {
+  async handleOpponentOffline() {
     // Pause the round timer
     if (this.isRoundActive) {
       console.log("Pausing round timer - opponent offline");
-      // Timer will automatically pause on server side since opponent is not sending heartbeats
+      await this.pauseRoundTimer();
     }
 
     // Show notification
@@ -1545,9 +1605,10 @@ class GameManager {
   }
 
   // Handle opponent coming back online
-  handleOpponentOnline() {
+  async handleOpponentOnline() {
     // Resume round timer if it was active
     console.log("Opponent back online - resuming game");
+    await this.resumeRoundTimer();
 
     // Hide notification
     this.hideOpponentOfflineMessage();

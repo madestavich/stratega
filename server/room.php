@@ -86,6 +86,12 @@ try {
         case 'start_round_timer':
             startRoundTimer($input);
             break;
+        case 'pause_round_timer':
+            pauseRoundTimer($input);
+            break;
+        case 'resume_round_timer':
+            resumeRoundTimer($input);
+            break;
         case 'increment_round':
             incrementRound($input);
             break;
@@ -516,8 +522,14 @@ function checkRoundStatus($data) {
     // Рахуємо залишковий час на основі серверного часу
     $time_left = 0;
     $round_active = false;
+    $is_paused = false;
     
-    if ($room['round_start_time']) {
+    if ($room['round_paused_time']) {
+        // Таймер на паузі - повертаємо збережений час
+        $time_left = $room['round_paused_time'];
+        $round_active = true;
+        $is_paused = true;
+    } elseif ($room['round_start_time']) {
         $start_time = new DateTime($room['round_start_time']);
         $current_time = new DateTime();
         $elapsed = $current_time->getTimestamp() - $start_time->getTimestamp();
@@ -562,6 +574,7 @@ function checkRoundStatus($data) {
         'round_time' => $round_time,
         'time_left' => $time_left,
         'round_active' => $round_active,
+        'is_paused' => $is_paused,
         'should_start_game' => $both_ready
     ]);
 }
@@ -603,7 +616,7 @@ function startRoundTimer($data) {
     $duration = $data['duration'] ?? 45; // Тривалість раунду в секундах
     
     // Перевіряємо чи таймер вже активний
-    $stmt = $conn->prepare("SELECT round_start_time, round_time FROM game_rooms WHERE id = ?");
+    $stmt = $conn->prepare("SELECT round_start_time, round_time, round_paused_time FROM game_rooms WHERE id = ?");
     $stmt->bind_param("i", $room_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -623,7 +636,7 @@ function startRoundTimer($data) {
     // Встановлюємо час початку раунду
     $stmt = $conn->prepare("
         UPDATE game_rooms 
-        SET round_start_time = NOW()
+        SET round_start_time = NOW(), round_paused_time = NULL
         WHERE id = ?
     ");
     $stmt->bind_param("i", $room_id);
@@ -636,6 +649,107 @@ function startRoundTimer($data) {
         ]);
     } else {
         throw new Exception('Помилка запуску таймера раунду');
+    }
+}
+
+function pauseRoundTimer($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Зберігаємо поточний залишковий час
+    $stmt = $conn->prepare("SELECT round_start_time, round_time, round_paused_time FROM game_rooms WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room['round_start_time'] || $room['round_paused_time']) {
+        // Таймер не активний або вже на паузі
+        echo json_encode([
+            'success' => true,
+            'message' => 'Таймер вже на паузі або не активний',
+            'already_paused' => true
+        ]);
+        return;
+    }
+    
+    // Рахуємо скільки часу минуло
+    $start_time = new DateTime($room['round_start_time']);
+    $current_time = new DateTime();
+    $elapsed = $current_time->getTimestamp() - $start_time->getTimestamp();
+    $time_left = max(0, $room['round_time'] - $elapsed);
+    
+    // Зберігаємо залишковий час
+    $stmt = $conn->prepare("
+        UPDATE game_rooms 
+        SET round_paused_time = ?, round_start_time = NULL
+        WHERE id = ?
+    ");
+    $stmt->bind_param("ii", $time_left, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Таймер раунду призупинено',
+            'time_left' => $time_left
+        ]);
+    } else {
+        throw new Exception('Помилка паузи таймера раунду');
+    }
+}
+
+function resumeRoundTimer($data) {
+    global $conn;
+    
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Користувач не авторизований');
+    }
+    
+    $room_id = $data['room_id'] ?? 0;
+    
+    // Отримуємо збережений час
+    $stmt = $conn->prepare("SELECT round_paused_time, round_time FROM game_rooms WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room = $result->fetch_assoc();
+    
+    if (!$room['round_paused_time']) {
+        // Таймер не на паузі
+        echo json_encode([
+            'success' => true,
+            'message' => 'Таймер не на паузі',
+            'not_paused' => true
+        ]);
+        return;
+    }
+    
+    // Відновлюємо таймер зі збереженим часом
+    // Встановлюємо новий round_start_time так, щоб залишок часу був як збережений
+    $time_left = $room['round_paused_time'];
+    $new_start_time = time() - ($room['round_time'] - $time_left);
+    $new_start_datetime = date('Y-m-d H:i:s', $new_start_time);
+    
+    $stmt = $conn->prepare("
+        UPDATE game_rooms 
+        SET round_start_time = ?, round_paused_time = NULL
+        WHERE id = ?
+    ");
+    $stmt->bind_param("si", $new_start_datetime, $room_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Таймер раунду відновлено',
+            'time_left' => $time_left
+        ]);
+    } else {
+        throw new Exception('Помилка відновлення таймера раунду');
     }
 }
 
