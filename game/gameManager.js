@@ -1302,8 +1302,55 @@ class GameManager {
     console.log("Setting current player as NOT in battle...");
     await this.setBattleState(false);
 
-    // Start checking for battle completion
+    // Start checking for battle completion OR deadlock
     this.battleCompletionCheckInterval = setInterval(async () => {
+      // FIRST: Check if both players are now waiting (deadlock)
+      const currentBattleState = await this.checkBattleState();
+
+      if (
+        currentBattleState &&
+        !currentBattleState.player1_in_battle &&
+        !currentBattleState.player2_in_battle
+      ) {
+        // Both players are waiting! Start battle for everyone
+        console.log(
+          "%c=== DEADLOCK DETECTED ===%c\nBoth players in waiting mode. Starting battle...",
+          "color: orange; font-weight: bold; font-size: 16px;",
+          "color: white;"
+        );
+
+        clearInterval(this.battleCompletionCheckInterval);
+        this.battleCompletionCheckInterval = null;
+
+        // Hide waiting overlay
+        this.hideWaitingForBattleMessage();
+
+        // Start battle
+        this.battleDisconnected = false;
+        this.waitingForBattleEnd = false;
+
+        // Reload units and start game
+        await this.objectManager.loadObjects();
+
+        // Update look direction
+        for (const unit of this.objectManager.objects) {
+          unit.setLookDirectionByTeam();
+        }
+        for (const unit of this.objectManager.enemyObjects) {
+          unit.setLookDirectionByTeam();
+        }
+
+        this.objectManager.updateGridWithAllObjects();
+
+        // Start the battle
+        setTimeout(() => {
+          this.startGame();
+        }, 500);
+
+        return;
+      }
+
+      // SECOND: Check if battle completed normally
       const completionState = await this.checkBattleCompletion();
       console.log("Battle completion check:", completionState);
 
