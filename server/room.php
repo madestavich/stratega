@@ -769,7 +769,7 @@ function incrementRound($data) {
     $room_id = $data['room_id'] ?? 0;
     $winner_id = $data['winner_id'] ?? null;
     
-    error_log("=== INCREMENT ROUND START === room_id: $room_id, winner_id: " . ($winner_id ?? 'NULL') . ", user_id: $user_id");
+    error_log("=== INCREMENT ROUND START === room_id: $room_id, winner_id: " . ($winner_id ?? 'NULL') . ", user_id: $user_id, timestamp: " . date('Y-m-d H:i:s.u'));
     
     // Get current state BEFORE increment for logging and response
     $stmt = $conn->prepare("SELECT current_round, battle_started, winner_id FROM game_rooms WHERE id = ?");

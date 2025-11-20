@@ -1024,6 +1024,16 @@ class GameManager {
       `Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`
     );
 
+    // Check if round was already incremented (winner_id is NULL means it was cleared after increment)
+    const currentRoomState = await this.getRoomSettings();
+    if (currentRoomState.winner_id === null) {
+      console.warn(
+        "Round already incremented (winner_id is NULL), skipping incrementRound"
+      );
+      await this.showWinnerModalAndContinue();
+      return;
+    }
+
     // Record the result in database
     const incrementSuccess = await this.incrementRound(actualWinnerId);
 
