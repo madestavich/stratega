@@ -177,11 +177,17 @@ class GameManager {
       if (lobbyState) {
         const playerNicknames = {};
         if (lobbyState.player1_id && lobbyState.player1_nickname) {
-          playerNicknames[lobbyState.player1_id] = lobbyState.player1_nickname;
+          playerNicknames[String(lobbyState.player1_id)] =
+            lobbyState.player1_nickname;
         }
         if (lobbyState.player2_id && lobbyState.player2_nickname) {
-          playerNicknames[lobbyState.player2_id] = lobbyState.player2_nickname;
+          playerNicknames[String(lobbyState.player2_id)] =
+            lobbyState.player2_nickname;
         }
+        console.log(
+          "Saving player nicknames to localStorage:",
+          playerNicknames
+        );
         localStorage.setItem(
           `player_nicknames_${this.objectManager.currentRoomId}`,
           JSON.stringify(playerNicknames)
@@ -1027,19 +1033,24 @@ class GameManager {
     // Get current round number from room settings
     const roomSettings = await this.getRoomSettings();
     const currentRoundStr = roomSettings.current_round.toString();
+    const roomId = this.objectManager.currentRoomId;
+    const roundKey = `lastProcessedRound_${roomId}_${currentRoundStr}`;
 
     // Check if we already processed this round end (to prevent double increment)
-    const lastProcessedRound = localStorage.getItem("lastProcessedRoundEnd");
-    if (lastProcessedRound === currentRoundStr) {
+    const alreadyProcessed = localStorage.getItem(roundKey);
+    if (alreadyProcessed === "true") {
       console.warn(
-        `Round ${currentRoundStr} already processed, skipping incrementRound`
+        `Round ${currentRoundStr} in room ${roomId} already processed, skipping incrementRound`
       );
       await this.showWinnerModalAndContinue();
       return;
     }
 
     // Mark this round as processed
-    localStorage.setItem("lastProcessedRoundEnd", currentRoundStr);
+    localStorage.setItem(roundKey, "true");
+    console.log(
+      `Marked round ${currentRoundStr} in room ${roomId} as processed`
+    );
 
     // Record the result in database
     const incrementSuccess = await this.incrementRound(actualWinnerId);
@@ -1341,10 +1352,6 @@ class GameManager {
 
   async resetReadyStatus() {
     try {
-      // Clear lastProcessedRoundEnd to allow new round increments
-      localStorage.removeItem("lastProcessedRoundEnd");
-      console.log("Cleared lastProcessedRoundEnd from localStorage");
-
       const response = await fetch("../server/room.php", {
         method: "POST",
         headers: {
