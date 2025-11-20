@@ -207,16 +207,21 @@ class GameManager {
     const shouldAddIncome = showWinnerAfterReload === "true";
 
     if (showWinnerAfterReload === "true") {
-      // Get winner data from localStorage and room settings
+      // Get winner data from localStorage (saved before resetReadyStatus cleared DB)
+      const winnerInfo = JSON.parse(
+        localStorage.getItem(
+          `round_winner_info_${this.objectManager.currentRoomId}`
+        ) || "{}"
+      );
+
       const playerNicknames = JSON.parse(
         localStorage.getItem(
           `player_nicknames_${this.objectManager.currentRoomId}`
         ) || "{}"
       );
 
-      const roomSettings = await this.getRoomSettings();
-      const winnerId = roomSettings.winner_id;
-      const currentRound = roomSettings.current_round;
+      const winnerId = winnerInfo.winnerId;
+      const currentRound = winnerInfo.round;
 
       // Convert winnerId to string for localStorage key lookup
       const winnerNickname =
@@ -248,9 +253,12 @@ class GameManager {
         }
       }, 100);
 
-      // Clear the flag
+      // Clear the flags
       localStorage.removeItem(
         `show_winner_after_reload_${this.objectManager.currentRoomId}`
+      );
+      localStorage.removeItem(
+        `round_winner_info_${this.objectManager.currentRoomId}`
       );
     }
 
@@ -1127,13 +1135,14 @@ class GameManager {
       // Get current round from room settings
       const roomSettings = await this.getRoomSettings();
       const currentRound = roomSettings.current_round || 1;
+      const winnerId = roomSettings.winner_id;
 
       console.log(
         "%c=== SHOW WINNER MODAL ===",
         "color: magenta; font-weight: bold;"
       );
       console.log("Current round:", currentRound);
-      console.log("Winner ID:", roomSettings.winner_id);
+      console.log("Winner ID:", winnerId);
 
       // Check if we already showed modal for this round
       const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${currentRound}`;
@@ -1145,13 +1154,22 @@ class GameManager {
       // Mark that we showed modal for this round
       localStorage.setItem(storageKey, "true");
 
+      // Save winner info to localStorage BEFORE clearing it from DB
+      localStorage.setItem(
+        `round_winner_info_${this.objectManager.currentRoomId}`,
+        JSON.stringify({
+          round: currentRound,
+          winnerId: winnerId,
+        })
+      );
+
       // Save flag to show winner modal after reload
       localStorage.setItem(
         `show_winner_after_reload_${this.objectManager.currentRoomId}`,
         "true"
       );
 
-      // Reset ready status before reload
+      // Reset ready status before reload (this clears winner_id in DB)
       await this.resetReadyStatus();
 
       console.log("Reloading page to show winner modal...");
