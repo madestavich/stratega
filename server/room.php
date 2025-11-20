@@ -783,13 +783,16 @@ function incrementRound($data) {
     
     error_log("State BEFORE: round=$current_round_before, battle_started=$battle_started_before, winner=" . ($winner_before ?? 'NULL'));
     
-    // ATOMIC UPDATE: Increment round ONLY if battle is still started (not already finished)
+    // ATOMIC UPDATE: Increment round ONLY if:
+    // 1. Current round matches (prevents double increment)
+    // 2. Winner is not yet set OR is different (prevents same winner updating twice)
     // This prevents race condition - only the first player will successfully update
     if ($winner_id !== null) {
-        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND battle_started = 1");
-        $stmt->bind_param("iiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before);
+        // Only increment if winner_id is NULL or different from what we're setting
+        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND (winner_id IS NULL OR winner_id != ?)");
+        $stmt->bind_param("iiiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before, $winner_id);
     } else {
-        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND battle_started = 1");
+        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND winner_id IS NULL");
         $stmt->bind_param("iiii", $room_id, $user_id, $user_id, $current_round_before);
     }
     
