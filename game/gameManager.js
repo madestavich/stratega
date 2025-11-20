@@ -259,14 +259,6 @@ class GameManager {
     await this.player.initializeResources();
     console.log("After initializeResources, money:", this.player.money);
 
-    // Check if we just finished a round (use saved flag)
-    if (shouldAddIncome) {
-      // Add round income after battle
-      console.log("Before addRoundIncome, money:", this.player.money);
-      await this.player.addRoundIncome();
-      console.log("After addRoundIncome, money:", this.player.money);
-    }
-
     this.interfaceManager.updatePlayerInterface(this.player);
     console.log("After updatePlayerInterface, money:", this.player.money);
 
