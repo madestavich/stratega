@@ -1062,6 +1062,7 @@ class GameManager {
     console.log("winnerId being sent to server:", winnerId);
     console.log("room_id:", this.objectManager.currentRoomId);
     console.log("battleEndProcessing flag:", this.battleEndProcessing);
+    console.trace("incrementRound call stack"); // Add stack trace
 
     try {
       const requestBody = {
@@ -1107,6 +1108,7 @@ class GameManager {
         new_round: result.new_round,
         old_round: result.new_round - (result.was_first ? 1 : 0),
         room_id: this.objectManager.currentRoomId,
+        battleEndProcessing: this.battleEndProcessing,
       };
 
       // Get existing debug history
@@ -1114,8 +1116,8 @@ class GameManager {
         localStorage.getItem("increment_debug_history") || "[]"
       );
       debugHistory.push(incrementDebugInfo);
-      // Keep only last 10 entries
-      if (debugHistory.length > 10) debugHistory.shift();
+      // Keep only last 20 entries to see pattern
+      if (debugHistory.length > 20) debugHistory.shift();
       localStorage.setItem(
         "increment_debug_history",
         JSON.stringify(debugHistory)
