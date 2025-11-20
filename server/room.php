@@ -800,10 +800,6 @@ function incrementRound($data) {
     $affected = $stmt->affected_rows;
     
     error_log("UPDATE affected_rows: $affected");
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    
-    error_log("UPDATE affected_rows: $affected");
     
     if ($affected > 0) {
         // Successfully incremented (we were first)
