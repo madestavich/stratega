@@ -36,7 +36,10 @@ export class GameObject {
     this.attackSpeed = objectConfig.attackSpeed || 1; // Швидкість атаки
     this.attackCooldown = 0; // Затримка між атаками
     this.health = objectConfig.health || 100; // Здоров'я об'єкта
+    this.maxHealth = objectConfig.health || 100; // Максимальне здоров'я об'єкта
     this.isDead = false; // Чи об'єкт мертвий
+    this.vampirism = objectConfig.vampirism || false; // Чи є вампіризм
+    this.vampirismPercent = objectConfig.vampirismPercent || 0; // Відсоток вампіризму
     this.isRanged = objectConfig.isRanged || false;
     this.isRangedAttack = false; // Чи об'єкт атакує здалеку
     this.minRangeDistance = objectConfig.minRangeDistance || null;

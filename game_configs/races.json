@@ -428,6 +428,8 @@
           "attackDamage": 35,
           "attackSpeed": 1.2,
           "health": 140,
+          "vampirism": true,
+          "vampirismPercent": 50,
           "cost": 230
         }
       },

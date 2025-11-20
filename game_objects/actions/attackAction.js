@@ -457,6 +457,15 @@ export class AttackAction {
     const damage = attacker.attackDamage || 10;
     target.health -= damage;
 
+    // Vampirism: heal attacker if enabled
+    if (attacker.vampirism && attacker.vampirismPercent > 0) {
+      const healAmount = (damage * attacker.vampirismPercent) / 100;
+      attacker.health = Math.min(
+        attacker.health + healAmount,
+        attacker.maxHealth
+      );
+    }
+
     // Check if target is defeated
     if (target.health <= 0 && !target.isDead) {
       // Set the isDead flag
