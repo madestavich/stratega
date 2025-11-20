@@ -769,15 +769,19 @@ function incrementRound($data) {
     $room_id = $data['room_id'] ?? 0;
     $winner_id = $data['winner_id'] ?? null;
     
-    error_log("incrementRound called - room_id: $room_id, winner_id: " . ($winner_id ?? 'NULL') . ", user_id: $user_id");
+    error_log("=== INCREMENT ROUND START === room_id: $room_id, winner_id: " . ($winner_id ?? 'NULL') . ", user_id: $user_id");
     
-    // Get current round BEFORE increment for response
-    $stmt = $conn->prepare("SELECT current_round FROM game_rooms WHERE id = ?");
+    // Get current state BEFORE increment for logging and response
+    $stmt = $conn->prepare("SELECT current_round, battle_started, winner_id FROM game_rooms WHERE id = ?");
     $stmt->bind_param("i", $room_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $current_room = $result->fetch_assoc();
     $current_round_before = $current_room['current_round'];
+    $battle_started_before = $current_room['battle_started'];
+    $winner_before = $current_room['winner_id'];
+    
+    error_log("State BEFORE: round=$current_round_before, battle_started=$battle_started_before, winner=" . ($winner_before ?? 'NULL'));
     
     // ATOMIC UPDATE: Increment round ONLY if battle is still started (not already finished)
     // This prevents race condition - only the first player will successfully update
@@ -789,22 +793,34 @@ function incrementRound($data) {
         $stmt->bind_param("iiii", $room_id, $user_id, $user_id, $current_round_before);
     }
     
-    if ($stmt->execute() && $stmt->affected_rows > 0) {
+    $stmt->execute();
+    $affected = $stmt->affected_rows;
+    
+    error_log("UPDATE affected_rows: $affected");
+    $stmt->execute();
+    $affected = $stmt->affected_rows;
+    
+    error_log("UPDATE affected_rows: $affected");
+    
+    if ($affected > 0) {
         // Successfully incremented (we were first)
-        error_log("Round incremented successfully - new round: " . ($current_round_before + 1) . ", winner_id set to: " . ($winner_id ?? 'NULL'));
+        $new_round = $current_round_before + 1;
+        error_log("SUCCESS: Round incremented to $new_round, winner_id set to: " . ($winner_id ?? 'NULL'));
         echo json_encode([
             'success' => true,
             'message' => 'Round incremented',
-            'new_round' => $current_round_before + 1,
+            'new_round' => $new_round,
             'was_first' => true
         ]);
     } else {
-        // Round was already incremented by other player
-        $stmt = $conn->prepare("SELECT current_round FROM game_rooms WHERE id = ?");
+        // Round was already incremented by other player - get current state
+        $stmt = $conn->prepare("SELECT current_round, winner_id FROM game_rooms WHERE id = ?");
         $stmt->bind_param("i", $room_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $room = $result->fetch_assoc();
+        
+        error_log("ALREADY INCREMENTED: current_round=" . $room['current_round'] . ", winner_id=" . ($room['winner_id'] ?? 'NULL'));
         
         echo json_encode([
             'success' => true,

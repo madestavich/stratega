@@ -1043,6 +1043,7 @@ class GameManager {
     );
     console.log("winnerId being sent to server:", winnerId);
     console.log("room_id:", this.objectManager.currentRoomId);
+    console.log("battleEndProcessing flag:", this.battleEndProcessing);
 
     try {
       const requestBody = {
@@ -1072,7 +1073,13 @@ class GameManager {
       }
 
       const result = await response.json();
+      console.log(
+        "%c=== INCREMENT ROUND RESPONSE ===",
+        "color: cyan; font-weight: bold;"
+      );
       console.log("Server response:", result);
+      console.log("was_first:", result.was_first);
+      console.log("new_round:", result.new_round);
 
       if (result.success) {
         console.log(
