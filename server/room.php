@@ -1460,17 +1460,33 @@ function setBattleState($data) {
     // Determine which player field to update
     if ($room['creator_id'] == $user_id) {
         $field = 'player1_in_battle';
+        $other_field = 'player2_in_battle';
     } else if ($room['second_player_id'] == $user_id) {
         $field = 'player2_in_battle';
+        $other_field = 'player1_in_battle';
     } else {
         throw new Exception('Ви не є учасником цієї кімнати');
     }
     
-    // Update battle state
-    $stmt = $conn->prepare("UPDATE game_rooms SET $field = ?, battle_started = 1 WHERE id = ?");
+    // Update this player's battle state
     $in_battle_int = $in_battle ? 1 : 0;
+    $stmt = $conn->prepare("UPDATE game_rooms SET $field = ? WHERE id = ?");
     $stmt->bind_param("ii", $in_battle_int, $room_id);
     $stmt->execute();
+    
+    // Check if BOTH players are now in battle
+    $stmt = $conn->prepare("SELECT player1_in_battle, player2_in_battle FROM game_rooms WHERE id = ?");
+    $stmt->bind_param("i", $room_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $room_state = $result->fetch_assoc();
+    
+    // Set battle_started = 1 only if both players are in battle
+    if ($room_state['player1_in_battle'] == 1 && $room_state['player2_in_battle'] == 1) {
+        $stmt = $conn->prepare("UPDATE game_rooms SET battle_started = 1 WHERE id = ?");
+        $stmt->bind_param("i", $room_id);
+        $stmt->execute();
+    }
     
     echo json_encode([
         'success' => true,
