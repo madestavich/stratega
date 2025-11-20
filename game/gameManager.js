@@ -1024,15 +1024,19 @@ class GameManager {
       `Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`
     );
 
-    // Check if round was already incremented (winner_id is NULL means it was cleared after increment)
-    const currentRoomState = await this.getRoomSettings();
-    if (currentRoomState.winner_id === null) {
+    // Check if we already processed this round end (to prevent double increment)
+    const lastProcessedRound = localStorage.getItem("lastProcessedRoundEnd");
+    const currentRoundStr = this.currentRound.toString();
+    if (lastProcessedRound === currentRoundStr) {
       console.warn(
-        "Round already incremented (winner_id is NULL), skipping incrementRound"
+        `Round ${currentRoundStr} already processed, skipping incrementRound`
       );
       await this.showWinnerModalAndContinue();
       return;
     }
+
+    // Mark this round as processed
+    localStorage.setItem("lastProcessedRoundEnd", currentRoundStr);
 
     // Record the result in database
     const incrementSuccess = await this.incrementRound(actualWinnerId);
