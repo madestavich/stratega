@@ -1341,6 +1341,10 @@ class GameManager {
 
   async resetReadyStatus() {
     try {
+      // Clear lastProcessedRoundEnd to allow new round increments
+      localStorage.removeItem("lastProcessedRoundEnd");
+      console.log("Cleared lastProcessedRoundEnd from localStorage");
+
       const response = await fetch("../server/room.php", {
         method: "POST",
         headers: {
