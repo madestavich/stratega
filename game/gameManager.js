@@ -539,6 +539,8 @@ class GameManager {
       return;
     }
 
+    console.log("CLIENT: Calling pause_round_timer");
+
     try {
       const response = await fetch("../server/room.php", {
         method: "POST",
@@ -554,12 +556,16 @@ class GameManager {
 
       const result = await response.json();
       if (result.success) {
-        console.log("Round timer paused:", result.time_left, "seconds left");
+        console.log(
+          "CLIENT: Round timer paused:",
+          result.time_left,
+          "seconds left"
+        );
       } else {
-        console.error("Failed to pause timer:", result.error);
+        console.error("CLIENT: Failed to pause timer:", result.error);
       }
     } catch (error) {
-      console.error("Error pausing timer:", error);
+      console.error("CLIENT: Error pausing timer:", error);
     }
   }
 
@@ -568,6 +574,8 @@ class GameManager {
       console.warn("Cannot resume round timer without room ID");
       return;
     }
+
+    console.log("CLIENT: Calling resume_round_timer");
 
     try {
       const response = await fetch("../server/room.php", {
@@ -584,12 +592,16 @@ class GameManager {
 
       const result = await response.json();
       if (result.success) {
-        console.log("Round timer resumed:", result.time_left, "seconds left");
+        console.log(
+          "CLIENT: Round timer resumed:",
+          result.time_left,
+          "seconds left"
+        );
       } else {
-        console.error("Failed to resume timer:", result.error);
+        console.error("CLIENT: Failed to resume timer:", result.error);
       }
     } catch (error) {
-      console.error("Error resuming timer:", error);
+      console.error("CLIENT: Error resuming timer:", error);
     }
   }
 
@@ -712,6 +724,16 @@ class GameManager {
       const result = await response.json();
 
       if (result.success) {
+        // Debug logging
+        if (result.is_paused !== undefined) {
+          console.log("TIMER STATUS:", {
+            round_active: result.round_active,
+            time_left: result.time_left,
+            is_paused: result.is_paused,
+            isPaused: this.isPaused,
+          });
+        }
+
         // Тільки оновлюємо таймер якщо він активний І гра на паузі (режим розстановки)
         if (result.round_active && result.time_left > 0 && this.isPaused) {
           this.roundTimeLeft = result.time_left;
@@ -1606,9 +1628,13 @@ class GameManager {
 
   // Handle opponent coming back online
   async handleOpponentOnline() {
-    // Resume round timer if it was active
+    // Resume round timer if it was paused
     console.log("Opponent back online - resuming game");
-    await this.resumeRoundTimer();
+
+    // Only resume if we actually paused it
+    if (this.opponentOffline) {
+      await this.resumeRoundTimer();
+    }
 
     // Hide notification
     this.hideOpponentOfflineMessage();

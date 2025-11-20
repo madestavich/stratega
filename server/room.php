@@ -684,6 +684,8 @@ function pauseRoundTimer($data) {
     $elapsed = $current_time->getTimestamp() - $start_time->getTimestamp();
     $time_left = max(0, $room['round_time'] - $elapsed);
     
+    error_log("Pausing timer - elapsed: $elapsed, round_time: {$room['round_time']}, time_left: $time_left");
+    
     // Зберігаємо залишковий час
     $stmt = $conn->prepare("
         UPDATE game_rooms 
@@ -732,8 +734,11 @@ function resumeRoundTimer($data) {
     // Відновлюємо таймер зі збереженим часом
     // Встановлюємо новий round_start_time так, щоб залишок часу був як збережений
     $time_left = $room['round_paused_time'];
-    $new_start_time = time() - ($room['round_time'] - $time_left);
+    $elapsed_before_pause = $room['round_time'] - $time_left;
+    $new_start_time = time() - $elapsed_before_pause;
     $new_start_datetime = date('Y-m-d H:i:s', $new_start_time);
+    
+    error_log("Resuming timer - time_left: $time_left, round_time: {$room['round_time']}, elapsed_before_pause: $elapsed_before_pause, new_start_time: $new_start_datetime");
     
     $stmt = $conn->prepare("
         UPDATE game_rooms 
