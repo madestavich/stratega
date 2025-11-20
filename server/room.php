@@ -481,8 +481,8 @@ function setPlayerReady($data) {
     // Determine which player ready field to update
     $ready_field = ($room['creator_id'] == $user_id) ? 'player1_ready' : 'player2_ready';
     
-    // Set player as ready
-    $stmt = $conn->prepare("UPDATE game_rooms SET $ready_field = 1 WHERE id = ?");
+    // Set player as ready and clear winner_id (new round starting)
+    $stmt = $conn->prepare("UPDATE game_rooms SET $ready_field = 1, winner_id = NULL WHERE id = ?");
     $stmt->bind_param("i", $room_id);
     
     if ($stmt->execute()) {
@@ -590,8 +590,8 @@ function resetReadyStatus($data) {
     $room_id = $data['room_id'] ?? 0;
     
     // Reset both players ready status and clear round timer, also reset battle state
-    // Clear winner_id here so it's ready for next round increment
-    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0, winner_id = NULL WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    // DON'T clear winner_id here - it's used by incrementRound to prevent double increment
+    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
     $stmt->bind_param("iii", $room_id, $user_id, $user_id);
     
     if ($stmt->execute()) {
