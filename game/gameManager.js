@@ -855,9 +855,6 @@ class GameManager {
     this.roundTimeLeft = 0;
     this.updateTimerDisplay(); // Візуально скидаємо таймер
 
-    // Clear winner_id from previous round before starting new battle
-    await this.clearWinner();
-
     // CRITICAL: Load all units from database to ensure synchronization
     console.log("Loading latest units from database...");
     await this.objectManager.loadObjects();

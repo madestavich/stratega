@@ -590,8 +590,8 @@ function resetReadyStatus($data) {
     $room_id = $data['room_id'] ?? 0;
     
     // Reset both players ready status and clear round timer, also reset battle state
-    // DO NOT clear winner_id here - it's needed for modal after reload
-    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
+    // Clear winner_id here so it's ready for next round increment
+    $stmt = $conn->prepare("UPDATE game_rooms SET player1_ready = 0, player2_ready = 0, round_start_time = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0, winner_id = NULL WHERE id = ? AND (creator_id = ? OR second_player_id = ?)");
     $stmt->bind_param("iii", $room_id, $user_id, $user_id);
     
     if ($stmt->execute()) {
