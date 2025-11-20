@@ -172,26 +172,9 @@ class GameManager {
     if (roomInfo) {
       this.isRoomCreator = roomInfo.isCreator;
 
-      // Get room players info and save nicknames to localStorage
+      // Get current user ID
       const lobbyState = await this.getRoomSettings();
       if (lobbyState) {
-        const playerNicknames = {};
-        if (lobbyState.player1_id && lobbyState.player1_nickname) {
-          playerNicknames[String(lobbyState.player1_id)] =
-            lobbyState.player1_nickname;
-        }
-        if (lobbyState.player2_id && lobbyState.player2_nickname) {
-          playerNicknames[String(lobbyState.player2_id)] =
-            lobbyState.player2_nickname;
-        }
-        console.log(
-          "Saving player nicknames to localStorage:",
-          playerNicknames
-        );
-        localStorage.setItem(
-          `player_nicknames_${this.objectManager.currentRoomId}`,
-          JSON.stringify(playerNicknames)
-        );
         this.currentUserId = this.isRoomCreator
           ? lobbyState.player1_id
           : lobbyState.player2_id;
@@ -204,68 +187,6 @@ class GameManager {
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
-    }
-
-    // Check if we should show winner modal after reload AND save flag for later
-    const showWinnerAfterReload = localStorage.getItem(
-      `show_winner_after_reload_${this.objectManager.currentRoomId}`
-    );
-    const shouldAddIncome = showWinnerAfterReload === "true";
-
-    if (showWinnerAfterReload === "true") {
-      // Get winner data from localStorage (saved before resetReadyStatus cleared DB)
-      const winnerInfo = JSON.parse(
-        localStorage.getItem(
-          `round_winner_info_${this.objectManager.currentRoomId}`
-        ) || "{}"
-      );
-
-      const playerNicknames = JSON.parse(
-        localStorage.getItem(
-          `player_nicknames_${this.objectManager.currentRoomId}`
-        ) || "{}"
-      );
-
-      const winnerId = winnerInfo.winnerId;
-      const currentRound = winnerInfo.round;
-
-      // Convert winnerId to string for localStorage key lookup
-      const winnerNickname =
-        playerNicknames[String(winnerId)] || "Невідомий гравець";
-
-      console.log("DEBUG WINNER MODAL:");
-      console.log("winnerId:", winnerId, "type:", typeof winnerId);
-      console.log("playerNicknames:", playerNicknames);
-      console.log("winnerNickname:", winnerNickname);
-
-      const modal = document.getElementById("round-winner-modal");
-      const roundNumber = document.getElementById("round-number");
-      const winnerNicknameEl = document.getElementById("winner-nickname");
-
-      roundNumber.textContent = `Раунд ${currentRound}`;
-      winnerNicknameEl.textContent = winnerNickname;
-
-      // Show winner modal FIRST
-      modal.style.display = "flex";
-
-      // Then fade out loading screen with delay to prevent white flash
-      setTimeout(() => {
-        const loadingScreen = document.getElementById("loading-screen");
-        if (loadingScreen) {
-          loadingScreen.classList.add("hidden");
-          setTimeout(() => {
-            loadingScreen.remove();
-          }, 300);
-        }
-      }, 100);
-
-      // Clear the flags
-      localStorage.removeItem(
-        `show_winner_after_reload_${this.objectManager.currentRoomId}`
-      );
-      localStorage.removeItem(
-        `round_winner_info_${this.objectManager.currentRoomId}`
-      );
     }
 
     // Check if we reconnected during battle
@@ -1030,21 +951,27 @@ class GameManager {
       `Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`
     );
 
-    // Record the result in database
+    // Try to increment round - server will return was_first flag
     const incrementResult = await this.incrementRound(actualWinnerId);
 
     if (incrementResult && incrementResult.success) {
-      // Only first player (was_first=true) shows modal
-      // Second player just reloads
-      if (incrementResult.was_first) {
-        console.log("This player was FIRST - showing winner modal");
-        await this.showWinnerModalAndContinue(actualWinnerId);
-      } else {
-        console.log("This player was SECOND - reloading without modal");
-        await this.resetReadyStatus();
-        this.allowReload = true;
-        window.location.reload();
-      }
+      // First player incremented the round
+      console.log("Round incremented successfully, reloading...");
+      await this.resetReadyStatus();
+      this.allowReload = true;
+      window.location.reload();
+    } else if (
+      incrementResult &&
+      !incrementResult.success &&
+      incrementResult.was_first === false
+    ) {
+      // Second player - round already incremented by first player
+      console.log("Round already incremented by other player, reloading...");
+      await this.resetReadyStatus();
+      this.allowReload = true;
+      window.location.reload();
+    } else {
+      console.error("Failed to increment round");
     }
   }
 
@@ -1151,49 +1078,6 @@ class GameManager {
     } catch (error) {
       console.error("Error incrementing round:", error);
       return false;
-    }
-  }
-
-  async showWinnerModalAndContinue(winnerId) {
-    try {
-      // Get current round from room settings
-      const roomSettings = await this.getRoomSettings();
-      const currentRound = roomSettings.current_round || 1;
-
-      console.log(
-        "%c=== SHOW WINNER MODAL ===",
-        "color: magenta; font-weight: bold;"
-      );
-      console.log("Current round:", currentRound);
-      console.log("Winner ID:", winnerId);
-
-      // Save winner info to localStorage BEFORE clearing it from DB
-      localStorage.setItem(
-        `round_winner_info_${this.objectManager.currentRoomId}`,
-        JSON.stringify({
-          round: currentRound,
-          winnerId: winnerId,
-        })
-      );
-
-      // Save flag to show winner modal after reload
-      localStorage.setItem(
-        `show_winner_after_reload_${this.objectManager.currentRoomId}`,
-        "true"
-      );
-
-      // Reset ready status before reload (this clears winner_id in DB)
-      await this.resetReadyStatus();
-
-      console.log("Reloading page to show winner modal...");
-
-      // Allow reload without warning
-      this.allowReload = true;
-
-      // Reload immediately - winner modal will be shown during loading
-      window.location.reload();
-    } catch (error) {
-      console.error("Error showing winner modal:", error);
     }
   }
 
@@ -1513,11 +1397,11 @@ class GameManager {
         clearInterval(this.battleCompletionCheckInterval);
         this.battleCompletionCheckInterval = null;
 
-        // DON'T hide waiting overlay - show winner modal on top of it
-        // This prevents white screen flash
-
-        // Show winner and continue to next round
-        await this.showWinnerModalAndContinue();
+        // Battle completed - just reload
+        console.log("Battle completed during reconnect, reloading...");
+        await this.resetReadyStatus();
+        this.allowReload = true;
+        window.location.reload();
       } else {
         console.log("Battle not yet completed, continuing to wait...");
       }
