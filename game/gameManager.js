@@ -1030,34 +1030,21 @@ class GameManager {
       `Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`
     );
 
-    // Get current round number from room settings
-    const roomSettings = await this.getRoomSettings();
-    const currentRoundStr = roomSettings.current_round.toString();
-    const roomId = this.objectManager.currentRoomId;
-    const roundKey = `lastProcessedRound_${roomId}_${currentRoundStr}`;
-
-    // Check if we already processed this round end (to prevent double increment)
-    const alreadyProcessed = localStorage.getItem(roundKey);
-    if (alreadyProcessed === "true") {
-      console.warn(
-        `Round ${currentRoundStr} in room ${roomId} already processed, skipping incrementRound`
-      );
-      await this.showWinnerModalAndContinue();
-      return;
-    }
-
-    // Mark this round as processed
-    localStorage.setItem(roundKey, "true");
-    console.log(
-      `Marked round ${currentRoundStr} in room ${roomId} as processed`
-    );
-
     // Record the result in database
-    const incrementSuccess = await this.incrementRound(actualWinnerId);
+    const incrementResult = await this.incrementRound(actualWinnerId);
 
-    if (incrementSuccess) {
-      // Show modal based on who won
-      await this.showWinnerModalAndContinue();
+    if (incrementResult && incrementResult.success) {
+      // Only first player (was_first=true) shows modal
+      // Second player just reloads
+      if (incrementResult.was_first) {
+        console.log("This player was FIRST - showing winner modal");
+        await this.showWinnerModalAndContinue(actualWinnerId);
+      } else {
+        console.log("This player was SECOND - reloading without modal");
+        await this.resetReadyStatus();
+        this.allowReload = true;
+        window.location.reload();
+      }
     }
   }
 
@@ -1156,7 +1143,7 @@ class GameManager {
           `%cRound incremented to: ${result.new_round}`,
           "color: green; font-weight: bold;"
         );
-        return true;
+        return result; // Return full result with was_first flag
       } else {
         console.error("Failed to increment round:", result.error);
         return false;
@@ -1167,12 +1154,11 @@ class GameManager {
     }
   }
 
-  async showWinnerModalAndContinue() {
+  async showWinnerModalAndContinue(winnerId) {
     try {
       // Get current round from room settings
       const roomSettings = await this.getRoomSettings();
       const currentRound = roomSettings.current_round || 1;
-      const winnerId = roomSettings.winner_id;
 
       console.log(
         "%c=== SHOW WINNER MODAL ===",
@@ -1180,16 +1166,6 @@ class GameManager {
       );
       console.log("Current round:", currentRound);
       console.log("Winner ID:", winnerId);
-
-      // Check if we already showed modal for this round
-      const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${currentRound}`;
-      if (localStorage.getItem(storageKey)) {
-        console.log("Winner modal already shown for this round, skipping");
-        return;
-      }
-
-      // Mark that we showed modal for this round
-      localStorage.setItem(storageKey, "true");
 
       // Save winner info to localStorage BEFORE clearing it from DB
       localStorage.setItem(
