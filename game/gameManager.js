@@ -348,6 +348,9 @@ class GameManager {
     // Start checking opponent online status (for unit placement phase)
     this.startOpponentCheck();
 
+    // Show debug info from previous increment if exists
+    this.showIncrementDebugHistory();
+
     // Hide loading screen after everything is ready
     this.hideLoadingScreen();
 
@@ -1081,6 +1084,28 @@ class GameManager {
       console.log("was_first:", result.was_first);
       console.log("new_round:", result.new_round);
 
+      // Save increment info to localStorage for debugging after reload
+      const incrementDebugInfo = {
+        timestamp: new Date().toISOString(),
+        winnerId: winnerId,
+        was_first: result.was_first,
+        new_round: result.new_round,
+        old_round: result.new_round - (result.was_first ? 1 : 0),
+        room_id: this.objectManager.currentRoomId,
+      };
+
+      // Get existing debug history
+      const debugHistory = JSON.parse(
+        localStorage.getItem("increment_debug_history") || "[]"
+      );
+      debugHistory.push(incrementDebugInfo);
+      // Keep only last 10 entries
+      if (debugHistory.length > 10) debugHistory.shift();
+      localStorage.setItem(
+        "increment_debug_history",
+        JSON.stringify(debugHistory)
+      );
+
       if (result.success) {
         console.log(
           `%cRound incremented to: ${result.new_round}`,
@@ -1703,6 +1728,39 @@ class GameManager {
   }
 
   // ========== DEADLOCK DETECTION ==========
+
+  // Show increment round debug history from localStorage
+  showIncrementDebugHistory() {
+    const debugHistory = JSON.parse(
+      localStorage.getItem("increment_debug_history") || "[]"
+    );
+
+    if (debugHistory.length > 0) {
+      console.log(
+        "%c=== INCREMENT ROUND DEBUG HISTORY ===",
+        "color: yellow; font-weight: bold; font-size: 14px;"
+      );
+      console.log(`Total increments: ${debugHistory.length}`);
+      console.table(debugHistory);
+
+      // Check for potential issues
+      const roomIncrements = debugHistory.filter(
+        (d) => d.room_id === this.objectManager.currentRoomId
+      );
+      if (roomIncrements.length > 1) {
+        const lastTwo = roomIncrements.slice(-2);
+        if (lastTwo.length === 2) {
+          const roundDiff = lastTwo[1].new_round - lastTwo[0].new_round;
+          if (roundDiff > 1) {
+            console.warn(
+              `%cWARNING: Round jumped by ${roundDiff} (from ${lastTwo[0].new_round} to ${lastTwo[1].new_round})`,
+              "color: red; font-weight: bold;"
+            );
+          }
+        }
+      }
+    }
+  }
 
   // Check for battle deadlock (both players offline during battle)
   async checkBattleDeadlock() {
