@@ -39,6 +39,7 @@ class GameManager {
     this.battleDisconnected = false;
     this.battleCheckInterval = null;
     this.waitingForBattleEnd = false;
+    this.battleEndProcessing = false; // Flag to prevent multiple battle end calls
 
     // Heartbeat system for tracking player online status
     this.heartbeatInterval = null;
@@ -824,6 +825,9 @@ class GameManager {
     console.log("DEBUG: startGame called, isPaused:", this.isPaused);
     console.trace("startGame call stack");
 
+    // Reset battle end processing flag
+    this.battleEndProcessing = false;
+
     // Mark that battle is in progress
     this.isBattleInProgress = true;
 
@@ -870,6 +874,9 @@ class GameManager {
     // Поновлюємо постріли всім ренджед юнітам на початку гри
     this.refillAllUnitsShots();
 
+    // Flag to prevent multiple battle end calls
+    this.battleEndProcessing = false;
+
     // Start checking for round end conditions (all units of one player dead)
     this.battleCheckInterval = setInterval(() => {
       this.checkBattleEnd();
@@ -877,6 +884,11 @@ class GameManager {
   }
 
   checkBattleEnd() {
+    // Prevent multiple simultaneous calls
+    if (this.battleEndProcessing) {
+      return;
+    }
+
     const playerUnits = this.objectManager.objects.filter((obj) => !obj.isDead);
     const enemyUnits = this.objectManager.enemyObjects.filter(
       (obj) => !obj.isDead
@@ -884,6 +896,9 @@ class GameManager {
 
     // Check if one team has no units left
     if (playerUnits.length === 0 || enemyUnits.length === 0) {
+      // Mark that we're processing battle end
+      this.battleEndProcessing = true;
+
       console.log(
         `%c=== BATTLE ENDED ===%c\nPlayer units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`,
         "color: red; font-weight: bold; font-size: 16px;",
@@ -1081,9 +1096,17 @@ class GameManager {
       const roomSettings = await this.getRoomSettings();
       const currentRound = roomSettings.current_round || 1;
 
+      console.log(
+        "%c=== SHOW WINNER MODAL ===",
+        "color: magenta; font-weight: bold;"
+      );
+      console.log("Current round:", currentRound);
+      console.log("Winner ID:", roomSettings.winner_id);
+
       // Check if we already showed modal for this round
       const storageKey = `winner_shown_${this.objectManager.currentRoomId}_${currentRound}`;
       if (localStorage.getItem(storageKey)) {
+        console.log("Winner modal already shown for this round, skipping");
         return;
       }
 
@@ -1098,6 +1121,8 @@ class GameManager {
 
       // Reset ready status before reload
       await this.resetReadyStatus();
+
+      console.log("Reloading page to show winner modal...");
 
       // Allow reload without warning
       this.allowReload = true;
