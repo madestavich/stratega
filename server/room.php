@@ -771,62 +771,77 @@ function incrementRound($data) {
     
     error_log("=== INCREMENT ROUND START === room_id: $room_id, winner_id: " . ($winner_id ?? 'NULL') . ", user_id: $user_id, timestamp: " . date('Y-m-d H:i:s.u'));
     
-    // Get current state BEFORE increment for logging and response
-    $stmt = $conn->prepare("SELECT current_round, battle_started, winner_id FROM game_rooms WHERE id = ?");
-    $stmt->bind_param("i", $room_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $current_room = $result->fetch_assoc();
-    $current_round_before = $current_room['current_round'];
-    $battle_started_before = $current_room['battle_started'];
-    $winner_before = $current_room['winner_id'];
+    // Start transaction for atomic operation
+    $conn->begin_transaction();
     
-    error_log("State BEFORE: round=$current_round_before, battle_started=$battle_started_before, winner=" . ($winner_before ?? 'NULL'));
-    
-    // ATOMIC UPDATE: Increment round ONLY if:
-    // 1. Current round matches (prevents double increment)
-    // 2. Winner is not yet set OR is different (prevents same winner updating twice)
-    // This prevents race condition - only the first player will successfully update
-    if ($winner_id !== null) {
-        // Only increment if winner_id is NULL or different from what we're setting
-        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND (winner_id IS NULL OR winner_id != ?)");
-        $stmt->bind_param("iiiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before, $winner_id);
-    } else {
-        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND winner_id IS NULL");
-        $stmt->bind_param("iiii", $room_id, $user_id, $user_id, $current_round_before);
-    }
-    
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    
-    error_log("UPDATE affected_rows: $affected");
-    
-    if ($affected > 0) {
-        // Successfully incremented (we were first)
-        $new_round = $current_round_before + 1;
-        error_log("SUCCESS: Round incremented to $new_round, winner_id set to: " . ($winner_id ?? 'NULL'));
-        echo json_encode([
-            'success' => true,
-            'message' => 'Round incremented',
-            'new_round' => $new_round,
-            'was_first' => true
-        ]);
-    } else {
-        // Round was already incremented by other player - get current state
-        $stmt = $conn->prepare("SELECT current_round, winner_id FROM game_rooms WHERE id = ?");
+    try {
+        // Lock row and get current state
+        $stmt = $conn->prepare("SELECT current_round, battle_started, winner_id FROM game_rooms WHERE id = ? FOR UPDATE");
         $stmt->bind_param("i", $room_id);
         $stmt->execute();
         $result = $stmt->get_result();
-        $room = $result->fetch_assoc();
+        $current_room = $result->fetch_assoc();
+        $current_round_before = $current_room['current_round'];
+        $battle_started_before = $current_room['battle_started'];
+        $winner_before = $current_room['winner_id'];
         
-        error_log("ALREADY INCREMENTED: current_round=" . $room['current_round'] . ", winner_id=" . ($room['winner_id'] ?? 'NULL'));
+        error_log("State BEFORE (locked): round=$current_round_before, battle_started=$battle_started_before, winner=" . ($winner_before ?? 'NULL'));
+        
+        // Check if we should increment (winner_id must be NULL or different)
+        $should_increment = false;
+        
+        if ($winner_id !== null) {
+            // Only increment if winner_id is NULL or different from what we're setting
+            $should_increment = ($winner_before === null || $winner_before != $winner_id);
+        } else {
+            // Null winner (draw) - only increment if winner_id is already NULL
+            $should_increment = ($winner_before === null);
+        }
+        
+        if ($should_increment) {
+            // Increment the round
+            if ($winner_id !== null) {
+                $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ?");
+                $stmt->bind_param("ii", $winner_id, $room_id);
+            } else {
+                $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ?");
+                $stmt->bind_param("i", $room_id);
+            }
+            
+            $stmt->execute();
+            $affected = $stmt->affected_rows;
+            
+            error_log("UPDATE affected_rows: $affected");
+            
+            if ($affected > 0) {
+                $new_round = $current_round_before + 1;
+                $conn->commit();
+                
+                error_log("SUCCESS: Round incremented to $new_round, winner_id set to: " . ($winner_id ?? 'NULL'));
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Round incremented',
+                    'new_round' => $new_round,
+                    'was_first' => true
+                ]);
+                return;
+            }
+        }
+        
+        // Did not increment - return current state
+        $conn->commit();
+        
+        error_log("NOT INCREMENTED: winner_before=" . ($winner_before ?? 'NULL') . ", winner_id=" . ($winner_id ?? 'NULL'));
         
         echo json_encode([
             'success' => true,
             'message' => 'Round already incremented by other player',
-            'new_round' => $room['current_round'],
+            'new_round' => $current_round_before,
             'was_first' => false
         ]);
+    } catch (Exception $e) {
+        $conn->rollback();
+        throw $e;
     }
 }
 
