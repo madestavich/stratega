@@ -259,6 +259,22 @@ class GameManager {
     await this.player.initializeResources();
     console.log("After initializeResources, money:", this.player.money);
 
+    // Check if we should add income after battle (using localStorage flag)
+    const shouldAddIncome = localStorage.getItem(
+      `add_income_after_reload_${this.objectManager.currentRoomId}`
+    );
+
+    if (shouldAddIncome === "true") {
+      console.log("Battle just ended - adding round income");
+      await this.player.addRoundIncome();
+      console.log("After addRoundIncome, money:", this.player.money);
+
+      // Clear the flag
+      localStorage.removeItem(
+        `add_income_after_reload_${this.objectManager.currentRoomId}`
+      );
+    }
+
     this.interfaceManager.updatePlayerInterface(this.player);
     console.log("After updatePlayerInterface, money:", this.player.money);
 
@@ -949,6 +965,13 @@ class GameManager {
     if (incrementResult && incrementResult.success) {
       // First player incremented the round
       console.log("Round incremented successfully, reloading...");
+
+      // Set flag for adding income after reload
+      localStorage.setItem(
+        `add_income_after_reload_${this.objectManager.currentRoomId}`,
+        "true"
+      );
+
       await this.resetReadyStatus();
       this.allowReload = true;
       window.location.reload();
@@ -959,6 +982,13 @@ class GameManager {
     ) {
       // Second player - round already incremented by first player
       console.log("Round already incremented by other player, reloading...");
+
+      // Set flag for adding income after reload
+      localStorage.setItem(
+        `add_income_after_reload_${this.objectManager.currentRoomId}`,
+        "true"
+      );
+
       await this.resetReadyStatus();
       this.allowReload = true;
       window.location.reload();
