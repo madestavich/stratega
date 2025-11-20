@@ -1024,9 +1024,12 @@ class GameManager {
       `Processing round end: ${winnerId} -> User ID: ${actualWinnerId}`
     );
 
+    // Get current round number from room settings
+    const roomSettings = await this.getRoomSettings();
+    const currentRoundStr = roomSettings.current_round.toString();
+
     // Check if we already processed this round end (to prevent double increment)
     const lastProcessedRound = localStorage.getItem("lastProcessedRoundEnd");
-    const currentRoundStr = this.currentRound.toString();
     if (lastProcessedRound === currentRoundStr) {
       console.warn(
         `Round ${currentRoundStr} already processed, skipping incrementRound`
