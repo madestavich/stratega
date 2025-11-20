@@ -1598,6 +1598,7 @@ class GameManager {
 
         // Check if opponent status changed
         if (this.opponentOffline !== !opponentOnline) {
+          const wasOffline = this.opponentOffline;
           this.opponentOffline = !opponentOnline;
 
           if (this.opponentOffline) {
@@ -1605,7 +1606,7 @@ class GameManager {
             this.handleOpponentOffline();
           } else {
             console.log("Opponent came back ONLINE");
-            this.handleOpponentOnline();
+            this.handleOpponentOnline(wasOffline);
           }
         }
       }
@@ -1627,12 +1628,13 @@ class GameManager {
   }
 
   // Handle opponent coming back online
-  async handleOpponentOnline() {
+  async handleOpponentOnline(wasOffline) {
     // Resume round timer if it was paused
     console.log("Opponent back online - resuming game");
 
-    // Only resume if we actually paused it
-    if (this.opponentOffline) {
+    // Only resume if opponent was actually offline (meaning we paused the timer)
+    if (wasOffline) {
+      console.log("CLIENT: Resuming timer after opponent reconnect");
       await this.resumeRoundTimer();
     }
 
