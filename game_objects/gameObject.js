@@ -138,6 +138,28 @@ export class GameObject {
           this.ctx.fillText(text, textX, textY);
           this.ctx.restore();
         }
+        // Відображення здоров'я
+        this.ctx.save();
+        this.ctx.fillStyle =
+          this.health > this.maxHealth * 0.5
+            ? "lime"
+            : this.health > this.maxHealth * 0.25
+            ? "orange"
+            : "red";
+        this.ctx.strokeStyle = "black";
+        this.ctx.lineWidth = 2;
+        this.ctx.font = "bold 14px Arial";
+        this.ctx.textAlign = "center";
+        const healthText = `${Math.ceil(this.health)}/${this.maxHealth}`;
+        const healthX = this.x;
+        const healthY =
+          this.y -
+          offsetY -
+          currentFrame.height / 2 -
+          (this.isRanged && this.maxShots !== null ? 28 : 10);
+        this.ctx.strokeText(healthText, healthX, healthY);
+        this.ctx.fillText(healthText, healthX, healthY);
+        this.ctx.restore();
       }
     } else {
       this.renderer.draw(
@@ -184,6 +206,28 @@ export class GameObject {
           this.ctx.fillText(text, textX, textY);
           this.ctx.restore();
         }
+        // Відображення здоров'я
+        this.ctx.save();
+        this.ctx.fillStyle =
+          this.health > this.maxHealth * 0.5
+            ? "lime"
+            : this.health > this.maxHealth * 0.25
+            ? "orange"
+            : "red";
+        this.ctx.strokeStyle = "black";
+        this.ctx.lineWidth = 2;
+        this.ctx.font = "bold 14px Arial";
+        this.ctx.textAlign = "center";
+        const healthText = `${Math.ceil(this.health)}/${this.maxHealth}`;
+        const healthX = this.x;
+        const healthY =
+          this.y -
+          offsetY -
+          currentFrame.height / 2 -
+          (this.isRanged && this.maxShots !== null ? 28 : 10);
+        this.ctx.strokeText(healthText, healthX, healthY);
+        this.ctx.fillText(healthText, healthX, healthY);
+        this.ctx.restore();
       }
     }
   }
