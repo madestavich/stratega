@@ -958,6 +958,13 @@ class GameManager {
     );
     console.log("winnerId:", winnerId);
 
+    // CRITICAL: Stop battle check interval FIRST to prevent multiple calls
+    if (this.battleCheckInterval) {
+      clearInterval(this.battleCheckInterval);
+      this.battleCheckInterval = null;
+      console.log("Stopped battleCheckInterval in endRound");
+    }
+
     // Mark player as no longer in battle
     await this.setBattleState(false);
 
