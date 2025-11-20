@@ -633,10 +633,10 @@ function startRoundTimer($data) {
         return;
     }
     
-    // Встановлюємо час початку раунду
+    // Встановлюємо час початку раунду та очищаємо winner_id
     $stmt = $conn->prepare("
         UPDATE game_rooms 
-        SET round_start_time = NOW(), round_paused_time = NULL
+        SET round_start_time = NOW(), round_paused_time = NULL, winner_id = NULL
         WHERE id = ?
     ");
     $stmt->bind_param("i", $room_id);
