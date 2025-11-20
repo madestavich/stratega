@@ -771,35 +771,21 @@ function incrementRound($data) {
     
     error_log("incrementRound called - room_id: $room_id, winner_id: " . ($winner_id ?? 'NULL') . ", user_id: $user_id");
     
-    // Check if round is already incremented (race condition protection)
-    $stmt = $conn->prepare("SELECT current_round, winner_id, battle_started FROM game_rooms WHERE id = ?");
+    // Get current round BEFORE increment for response
+    $stmt = $conn->prepare("SELECT current_round FROM game_rooms WHERE id = ?");
     $stmt->bind_param("i", $room_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $current_room = $result->fetch_assoc();
     $current_round_before = $current_room['current_round'];
-    $existing_winner = $current_room['winner_id'];
-    $battle_started = $current_room['battle_started'];
     
-    // If winner is already set and battle is already finished (battle_started = 0), round was already incremented
-    if ($existing_winner !== null && $battle_started == 0) {
-        error_log("Round already incremented - winner_id already set to: $existing_winner, battle finished");
-        echo json_encode([
-            'success' => true,
-            'message' => 'Round already incremented',
-            'new_round' => $current_round_before,
-            'was_first' => false
-        ]);
-        return;
-    }
-    
-    // Increment round number and set winner only if not already incremented
-    // Also reset battle state
+    // ATOMIC UPDATE: Increment round ONLY if battle is still started (not already finished)
+    // This prevents race condition - only the first player will successfully update
     if ($winner_id !== null) {
-        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
+        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = ?, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND battle_started = 1");
         $stmt->bind_param("iiiii", $winner_id, $room_id, $user_id, $user_id, $current_round_before);
     } else {
-        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ?");
+        $stmt = $conn->prepare("UPDATE game_rooms SET current_round = current_round + 1, winner_id = NULL, battle_started = 0, player1_in_battle = 0, player2_in_battle = 0 WHERE id = ? AND (creator_id = ? OR second_player_id = ?) AND current_round = ? AND battle_started = 1");
         $stmt->bind_param("iiii", $room_id, $user_id, $user_id, $current_round_before);
     }
     
