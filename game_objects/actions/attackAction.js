@@ -678,7 +678,17 @@ export class AttackAction {
     const targets = [];
     const allObjects = this.getAllObjects();
 
+    console.log("[AREA ATTACK] findTargetsInCells:", {
+      cellsCount: cells.length,
+      allObjectsCount: allObjects.length,
+      attackerTeam,
+      excludeTargetName: excludeTarget?.name,
+    });
+
     cells.forEach((cell) => {
+      console.log("[AREA ATTACK] Checking cell:", cell);
+      let cellHasTarget = false;
+
       allObjects.forEach((obj) => {
         // Skip if same object as excluded target
         if (excludeTarget && obj === excludeTarget) {
@@ -692,12 +702,22 @@ export class AttackAction {
 
         // Check if object occupies this cell
         if (this.objectOccupiesCell(obj, cell.col, cell.row)) {
+          console.log("[AREA ATTACK] Found target in cell:", {
+            cell,
+            target: obj.name || obj.objectType,
+            targetPos: { col: obj.gridCol, row: obj.gridRow },
+          });
+          cellHasTarget = true;
           // Avoid duplicates
           if (!targets.includes(obj)) {
             targets.push(obj);
           }
         }
       });
+
+      if (!cellHasTarget) {
+        console.log("[AREA ATTACK] No targets in cell:", cell);
+      }
     });
 
     return targets;
