@@ -152,31 +152,11 @@ export class AttackAction {
           this.dealDamage(gameObject, gameObject.attackTarget);
 
           // Check for area attack
-          console.log("[AREA ATTACK] Checking:", {
-            hasAreaAttack: gameObject.areaAttack,
-            hasParams: !!gameObject.areaAttackParameters,
-            unitName: gameObject.name,
-          });
-
           if (gameObject.areaAttack && gameObject.areaAttackParameters) {
-            console.log(
-              "[AREA ATTACK] Parameters:",
-              gameObject.areaAttackParameters
-            );
-
             const areaTargets = this.getAreaAttackTargets(
               gameObject,
               gameObject.attackTarget
             );
-
-            console.log("[AREA ATTACK] Found targets:", {
-              count: areaTargets.length,
-              targets: areaTargets.map((t) => ({
-                name: t.target.name,
-                hp: t.target.health,
-                multiplier: t.damageMultiplier,
-              })),
-            });
 
             areaTargets.forEach((targetInfo) => {
               this.dealDamage(
@@ -537,15 +517,12 @@ export class AttackAction {
   // Get secondary targets for area attack
   getAreaAttackTargets(attacker, primaryTarget) {
     if (!attacker.areaAttackParameters || !primaryTarget) {
-      console.log("[AREA ATTACK] No params or target");
       return [];
     }
 
     const params = attacker.areaAttackParameters;
     const pattern = params.pattern || "adjacent";
     const damageMultiplier = params.damageMultiplier || 0.5;
-
-    console.log("[AREA ATTACK] Pattern:", pattern, "Range:", params.range);
 
     // Calculate area coordinates based on pattern
     const areaCells = this.calculateAreaPattern(
@@ -555,16 +532,12 @@ export class AttackAction {
       params.range || {}
     );
 
-    console.log("[AREA ATTACK] Calculated cells:", areaCells);
-
     // Find targets in those cells
     const targets = this.findTargetsInCells(
       areaCells,
       attacker.team,
       primaryTarget
     );
-
-    console.log("[AREA ATTACK] Found raw targets:", targets.length);
 
     // Return targets with damage multiplier
     return targets.map((target) => ({
@@ -580,36 +553,17 @@ export class AttackAction {
     const targetRow = primaryTarget.gridRow;
     const lookDir = attacker.lookDirection || { dx: 1, dy: 0 };
 
-    console.log("[AREA ATTACK] calculateAreaPattern:", {
-      targetCol,
-      targetRow,
-      lookDir,
-      pattern,
-      range,
-    });
-
     switch (pattern) {
       case "line":
-        // Attack in a line behind the target
+        // Attack in a straight line in the direction of lookDirection
         const horizontalRange = range.horizontal || 1;
         const verticalRange = range.vertical || 1;
 
-        console.log("[AREA ATTACK] Line pattern:", {
-          horizontalRange,
-          verticalRange,
-          dxAbs: Math.abs(lookDir.dx),
-          dyAbs: Math.abs(lookDir.dy),
-          isHorizontal: Math.abs(lookDir.dx) > Math.abs(lookDir.dy),
-        });
-
-        // Attack in a straight line in the direction of lookDirection
         for (let i = 1; i <= horizontalRange; i++) {
-          const cell = {
+          cells.push({
             col: targetCol + lookDir.dx * i,
             row: targetRow + lookDir.dy * i,
-          };
-          console.log("[AREA ATTACK] Adding line cell:", cell);
-          cells.push(cell);
+          });
         }
         break;
 
@@ -678,18 +632,7 @@ export class AttackAction {
     const targets = [];
     const allObjects = this.getAllObjects();
 
-    console.log("[AREA ATTACK] findTargetsInCells:", {
-      cellsCount: cells.length,
-      allObjectsCount: allObjects.length,
-      attackerTeam,
-      excludeTargetName: excludeTarget?.name,
-    });
-
     cells.forEach((cell) => {
-      console.log("[AREA ATTACK] Checking cell:", cell);
-      let cellHasTarget = false;
-      let objectsChecked = 0;
-
       allObjects.forEach((obj) => {
         // Skip if same object as excluded target
         if (excludeTarget && obj === excludeTarget) {
@@ -701,32 +644,14 @@ export class AttackAction {
           return;
         }
 
-        objectsChecked++;
-
         // Check if object occupies this cell
         if (this.objectOccupiesCell(obj, cell.col, cell.row)) {
-          console.log("[AREA ATTACK] Found target in cell:", {
-            cell,
-            target: obj.name || obj.objectType,
-            targetPos: { col: obj.gridCol, row: obj.gridRow },
-          });
-          cellHasTarget = true;
           // Avoid duplicates
           if (!targets.includes(obj)) {
             targets.push(obj);
           }
         }
       });
-
-      if (!cellHasTarget) {
-        console.log(
-          "[AREA ATTACK] No targets in cell:",
-          cell,
-          "Checked",
-          objectsChecked,
-          "enemy objects"
-        );
-      }
     });
 
     return targets;

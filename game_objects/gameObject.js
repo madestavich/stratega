@@ -12,6 +12,7 @@ export class GameObject {
     this.y = undefined;
     this.z = undefined;
     this.objectType = objectConfig.objectType || "default"; // Тип об'єкта
+    this.name = objectConfig.name || objectConfig.objectType; // Ім'я об'єкта
     this.actionPriorities = objectConfig.actionPriorities || [];
     this.canAct = true; // Чи може об'єкт виконувати дії
     this.isMoving = false; // Чи об'єкт рухається
