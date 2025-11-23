@@ -150,6 +150,21 @@ export class AttackAction {
         } else {
           // For melee attack, deal damage directly
           this.dealDamage(gameObject, gameObject.attackTarget);
+
+          // Check for area attack
+          if (gameObject.areaAttack && gameObject.areaAttackParameters) {
+            const areaTargets = this.getAreaAttackTargets(
+              gameObject,
+              gameObject.attackTarget
+            );
+            areaTargets.forEach((targetInfo) => {
+              this.dealDamage(
+                gameObject,
+                targetInfo.target,
+                targetInfo.damageMultiplier
+              );
+            });
+          }
         }
 
         // Reset attack state
@@ -447,14 +462,15 @@ export class AttackAction {
     gameObject.lookDirection = { dx: dirX, dy: dirY };
   }
 
-  dealDamage(attacker, target) {
+  dealDamage(attacker, target, damageMultiplier = 1) {
     // Skip if no target or target is already dead
     if (!target || target.isDead || target.health === undefined) {
       return;
     }
 
     // Apply damage
-    const damage = attacker.attackDamage || 10;
+    const baseDamage = attacker.attackDamage || 10;
+    const damage = baseDamage * damageMultiplier;
     target.health -= damage;
 
     // Vampirism: heal attacker if enabled
@@ -481,6 +497,190 @@ export class AttackAction {
         target.animator.setAnimation("death", false);
       }
     }
+  }
+
+  // Get secondary targets for area attack
+  getAreaAttackTargets(attacker, primaryTarget) {
+    if (!attacker.areaAttackParameters || !primaryTarget) {
+      return [];
+    }
+
+    const params = attacker.areaAttackParameters;
+    const pattern = params.pattern || "adjacent";
+    const damageMultiplier = params.damageMultiplier || 0.5;
+
+    // Calculate area coordinates based on pattern
+    const areaCells = this.calculateAreaPattern(
+      primaryTarget,
+      attacker,
+      pattern,
+      params.range || {}
+    );
+
+    // Find targets in those cells
+    const targets = this.findTargetsInCells(
+      areaCells,
+      attacker.team,
+      primaryTarget
+    );
+
+    // Return targets with damage multiplier
+    return targets.map((target) => ({
+      target: target,
+      damageMultiplier: damageMultiplier,
+    }));
+  }
+
+  // Calculate area attack pattern coordinates
+  calculateAreaPattern(primaryTarget, attacker, pattern, range) {
+    const cells = [];
+    const targetCol = primaryTarget.gridCol;
+    const targetRow = primaryTarget.gridRow;
+    const lookDir = attacker.lookDirection || { dx: 1, dy: 0 };
+
+    switch (pattern) {
+      case "line":
+        // Attack in a line behind the target
+        const horizontalRange = range.horizontal || 1;
+        const verticalRange = range.vertical || 0;
+
+        if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
+          // Horizontal attack
+          for (let i = 1; i <= horizontalRange; i++) {
+            cells.push({ col: targetCol + lookDir.dx * i, row: targetRow });
+          }
+        } else {
+          // Vertical attack
+          for (let i = 1; i <= verticalRange; i++) {
+            cells.push({ col: targetCol, row: targetRow + lookDir.dy * i });
+          }
+        }
+        break;
+
+      case "triangle":
+        // Triangle/cone pattern behind target
+        const hRange = range.horizontal || 1;
+        const vRange = range.vertical || 1;
+
+        for (let depth = 1; depth <= hRange; depth++) {
+          for (let width = -depth; width <= depth; width++) {
+            if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
+              // Horizontal cone
+              cells.push({
+                col: targetCol + lookDir.dx * depth,
+                row: targetRow + width,
+              });
+            } else {
+              // Vertical cone
+              cells.push({
+                col: targetCol + width,
+                row: targetRow + lookDir.dy * depth,
+              });
+            }
+          }
+        }
+        break;
+
+      case "adjacent":
+        // All cells adjacent to target
+        const adjRange = range.horizontal || 1;
+        for (let dc = -adjRange; dc <= adjRange; dc++) {
+          for (let dr = -adjRange; dr <= adjRange; dr++) {
+            if (dc === 0 && dr === 0) continue; // Skip target cell
+            cells.push({ col: targetCol + dc, row: targetRow + dr });
+          }
+        }
+        break;
+
+      case "custom":
+        // Custom offsets from parameters
+        if (params.customOffsets && Array.isArray(params.customOffsets)) {
+          params.customOffsets.forEach((offset) => {
+            cells.push({
+              col: targetCol + offset.col,
+              row: targetRow + offset.row,
+            });
+          });
+        }
+        break;
+
+      default:
+        // Default to adjacent
+        cells.push(
+          { col: targetCol + 1, row: targetRow },
+          { col: targetCol - 1, row: targetRow },
+          { col: targetCol, row: targetRow + 1 },
+          { col: targetCol, row: targetRow - 1 }
+        );
+    }
+
+    return cells;
+  }
+
+  // Find enemy targets in specified cells
+  findTargetsInCells(cells, attackerTeam, excludeTarget) {
+    const targets = [];
+    const allObjects = this.getAllObjects();
+
+    cells.forEach((cell) => {
+      allObjects.forEach((obj) => {
+        // Skip if same object as excluded target
+        if (excludeTarget && obj === excludeTarget) {
+          return;
+        }
+
+        // Skip if dead, no team, or same team
+        if (obj.isDead || !obj.team || obj.team === attackerTeam) {
+          return;
+        }
+
+        // Check if object occupies this cell
+        if (this.objectOccupiesCell(obj, cell.col, cell.row)) {
+          // Avoid duplicates
+          if (!targets.includes(obj)) {
+            targets.push(obj);
+          }
+        }
+      });
+    });
+
+    return targets;
+  }
+
+  // Check if object occupies a specific cell
+  objectOccupiesCell(obj, col, row) {
+    for (let c = 0; c < obj.gridWidth; c++) {
+      for (let r = 0; r < obj.gridHeight; r++) {
+        let cellCol, cellRow;
+
+        switch (obj.expansionDirection) {
+          case "bottomRight":
+            cellCol = obj.gridCol + c;
+            cellRow = obj.gridRow + r;
+            break;
+          case "topRight":
+            cellCol = obj.gridCol + c;
+            cellRow = obj.gridRow - r;
+            break;
+          case "bottomLeft":
+            cellCol = obj.gridCol - c;
+            cellRow = obj.gridRow + r;
+            break;
+          case "topLeft":
+            cellCol = obj.gridCol - c;
+            cellRow = obj.gridRow - r;
+            break;
+          default:
+            cellCol = obj.gridCol + c;
+            cellRow = obj.gridRow + r;
+        }
+
+        if (cellCol === col && cellRow === row) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   updateAttackTarget(gameObject) {
