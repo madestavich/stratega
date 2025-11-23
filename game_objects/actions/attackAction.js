@@ -348,22 +348,24 @@ export class AttackAction {
     let nearestEnemy = null;
     let minDistance = Infinity;
     let minManhattan = Infinity;
-    
+
     for (const obj of this.getAllObjects()) {
       // Skip if dead, no team, or same team
       if (obj.isDead || !obj.team || obj.team === gameObject.team) {
         continue;
       }
       const distance = this.getMinDistanceBetweenObjects(gameObject, obj);
-      
+
       // Calculate Manhattan distance as tiebreaker (prefer straight lines)
       const dx = Math.abs(obj.gridCol - gameObject.gridCol);
       const dy = Math.abs(obj.gridRow - gameObject.gridRow);
       const manhattanDist = dx + dy;
-      
+
       // Prefer enemies that are closer, or at same distance but in straight line
-      if (distance < minDistance || 
-          (distance === minDistance && manhattanDist < minManhattan)) {
+      if (
+        distance < minDistance ||
+        (distance === minDistance && manhattanDist < minManhattan)
+      ) {
         minDistance = distance;
         minManhattan = manhattanDist;
         nearestEnemy = obj;
