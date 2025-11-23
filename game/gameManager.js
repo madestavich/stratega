@@ -22,6 +22,7 @@ class GameManager {
     this.accumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
+    this.aoeDebugCells = null; // Cells to highlight for AoE attack debug
     this.isRunning = true;
     this.player = null;
 
@@ -370,6 +371,12 @@ class GameManager {
     if (this.debugMode) {
       this.gridManager.debugDrawGrid();
       this.gridManager.debugColorOccupiedCells();
+      
+      // Draw AoE attack cells if any
+      if (this.aoeDebugCells) {
+        this.gridManager.debugDrawAoECells(this.aoeDebugCells);
+      }
+      
       const moveAction = this.actionManager.actions.move;
       if (moveAction) {
         for (const obj of this.objectManager.objects) {

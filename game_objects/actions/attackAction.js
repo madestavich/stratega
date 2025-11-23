@@ -168,6 +168,11 @@ export class AttackAction {
           }
         }
 
+        // Clear debug AoE visualization after attack
+        if (window.gameManager) {
+          window.gameManager.aoeDebugCells = null;
+        }
+
         // Reset attack state
         gameObject.isAttacking = false;
         gameObject.isRangedAttack = false;
@@ -187,6 +192,18 @@ export class AttackAction {
       !gameObject.attackTarget.isDead
     ) {
       gameObject.isAttacking = true;
+
+      // Debug: visualize AoE cells if in debug mode and has area attack
+      if (window.gameManager && window.gameManager.debugMode && gameObject.areaAttack && gameObject.areaAttackParameters) {
+        this.setLookDirection(gameObject, gameObject.attackTarget);
+        const areaCells = this.calculateAreaPattern(
+          gameObject.attackTarget,
+          gameObject,
+          gameObject.areaAttackParameters.pattern || "adjacent",
+          gameObject.areaAttackParameters.range || {}
+        );
+        window.gameManager.aoeDebugCells = areaCells;
+      }
 
       // Вибір правильної анімації в залежності від типу атаки
       if (
