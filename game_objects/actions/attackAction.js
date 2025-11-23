@@ -719,7 +719,13 @@ export class AttackAction {
       });
 
       if (!cellHasTarget) {
-        console.log("[AREA ATTACK] No targets in cell:", cell, "Checked", objectsChecked, "enemy objects");
+        console.log(
+          "[AREA ATTACK] No targets in cell:",
+          cell,
+          "Checked",
+          objectsChecked,
+          "enemy objects"
+        );
       }
     });
 
