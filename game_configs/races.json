@@ -318,7 +318,7 @@
           "attackDamage": 160,
           "areaAttack": true,
           "areaAttackParameters": {
-            "pattern": "line",
+            "pattern": "triangle",
             "damageMultiplier": 0.6,
             "range": {
               "horizontal": 2,
