@@ -587,34 +587,17 @@ export class AttackAction {
         for (let depth = 1; depth <= hRange; depth++) {
           for (let width = -depth; width <= depth; width++) {
             if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
-              // Horizontal cone - expands horizontally and vertically
+              // Horizontal cone - expands horizontally (forward) and vertically (width)
               cells.push({
                 col: targetCol + lookDir.dx * depth,
                 row: targetRow + width,
               });
-            } else if (Math.abs(lookDir.dy) > Math.abs(lookDir.dx)) {
-              // Vertical cone - expands vertically and horizontally
+            } else {
+              // Vertical cone - expands vertically (forward) and horizontally (width)
               cells.push({
                 col: targetCol + width,
                 row: targetRow + lookDir.dy * depth,
               });
-            } else {
-              // Diagonal cone - expands in both perpendicular directions
-              cells.push({
-                col: targetCol + lookDir.dx * depth,
-                row: targetRow + lookDir.dy * depth,
-              });
-              // Add cells on both sides of the diagonal
-              if (width !== 0) {
-                cells.push({
-                  col: targetCol + lookDir.dx * depth + width,
-                  row: targetRow + lookDir.dy * depth,
-                });
-                cells.push({
-                  col: targetCol + lookDir.dx * depth,
-                  row: targetRow + lookDir.dy * depth + width,
-                });
-              }
             }
           }
         }
