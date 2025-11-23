@@ -322,7 +322,7 @@
             "damageMultiplier": 0.6,
             "range": {
               "horizontal": 2,
-              "vertical": 2
+              "vertical": 1
             }
           },
           "attackSpeed": 1,
