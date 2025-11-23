@@ -671,16 +671,6 @@ class GameManager {
       const result = await response.json();
 
       if (result.success) {
-        // Debug logging
-        if (result.is_paused !== undefined) {
-          console.log("TIMER STATUS:", {
-            round_active: result.round_active,
-            time_left: result.time_left,
-            is_paused: result.is_paused,
-            isPaused: this.isPaused,
-          });
-        }
-
         // Тільки оновлюємо таймер якщо він активний І гра на паузі (режим розстановки)
         if (result.round_active && result.time_left > 0 && this.isPaused) {
           this.roundTimeLeft = result.time_left;
