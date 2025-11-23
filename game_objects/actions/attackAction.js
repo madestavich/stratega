@@ -152,11 +152,32 @@ export class AttackAction {
           this.dealDamage(gameObject, gameObject.attackTarget);
 
           // Check for area attack
+          console.log("[AREA ATTACK] Checking:", {
+            hasAreaAttack: gameObject.areaAttack,
+            hasParams: !!gameObject.areaAttackParameters,
+            unitName: gameObject.name,
+          });
+
           if (gameObject.areaAttack && gameObject.areaAttackParameters) {
+            console.log(
+              "[AREA ATTACK] Parameters:",
+              gameObject.areaAttackParameters
+            );
+
             const areaTargets = this.getAreaAttackTargets(
               gameObject,
               gameObject.attackTarget
             );
+
+            console.log("[AREA ATTACK] Found targets:", {
+              count: areaTargets.length,
+              targets: areaTargets.map((t) => ({
+                name: t.target.name,
+                hp: t.target.health,
+                multiplier: t.damageMultiplier,
+              })),
+            });
+
             areaTargets.forEach((targetInfo) => {
               this.dealDamage(
                 gameObject,
@@ -473,6 +494,20 @@ export class AttackAction {
     const damage = baseDamage * damageMultiplier;
     target.health -= damage;
 
+    if (damageMultiplier !== 1) {
+      console.log(
+        "[AREA DAMAGE]",
+        attacker.name,
+        "hit",
+        target.name,
+        "for",
+        damage,
+        "(x" + damageMultiplier + ")",
+        "HP left:",
+        target.health
+      );
+    }
+
     // Vampirism: heal attacker if enabled
     if (attacker.vampirism && attacker.vampirismPercent > 0) {
       const healAmount = (damage * attacker.vampirismPercent) / 100;
@@ -502,12 +537,15 @@ export class AttackAction {
   // Get secondary targets for area attack
   getAreaAttackTargets(attacker, primaryTarget) {
     if (!attacker.areaAttackParameters || !primaryTarget) {
+      console.log("[AREA ATTACK] No params or target");
       return [];
     }
 
     const params = attacker.areaAttackParameters;
     const pattern = params.pattern || "adjacent";
     const damageMultiplier = params.damageMultiplier || 0.5;
+
+    console.log("[AREA ATTACK] Pattern:", pattern, "Range:", params.range);
 
     // Calculate area coordinates based on pattern
     const areaCells = this.calculateAreaPattern(
@@ -517,12 +555,16 @@ export class AttackAction {
       params.range || {}
     );
 
+    console.log("[AREA ATTACK] Calculated cells:", areaCells);
+
     // Find targets in those cells
     const targets = this.findTargetsInCells(
       areaCells,
       attacker.team,
       primaryTarget
     );
+
+    console.log("[AREA ATTACK] Found raw targets:", targets.length);
 
     // Return targets with damage multiplier
     return targets.map((target) => ({
