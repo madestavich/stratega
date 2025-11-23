@@ -688,6 +688,7 @@ export class AttackAction {
     cells.forEach((cell) => {
       console.log("[AREA ATTACK] Checking cell:", cell);
       let cellHasTarget = false;
+      let objectsChecked = 0;
 
       allObjects.forEach((obj) => {
         // Skip if same object as excluded target
@@ -699,6 +700,8 @@ export class AttackAction {
         if (obj.isDead || !obj.team || obj.team === attackerTeam) {
           return;
         }
+
+        objectsChecked++;
 
         // Check if object occupies this cell
         if (this.objectOccupiesCell(obj, cell.col, cell.row)) {
@@ -716,7 +719,7 @@ export class AttackAction {
       });
 
       if (!cellHasTarget) {
-        console.log("[AREA ATTACK] No targets in cell:", cell);
+        console.log("[AREA ATTACK] No targets in cell:", cell, "Checked", objectsChecked, "enemy objects");
       }
     });
 
