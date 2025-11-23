@@ -581,43 +581,23 @@ export class AttackAction {
         break;
 
       case "triangle":
-        // Triangle/cone pattern - true triangle shape
+        // Triangle/cone pattern - filled triangle shape
         const hRange = range.horizontal || 1;
 
         for (let depth = 1; depth <= hRange; depth++) {
           if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
-            // Horizontal cone - triangle expands to the sides
-            // Center line
-            cells.push({
-              col: targetCol + lookDir.dx * depth,
-              row: targetRow,
-            });
-            // Edges only (not filled)
-            for (let width = 1; width <= depth; width++) {
+            // Horizontal cone - filled triangle
+            for (let width = -depth; width <= depth; width++) {
               cells.push({
                 col: targetCol + lookDir.dx * depth,
                 row: targetRow + width,
               });
-              cells.push({
-                col: targetCol + lookDir.dx * depth,
-                row: targetRow - width,
-              });
             }
           } else {
-            // Vertical cone - triangle expands to the sides
-            // Center line
-            cells.push({
-              col: targetCol,
-              row: targetRow + lookDir.dy * depth,
-            });
-            // Edges only (not filled)
-            for (let width = 1; width <= depth; width++) {
+            // Vertical cone - filled triangle
+            for (let width = -depth; width <= depth; width++) {
               cells.push({
                 col: targetCol + width,
-                row: targetRow + lookDir.dy * depth,
-              });
-              cells.push({
-                col: targetCol - width,
                 row: targetRow + lookDir.dy * depth,
               });
             }
