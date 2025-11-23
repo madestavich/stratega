@@ -194,7 +194,12 @@ export class AttackAction {
       gameObject.isAttacking = true;
 
       // Debug: visualize AoE cells if in debug mode and has area attack
-      if (window.gameManager && window.gameManager.debugMode && gameObject.areaAttack && gameObject.areaAttackParameters) {
+      if (
+        window.gameManager &&
+        window.gameManager.debugMode &&
+        gameObject.areaAttack &&
+        gameObject.areaAttackParameters
+      ) {
         this.setLookDirection(gameObject, gameObject.attackTarget);
         const areaCells = this.calculateAreaPattern(
           gameObject.attackTarget,

@@ -254,13 +254,18 @@ export class GridManager {
 
     this.ctx.save();
     cells.forEach((cell) => {
-      if (cell.row >= 0 && cell.row < this.rows && cell.col >= 0 && cell.col < this.cols) {
+      if (
+        cell.row >= 0 &&
+        cell.row < this.rows &&
+        cell.col >= 0 &&
+        cell.col < this.cols
+      ) {
         const x = cell.col * this.cellWidth;
         const y = cell.row * this.cellHeight;
 
         this.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
         this.ctx.fillRect(x, y, this.cellWidth, this.cellHeight);
-        
+
         // Draw border for clarity
         this.ctx.strokeStyle = "rgba(255, 0, 0, 0.8)";
         this.ctx.lineWidth = 2;
