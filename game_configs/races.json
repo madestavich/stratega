@@ -316,6 +316,15 @@
           "moveSpeed": 30,
           "availableActions": ["move", "attack"],
           "attackDamage": 160,
+          "areaAttack": true,
+          "areaAttackParameters": {
+            "pattern": "line",
+            "damageMultiplier": 0.6,
+            "range": {
+              "horizontal": 2,
+              "vertical": 0
+            }
+          },
           "attackSpeed": 1,
           "health": 500,
           "cost": 1050
