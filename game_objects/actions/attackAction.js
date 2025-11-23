@@ -580,12 +580,12 @@ export class AttackAction {
     const targetRow = primaryTarget.gridRow;
     const lookDir = attacker.lookDirection || { dx: 1, dy: 0 };
 
-    console.log('[AREA ATTACK] calculateAreaPattern:', {
+    console.log("[AREA ATTACK] calculateAreaPattern:", {
       targetCol,
       targetRow,
       lookDir,
       pattern,
-      range
+      range,
     });
 
     switch (pattern) {
@@ -594,21 +594,21 @@ export class AttackAction {
         const horizontalRange = range.horizontal || 1;
         const verticalRange = range.vertical || 1;
 
-        console.log('[AREA ATTACK] Line pattern:', {
+        console.log("[AREA ATTACK] Line pattern:", {
           horizontalRange,
           verticalRange,
           dxAbs: Math.abs(lookDir.dx),
           dyAbs: Math.abs(lookDir.dy),
-          isHorizontal: Math.abs(lookDir.dx) > Math.abs(lookDir.dy)
+          isHorizontal: Math.abs(lookDir.dx) > Math.abs(lookDir.dy),
         });
 
         // Attack in a straight line in the direction of lookDirection
         for (let i = 1; i <= horizontalRange; i++) {
-          const cell = { 
-            col: targetCol + lookDir.dx * i, 
-            row: targetRow + lookDir.dy * i 
+          const cell = {
+            col: targetCol + lookDir.dx * i,
+            row: targetRow + lookDir.dy * i,
           };
-          console.log('[AREA ATTACK] Adding line cell:', cell);
+          console.log("[AREA ATTACK] Adding line cell:", cell);
           cells.push(cell);
         }
         break;
