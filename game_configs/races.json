@@ -327,7 +327,7 @@
           "attackDamage": 160,
           "areaAttack": true,
           "areaAttackParameters": {
-            "pattern": "linear",
+            "pattern": "line",
             "damageMultiplier": 0.8,
             "range": {
               "horizontal": 4,
@@ -602,7 +602,7 @@
           "attackDamage": 150,
           "areaAttack": true,
           "areaAttackParameters": {
-            "pattern": "linear",
+            "pattern": "line",
             "damageMultiplier": 0.9,
             "range": {
               "horizontal": 4,
