@@ -953,6 +953,23 @@ class GameManager {
     const incrementResult = await this.incrementRound(actualWinnerId);
 
     if (incrementResult && incrementResult.success) {
+      // Calculate the battle round number (before increment)
+      const battleRound = incrementResult.was_first
+        ? incrementResult.new_round - 1
+        : incrementResult.new_round - 1;
+
+      // Get winner nickname
+      const roomSettings = await this.getRoomSettings();
+      let winnerNickname = "";
+      if (actualWinnerId === roomSettings.player1_id) {
+        winnerNickname = roomSettings.player1_nickname;
+      } else if (actualWinnerId === roomSettings.player2_id) {
+        winnerNickname = roomSettings.player2_nickname;
+      }
+
+      // Show winner modal
+      this.showRoundWinnerModal(battleRound, winnerNickname);
+
       // First player incremented the round
       console.log("Round incremented successfully, reloading...");
 
@@ -962,14 +979,32 @@ class GameManager {
         "true"
       );
 
-      await this.resetReadyStatus();
-      this.allowReload = true;
-      window.location.reload();
+      // Reload after showing modal
+      setTimeout(async () => {
+        await this.resetReadyStatus();
+        this.allowReload = true;
+        window.location.reload();
+      }, 2000);
     } else if (
       incrementResult &&
       !incrementResult.success &&
       incrementResult.was_first === false
     ) {
+      // Calculate the battle round number (before increment)
+      const battleRound = incrementResult.new_round - 1;
+
+      // Get winner nickname
+      const roomSettings = await this.getRoomSettings();
+      let winnerNickname = "";
+      if (actualWinnerId === roomSettings.player1_id) {
+        winnerNickname = roomSettings.player1_nickname;
+      } else if (actualWinnerId === roomSettings.player2_id) {
+        winnerNickname = roomSettings.player2_nickname;
+      }
+
+      // Show winner modal
+      this.showRoundWinnerModal(battleRound, winnerNickname);
+
       // Second player - round already incremented by first player
       console.log("Round already incremented by other player, reloading...");
 
@@ -979,11 +1014,29 @@ class GameManager {
         "true"
       );
 
-      await this.resetReadyStatus();
-      this.allowReload = true;
-      window.location.reload();
+      // Reload after showing modal
+      setTimeout(async () => {
+        await this.resetReadyStatus();
+        this.allowReload = true;
+        window.location.reload();
+      }, 2000);
     } else {
       console.error("Failed to increment round");
+    }
+  }
+
+  showRoundWinnerModal(roundNumber, winnerNickname) {
+    const modal = document.getElementById("round-winner-modal");
+    const roundNumberEl = document.getElementById("round-number");
+    const winnerNicknameEl = document.getElementById("winner-nickname");
+
+    if (modal && roundNumberEl && winnerNicknameEl) {
+      roundNumberEl.textContent = `Раунд ${roundNumber}`;
+      winnerNicknameEl.textContent = winnerNickname;
+      modal.style.display = "flex";
+      console.log(
+        `Showing winner modal: Round ${roundNumber}, Winner: ${winnerNickname}`
+      );
     }
   }
 
