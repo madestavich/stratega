@@ -592,7 +592,7 @@ export class AttackAction {
       case "line":
         // Attack in a line behind the target
         const horizontalRange = range.horizontal || 1;
-        const verticalRange = range.vertical || 0;
+        const verticalRange = range.vertical || 1;
 
         console.log('[AREA ATTACK] Line pattern:', {
           horizontalRange,
@@ -602,20 +602,14 @@ export class AttackAction {
           isHorizontal: Math.abs(lookDir.dx) > Math.abs(lookDir.dy)
         });
 
-        if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
-          // Horizontal attack
-          for (let i = 1; i <= horizontalRange; i++) {
-            const cell = { col: targetCol + lookDir.dx * i, row: targetRow };
-            console.log('[AREA ATTACK] Adding horizontal cell:', cell);
-            cells.push(cell);
-          }
-        } else {
-          // Vertical attack
-          for (let i = 1; i <= verticalRange; i++) {
-            const cell = { col: targetCol, row: targetRow + lookDir.dy * i };
-            console.log('[AREA ATTACK] Adding vertical cell:', cell);
-            cells.push(cell);
-          }
+        // Attack in a straight line in the direction of lookDirection
+        for (let i = 1; i <= horizontalRange; i++) {
+          const cell = { 
+            col: targetCol + lookDir.dx * i, 
+            row: targetRow + lookDir.dy * i 
+          };
+          console.log('[AREA ATTACK] Adding line cell:', cell);
+          cells.push(cell);
         }
         break;
 
