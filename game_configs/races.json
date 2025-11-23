@@ -399,15 +399,6 @@
           "attackDamage": 15,
           "attackSpeed": 0.8,
           "health": 40,
-          "areaAttack": true,
-          "areaAttackParameters": {
-            "pattern": "adjacent",
-            "damageMultiplier": 0.5,
-            "range": {
-              "horizontal": 1,
-              "vertical": 1
-            }
-          },
           "cost": 75
         },
         "walking_dead": {
