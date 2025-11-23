@@ -372,11 +372,6 @@ class GameManager {
       this.gridManager.debugDrawGrid();
       this.gridManager.debugColorOccupiedCells();
 
-      // Draw AoE attack cells if any
-      if (this.aoeDebugCells) {
-        this.gridManager.debugDrawAoECells(this.aoeDebugCells);
-      }
-
       const moveAction = this.actionManager.actions.move;
       if (moveAction) {
         for (const obj of this.objectManager.objects) {
@@ -402,6 +397,11 @@ class GameManager {
       for (const particle of this.objectManager.particles) {
         particle.draw();
       }
+    }
+
+    // Draw AoE attack cells LAST (on top of everything) in debug mode
+    if (this.debugMode && this.aoeDebugCells) {
+      this.gridManager.debugDrawAoECells(this.aoeDebugCells);
     }
   }
 
