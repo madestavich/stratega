@@ -336,8 +336,9 @@ class GameManager {
         // Wait for animation to complete, then hide and start timer
         setTimeout(() => {
           console.log("Hiding modal and starting timer");
-          winnerModal.style.display = "none";
-          winnerModal.classList.remove("fade-out");
+          // Don't remove display to prevent white flash - just make invisible
+          winnerModal.style.opacity = "0";
+          winnerModal.style.pointerEvents = "none";
 
           // Start round timer AFTER modal is hidden
           this.startRoundTimer();
