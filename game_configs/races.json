@@ -202,6 +202,15 @@
           "moveSpeed": 28,
           "availableActions": ["move", "attack"],
           "attackDamage": 150,
+          "areaAttack": true,
+          "areaAttackParameters": {
+            "pattern": "triangular",
+            "damageMultiplier": 1,
+            "range": {
+              "horizontal": 2,
+              "vertical": 1
+            }
+          },
           "attackSpeed": 1,
           "health": 500,
           "cost": 1100
@@ -318,10 +327,10 @@
           "attackDamage": 160,
           "areaAttack": true,
           "areaAttackParameters": {
-            "pattern": "triangle",
-            "damageMultiplier": 0.6,
+            "pattern": "linear",
+            "damageMultiplier": 0.8,
             "range": {
-              "horizontal": 2,
+              "horizontal": 4,
               "vertical": 1
             }
           },
@@ -591,6 +600,15 @@
           "moveSpeed": 32,
           "availableActions": ["move", "attack"],
           "attackDamage": 150,
+          "areaAttack": true,
+          "areaAttackParameters": {
+            "pattern": "linear",
+            "damageMultiplier": 0.9,
+            "range": {
+              "horizontal": 4,
+              "vertical": 1
+            }
+          },
           "attackSpeed": 1,
           "health": 540,
           "cost": 1150
