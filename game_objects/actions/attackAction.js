@@ -581,24 +581,40 @@ export class AttackAction {
         break;
 
       case "triangle":
-        // Triangle/cone pattern behind target
+        // Triangle/cone pattern - expands both forward and sideways
         const hRange = range.horizontal || 1;
-        const vRange = range.vertical || 1;
 
         for (let depth = 1; depth <= hRange; depth++) {
           for (let width = -depth; width <= depth; width++) {
             if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
-              // Horizontal cone
+              // Horizontal cone - expands horizontally and vertically
               cells.push({
                 col: targetCol + lookDir.dx * depth,
                 row: targetRow + width,
               });
-            } else {
-              // Vertical cone
+            } else if (Math.abs(lookDir.dy) > Math.abs(lookDir.dx)) {
+              // Vertical cone - expands vertically and horizontally
               cells.push({
                 col: targetCol + width,
                 row: targetRow + lookDir.dy * depth,
               });
+            } else {
+              // Diagonal cone - expands in both perpendicular directions
+              cells.push({
+                col: targetCol + lookDir.dx * depth,
+                row: targetRow + lookDir.dy * depth,
+              });
+              // Add cells on both sides of the diagonal
+              if (width !== 0) {
+                cells.push({
+                  col: targetCol + lookDir.dx * depth + width,
+                  row: targetRow + lookDir.dy * depth,
+                });
+                cells.push({
+                  col: targetCol + lookDir.dx * depth,
+                  row: targetRow + lookDir.dy * depth + width,
+                });
+              }
             }
           }
         }
