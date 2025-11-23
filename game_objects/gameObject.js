@@ -47,6 +47,8 @@ export class GameObject {
     this.maxShots = objectConfig.maxShots || null; // Максимальна кількість пострілів
     this.remainingShots = this.maxShots; // Поточна кількість пострілів
     this.bulletConfig = objectConfig.bulletConfig || null; // Конфігурація кулі
+    this.areaAttack = objectConfig.areaAttack || false; // Чи є area attack
+    this.areaAttackParameters = objectConfig.areaAttackParameters || null; // Параметри area attack
 
     if (this.isRanged) {
       const lastFrame =
