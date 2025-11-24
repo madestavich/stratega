@@ -657,7 +657,6 @@ export class AttackAction {
       case "line":
         // Attack in a straight line in the direction of lookDirection
         const horizontalRange = range.horizontal || 1;
-        const verticalRange = range.vertical || 1;
 
         for (let i = 1; i <= horizontalRange; i++) {
           cells.push({
