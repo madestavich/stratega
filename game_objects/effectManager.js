@@ -1,11 +1,10 @@
 import { Effect } from "../import.js";
 
 export class EffectManager {
-  constructor(ctx, configLoader, spriteLoader) {
+  constructor(ctx, configLoader) {
     this.ctx = ctx;
     this.effects = [];
     this.configLoader = configLoader;
-    this.spriteLoader = spriteLoader;
   }
 
   /**
@@ -21,35 +20,11 @@ export class EffectManager {
   }
 
   /**
-   * Створює ефект з конфігу (завантажуючи спрайт якщо потрібно)
-   * @param {string} effectType - Тип ефекту (назва файлу конфігу)
-   * @param {Object} effectConfig - Конфігурація ефекту
-   * @returns {Promise<Effect>} Створений ефект
-   */
-  async createEffectFromConfig(effectType, effectConfig) {
-    // Перевіряємо чи спрайт вже завантажений
-    if (!this.configLoader.getConfig(effectType)) {
-      // Якщо ні, завантажуємо його
-      await this.spriteLoader.loadSprites(effectType);
-    }
-
-    // Отримуємо конфігурацію спрайту
-    const spriteConfig = this.configLoader.getConfig(effectType);
-
-    if (!spriteConfig) {
-      console.error(`Effect config for "${effectType}" not found`);
-      return null;
-    }
-
-    return this.createEffect(spriteConfig, effectConfig);
-  }
-
-  /**
    * Створює ефект на юніті
    * @param {GameObject} targetUnit - Юніт для прив'язки
    * @param {Object|string} spriteConfigOrType - Конфігурація спрайту або назва типу ефекту
    * @param {Object} options - Додаткові опції
-   * @returns {Effect|Promise<Effect>} Створений ефект
+   * @returns {Effect} Створений ефект
    */
   createEffectOnUnit(targetUnit, spriteConfigOrType, options = {}) {
     const effectConfig = {
@@ -65,9 +40,18 @@ export class EffectManager {
       animationName: options.animationName || null,
     };
 
-    // Якщо передано рядок - завантажуємо з конфігу
+    // Якщо передано рядок - отримуємо конфіг (вже завантажений через spriteLoader)
     if (typeof spriteConfigOrType === "string") {
-      return this.createEffectFromConfig(spriteConfigOrType, effectConfig);
+      const spriteConfig = this.configLoader.getConfig(spriteConfigOrType);
+
+      if (!spriteConfig) {
+        console.error(
+          `Effect config for "${spriteConfigOrType}" not found. Make sure it's loaded via spriteLoader.`
+        );
+        return null;
+      }
+
+      return this.createEffect(spriteConfig, effectConfig);
     }
 
     // Інакше використовуємо як готовий конфіг
@@ -80,7 +64,7 @@ export class EffectManager {
    * @param {number} y - Y координата
    * @param {Object|string} spriteConfigOrType - Конфігурація спрайту або назва типу ефекту
    * @param {Object} options - Додаткові опції
-   * @returns {Effect|Promise<Effect>} Створений ефект
+   * @returns {Effect} Створений ефект
    */
   createEffectAtPosition(x, y, spriteConfigOrType, options = {}) {
     const effectConfig = {
@@ -95,9 +79,18 @@ export class EffectManager {
       animationName: options.animationName || null,
     };
 
-    // Якщо передано рядок - завантажуємо з конфігу
+    // Якщо передано рядок - отримуємо конфіг (вже завантажений через spriteLoader)
     if (typeof spriteConfigOrType === "string") {
-      return this.createEffectFromConfig(spriteConfigOrType, effectConfig);
+      const spriteConfig = this.configLoader.getConfig(spriteConfigOrType);
+
+      if (!spriteConfig) {
+        console.error(
+          `Effect config for "${spriteConfigOrType}" not found. Make sure it's loaded via spriteLoader.`
+        );
+        return null;
+      }
+
+      return this.createEffect(spriteConfig, effectConfig);
     }
 
     // Інакше використовуємо як готовий конфіг

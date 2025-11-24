@@ -51,6 +51,9 @@ export class SpriteLoader {
       gnoll: "/game_configs/units/gnoll.json",
       gnoll_marauder: "/game_configs/units/gnoll_marauder.json",
       basilisk: "/game_configs/units/basilisk.json",
+
+      //! effects
+      healing: "/game_configs/effects/healing.json",
     };
   }
 
