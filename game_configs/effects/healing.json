@@ -2,7 +2,7 @@
   "healing": {
     "name": "healing",
     "sourceImage": {
-      "link": "../sprites/effects/healing.png",
+      "link": "/sprites/effects/healing.png",
       "width": 1615,
       "height": 93
     },
