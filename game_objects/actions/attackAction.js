@@ -674,17 +674,23 @@ export class AttackAction {
         for (let depth = 1; depth <= hRange; depth++) {
           // Діагональна атака (обидві координати ненульові)
           if (lookDir.dx !== 0 && lookDir.dy !== 0) {
-            // Діагональний конус - розширюється в усі сторони від лінії атаки
-            for (let width = -depth; width <= depth; width++) {
-              // Перпендикуляр для діагоналі: міняємо місцями dx та dy, один з інвертуємо
-              // Для діагоналі (1,1) перпендикуляр буде (1,-1) або (-1,1)
-              const perpX = lookDir.dy; // Переставляємо координати
-              const perpY = -lookDir.dx; // та інвертуємо одну
-
+            // Діагональний трикутник - розширюється вздовж діагоналі
+            // Для кожного рівня глибини додаємо клітинки по діагоналі
+            for (let offset = 0; offset <= depth; offset++) {
+              // Основна діагональна лінія
               cells.push({
-                col: targetCol + lookDir.dx * depth + width * perpX,
-                row: targetRow + lookDir.dy * depth + width * perpY,
+                col: targetCol + lookDir.dx * depth - lookDir.dx * offset,
+                row: targetRow + lookDir.dy * depth - lookDir.dy * offset,
               });
+
+              // Додаткові клітинки для розширення трикутника
+              if (offset > 0) {
+                // Розширення в перпендикулярних напрямках
+                cells.push({
+                  col: targetCol + lookDir.dx * depth - lookDir.dy * offset,
+                  row: targetRow + lookDir.dy * depth - lookDir.dx * offset,
+                });
+              }
             }
           } else if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
             // Горизонтальний конус
