@@ -34,8 +34,18 @@ export class ConfigLoader {
           if (spritePath.startsWith("/sprites/")) {
             spritePath = `${baseUrl}${spritePath}`;
           } else {
-            // Legacy format - just filename
-            spritePath = `${baseUrl}/sprites/${spritePath.split("/").pop()}`;
+            // Relative path like ../sprites/vampire.png or ../sprites/effects/healing.png
+            // Extract everything after ../sprites/
+            const spritesIndex = spritePath.indexOf("sprites/");
+            if (spritesIndex !== -1) {
+              const pathAfterSprites = spritePath.substring(
+                spritesIndex + "sprites/".length
+              );
+              spritePath = `${baseUrl}/sprites/${pathAfterSprites}`;
+            } else {
+              // Fallback - just filename
+              spritePath = `${baseUrl}/sprites/${spritePath.split("/").pop()}`;
+            }
           }
         }
 
