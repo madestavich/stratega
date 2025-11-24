@@ -149,8 +149,14 @@ export class Effect {
     const offsetX = currentFrame.frameCenter.x - currentFrame.x;
     const offsetY = currentFrame.frameCenter.y - currentFrame.y;
 
+    // Встановлюємо прозорість 50%
+    this.ctx.save();
+    this.ctx.globalAlpha = 0.5;
+
     // Рендеримо ефект (без direction, тому що ефекти зазвичай не флипаються)
     this.renderer.draw(this.x - offsetX, this.y - offsetY, null);
+
+    this.ctx.restore();
 
     // Debug відображення (якщо увімкнено)
     if (window.gameManager && window.gameManager.debugMode) {
