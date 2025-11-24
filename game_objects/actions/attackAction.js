@@ -581,7 +581,7 @@ export class AttackAction {
           {
             attachmentPoint: "center",
             zMode: "over",
-            offsetY: 0,
+            offsetY: "center",
             autoRemove: true,
             loop: false,
           }

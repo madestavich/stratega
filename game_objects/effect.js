@@ -85,31 +85,57 @@ export class Effect {
     if (this.targetUnit) {
       const currentFrame = this.targetUnit.animator.activeFrame;
 
+      // Базова позиція по X
+      this.x = this.targetUnit.x + this.offsetX;
+
+      // Обчислюємо offsetY в залежності від типу
+      let calculatedOffsetY = this.offsetY;
+
+      // Якщо offsetY - це строка (top/center/bottom), розраховуємо числове значення
+      if (typeof this.offsetY === "string") {
+        switch (this.offsetY) {
+          case "top":
+            // Верх кадру юніта
+            calculatedOffsetY =
+              -(currentFrame.height / 2) +
+              (currentFrame.frameCenter.y - currentFrame.y);
+            break;
+          case "bottom":
+            // Низ кадру юніта
+            calculatedOffsetY =
+              currentFrame.height / 2 -
+              (currentFrame.frameCenter.y - currentFrame.y);
+            break;
+          case "center":
+          default:
+            // Центр юніта
+            calculatedOffsetY = 0;
+            break;
+        }
+      }
+
       // Обчислюємо позицію відносно поточного кадру юніта
       switch (this.attachmentPoint) {
         case "center":
-          this.x = this.targetUnit.x + this.offsetX;
-          this.y = this.targetUnit.y + this.offsetY;
+          this.y = this.targetUnit.y + calculatedOffsetY;
           break;
 
         case "bottom":
           // Низ спрайта = y юніта + половина висоти кадру
-          this.x = this.targetUnit.x + this.offsetX;
           this.y =
             this.targetUnit.y +
             currentFrame.height / 2 -
             (currentFrame.frameCenter.y - currentFrame.y) +
-            this.offsetY;
+            calculatedOffsetY;
           break;
 
         case "top":
           // Верх спрайта = y юніта - половина висоти кадру
-          this.x = this.targetUnit.x + this.offsetX;
           this.y =
             this.targetUnit.y -
             currentFrame.height / 2 +
             (currentFrame.frameCenter.y - currentFrame.y) +
-            this.offsetY;
+            calculatedOffsetY;
           break;
       }
 
