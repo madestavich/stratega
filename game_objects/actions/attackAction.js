@@ -572,6 +572,21 @@ export class AttackAction {
         attacker.health + healAmount,
         attacker.maxHealth
       );
+
+      // Показуємо ефект зцілення на атакуючому
+      if (this.objectManager.effectManager) {
+        this.objectManager.effectManager.createEffectOnUnit(
+          attacker,
+          "healing",
+          {
+            attachmentPoint: "center",
+            zMode: "over",
+            offsetY: -30,
+            autoRemove: true,
+            loop: false,
+          }
+        );
+      }
     }
 
     // Check if target is defeated
