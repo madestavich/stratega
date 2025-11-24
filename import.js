@@ -13,6 +13,7 @@ import { AttackAction } from "./game_objects/actions/attackAction.js";
 
 import { GameObject } from "./game_objects/gameObject.js";
 import { Particle } from "./game_objects/particle.js";
+import { Effect } from "./game_objects/effect.js";
 import { Animator } from "./game_objects/animator.js";
 import { Renderer } from "./game_objects/renderer.js";
 
@@ -23,6 +24,7 @@ import { GridManager } from "./game_map/gridManager.js";
 import { ActionManager } from "./game_objects/actionManager.js";
 import { InputManager } from "./input/inputManager.js";
 import { InterfaceManager } from "./input/interfaceManager.js";
+import { EffectManager } from "./game_objects/effectManager.js";
 
 export {
   ObjectManager,
@@ -37,6 +39,8 @@ export {
   Pathfinder,
   ConfigLoader,
   Particle,
+  Effect,
+  EffectManager,
   SpriteLoader,
   Player,
   InterfaceManager,

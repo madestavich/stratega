@@ -1,4 +1,5 @@
 import { GameObject } from "../import.js";
+import { EffectManager } from "../import.js";
 
 export class ObjectManager {
   constructor(ctx, gridManager, configLoader, spriteLoader) {
@@ -9,6 +10,7 @@ export class ObjectManager {
     this.objects = [];
     this.enemyObjects = [];
     this.particles = [];
+    this.effectManager = new EffectManager(ctx); // Менеджер ефектів
     this.currentRoomId = null;
     this.isCreator = null; // Додаємо прапорець, чи це creator
   }
@@ -162,15 +164,31 @@ export class ObjectManager {
         this.particles.splice(i, 1);
       }
     }
+
+    // Update effects
+    this.effectManager.updateAll(dt);
   }
 
   renderAll() {
-    // Сортуємо об'єкти за Z-координатою перед відображенням
-    const sortedObjects = [...this.objects, ...this.enemyObjects].sort(
-      (a, b) => a.z - b.z
-    );
-    for (const obj of sortedObjects) obj.render();
-    for (const particle of this.particles) particle.draw();
+    // Об'єднуємо всі об'єкти та ефекти для сортування за Z
+    const allRenderables = [
+      ...this.objects,
+      ...this.enemyObjects,
+      ...this.effectManager.getAllEffects(),
+    ];
+
+    // Сортуємо за Z-координатою перед відображенням
+    const sortedRenderables = allRenderables.sort((a, b) => a.z - b.z);
+
+    // Рендеримо все в правильному порядку
+    for (const obj of sortedRenderables) {
+      obj.render();
+    }
+
+    // Particles рендеримо останніми (завжди зверху)
+    for (const particle of this.particles) {
+      particle.draw();
+    }
   }
 
   // Set current room ID for synchronization

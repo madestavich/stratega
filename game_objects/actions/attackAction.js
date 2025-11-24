@@ -151,6 +151,27 @@ export class AttackAction {
           // For melee attack, deal damage directly
           this.dealDamage(gameObject, gameObject.attackTarget);
 
+          // ПРИКЛАД: Створення ефекту попадання при melee атаці
+          // if (this.objectManager.effectManager) {
+          //   const hitEffectConfig = {
+          //     "hit_effect": {
+          //       "imagePath": "sprites/effects/hit.png",
+          //       "animations": {
+          //         "hit": { "frames": [/* frames */] }
+          //       }
+          //     }
+          //   };
+          //   this.objectManager.effectManager.createEffectOnUnit(
+          //     gameObject.attackTarget,
+          //     hitEffectConfig,
+          //     {
+          //       attachmentPoint: 'center',
+          //       zMode: 'over',
+          //       autoRemove: true
+          //     }
+          //   );
+          // }
+
           // Check for area attack
           if (gameObject.areaAttack && gameObject.areaAttackParameters) {
             const areaTargets = this.getAreaAttackTargets(
@@ -192,6 +213,27 @@ export class AttackAction {
       !gameObject.attackTarget.isDead
     ) {
       gameObject.isAttacking = true;
+
+      // ПРИКЛАД: Створення ефекту початку атаки
+      // if (this.objectManager.effectManager) {
+      //   const attackStartEffectConfig = {
+      //     "attack_glow": {
+      //       "imagePath": "sprites/effects/attack_glow.png",
+      //       "animations": {
+      //         "glow": { "frames": [/* frames */] }
+      //       }
+      //     }
+      //   };
+      //   this.objectManager.effectManager.createEffectOnUnit(
+      //     gameObject,
+      //     attackStartEffectConfig,
+      //     {
+      //       attachmentPoint: 'center',
+      //       zMode: 'under',
+      //       autoRemove: true
+      //     }
+      //   );
+      // }
 
       // Debug: visualize AoE cells if in debug mode and has area attack
       if (
