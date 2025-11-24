@@ -672,18 +672,19 @@ export class AttackAction {
 
         // Діагональна атака (обидві координати ненульові)
         if (lookDir.dx !== 0 && lookDir.dy !== 0) {
-          // Діагональний трикутник
-          // Перпендикулярний вектор: просто міняємо місцями без інверсії
-          const perpDx = lookDir.dy;
-          const perpDy = lookDir.dx;
-
+          // Діагональний трикутник - заповнений трикутник
           for (let depth = 1; depth <= hRange; depth++) {
-            // На кожному рівні depth створюємо depth клітинок
-            for (let offset = 0; offset < depth; offset++) {
-              cells.push({
-                col: targetCol + lookDir.dx * depth + perpDx * offset,
-                row: targetRow + lookDir.dy * depth + perpDy * offset,
-              });
+            // Для кожного depth перебираємо всі можливі комбінації
+            for (let dx = 1; dx <= depth; dx++) {
+              for (let dy = 1; dy <= depth; dy++) {
+                // Додаємо клітинку якщо вона в межах трикутника
+                if (dx + dy <= depth + 1) {
+                  cells.push({
+                    col: targetCol + lookDir.dx * dx,
+                    row: targetRow + lookDir.dy * dy,
+                  });
+                }
+              }
             }
           }
         } else {
