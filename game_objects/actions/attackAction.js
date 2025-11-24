@@ -673,13 +673,13 @@ export class AttackAction {
         // Діагональна атака (обидві координати ненульові)
         if (lookDir.dx !== 0 && lookDir.dy !== 0) {
           // Діагональний трикутник
-          // Перпендикулярний вектор для розширення: міняємо dx та dy місцями і інвертуємо один
-          const perpDx = -lookDir.dy;
+          // Перпендикулярний вектор: просто міняємо місцями без інверсії
+          const perpDx = lookDir.dy;
           const perpDy = lookDir.dx;
 
           for (let depth = 1; depth <= hRange; depth++) {
-            // На кожному рівні depth створюємо лінію з клітинок симетрично
-            for (let offset = -depth; offset <= depth; offset++) {
+            // На кожному рівні depth створюємо depth клітинок
+            for (let offset = 0; offset < depth; offset++) {
               cells.push({
                 col: targetCol + lookDir.dx * depth + perpDx * offset,
                 row: targetRow + lookDir.dy * depth + perpDy * offset,
