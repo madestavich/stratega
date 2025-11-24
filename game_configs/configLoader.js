@@ -30,7 +30,13 @@ export class ConfigLoader {
 
         // If it's a relative path, make it absolute
         if (!spritePath.startsWith("http")) {
-          spritePath = `${baseUrl}/sprites/${spritePath.split("/").pop()}`;
+          // Check if path already contains full path (e.g., /sprites/effects/healing.png)
+          if (spritePath.startsWith("/sprites/")) {
+            spritePath = `${baseUrl}${spritePath}`;
+          } else {
+            // Legacy format - just filename
+            spritePath = `${baseUrl}/sprites/${spritePath.split("/").pop()}`;
+          }
         }
 
         const img = new Image();
