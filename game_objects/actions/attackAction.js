@@ -638,6 +638,16 @@ export class AttackAction {
     const targetRow = primaryTarget.gridRow;
     const lookDir = attacker.lookDirection || { dx: 1, dy: 0 };
 
+    console.log(
+      "[AOE DEBUG] Pattern:",
+      pattern,
+      "LookDir:",
+      lookDir,
+      "Target:",
+      targetCol,
+      targetRow
+    );
+
     switch (pattern) {
       case "line":
         // Attack in a straight line in the direction of lookDirection
@@ -659,6 +669,7 @@ export class AttackAction {
         for (let depth = 1; depth <= hRange; depth++) {
           // Діагональна атака (обидві координати ненульові)
           if (lookDir.dx !== 0 && lookDir.dy !== 0) {
+            console.log("[TRIANGLE] Diagonal attack detected, depth:", depth);
             // Діагональний конус - розширюється в усі сторони від лінії атаки
             for (let width = -depth; width <= depth; width++) {
               // Перпендикуляр для діагоналі: міняємо місцями dx та dy, один з інвертуємо
@@ -666,12 +677,20 @@ export class AttackAction {
               const perpX = lookDir.dy; // Переставляємо координати
               const perpY = -lookDir.dx; // та інвертуємо одну
 
-              cells.push({
+              const cell = {
                 col: targetCol + lookDir.dx * depth + width * perpX,
                 row: targetRow + lookDir.dy * depth + width * perpY,
-              });
+              };
+              console.log(
+                "[TRIANGLE] Adding diagonal cell:",
+                cell,
+                "width:",
+                width
+              );
+              cells.push(cell);
             }
           } else if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
+            console.log("[TRIANGLE] Horizontal attack, depth:", depth);
             // Горизонтальний конус
             for (let width = -depth; width <= depth; width++) {
               cells.push({
@@ -680,6 +699,7 @@ export class AttackAction {
               });
             }
           } else {
+            console.log("[TRIANGLE] Vertical attack, depth:", depth);
             // Вертикальний конус
             for (let width = -depth; width <= depth; width++) {
               cells.push({
