@@ -657,8 +657,19 @@ export class AttackAction {
         const hRange = range.horizontal || 1;
 
         for (let depth = 1; depth <= hRange; depth++) {
-          if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
-            // Horizontal cone - filled triangle
+          // Діагональна атака (обидві координати ненульові)
+          if (lookDir.dx !== 0 && lookDir.dy !== 0) {
+            // Діагональний конус - розширюється у бік перпендикулярний до напрямку
+            for (let width = -depth; width <= depth; width++) {
+              // Перпендикулярне розширення відносно діагоналі
+              // Якщо атакуємо вправо-вниз (dx=1, dy=1), то розширюємо вліво-вниз та вправо-вгору
+              cells.push({
+                col: targetCol + lookDir.dx * depth + width * lookDir.dy,
+                row: targetRow + lookDir.dy * depth + width * lookDir.dx,
+              });
+            }
+          } else if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
+            // Горизонтальний конус
             for (let width = -depth; width <= depth; width++) {
               cells.push({
                 col: targetCol + lookDir.dx * depth,
@@ -666,7 +677,7 @@ export class AttackAction {
               });
             }
           } else {
-            // Vertical cone - filled triangle
+            // Вертикальний конус
             for (let width = -depth; width <= depth; width++) {
               cells.push({
                 col: targetCol + width,
