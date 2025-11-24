@@ -166,6 +166,7 @@ class GameManager {
 
   async start() {
     await this.configLoader.loadRacesConfig();
+    await this.objectManager.effectManager.loadEffectsConfig();
     await this.objectManager.initializeGame();
 
     // Determine if current player is room creator

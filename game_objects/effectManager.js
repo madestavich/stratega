@@ -5,6 +5,26 @@ export class EffectManager {
     this.ctx = ctx;
     this.effects = [];
     this.configLoader = configLoader;
+    this.effectsConfig = null; // Конфіг з effects.json
+  }
+
+  /**
+   * Завантажує конфігурацію ефектів з effects.json
+   */
+  async loadEffectsConfig() {
+    try {
+      const baseUrl = window.location.hostname.includes("github.io")
+        ? "https://madestavich.github.io/stratega"
+        : "";
+      const response = await fetch(`${baseUrl}/game_configs/effects.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load effects config: ${response.status}`);
+      }
+      this.effectsConfig = await response.json();
+      console.log("Effects config loaded:", this.effectsConfig);
+    } catch (error) {
+      console.error("Error loading effects configuration:", error);
+    }
   }
 
   /**
@@ -22,40 +42,53 @@ export class EffectManager {
   /**
    * Створює ефект на юніті
    * @param {GameObject} targetUnit - Юніт для прив'язки
-   * @param {Object|string} spriteConfigOrType - Конфігурація спрайту або назва типу ефекту
-   * @param {Object} options - Додаткові опції
+   * @param {string} effectName - Назва ефекту з effects.json
+   * @param {Object} optionsOverride - Додаткові опції для перевизначення
    * @returns {Effect} Створений ефект
    */
-  createEffectOnUnit(targetUnit, spriteConfigOrType, options = {}) {
-    const effectConfig = {
-      targetUnit: targetUnit,
-      attachmentPoint: options.attachmentPoint || "center",
-      zMode: options.zMode || "over",
-      zOffset: options.zOffset || 0,
-      offsetX: options.offsetX || 0,
-      offsetY: options.offsetY || 0,
-      loop: options.loop || false,
-      autoRemove: options.autoRemove !== undefined ? options.autoRemove : true,
-      duration: options.duration || null,
-      animationName: options.animationName || null,
-    };
-
-    // Якщо передано рядок - отримуємо конфіг (вже завантажений через spriteLoader)
-    if (typeof spriteConfigOrType === "string") {
-      const spriteConfig = this.configLoader.getConfig(spriteConfigOrType);
-
-      if (!spriteConfig) {
-        console.error(
-          `Effect config for "${spriteConfigOrType}" not found. Make sure it's loaded via spriteLoader.`
-        );
-        return null;
-      }
-
-      return this.createEffect(spriteConfig, effectConfig);
+  createEffectOnUnit(targetUnit, effectName, optionsOverride = {}) {
+    // Отримуємо спрайт конфіг
+    const spriteConfig = this.configLoader.getConfig(effectName);
+    if (!spriteConfig) {
+      console.error(
+        `Effect sprite config for "${effectName}" not found. Make sure it's loaded via spriteLoader.`
+      );
+      return null;
     }
 
-    // Інакше використовуємо як готовий конфіг
-    return this.createEffect(spriteConfigOrType, effectConfig);
+    // Отримуємо дефолтні параметри з effects.json
+    const defaultParams = this.effectsConfig?.[effectName] || {};
+
+    // Об'єднуємо дефолтні параметри з перевизначеннями
+    const effectConfig = {
+      targetUnit: targetUnit,
+      attachmentPoint:
+        optionsOverride.attachmentPoint ||
+        defaultParams.attachmentPoint ||
+        "center",
+      zMode: optionsOverride.zMode || defaultParams.zMode || "over",
+      zOffset: optionsOverride.zOffset || defaultParams.zOffset || 0,
+      offsetX: optionsOverride.offsetX || defaultParams.offsetX || 0,
+      offsetY:
+        optionsOverride.offsetY !== undefined
+          ? optionsOverride.offsetY
+          : defaultParams.offsetY || 0,
+      loop:
+        optionsOverride.loop !== undefined
+          ? optionsOverride.loop
+          : defaultParams.loop || false,
+      autoRemove:
+        optionsOverride.autoRemove !== undefined
+          ? optionsOverride.autoRemove
+          : defaultParams.autoRemove !== undefined
+          ? defaultParams.autoRemove
+          : true,
+      duration: optionsOverride.duration || defaultParams.duration || null,
+      animationName:
+        optionsOverride.animationName || defaultParams.animationName || null,
+    };
+
+    return this.createEffect(spriteConfig, effectConfig);
   }
 
   /**

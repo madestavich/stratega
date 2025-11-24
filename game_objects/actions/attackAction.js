@@ -577,14 +577,7 @@ export class AttackAction {
       if (this.objectManager.effectManager) {
         this.objectManager.effectManager.createEffectOnUnit(
           attacker,
-          "healing",
-          {
-            attachmentPoint: "center",
-            zMode: "over",
-            offsetY: "center",
-            autoRemove: true,
-            loop: false,
-          }
+          "healing"
         );
       }
     }
