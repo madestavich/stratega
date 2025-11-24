@@ -671,37 +671,40 @@ export class AttackAction {
         // Triangle/cone pattern - filled triangle shape
         const hRange = range.horizontal || 1;
 
-        for (let depth = 1; depth <= hRange; depth++) {
-          // Діагональна атака (обидві координати ненульові)
-          if (lookDir.dx !== 0 && lookDir.dy !== 0) {
-            // Діагональний трикутник - формуємо трикутник по діагоналі
-            // На кожному рівні глибини додаємо все більше клітинок
-            for (let d = 0; d <= depth; d++) {
-              for (let w = 0; w <= depth; w++) {
-                // Пропускаємо клітинки поза трикутником (сума відступів більша за глибину)
-                if (d + w <= depth) {
-                  cells.push({
-                    col: targetCol + lookDir.dx * d + lookDir.dy * w,
-                    row: targetRow + lookDir.dy * d + lookDir.dx * w,
-                  });
-                }
+        // Діагональна атака (обидві координати ненульові)
+        if (lookDir.dx !== 0 && lookDir.dy !== 0) {
+          // Діагональний трикутник - формуємо трикутник по діагоналі
+          // Трикутник від цілі назад до атакуючого
+          for (let d = 0; d <= hRange; d++) {
+            for (let w = 0; w <= hRange; w++) {
+              // Пропускаємо клітинки поза трикутником (сума відступів більша за range)
+              if (d + w <= hRange && (d > 0 || w > 0)) {
+                cells.push({
+                  col: targetCol + lookDir.dx * d + lookDir.dy * w,
+                  row: targetRow + lookDir.dy * d + lookDir.dx * w,
+                });
               }
             }
-          } else if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
-            // Горизонтальний конус
-            for (let width = -depth; width <= depth; width++) {
-              cells.push({
-                col: targetCol + lookDir.dx * depth,
-                row: targetRow + width,
-              });
-            }
-          } else {
-            // Вертикальний конус
-            for (let width = -depth; width <= depth; width++) {
-              cells.push({
-                col: targetCol + width,
-                row: targetRow + lookDir.dy * depth,
-              });
+          }
+        } else {
+          // Горизонтальна або вертикальна атака
+          for (let depth = 1; depth <= hRange; depth++) {
+            if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
+              // Горизонтальний конус
+              for (let width = -depth; width <= depth; width++) {
+                cells.push({
+                  col: targetCol + lookDir.dx * depth,
+                  row: targetRow + width,
+                });
+              }
+            } else {
+              // Вертикальний конус
+              for (let width = -depth; width <= depth; width++) {
+                cells.push({
+                  col: targetCol + width,
+                  row: targetRow + lookDir.dy * depth,
+                });
+              }
             }
           }
         }
