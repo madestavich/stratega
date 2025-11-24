@@ -95,21 +95,17 @@ export class Effect {
       if (typeof this.offsetY === "string") {
         switch (this.offsetY) {
           case "top":
-            // Верх кадру юніта
-            calculatedOffsetY =
-              -(currentFrame.height / 2) +
-              (currentFrame.frameCenter.y - currentFrame.y);
+            // Верх кадру юніта = frameCenter (низ) мінус висота кадру
+            calculatedOffsetY = -currentFrame.height;
             break;
           case "bottom":
-            // Низ кадру юніта
-            calculatedOffsetY =
-              currentFrame.height / 2 -
-              (currentFrame.frameCenter.y - currentFrame.y);
+            // Низ кадру юніта = frameCenter (це вже низ)
+            calculatedOffsetY = 0;
             break;
           case "center":
           default:
-            // Центр юніта
-            calculatedOffsetY = 0;
+            // Центр кадру юніта = frameCenter (низ) мінус половина висоти
+            calculatedOffsetY = -(currentFrame.height / 2);
             break;
         }
       }
