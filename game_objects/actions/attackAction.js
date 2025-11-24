@@ -692,7 +692,10 @@ export class AttackAction {
           for (let depth = 1; depth <= hRange; depth++) {
             if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
               // Горизонтальний конус
-              for (let width = -depth; width <= depth; width++) {
+              // depth=1: 1 клітинка (width=0)
+              // depth=2: 3 клітинки (width=-1,0,1)
+              // depth=3: 5 клітинок (width=-2,-1,0,1,2)
+              for (let width = -(depth - 1); width <= depth - 1; width++) {
                 cells.push({
                   col: targetCol + lookDir.dx * depth,
                   row: targetRow + width,
@@ -700,7 +703,7 @@ export class AttackAction {
               }
             } else {
               // Вертикальний конус
-              for (let width = -depth; width <= depth; width++) {
+              for (let width = -(depth - 1); width <= depth - 1; width++) {
                 cells.push({
                   col: targetCol + width,
                   row: targetRow + lookDir.dy * depth,
