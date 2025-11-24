@@ -674,22 +674,17 @@ export class AttackAction {
         for (let depth = 1; depth <= hRange; depth++) {
           // Діагональна атака (обидві координати ненульові)
           if (lookDir.dx !== 0 && lookDir.dy !== 0) {
-            // Діагональний трикутник - розширюється вздовж діагоналі
-            // Для кожного рівня глибини додаємо клітинки по діагоналі
-            for (let offset = 0; offset <= depth; offset++) {
-              // Основна діагональна лінія
-              cells.push({
-                col: targetCol + lookDir.dx * depth - lookDir.dx * offset,
-                row: targetRow + lookDir.dy * depth - lookDir.dy * offset,
-              });
-
-              // Додаткові клітинки для розширення трикутника
-              if (offset > 0) {
-                // Розширення в перпендикулярних напрямках
-                cells.push({
-                  col: targetCol + lookDir.dx * depth - lookDir.dy * offset,
-                  row: targetRow + lookDir.dy * depth - lookDir.dx * offset,
-                });
+            // Діагональний трикутник - формуємо трикутник по діагоналі
+            // На кожному рівні глибини додаємо все більше клітинок
+            for (let d = 0; d <= depth; d++) {
+              for (let w = 0; w <= depth; w++) {
+                // Пропускаємо клітинки поза трикутником (сума відступів більша за глибину)
+                if (d + w <= depth) {
+                  cells.push({
+                    col: targetCol + lookDir.dx * d + lookDir.dy * w,
+                    row: targetRow + lookDir.dy * d + lookDir.dx * w,
+                  });
+                }
               }
             }
           } else if (Math.abs(lookDir.dx) > Math.abs(lookDir.dy)) {
