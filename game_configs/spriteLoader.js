@@ -51,6 +51,10 @@ export class SpriteLoader {
       gnoll: "/game_configs/units/gnoll.json",
       gnoll_marauder: "/game_configs/units/gnoll_marauder.json",
       basilisk: "/game_configs/units/basilisk.json",
+      lizardman: "/game_configs/units/lizardman.json",
+      serpent_fly: "/game_configs/units/serpent_fly.json",
+      gorgon: "/game_configs/units/gorgon.json",
+      hydra: "/game_configs/units/hydra.json",
 
       //! effects
       healing: "/game_configs/effects/healing.json",

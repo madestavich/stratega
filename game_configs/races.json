@@ -367,10 +367,42 @@
           "attackSpeed": 1.1,
           "health": 60,
           "cost": 95
+        },
+        "lizardman": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "lizardman",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 8,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 10,
+          "attackSpeed": 1,
+          "health": 40,
+          "isRanged": true,
+          "maxShots": 10,
+          "minRangeDistance": 6,
+          "maxRangeDistance": 25,
+          "bulletConfig": {
+            "bulletType": "bullet",
+            "moveSpeed": 40,
+            "bulletDamage": 25
+          },
+          "cost": 100
         }
       },
-      "tier_two": {},
-      "tier_three": {
+      "tier_two": {
+        "serpent_fly": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "serpent_fly",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 21,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 22,
+          "attackSpeed": 1,
+          "health": 75,
+          "cost": 130
+        },
         "basilisk": {
           "gridWidth": 2,
           "gridHeight": 2,
@@ -384,7 +416,43 @@
           "cost": 400
         }
       },
-      "tier_four": {}
+      "tier_three": {
+        "gorgon": {
+          "gridWidth": 3,
+          "gridHeight": 2,
+          "objectType": "gorgon",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 15,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 65,
+          "attackSpeed": 1,
+          "health": 320,
+          "cost": 440
+        }
+      },
+      "tier_four": {
+        "hydra": {
+          "gridWidth": 3,
+          "gridHeight": 3,
+          "objectType": "hydra",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 19,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 120,
+          "areaAttack": true,
+          "areaAttackParameters": {
+            "pattern": "triangle",
+            "damageMultiplier": 0.5,
+            "range": {
+              "horizontal": 4,
+              "vertical": 1
+            }
+          },
+          "attackSpeed": 1,
+          "health": 600,
+          "cost": 1250
+        }
+      }
     }
   },
   "inferno": {
