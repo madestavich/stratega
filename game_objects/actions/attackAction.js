@@ -673,23 +673,15 @@ export class AttackAction {
 
         // Діагональна атака (обидві координати ненульові)
         if (lookDir.dx !== 0 && lookDir.dy !== 0) {
-          // Діагональний трикутник - формуємо трикутник по діагоналі
-          // Трикутник розширюється назад від цілі
+          // Діагональний трикутник
           for (let d = 1; d <= hRange; d++) {
-            // d - відстань від цілі по основній діагоналі
-            for (let offset = 0; offset <= d; offset++) {
-              // offset - зміщення перпендикулярно до діагоналі
-              // Додаємо дві клітинки симетрично відносно основної діагоналі
+            // d - відстань від цілі
+            // На кожному рівні d додаємо d клітинок
+            for (let i = 0; i < d; i++) {
               cells.push({
-                col: targetCol + lookDir.dx * d - lookDir.dy * offset,
-                row: targetRow + lookDir.dy * d - lookDir.dx * offset,
+                col: targetCol + lookDir.dx * d - lookDir.dx * i,
+                row: targetRow + lookDir.dy * d - lookDir.dy * i,
               });
-              if (offset > 0) {
-                cells.push({
-                  col: targetCol + lookDir.dx * d + lookDir.dy * offset,
-                  row: targetRow + lookDir.dy * d + lookDir.dx * offset,
-                });
-              }
             }
           }
         } else {
