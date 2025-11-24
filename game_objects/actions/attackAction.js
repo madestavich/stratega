@@ -678,8 +678,8 @@ export class AttackAction {
           const perpDy = lookDir.dx;
 
           for (let depth = 1; depth <= hRange; depth++) {
-            // На кожному рівні depth створюємо лінію з (depth+1) клітинок
-            for (let offset = 0; offset <= depth; offset++) {
+            // На кожному рівні depth створюємо лінію з клітинок симетрично
+            for (let offset = -depth; offset <= depth; offset++) {
               cells.push({
                 col: targetCol + lookDir.dx * depth + perpDx * offset,
                 row: targetRow + lookDir.dy * depth + perpDy * offset,
@@ -709,7 +709,6 @@ export class AttackAction {
           }
         }
         break;
-
       case "adjacent":
         // All cells adjacent to target
         const adjRange = range.horizontal || 1;
