@@ -1,0 +1,38 @@
+{
+  "attack_glow": {
+    "name": "attack_glow",
+    "sourceImage": {
+      "link": "../sprites/effects/attack_glow.png",
+      "width": 288,
+      "height": 96
+    },
+    "animations": {
+      "glow": {
+        "name": "glow",
+        "frames": [
+          {
+            "x": 0,
+            "y": 0,
+            "width": 96,
+            "height": 96,
+            "frameCenter": { "x": 48, "y": 48 }
+          },
+          {
+            "x": 96,
+            "y": 0,
+            "width": 96,
+            "height": 96,
+            "frameCenter": { "x": 144, "y": 48 }
+          },
+          {
+            "x": 192,
+            "y": 0,
+            "width": 96,
+            "height": 96,
+            "frameCenter": { "x": 240, "y": 48 }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -10,7 +10,7 @@ export class ObjectManager {
     this.objects = [];
     this.enemyObjects = [];
     this.particles = [];
-    this.effectManager = new EffectManager(ctx); // Менеджер ефектів
+    this.effectManager = new EffectManager(ctx, configLoader, spriteLoader); // Менеджер ефектів
     this.currentRoomId = null;
     this.isCreator = null; // Додаємо прапорець, чи це creator
   }

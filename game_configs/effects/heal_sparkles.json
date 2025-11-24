@@ -1,14 +1,14 @@
 {
-  "hit_effect": {
-    "name": "hit_effect",
+  "heal_sparkles": {
+    "name": "heal_sparkles",
     "sourceImage": {
-      "link": "../sprites/effects/hit_spark.png",
+      "link": "../sprites/effects/heal.png",
       "width": 256,
       "height": 64
     },
     "animations": {
-      "hit": {
-        "name": "hit",
+      "heal": {
+        "name": "heal",
         "frames": [
           {
             "x": 0,

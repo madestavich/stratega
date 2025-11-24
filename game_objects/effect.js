@@ -34,18 +34,21 @@ export class Effect {
     this.offsetX = effectConfig.offsetX || 0;
     this.offsetY = effectConfig.offsetY || 0;
 
+    // Анімація для ефекту (можна вказати конкретну, інакше перша)
+    this.animationName = effectConfig.animationName || null;
+
     // Ініціалізація аніматора
     this.animator = new Animator(this.spriteConfig);
 
-    // Встановлюємо спрайтшит (перший доступний)
+    // Встановлюємо спрайтшит (перший доступний ключ)
     const defaultSpritesheetId = Object.keys(spriteConfig)[0];
     this.animator.setSpritesheet(defaultSpritesheetId);
 
-    // Встановлюємо анімацію (перша доступна)
-    const defaultAnim = Object.keys(
-      spriteConfig[defaultSpritesheetId].animations
-    )[0];
-    this.animator.setAnimation(defaultAnim, this.loop);
+    // Встановлюємо анімацію
+    const animToUse =
+      this.animationName ||
+      Object.keys(spriteConfig[defaultSpritesheetId].animations)[0];
+    this.animator.setAnimation(animToUse, this.loop);
 
     // Ініціалізація рендерера
     this.renderer = new Renderer(ctx, this.animator);
