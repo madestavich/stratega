@@ -2,41 +2,9 @@
   "healing": {
     "attachmentPoint": "center",
     "zMode": "over",
-    "offsetY": "top",
+    "offsetY": "center",
     "autoRemove": true,
     "loop": false,
     "animationName": "effect"
-  },
-  "hit_effect": {
-    "attachmentPoint": "center",
-    "zMode": "over",
-    "offsetY": "center",
-    "autoRemove": true,
-    "loop": false,
-    "animationName": "hit"
-  },
-  "attack_glow": {
-    "attachmentPoint": "center",
-    "zMode": "under",
-    "offsetY": "bottom",
-    "autoRemove": true,
-    "loop": false,
-    "animationName": "glow"
-  },
-  "explosion": {
-    "attachmentPoint": "center",
-    "zMode": "top",
-    "offsetY": "center",
-    "autoRemove": true,
-    "loop": false,
-    "animationName": "explode"
-  },
-  "heal_sparkles": {
-    "attachmentPoint": "center",
-    "zMode": "over",
-    "offsetY": "top",
-    "autoRemove": true,
-    "loop": false,
-    "animationName": "sparkle"
   }
 }
