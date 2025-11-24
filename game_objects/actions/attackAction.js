@@ -674,13 +674,12 @@ export class AttackAction {
         // Діагональна атака (обидві координати ненульові)
         if (lookDir.dx !== 0 && lookDir.dy !== 0) {
           // Діагональний трикутник
-          for (let d = 1; d <= hRange; d++) {
-            // d - відстань від цілі
-            // На кожному рівні d додаємо d клітинок
-            for (let i = 0; i < d; i++) {
+          // На кожному рівні depth формуємо лінію з (depth+1) клітинок
+          for (let depth = 1; depth <= hRange; depth++) {
+            for (let offset = 0; offset <= depth; offset++) {
               cells.push({
-                col: targetCol + lookDir.dx * d - lookDir.dx * i,
-                row: targetRow + lookDir.dy * d - lookDir.dy * i,
+                col: targetCol + lookDir.dx * depth + lookDir.dy * offset,
+                row: targetRow + lookDir.dy * depth + lookDir.dx * offset,
               });
             }
           }
