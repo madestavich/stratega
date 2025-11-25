@@ -442,10 +442,10 @@
           "attackDamage": 120,
           "areaAttack": true,
           "areaAttackParameters": {
-            "pattern": "triangle",
+            "pattern": "adjacent",
             "damageMultiplier": 0.5,
             "range": {
-              "horizontal": 4,
+              "horizontal": 3,
               "vertical": 1
             }
           },
