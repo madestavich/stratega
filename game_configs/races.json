@@ -428,6 +428,18 @@
           "attackSpeed": 1,
           "health": 320,
           "cost": 440
+        },
+        "wyvern": {
+          "gridWidth": 3,
+          "gridHeight": 2,
+          "objectType": "wyvern",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 25,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 50,
+          "attackSpeed": 0.7,
+          "health": 260,
+          "cost": 400
         }
       },
       "tier_four": {

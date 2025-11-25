@@ -54,6 +54,7 @@ export class SpriteLoader {
       lizardman: "/game_configs/units/lizardman.json",
       serpent_fly: "/game_configs/units/serpent_fly.json",
       gorgon: "/game_configs/units/gorgon.json",
+      wyvern: "/game_configs/units/wyvern.json",
       hydra: "/game_configs/units/hydra.json",
 
       //! effects
