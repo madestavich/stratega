@@ -7,6 +7,7 @@ import { SpriteLoader } from "../import.js";
 import { Player } from "../import.js";
 import { InterfaceManager } from "../import.js";
 import { MapRenderer } from "../game_map/mapRender.js";
+import { battleLogger } from "./battleLogger.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -446,6 +447,9 @@ class GameManager {
       this.animationTickCounter++;
 
       if (!this.isPaused) {
+        // Log tick state for determinism debugging
+        battleLogger.logTick(this, isAnimationTick);
+
         // Pass isAnimationTick to actionManager so attacks only process on animation frames
         this.actionManager.update(this.moveTimeStep, isAnimationTick);
         this.objectManager.updateParticles(this.moveTimeStep);
@@ -912,6 +916,9 @@ class GameManager {
 
       console.log(`Calling endRound with winnerId: ${winnerId}`);
 
+      // Download battle logs for debugging before ending round
+      battleLogger.downloadLogs();
+
       // End the round with winner info
       this.endRound(winnerId);
     }
@@ -1351,6 +1358,9 @@ class GameManager {
   // Поновлює постріли всім ренджед юнітам (на початку гри або раунду)
   refillAllUnitsShots() {
     console.log("Refilling shots and resetting attack states for all units...");
+
+    // Reset battle logger for deterministic logging
+    battleLogger.reset();
 
     // Скидаємо стани для юнітів гравця
     for (const unit of this.objectManager.objects) {

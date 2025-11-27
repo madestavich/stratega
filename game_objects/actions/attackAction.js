@@ -1,5 +1,6 @@
 import { MoveAction } from "../../import.js";
 import { Particle } from "../../import.js"; // Add this import
+import { battleLogger } from "../../game/battleLogger.js";
 
 export class AttackAction {
   constructor(objectManager) {
@@ -235,6 +236,9 @@ export class AttackAction {
     ) {
       gameObject.isAttacking = true;
       gameObject.attackDamageDealt = false; // Reset damage flag for new attack
+
+      // Log attack start for determinism debugging
+      battleLogger.logAttackStart(gameObject, gameObject.attackTarget);
 
       // ПРИКЛАД: Створення ефекту початку атаки
       // if (this.objectManager.effectManager) {
@@ -592,7 +596,17 @@ export class AttackAction {
     // Apply damage
     const baseDamage = attacker.attackDamage || 10;
     const damage = baseDamage * damageMultiplier;
+    const healthBefore = target.health;
     target.health -= damage;
+
+    // Log damage for determinism debugging
+    battleLogger.logDamage(
+      attacker,
+      target,
+      damage,
+      healthBefore,
+      target.health
+    );
 
     if (damageMultiplier !== 1) {
       console.log(
@@ -631,6 +645,9 @@ export class AttackAction {
       target.isDead = true;
       target.canAct = false;
       attacker.isAttacking = false;
+
+      // Log death for determinism debugging
+      battleLogger.logDeath(target, attacker);
 
       // Play death animation if available
       if (
