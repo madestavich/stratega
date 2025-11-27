@@ -19,7 +19,7 @@ class GameManager {
     this.lastTime = 0;
     this.deltaTime = 0;
     this.fixedTimeStep = 1000 / 12; // Для анімацій
-    this.moveTimeStep = 1000 / 48; // Для руху (вдвічі частіше за анімації)
+    this.moveTimeStep = 1000 / 36; // Для руху (вдвічі частіше за анімації)
     this.accumulator = 0;
     this.moveAccumulator = 0;
     this.debugMode = false;
