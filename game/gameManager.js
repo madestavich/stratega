@@ -424,23 +424,23 @@ class GameManager {
 
     // Цикл для РУХУ та АНІМАЦІЙ (36 FPS, анімації кожен 3-й тік = 12 FPS)
     while (this.moveAccumulator >= this.moveTimeStep) {
-      if (!this.isPaused) {
-        // Update animations every 3rd tick (12 FPS) - BEFORE movement for determinism
-        if (this.animationTickCounter % 3 === 0) {
-          const allObjects = [
-            ...this.objectManager.objects,
-            ...this.objectManager.enemyObjects,
-          ];
-          // Sort for deterministic animation order
-          allObjects.sort((a, b) => a.id - b.id);
-          for (const obj of allObjects) {
-            if (obj.animator && !obj.animator.hasFinished) {
-              obj.animator.nextFrame();
-            }
+      // Update animations every 3rd tick (12 FPS) - ALWAYS, even when paused
+      if (this.animationTickCounter % 3 === 0) {
+        const allObjects = [
+          ...this.objectManager.objects,
+          ...this.objectManager.enemyObjects,
+        ];
+        // Sort for deterministic animation order
+        allObjects.sort((a, b) => a.id - b.id);
+        for (const obj of allObjects) {
+          if (obj.animator && !obj.animator.hasFinished) {
+            obj.animator.nextFrame();
           }
         }
-        this.animationTickCounter++;
+      }
+      this.animationTickCounter++;
 
+      if (!this.isPaused) {
         this.actionManager.update(this.moveTimeStep);
         this.objectManager.updateParticles(this.moveTimeStep);
         this.objectManager.updateGridWithAllObjects();

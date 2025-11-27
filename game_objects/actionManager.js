@@ -51,16 +51,12 @@ export class ActionManager {
   // Виконання дій для всіх об'єктів з урахуванням deltaTime
   update(deltaTime) {
     // Process actions for ALL objects (player and enemy) for consistent results
-    // Sort objects by position for deterministic processing order
+    // Sort ONLY by id for absolute determinism (gridRow/gridCol changes during movement)
     const allObjects = [
       ...this.objectManager.objects,
       ...this.objectManager.enemyObjects,
     ];
-    const sortedObjects = allObjects.sort((a, b) => {
-      if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
-      if (a.gridCol !== b.gridCol) return a.gridCol - b.gridCol;
-      return a.id - b.id;
-    });
+    const sortedObjects = allObjects.sort((a, b) => a.id - b.id);
 
     for (const gameObject of sortedObjects) {
       // Update action-specific timers and states
