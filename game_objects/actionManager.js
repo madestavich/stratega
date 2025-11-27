@@ -105,11 +105,7 @@ export class ActionManager {
           if (actionType === "move") {
             const moveIterations = 5; // Кількість виконань руху за один fixedTimeStep
             for (let i = 0; i < moveIterations; i++) {
-              this.actions[actionType].execute(
-                gameObject,
-                deltaTime / moveIterations,
-                [0]
-              );
+              this.actions[actionType].execute(gameObject, deltaTime, [0]);
             }
           } else {
             // Інші дії виконуються один раз
