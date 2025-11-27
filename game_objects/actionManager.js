@@ -58,7 +58,8 @@ export class ActionManager {
     ];
     const sortedObjects = allObjects.sort((a, b) => {
       if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
-      return a.gridCol - b.gridCol;
+      if (a.gridCol !== b.gridCol) return a.gridCol - b.gridCol;
+      return a.id - b.id;
     });
 
     for (const gameObject of sortedObjects) {

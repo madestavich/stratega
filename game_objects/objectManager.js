@@ -150,7 +150,8 @@ export class ObjectManager {
     const allObjects = [...this.objects, ...this.enemyObjects];
     const sortedObjects = allObjects.sort((a, b) => {
       if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
-      return a.gridCol - b.gridCol;
+      if (a.gridCol !== b.gridCol) return a.gridCol - b.gridCol;
+      return a.id - b.id;
     });
 
     for (const obj of sortedObjects) obj.update();

@@ -1,8 +1,11 @@
 import { Animator } from "../import.js";
 import { Renderer } from "../import.js";
 
+let nextObjectId = 0;
+
 export class GameObject {
   constructor(ctx, spriteConfig, objectConfig, gridCol, gridRow, gridManager) {
+    this.id = nextObjectId++;
     this.ctx = ctx;
     this.spriteConfig = spriteConfig;
     this.gridCol = gridCol;
