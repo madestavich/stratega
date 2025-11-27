@@ -49,7 +49,7 @@ export class ActionManager {
   }
 
   // Виконання дій для всіх об'єктів з урахуванням deltaTime
-  update(deltaTime) {
+  update(deltaTime, isAnimationTick = true) {
     // Process actions for ALL objects (player and enemy) for consistent results
     // Sort ONLY by id for absolute determinism (gridRow/gridCol changes during movement)
     const allObjects = [
@@ -59,12 +59,30 @@ export class ActionManager {
     const sortedObjects = allObjects.sort((a, b) => a.id - b.id);
 
     for (const gameObject of sortedObjects) {
-      // Update action-specific timers and states
+      // Update action-specific timers and states (always, for cooldown tracking)
       if (this.actions.attack) {
         this.actions.attack.update(gameObject, deltaTime);
       }
 
-      this.processObjectActions(gameObject, deltaTime);
+      // Only process actions on animation ticks to sync attack execution with animation frames
+      if (isAnimationTick) {
+        this.processObjectActions(gameObject, deltaTime);
+      } else {
+        // On non-animation ticks, only process movement (not attacks)
+        this.processMovementOnly(gameObject, deltaTime);
+      }
+    }
+  }
+
+  // Process only movement actions (for non-animation ticks)
+  processMovementOnly(gameObject, deltaTime) {
+    if (!gameObject.objectType || !gameObject.canAct) {
+      return;
+    }
+
+    // Only execute move action if object is currently moving
+    if (gameObject.isMoving && this.actions.move) {
+      this.actions.move.execute(gameObject, deltaTime, [0]);
     }
   }
 

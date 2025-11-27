@@ -426,8 +426,11 @@ class GameManager {
 
     // Цикл для РУХУ та АНІМАЦІЙ (36 FPS, анімації кожен 3-й тік = 12 FPS)
     while (this.moveAccumulator >= this.moveTimeStep) {
+      // Check if this is an animation tick (every 3rd tick)
+      const isAnimationTick = this.animationTickCounter % 3 === 0;
+
       // Update animations every 3rd tick (12 FPS) - ALWAYS, even when paused
-      if (this.animationTickCounter % 3 === 0) {
+      if (isAnimationTick) {
         const allObjects = [
           ...this.objectManager.objects,
           ...this.objectManager.enemyObjects,
@@ -443,7 +446,8 @@ class GameManager {
       this.animationTickCounter++;
 
       if (!this.isPaused) {
-        this.actionManager.update(this.moveTimeStep);
+        // Pass isAnimationTick to actionManager so attacks only process on animation frames
+        this.actionManager.update(this.moveTimeStep, isAnimationTick);
         this.objectManager.updateParticles(this.moveTimeStep);
         this.objectManager.updateGridWithAllObjects();
       }
