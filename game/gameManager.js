@@ -420,8 +420,18 @@ class GameManager {
         ...this.objectManager.enemyObjects,
       ];
       for (const obj of allObjects) {
-        if (obj.isMoving && this.actionManager.actions.move) {
-          this.actionManager.actions.move.execute(obj, this.fixedTimeStep);
+        if (this.actionManager.actions.move && obj.moveTarget) {
+          // Перевіряємо чи можна виконати рух
+          if (
+            this.actionManager.actions.move.canExecute(
+              obj,
+              obj.moveTarget.col,
+              obj.moveTarget.row,
+              [0]
+            )
+          ) {
+            this.actionManager.actions.move.execute(obj, this.fixedTimeStep);
+          }
         }
       }
     }
