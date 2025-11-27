@@ -446,8 +446,14 @@ export class ObjectManager {
         // CRITICAL FIX: Combine ALL objects and sort globally for deterministic IDs
         // This ensures both players assign the same IDs to the same units
         const allObjects = [
-          ...(result.player_objects || []).map(o => ({ ...o, _isPlayer: true })),
-          ...(result.enemy_objects || []).map(o => ({ ...o, _isPlayer: false }))
+          ...(result.player_objects || []).map((o) => ({
+            ...o,
+            _isPlayer: true,
+          })),
+          ...(result.enemy_objects || []).map((o) => ({
+            ...o,
+            _isPlayer: false,
+          })),
         ];
 
         // Sort ALL objects by the same criteria - use startingGridCol/Row for consistency
@@ -457,7 +463,7 @@ export class ObjectManager {
           const aRow = a.startingGridRow ?? a.gridRow;
           const bCol = b.startingGridCol ?? b.gridCol;
           const bRow = b.startingGridRow ?? b.gridRow;
-          
+
           if (aRow !== bRow) return aRow - bRow;
           if (aCol !== bCol) return aCol - bCol;
           // Use unitType as final tiebreaker
@@ -468,7 +474,9 @@ export class ObjectManager {
 
         // Now create objects in global sorted order - IDs will be deterministic
         for (const objData of allObjects) {
-          const targetArray = objData._isPlayer ? this.objects : this.enemyObjects;
+          const targetArray = objData._isPlayer
+            ? this.objects
+            : this.enemyObjects;
           await this.createObjectFromSerializedData(objData, targetArray);
         }
 
