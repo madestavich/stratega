@@ -419,7 +419,12 @@ class GameManager {
         ...this.objectManager.objects,
         ...this.objectManager.enemyObjects,
       ];
-      for (const obj of allObjects) {
+      // Сортуємо для детермінованого порядку (як в actionManager.update)
+      const sortedObjects = allObjects.sort((a, b) => {
+        if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
+        return a.gridCol - b.gridCol;
+      });
+      for (const obj of sortedObjects) {
         if (this.actionManager.actions.move && obj.moveTarget) {
           // Перевіряємо чи можна виконати рух
           if (
