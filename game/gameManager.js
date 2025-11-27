@@ -413,6 +413,19 @@ class GameManager {
     this.lastTime = timestamp;
     this.accumulator += this.deltaTime;
 
+    // Виконуємо рух кожного кадру для плавності
+    if (!this.isPaused) {
+      const allObjects = [
+        ...this.objectManager.objects,
+        ...this.objectManager.enemyObjects,
+      ];
+      for (const obj of allObjects) {
+        if (obj.isMoving && this.actionManager.actions.move) {
+          this.actionManager.actions.move.execute(obj, this.fixedTimeStep);
+        }
+      }
+    }
+
     while (this.accumulator >= this.fixedTimeStep) {
       // Оновлюємо анімації для всіх об'єктів незалежно від режиму
       const allObjects = [
