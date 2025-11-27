@@ -476,7 +476,7 @@
           "gridHeight": 2,
           "objectType": "demon",
           "actionPriorities": ["attack", "move"],
-          "moveSpeed": 15,
+          "moveSpeed": 1.5,
           "availableActions": ["move", "attack"],
           "attackDamage": 44,
           "attackSpeed": 1,
