@@ -443,29 +443,33 @@ export class ObjectManager {
         // CRITICAL: Reset ID counter for deterministic IDs
         resetObjectIdCounter();
 
-        // Sort objects by position before creating them (deterministic order)
+        // CRITICAL FIX: Combine ALL objects and sort globally for deterministic IDs
+        // This ensures both players assign the same IDs to the same units
+        const allObjects = [
+          ...(result.player_objects || []).map(o => ({ ...o, _isPlayer: true })),
+          ...(result.enemy_objects || []).map(o => ({ ...o, _isPlayer: false }))
+        ];
+
+        // Sort ALL objects by the same criteria - use startingGridCol/Row for consistency
+        // since units may have moved from their original positions
         const sortByPosition = (a, b) => {
-          if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
-          if (a.gridCol !== b.gridCol) return a.gridCol - b.gridCol;
+          const aCol = a.startingGridCol ?? a.gridCol;
+          const aRow = a.startingGridRow ?? a.gridRow;
+          const bCol = b.startingGridCol ?? b.gridCol;
+          const bRow = b.startingGridRow ?? b.gridRow;
+          
+          if (aRow !== bRow) return aRow - bRow;
+          if (aCol !== bCol) return aCol - bCol;
           // Use unitType as final tiebreaker
           return (a.unitType || "").localeCompare(b.unitType || "");
         };
 
-        const sortedPlayerObjects = (result.player_objects || []).sort(
-          sortByPosition
-        );
-        const sortedEnemyObjects = (result.enemy_objects || []).sort(
-          sortByPosition
-        );
+        allObjects.sort(sortByPosition);
 
-        // Recreate player objects from sorted serialized data
-        for (const objData of sortedPlayerObjects) {
-          await this.createObjectFromSerializedData(objData, this.objects);
-        }
-
-        // Recreate enemy objects from sorted serialized data
-        for (const objData of sortedEnemyObjects) {
-          await this.createObjectFromSerializedData(objData, this.enemyObjects);
+        // Now create objects in global sorted order - IDs will be deterministic
+        for (const objData of allObjects) {
+          const targetArray = objData._isPlayer ? this.objects : this.enemyObjects;
+          await this.createObjectFromSerializedData(objData, targetArray);
         }
 
         console.log(
