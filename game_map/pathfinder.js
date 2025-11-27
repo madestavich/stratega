@@ -110,8 +110,12 @@ export class Pathfinder {
       }
     }
 
-    // Sort by distance to target
-    alternativePaths.sort((a, b) => a.distance - b.distance);
+    // Sort by distance to target, then by col, then by row for deterministic order
+    alternativePaths.sort((a, b) => {
+      if (a.distance !== b.distance) return a.distance - b.distance;
+      if (a.col !== b.col) return a.col - b.col;
+      return a.row - b.row;
+    });
 
     // If we found an alternative step, return it
     if (alternativePaths.length > 0) {
