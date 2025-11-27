@@ -7,9 +7,12 @@ export class AttackAction {
     this.moveAction = new MoveAction();
   }
 
-  // Get all objects (player and enemy) in one array
+  // Get all objects (player and enemy) in one array, sorted by id for deterministic order
   getAllObjects() {
-    return [...this.objectManager.objects, ...this.objectManager.enemyObjects];
+    return [
+      ...this.objectManager.objects,
+      ...this.objectManager.enemyObjects,
+    ].sort((a, b) => a.id - b.id);
   }
 
   canExecute(gameObject) {
