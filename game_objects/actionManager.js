@@ -52,7 +52,10 @@ export class ActionManager {
   update(deltaTime) {
     // Process actions for ALL objects (player and enemy) for consistent results
     // Sort objects by position for deterministic processing order
-    const allObjects = [...this.objectManager.objects, ...this.objectManager.enemyObjects];
+    const allObjects = [
+      ...this.objectManager.objects,
+      ...this.objectManager.enemyObjects,
+    ];
     const sortedObjects = allObjects.sort((a, b) => {
       if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
       return a.gridCol - b.gridCol;
@@ -83,6 +86,9 @@ export class ActionManager {
 
     // Перебір дій за пріоритетом
     for (const actionType of actionPriorities) {
+      // Пропускаємо move, бо він виконується окремо в gameManager.loop
+      if (actionType === "move") continue;
+
       // Перевірка, чи існує такий тип дії і чи доступний він для цього типу об'єкта
       if (
         this.actions[actionType] &&
