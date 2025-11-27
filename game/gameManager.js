@@ -22,6 +22,7 @@ class GameManager {
     this.moveTimeStep = Math.round(1000 / 36); // Для руху (~28ms)
     this.accumulator = 0;
     this.moveAccumulator = 0;
+    this.animationTickCounter = 0; // Counter for animation updates (every 3rd movement tick)
     this.debugMode = false;
     this.debugInterval = null;
     this.aoeDebugCells = null; // Cells to highlight for AoE attack debug
@@ -421,9 +422,25 @@ class GameManager {
     this.accumulator += this.deltaTime;
     this.moveAccumulator += this.deltaTime;
 
-    // Цикл для РУХУ (60 FPS)
+    // Цикл для РУХУ та АНІМАЦІЙ (36 FPS, анімації кожен 3-й тік = 12 FPS)
     while (this.moveAccumulator >= this.moveTimeStep) {
       if (!this.isPaused) {
+        // Update animations every 3rd tick (12 FPS) - BEFORE movement for determinism
+        if (this.animationTickCounter % 3 === 0) {
+          const allObjects = [
+            ...this.objectManager.objects,
+            ...this.objectManager.enemyObjects,
+          ];
+          // Sort for deterministic animation order
+          allObjects.sort((a, b) => a.id - b.id);
+          for (const obj of allObjects) {
+            if (obj.animator && !obj.animator.hasFinished) {
+              obj.animator.nextFrame();
+            }
+          }
+        }
+        this.animationTickCounter++;
+
         this.actionManager.update(this.moveTimeStep);
         this.objectManager.updateParticles(this.moveTimeStep);
         this.objectManager.updateGridWithAllObjects();
@@ -432,18 +449,8 @@ class GameManager {
       if (!this.isRunning) break;
     }
 
-    // Цикл для АНІМАЦІЙ та іншої логіки (12 FPS)
+    // Effects update (12 FPS) - visual only, doesn't affect gameplay
     while (this.accumulator >= this.fixedTimeStep) {
-      const allObjects = [
-        ...this.objectManager.objects,
-        ...this.objectManager.enemyObjects,
-      ];
-      for (const obj of allObjects) {
-        if (obj.animator && !obj.animator.hasFinished) {
-          obj.animator.nextFrame();
-        }
-      }
-
       if (!this.isPaused) {
         this.objectManager.updateAll(this.fixedTimeStep);
       }
