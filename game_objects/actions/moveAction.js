@@ -238,7 +238,7 @@ export class MoveAction {
     const targetY = (anchorRow + gameObject.gridHeight / 2) * cellHeight;
 
     // Calculate distance to move this frame based on speed and deltaTime
-    const speedMultiplier = 5; // Додатковий множник швидкості
+    const speedMultiplier = 10; // Додатковий множник швидкості
     const moveDistance =
       (gameObject.moveSpeed * deltaTime * speedMultiplier) / 1000;
 

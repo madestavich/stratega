@@ -19,9 +19,9 @@ class GameManager {
     this.lastTime = 0;
     this.deltaTime = 0;
     this.fixedTimeStep = 1000 / 12; // Для анімацій
-    this.logicTimeStep = 1000 / 60; // Для логіки руху (вища частота)
+    this.moveTimeStep = 1000 / 60; // Для руху (вища частота)
     this.accumulator = 0;
-    this.logicAccumulator = 0;
+    this.moveAccumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
     this.aoeDebugCells = null; // Cells to highlight for AoE attack debug
@@ -409,25 +409,24 @@ class GameManager {
   }
 
   loop(timestamp) {
-    if (!this.isRunning) return; // Не продовжуємо цикл, якщо гра зупинена
+    if (!this.isRunning) return;
     if (this.lastTime === 0) this.lastTime = timestamp;
     this.deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
     this.accumulator += this.deltaTime;
-    this.logicAccumulator += this.deltaTime;
+    this.moveAccumulator += this.deltaTime;
 
-    // Оновлюємо логіку (рух, атаки) з вищою частотою
-    while (this.logicAccumulator >= this.logicTimeStep) {
+    // Цикл для РУХУ (60 FPS)
+    while (this.moveAccumulator >= this.moveTimeStep) {
       if (!this.isPaused) {
-        this.objectManager.updateAll(this.logicTimeStep);
-        this.actionManager.update(this.logicTimeStep);
+        this.actionManager.update(this.moveTimeStep);
         this.objectManager.updateGridWithAllObjects();
       }
-      this.logicAccumulator -= this.logicTimeStep;
+      this.moveAccumulator -= this.moveTimeStep;
       if (!this.isRunning) break;
     }
 
-    // Оновлюємо анімації з нижчою частотою (12 FPS)
+    // Цикл для АНІМАЦІЙ та іншої логіки (12 FPS)
     while (this.accumulator >= this.fixedTimeStep) {
       const allObjects = [
         ...this.objectManager.objects,
@@ -437,6 +436,10 @@ class GameManager {
         if (obj.animator && !obj.animator.hasFinished) {
           obj.animator.nextFrame();
         }
+      }
+
+      if (!this.isPaused) {
+        this.objectManager.updateAll(this.fixedTimeStep);
       }
 
       this.accumulator -= this.fixedTimeStep;
