@@ -413,6 +413,11 @@ class GameManager {
     if (this.lastTime === 0) this.lastTime = timestamp;
     this.deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
+
+    // Clamp deltaTime to prevent spiral of death and ensure determinism
+    const maxDelta = 200; // Max 200ms (~5 FPS minimum)
+    if (this.deltaTime > maxDelta) this.deltaTime = maxDelta;
+
     this.accumulator += this.deltaTime;
     this.moveAccumulator += this.deltaTime;
 
