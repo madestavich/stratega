@@ -425,6 +425,7 @@ class GameManager {
     while (this.moveAccumulator >= this.moveTimeStep) {
       if (!this.isPaused) {
         this.actionManager.update(this.moveTimeStep);
+        this.objectManager.updateParticles(this.moveTimeStep);
         this.objectManager.updateGridWithAllObjects();
       }
       this.moveAccumulator -= this.moveTimeStep;

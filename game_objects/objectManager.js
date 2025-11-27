@@ -156,18 +156,24 @@ export class ObjectManager {
 
     for (const obj of sortedObjects) obj.update();
 
-    // Update particles and check collisions with ALL objects
+    // Update effects
+    this.effectManager.updateAll(dt);
+  }
+
+  // Update particles separately (called from movement loop for sync with unit movement)
+  updateParticles(dt) {
+    const allObjects = [...this.objects, ...this.enemyObjects];
+    // Sort for deterministic collision order
+    const sortedObjects = allObjects.sort((a, b) => a.id - b.id);
+
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const particle = this.particles[i];
       particle.update(dt);
-      particle.checkCollision(allObjects);
+      particle.checkCollision(sortedObjects);
       if (particle.hasReachedTarget) {
         this.particles.splice(i, 1);
       }
     }
-
-    // Update effects
-    this.effectManager.updateAll(dt);
   }
 
   renderAll() {
