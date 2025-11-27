@@ -383,7 +383,10 @@ export class AttackAction {
         } else if (Math.abs(dx) === Math.abs(dy)) {
           score -= 25;
         }
-        if (score < bestScore) {
+        if (
+          score < bestScore ||
+          (score === bestScore && obj.id < bestTarget.id)
+        ) {
           bestScore = score;
           bestTarget = obj;
         }
@@ -425,10 +428,13 @@ export class AttackAction {
       const dy = Math.abs(obj.gridRow - gameObject.gridRow);
       const manhattanDist = dx + dy;
 
-      // Prefer enemies that are closer, or at same distance but in straight line
+      // Prefer enemies that are closer, or at same distance but in straight line, or by id
       if (
         distance < minDistance ||
-        (distance === minDistance && manhattanDist < minManhattan)
+        (distance === minDistance && manhattanDist < minManhattan) ||
+        (distance === minDistance &&
+          manhattanDist === minManhattan &&
+          obj.id < nearestEnemy?.id)
       ) {
         minDistance = distance;
         minManhattan = manhattanDist;
