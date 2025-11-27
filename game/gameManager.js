@@ -18,8 +18,8 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 12; // Для анімацій
-    this.moveTimeStep = 1000 / 36; // Для руху (вдвічі частіше за анімації)
+    this.fixedTimeStep = Math.round(1000 / 12); // Для анімацій (~83ms)
+    this.moveTimeStep = Math.round(1000 / 36); // Для руху (~28ms)
     this.accumulator = 0;
     this.moveAccumulator = 0;
     this.debugMode = false;
