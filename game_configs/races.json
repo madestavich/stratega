@@ -450,7 +450,6 @@
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 19,
           "availableActions": ["move", "attack"],
-          "attackRange": 2,
           "attackDamage": 120,
           "areaAttack": true,
           "areaAttackParameters": {
@@ -471,9 +470,44 @@
   "inferno": {
     "units": {
       "tier_one": {},
-      "tier_two": {},
+      "tier_two": {
+        "demon": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "demon",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 15,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 44,
+          "attackSpeed": 1,
+          "health": 250,
+          "cost": 400
+        }
+      },
       "tier_three": {},
-      "tier_four": {}
+      "tier_four": {
+        "devil": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "devil",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 60,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 150,
+          "areaAttack": true,
+          "areaAttackParameters": {
+            "pattern": "adjacent",
+            "damageMultiplier": 0.2,
+            "range": {
+              "horizontal": 1,
+              "vertical": 1
+            }
+          },
+          "attackSpeed": 0.9,
+          "health": 450,
+          "cost": 1450
+        }
+      }
     }
   },
   "necropolis": {

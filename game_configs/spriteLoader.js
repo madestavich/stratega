@@ -57,6 +57,10 @@ export class SpriteLoader {
       wyvern: "/game_configs/units/wyvern.json",
       hydra: "/game_configs/units/hydra.json",
 
+      //! inferno
+      demon: "/game_configs/units/demon.json",
+      devil: "/game_configs/units/devil.json",
+
       //! effects
       healing: "/game_configs/effects/healing.json",
     };
