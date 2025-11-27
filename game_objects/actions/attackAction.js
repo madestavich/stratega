@@ -146,6 +146,18 @@ export class AttackAction {
       if (isLastFrame && !gameObject.attackDamageDealt) {
         gameObject.attackDamageDealt = true;
 
+        // Check if target died during our attack animation (killed by another unit)
+        if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
+          // Target is gone, just finish the attack without dealing damage
+          gameObject.isAttacking = false;
+          gameObject.isRangedAttack = false;
+          gameObject.attackDamageDealt = false;
+          gameObject.attackTarget = null;
+          gameObject.attackCooldown = gameObject.attackSpeed * 1000;
+          gameObject.animator.setAnimation("idle", true);
+          return true;
+        }
+
         // Always update lookDirection before attack
         if (gameObject.attackTarget) {
           this.setLookDirection(gameObject, gameObject.attackTarget);
