@@ -46,8 +46,7 @@ export class BattleLogger {
         attackTargetId: unit.attackTarget?.id ?? null,
         attackCooldown: Math.round((unit.attackCooldown || 0) * 100) / 100,
         attackDamageDealt: unit.attackDamageDealt || false,
-        animFrame: unit.animator?.frameIndex ?? null,
-        animName: unit.animator?.activeAnimation?.name ?? null,
+        // animFrame and animName removed - visual only, not determinism-relevant
       });
     }
 

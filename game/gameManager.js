@@ -447,8 +447,10 @@ class GameManager {
       this.animationTickCounter++;
 
       if (!this.isPaused) {
-        // Log tick state for determinism debugging
-        battleLogger.logTick(this, isAnimationTick);
+        // Log tick state for determinism debugging (only in debug mode)
+        if (this.debugMode) {
+          battleLogger.logTick(this, isAnimationTick);
+        }
 
         // Pass isAnimationTick to actionManager so attacks only process on animation frames
         this.actionManager.update(this.moveTimeStep, isAnimationTick);
@@ -916,8 +918,10 @@ class GameManager {
 
       console.log(`Calling endRound with winnerId: ${winnerId}`);
 
-      // Download battle logs for debugging before ending round
-      battleLogger.downloadLogs();
+      // Download battle logs for debugging before ending round (only in debug mode)
+      if (this.debugMode) {
+        battleLogger.downloadLogs();
+      }
 
       // End the round with winner info
       this.endRound(winnerId);
@@ -1359,8 +1363,10 @@ class GameManager {
   refillAllUnitsShots() {
     console.log("Refilling shots and resetting attack states for all units...");
 
-    // Reset battle logger for deterministic logging
-    battleLogger.reset();
+    // Reset battle logger for deterministic logging (only in debug mode)
+    if (this.debugMode) {
+      battleLogger.reset();
+    }
 
     // Скидаємо стани для юнітів гравця
     for (const unit of this.objectManager.objects) {

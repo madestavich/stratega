@@ -273,7 +273,7 @@
               continue;
             }
 
-            // Compare key fields
+            // Compare key fields (animFrame/animName removed - visual only)
             const fields = [
               "gridCol",
               "gridRow",
@@ -282,8 +282,6 @@
               "isAttacking",
               "attackTargetId",
               "attackDamageDealt",
-              "animFrame",
-              "animName",
             ];
 
             for (const field of fields) {
