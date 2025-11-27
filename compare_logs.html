@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Battle Log Comparator</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        background: #1a1a2e;
+        color: #eee;
+        padding: 20px;
+        margin: 0;
+      }
+      h1 {
+        color: #e94560;
+        text-align: center;
+      }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .upload-area {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .upload-box {
+        flex: 1;
+        border: 2px dashed #444;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+      }
+      .upload-box.loaded {
+        border-color: #4ecca3;
+      }
+      .upload-box h3 {
+        margin-top: 0;
+      }
+      input[type="file"] {
+        margin: 10px 0;
+      }
+      button {
+        background: #e94560;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        margin: 20px auto;
+      }
+      button:hover {
+        background: #ff6b6b;
+      }
+      button:disabled {
+        background: #666;
+        cursor: not-allowed;
+      }
+      .results {
+        background: #16213e;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      .stat-box {
+        background: #0f3460;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .stat-box .value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #4ecca3;
+      }
+      .stat-box .label {
+        color: #aaa;
+        font-size: 14px;
+      }
+      .stat-box.error .value {
+        color: #e94560;
+      }
+      .diff-list {
+        max-height: 600px;
+        overflow-y: auto;
+      }
+      .diff-item {
+        background: #0f3460;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #e94560;
+      }
+      .diff-item.first {
+        border-left-color: #ff0;
+        background: #2a2a0a;
+      }
+      .diff-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      .diff-tick {
+        color: #4ecca3;
+      }
+      .diff-type {
+        color: #e94560;
+      }
+      .diff-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .diff-col {
+        background: #1a1a2e;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      .diff-col h4 {
+        margin: 0 0 10px 0;
+        color: #aaa;
+      }
+      .match {
+        color: #4ecca3;
+      }
+      .mismatch {
+        color: #e94560;
+        font-weight: bold;
+      }
+      .info {
+        color: #888;
+        font-style: italic;
+        text-align: center;
+        padding: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎮 Battle Log Comparator</h1>
+
+      <div class="upload-area">
+        <div class="upload-box" id="box1">
+          <h3>Player 1 Log</h3>
+          <input type="file" id="file1" accept=".json" />
+          <div id="info1">No file loaded</div>
+        </div>
+        <div class="upload-box" id="box2">
+          <h3>Player 2 Log</h3>
+          <input type="file" id="file2" accept=".json" />
+          <div id="info2">No file loaded</div>
+        </div>
+      </div>
+
+      <button id="compare" disabled>Compare Logs</button>
+
+      <div class="results" id="results" style="display: none">
+        <h2>Comparison Results</h2>
+        <div class="summary" id="summary"></div>
+        <h3>Differences Found:</h3>
+        <div class="diff-list" id="diffList"></div>
+      </div>
+    </div>
+
+    <script>
+      let log1 = null,
+        log2 = null;
+
+      document
+        .getElementById("file1")
+        .addEventListener("change", (e) => loadFile(e, 1));
+      document
+        .getElementById("file2")
+        .addEventListener("change", (e) => loadFile(e, 2));
+      document.getElementById("compare").addEventListener("click", compareLogs);
+
+      function loadFile(e, num) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            if (num === 1) log1 = data;
+            else log2 = data;
+
+            document.getElementById(`box${num}`).classList.add("loaded");
+            document.getElementById(
+              `info${num}`
+            ).textContent = `✓ Loaded: ${data.totalTicks} ticks, ${data.logs.length} events`;
+
+            document.getElementById("compare").disabled = !(log1 && log2);
+          } catch (err) {
+            alert("Error parsing JSON: " + err.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function compareLogs() {
+        const diffs = [];
+        let firstDiffTick = null;
+
+        // Get tick logs only (not events)
+        const ticks1 = log1.logs.filter(
+          (l) => l.tick !== undefined && !l.event
+        );
+        const ticks2 = log2.logs.filter(
+          (l) => l.tick !== undefined && !l.event
+        );
+
+        const maxTicks = Math.max(ticks1.length, ticks2.length);
+
+        for (let i = 0; i < maxTicks; i++) {
+          const t1 = ticks1[i];
+          const t2 = ticks2[i];
+
+          if (!t1 || !t2) {
+            diffs.push({
+              tick: i,
+              type: "MISSING_TICK",
+              details: `Tick ${i} missing in ${
+                !t1 ? "Player 1" : "Player 2"
+              } log`,
+              isFirst: firstDiffTick === null,
+            });
+            if (firstDiffTick === null) firstDiffTick = i;
+            continue;
+          }
+
+          // Compare units
+          const units1 = t1.units || [];
+          const units2 = t2.units || [];
+
+          // Create maps by unit id
+          const map1 = new Map(units1.map((u) => [u.id, u]));
+          const map2 = new Map(units2.map((u) => [u.id, u]));
+
+          // Check all units
+          const allIds = new Set([...map1.keys(), ...map2.keys()]);
+
+          for (const id of allIds) {
+            const u1 = map1.get(id);
+            const u2 = map2.get(id);
+
+            if (!u1 || !u2) {
+              diffs.push({
+                tick: i,
+                type: "UNIT_MISSING",
+                unitId: id,
+                details: `Unit ${id} (${u1?.name || u2?.name}) missing in ${
+                  !u1 ? "P1" : "P2"
+                }`,
+                p1: u1,
+                p2: u2,
+                isFirst: firstDiffTick === null,
+              });
+              if (firstDiffTick === null) firstDiffTick = i;
+              continue;
+            }
+
+            // Compare key fields
+            const fields = [
+              "gridCol",
+              "gridRow",
+              "health",
+              "isDead",
+              "isAttacking",
+              "attackTargetId",
+              "attackDamageDealt",
+              "animFrame",
+              "animName",
+            ];
+
+            for (const field of fields) {
+              if (JSON.stringify(u1[field]) !== JSON.stringify(u2[field])) {
+                diffs.push({
+                  tick: i,
+                  type: "UNIT_DIFF",
+                  unitId: id,
+                  unitName: u1.name,
+                  field: field,
+                  val1: u1[field],
+                  val2: u2[field],
+                  p1: u1,
+                  p2: u2,
+                  isFirst: firstDiffTick === null,
+                });
+                if (firstDiffTick === null) firstDiffTick = i;
+              }
+            }
+          }
+
+          // Compare particles
+          const p1 = t1.particles || [];
+          const p2 = t2.particles || [];
+
+          if (p1.length !== p2.length) {
+            diffs.push({
+              tick: i,
+              type: "PARTICLE_COUNT",
+              count1: p1.length,
+              count2: p2.length,
+              isFirst: firstDiffTick === null,
+            });
+            if (firstDiffTick === null) firstDiffTick = i;
+          }
+        }
+
+        // Display results
+        displayResults(diffs, firstDiffTick, ticks1.length, ticks2.length);
+      }
+
+      function displayResults(diffs, firstDiffTick, ticks1, ticks2) {
+        document.getElementById("results").style.display = "block";
+
+        const summaryHtml = `
+        <div class="stat-box">
+          <div class="value">${ticks1} / ${ticks2}</div>
+          <div class="label">Total Ticks (P1 / P2)</div>
+        </div>
+        <div class="stat-box ${diffs.length > 0 ? "error" : ""}">
+          <div class="value">${diffs.length}</div>
+          <div class="label">Total Differences</div>
+        </div>
+        <div class="stat-box ${firstDiffTick !== null ? "error" : ""}">
+          <div class="value">${
+            firstDiffTick !== null ? firstDiffTick : "✓ None"
+          }</div>
+          <div class="label">First Divergence Tick</div>
+        </div>
+      `;
+        document.getElementById("summary").innerHTML = summaryHtml;
+
+        if (diffs.length === 0) {
+          document.getElementById("diffList").innerHTML =
+            '<div class="info">✓ Logs are identical! Battle was deterministic.</div>';
+          return;
+        }
+
+        // Show first 100 diffs
+        const diffsToShow = diffs.slice(0, 100);
+        let html = "";
+
+        for (const diff of diffsToShow) {
+          html += `<div class="diff-item ${diff.isFirst ? "first" : ""}">`;
+          html += `<div class="diff-header">
+          <span class="diff-tick">Tick ${diff.tick}</span>
+          <span class="diff-type">${diff.type}</span>
+        </div>`;
+
+          if (diff.type === "UNIT_DIFF") {
+            html += `<div>Unit: <strong>${diff.unitName}</strong> (id: ${diff.unitId})</div>`;
+            html += `<div>Field: <strong>${diff.field}</strong></div>`;
+            html += `<div class="diff-details">
+            <div class="diff-col"><h4>Player 1</h4>${JSON.stringify(
+              diff.val1,
+              null,
+              2
+            )}</div>
+            <div class="diff-col"><h4>Player 2</h4>${JSON.stringify(
+              diff.val2,
+              null,
+              2
+            )}</div>
+          </div>`;
+          } else if (
+            diff.type === "UNIT_MISSING" ||
+            diff.type === "MISSING_TICK"
+          ) {
+            html += `<div>${diff.details}</div>`;
+          } else if (diff.type === "PARTICLE_COUNT") {
+            html += `<div>Particle count: P1=${diff.count1}, P2=${diff.count2}</div>`;
+          }
+
+          html += "</div>";
+        }
+
+        if (diffs.length > 100) {
+          html += `<div class="info">... and ${
+            diffs.length - 100
+          } more differences</div>`;
+        }
+
+        document.getElementById("diffList").innerHTML = html;
+      }
+    </script>
+  </body>
+</html>
