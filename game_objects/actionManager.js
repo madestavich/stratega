@@ -86,9 +86,6 @@ export class ActionManager {
 
     // Перебір дій за пріоритетом
     for (const actionType of actionPriorities) {
-      // Пропускаємо move, бо він виконується окремо в gameManager.loop
-      if (actionType === "move") continue;
-
       // Перевірка, чи існує такий тип дії і чи доступний він для цього типу об'єкта
       if (
         this.actions[actionType] &&
@@ -104,8 +101,20 @@ export class ActionManager {
             [0]
           )
         ) {
-          // Виконання дії з передачею deltaTime
-          this.actions[actionType].execute(gameObject, deltaTime, [0]);
+          // Для move виконуємо кілька разів за ітерацію для швидкості
+          if (actionType === "move") {
+            const moveIterations = 5; // Кількість виконань руху за один fixedTimeStep
+            for (let i = 0; i < moveIterations; i++) {
+              this.actions[actionType].execute(
+                gameObject,
+                deltaTime / moveIterations,
+                [0]
+              );
+            }
+          } else {
+            // Інші дії виконуються один раз
+            this.actions[actionType].execute(gameObject, deltaTime, [0]);
+          }
           // Після успішного виконання однієї дії припиняємо перевірку інших
           break;
         }

@@ -413,34 +413,6 @@ class GameManager {
     this.lastTime = timestamp;
     this.accumulator += this.deltaTime;
 
-    // Виконуємо рух кожного кадру для плавності
-    if (!this.isPaused) {
-      const allObjects = [
-        ...this.objectManager.objects,
-        ...this.objectManager.enemyObjects,
-      ];
-      // Сортуємо для детермінованого порядку (як в actionManager.update)
-      const sortedObjects = allObjects.sort((a, b) => {
-        if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
-        return a.gridCol - b.gridCol;
-      });
-      for (const obj of sortedObjects) {
-        if (this.actionManager.actions.move && obj.moveTarget) {
-          // Перевіряємо чи можна виконати рух
-          if (
-            this.actionManager.actions.move.canExecute(
-              obj,
-              obj.moveTarget.col,
-              obj.moveTarget.row,
-              [0]
-            )
-          ) {
-            this.actionManager.actions.move.execute(obj, this.fixedTimeStep);
-          }
-        }
-      }
-    }
-
     while (this.accumulator >= this.fixedTimeStep) {
       // Оновлюємо анімації для всіх об'єктів незалежно від режиму
       const allObjects = [
