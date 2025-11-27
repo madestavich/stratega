@@ -18,8 +18,10 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = 1000 / 12;
+    this.fixedTimeStep = 1000 / 12; // Для анімацій
+    this.logicTimeStep = 1000 / 60; // Для логіки руху (вища частота)
     this.accumulator = 0;
+    this.logicAccumulator = 0;
     this.debugMode = false;
     this.debugInterval = null;
     this.aoeDebugCells = null; // Cells to highlight for AoE attack debug
@@ -412,9 +414,21 @@ class GameManager {
     this.deltaTime = timestamp - this.lastTime;
     this.lastTime = timestamp;
     this.accumulator += this.deltaTime;
+    this.logicAccumulator += this.deltaTime;
 
+    // Оновлюємо логіку (рух, атаки) з вищою частотою
+    while (this.logicAccumulator >= this.logicTimeStep) {
+      if (!this.isPaused) {
+        this.objectManager.updateAll(this.logicTimeStep);
+        this.actionManager.update(this.logicTimeStep);
+        this.objectManager.updateGridWithAllObjects();
+      }
+      this.logicAccumulator -= this.logicTimeStep;
+      if (!this.isRunning) break;
+    }
+
+    // Оновлюємо анімації з нижчою частотою (12 FPS)
     while (this.accumulator >= this.fixedTimeStep) {
-      // Оновлюємо анімації для всіх об'єктів незалежно від режиму
       const allObjects = [
         ...this.objectManager.objects,
         ...this.objectManager.enemyObjects,
@@ -425,16 +439,7 @@ class GameManager {
         }
       }
 
-      // Оновлюємо ВСЮ логіку (юніти, particles, дії, сітка) через objectManager.updateAll
-      if (!this.isPaused) {
-        this.objectManager.updateAll(this.fixedTimeStep);
-        this.actionManager.update(this.fixedTimeStep);
-        this.objectManager.updateGridWithAllObjects();
-      }
-
       this.accumulator -= this.fixedTimeStep;
-
-      // Якщо гра зупинена через помилку, виходимо з циклу
       if (!this.isRunning) break;
     }
 
