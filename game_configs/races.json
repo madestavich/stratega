@@ -491,7 +491,7 @@
           "gridHeight": 2,
           "objectType": "devil",
           "actionPriorities": ["attack", "move"],
-          "moveSpeed": 500,
+          "moveSpeed": 5000,
           "availableActions": ["move", "attack"],
           "attackDamage": 150,
           "areaAttack": true,
