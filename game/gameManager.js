@@ -18,8 +18,10 @@ class GameManager {
   constructor() {
     this.lastTime = 0;
     this.deltaTime = 0;
-    this.fixedTimeStep = Math.round(1000 / 12); // Для анімацій (~83ms)
-    this.moveTimeStep = Math.round(1000 / 36); // Для руху (~28ms)
+    // Use same timestep for both movement and animations for perfect sync
+    // 36 FPS for movement, animations update every 3rd tick = 12 FPS
+    this.moveTimeStep = Math.round(1000 / 36); // ~28ms
+    this.fixedTimeStep = this.moveTimeStep * 3; // Exactly 84ms (12 FPS)
     this.accumulator = 0;
     this.moveAccumulator = 0;
     this.animationTickCounter = 0; // Counter for animation updates (every 3rd movement tick)
@@ -794,6 +796,11 @@ class GameManager {
     // Reset battle end processing flag
     this.battleEndProcessing = false;
 
+    // CRITICAL: Reset all timing counters for deterministic battle start
+    this.animationTickCounter = 0;
+    this.moveAccumulator = 0;
+    this.accumulator = 0;
+
     // Mark that battle is in progress
     this.isBattleInProgress = true;
 
@@ -1339,23 +1346,35 @@ class GameManager {
 
   // Поновлює постріли всім ренджед юнітам (на початку гри або раунду)
   refillAllUnitsShots() {
-    console.log("Refilling shots for all ranged units...");
+    console.log("Refilling shots and resetting attack states for all units...");
 
-    // Поновлюємо постріли для юнітів гравця
+    // Скидаємо стани для юнітів гравця
     for (const unit of this.objectManager.objects) {
+      // Reset attack state for deterministic start
+      unit.attackCooldown = 0;
+      unit.isAttacking = false;
+      unit.attackTarget = null;
+      unit.attackDamageDealt = false;
+
       if (unit.isRanged && unit.maxShots !== null) {
         unit.refillShots();
       }
     }
 
-    // Поновлюємо постріли для юнітів ворога
+    // Скидаємо стани для юнітів ворога
     for (const unit of this.objectManager.enemyObjects) {
+      // Reset attack state for deterministic start
+      unit.attackCooldown = 0;
+      unit.isAttacking = false;
+      unit.attackTarget = null;
+      unit.attackDamageDealt = false;
+
       if (unit.isRanged && unit.maxShots !== null) {
         unit.refillShots();
       }
     }
 
-    console.log("Shots refilled for all ranged units");
+    console.log("All units reset for battle start");
   }
 
   // Check battle state on reconnect

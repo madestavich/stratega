@@ -11,7 +11,7 @@ import { AttackAction } from "./game_objects/actions/attackAction.js";
 
 //! object
 
-import { GameObject } from "./game_objects/gameObject.js";
+import { GameObject, resetObjectIdCounter } from "./game_objects/gameObject.js";
 import { Particle } from "./game_objects/particle.js";
 import { Effect } from "./game_objects/effect.js";
 import { Animator } from "./game_objects/animator.js";
@@ -32,6 +32,7 @@ export {
   ActionManager,
   InputManager,
   GameObject,
+  resetObjectIdCounter,
   Animator,
   Renderer,
   MoveAction,
