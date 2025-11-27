@@ -32,6 +32,7 @@ export class AttackAction {
         gameObject.isAttacking = false;
         gameObject.isRangedAttack = false;
         gameObject.attackTarget = null;
+        gameObject.attackDamageDealt = false;
 
         // Встановлюємо анімацію idle
         if (
@@ -44,7 +45,8 @@ export class AttackAction {
         return false; // Завершуємо атаку достроково
       }
 
-      return isLastFrame; // Can execute to finish the attack
+      // Only allow execute if on last frame AND damage not yet dealt
+      return isLastFrame && !gameObject.attackDamageDealt;
     }
 
     // Check if attack is on cooldown
@@ -140,7 +142,10 @@ export class AttackAction {
       const isLastFrame =
         animator.frameIndex === animator.activeAnimation.frames.length - 1;
 
-      if (isLastFrame) {
+      // Deal damage only once per attack (prevent multiple damage on same animation frame)
+      if (isLastFrame && !gameObject.attackDamageDealt) {
+        gameObject.attackDamageDealt = true;
+
         // Always update lookDirection before attack
         if (gameObject.attackTarget) {
           this.setLookDirection(gameObject, gameObject.attackTarget);
@@ -200,6 +205,7 @@ export class AttackAction {
         // Reset attack state
         gameObject.isAttacking = false;
         gameObject.isRangedAttack = false;
+        gameObject.attackDamageDealt = false; // Reset for next attack
         // Set attack cooldown
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
         // Set animation back to idle after attack
@@ -216,6 +222,7 @@ export class AttackAction {
       !gameObject.attackTarget.isDead
     ) {
       gameObject.isAttacking = true;
+      gameObject.attackDamageDealt = false; // Reset damage flag for new attack
 
       // ПРИКЛАД: Створення ефекту початку атаки
       // if (this.objectManager.effectManager) {
