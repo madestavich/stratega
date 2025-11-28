@@ -8,6 +8,7 @@ import { Player } from "./game/player.js";
 //! objects actions
 import { MoveAction } from "./game_objects/actions/moveAction.js";
 import { AttackAction } from "./game_objects/actions/attackAction.js";
+import { TeleportAction } from "./game_objects/actions/teleportAction.js";
 
 //! object
 
@@ -37,6 +38,7 @@ export {
   Renderer,
   MoveAction,
   AttackAction,
+  TeleportAction,
   Pathfinder,
   ConfigLoader,
   Particle,

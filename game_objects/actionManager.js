@@ -1,11 +1,13 @@
 import { MoveAction } from "../import.js";
 import { AttackAction } from "../import.js";
+import { TeleportAction } from "../import.js";
 // import { DefendAction } from "../import.js";
 
 // В GameManager.js
 const actionsClasses = {
   move: MoveAction,
   attack: AttackAction,
+  teleport: TeleportAction,
   //   defend: DefendAction,
 };
 
@@ -81,8 +83,13 @@ export class ActionManager {
     }
 
     // Only execute move action if object is currently moving
-    if (gameObject.isMoving && this.actions.move) {
-      this.actions.move.execute(gameObject, deltaTime, [0]);
+    if (gameObject.isMoving) {
+      // Check if unit uses teleport movement
+      if (gameObject.isTeleporting && this.actions.teleport) {
+        this.actions.teleport.execute(gameObject, deltaTime, [0]);
+      } else if (this.actions.move) {
+        this.actions.move.execute(gameObject, deltaTime, [0]);
+      }
     }
   }
 
