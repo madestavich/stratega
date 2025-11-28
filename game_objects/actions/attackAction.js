@@ -30,8 +30,8 @@ export class AttackAction {
         animator.activeAnimation.name === "attack" ||
         animator.activeAnimation.name === "range_attack";
 
-      // Якщо анімація ще не атаки - встановлюємо її тут
-      if (!isAttackAnimation) {
+      // Якщо анімація ще не атаки і ще не запрошена - встановлюємо її
+      if (!isAttackAnimation && !gameObject.attackAnimationPending) {
         // Встановлюємо анімацію атаки
         if (
           gameObject.isRangedAttack &&
@@ -41,7 +41,13 @@ export class AttackAction {
         } else {
           animator.setAnimation("attack", false);
         }
+        gameObject.attackAnimationPending = true; // Позначаємо що анімація запрошена
         return false; // Чекаємо наступного кадру
+      }
+
+      // Якщо анімація вже атаки - скидаємо флаг pending
+      if (isAttackAnimation) {
+        gameObject.attackAnimationPending = false;
       }
 
       const isLastFrame =
@@ -54,6 +60,7 @@ export class AttackAction {
         gameObject.isRangedAttack = false;
         gameObject.attackTarget = null;
         gameObject.attackDamageDealt = false;
+        gameObject.attackAnimationPending = false;
 
         // Встановлюємо анімацію idle
         if (
@@ -184,6 +191,7 @@ export class AttackAction {
           gameObject.isAttacking = false;
           gameObject.isRangedAttack = false;
           gameObject.attackDamageDealt = false;
+          gameObject.attackAnimationPending = false;
           gameObject.attackTarget = null;
           gameObject.attackCooldown = gameObject.attackSpeed * 1000;
           gameObject.animator.setAnimation("idle", true);
@@ -250,6 +258,7 @@ export class AttackAction {
         gameObject.isAttacking = false;
         gameObject.isRangedAttack = false;
         gameObject.attackDamageDealt = false; // Reset for next attack
+        gameObject.attackAnimationPending = false; // Reset animation pending flag
         // Set attack cooldown
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
         // Set animation back to idle after attack
