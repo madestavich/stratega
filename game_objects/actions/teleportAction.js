@@ -245,6 +245,7 @@ export class TeleportAction {
   // Виконання миттєвого переміщення
   performTeleport(gameObject) {
     if (!gameObject.teleportTarget) {
+      console.warn("performTeleport: no teleportTarget");
       this.cancelTeleport(gameObject);
       return;
     }
@@ -252,20 +253,24 @@ export class TeleportAction {
     let { col, row } = gameObject.teleportTarget;
     const { cellWidth, cellHeight } = gameObject.gridManager;
 
+    console.log(`performTeleport: target (${col}, ${row}), current (${gameObject.gridCol}, ${gameObject.gridRow})`);
+
     // ВАЖЛИВО: Перевіряємо чи цільова клітинка все ще вільна
     // (інший юніт міг зайняти її поки ми грали анімацію старту)
     const allowedObstacleTypes = gameObject.movementObstacleExceptions || [];
-    if (
-      !this.pathfinder.canOccupyExcludingSelf(
-        col,
-        row,
-        gameObject.gridWidth,
-        gameObject.gridHeight,
-        gameObject.expansionDirection,
-        gameObject,
-        allowedObstacleTypes
-      )
-    ) {
+    const canOccupy = this.pathfinder.canOccupyExcludingSelf(
+      col,
+      row,
+      gameObject.gridWidth,
+      gameObject.gridHeight,
+      gameObject.expansionDirection,
+      gameObject,
+      allowedObstacleTypes
+    );
+    
+    console.log(`performTeleport: canOccupy = ${canOccupy}`);
+    
+    if (!canOccupy) {
       // Клітинка зайнята - шукаємо іншу вільну поруч
       const attackTarget = gameObject.attackTarget;
       const targetCol = attackTarget ? attackTarget.gridCol : col;
