@@ -253,7 +253,9 @@ export class TeleportAction {
     let { col, row } = gameObject.teleportTarget;
     const { cellWidth, cellHeight } = gameObject.gridManager;
 
-    console.log(`performTeleport: target (${col}, ${row}), current (${gameObject.gridCol}, ${gameObject.gridRow})`);
+    console.log(
+      `performTeleport: target (${col}, ${row}), current (${gameObject.gridCol}, ${gameObject.gridRow})`
+    );
 
     // ВАЖЛИВО: Перевіряємо чи цільова клітинка все ще вільна
     // (інший юніт міг зайняти її поки ми грали анімацію старту)
@@ -267,9 +269,9 @@ export class TeleportAction {
       gameObject,
       allowedObstacleTypes
     );
-    
+
     console.log(`performTeleport: canOccupy = ${canOccupy}`);
-    
+
     if (!canOccupy) {
       // Клітинка зайнята - шукаємо іншу вільну поруч
       const attackTarget = gameObject.attackTarget;
