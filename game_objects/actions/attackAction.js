@@ -24,14 +24,21 @@ export class AttackAction {
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       const animator = gameObject.animator;
+      const animName = animator.activeAnimation.name;
 
       // Перевіряємо чи анімація атаки вже встановлена
-      const isAttackAnimation =
-        animator.activeAnimation.name === "attack" ||
-        animator.activeAnimation.name === "range_attack";
+      const isAttackAnimation = animName === "attack" || animName === "range_attack";
 
-      // Якщо анімація ще не атаки - чекаємо (анімація встановлюється в execute)
+      // Якщо анімація НЕ атаки - встановлюємо її
       if (!isAttackAnimation) {
+        if (
+          gameObject.isRangedAttack &&
+          animator.activeSpritesheet.animations.range_attack
+        ) {
+          animator.setAnimation("range_attack", false);
+        } else {
+          animator.setAnimation("attack", false);
+        }
         return false;
       }
 
@@ -257,18 +264,8 @@ export class AttackAction {
       !gameObject.attackTarget.isDead
     ) {
       gameObject.isAttacking = true;
-      gameObject.attackDamageDealt = false; // Reset damage flag for new attack
-
-      // Встановлюємо анімацію атаки ОДИН РАЗ при старті
-      const animator = gameObject.animator;
-      if (
-        gameObject.isRangedAttack &&
-        animator.activeSpritesheet.animations.range_attack
-      ) {
-        animator.setAnimation("range_attack", false);
-      } else {
-        animator.setAnimation("attack", false);
-      }
+      gameObject.attackDamageDealt = false;
+      // Анімація встановлюється в canExecute
 
       // Log attack start for determinism debugging
       battleLogger.logAttackStart(gameObject, gameObject.attackTarget);
