@@ -93,6 +93,14 @@ export class TeleportAction {
         }
       }
 
+      // Перевіряємо що нова ціль не є поточною позицією (інакше телепорт не потрібен)
+      if (
+        gameObject.gridCol === finalTargetCol &&
+        gameObject.gridRow === finalTargetRow
+      ) {
+        return false;
+      }
+
       // Зберігаємо ціль телепортації
       gameObject.teleportTarget = { col: finalTargetCol, row: finalTargetRow };
       gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
@@ -296,6 +304,13 @@ export class TeleportAction {
         this.cancelTeleport(gameObject);
         return;
       }
+    }
+
+    // Перевіряємо чи нова ціль не є поточною позицією (телепорт на місці не потрібен)
+    if (gameObject.gridCol === col && gameObject.gridRow === row) {
+      console.warn("Teleport target is current position, cancelling");
+      this.cancelTeleport(gameObject);
+      return;
     }
 
     // Звільняємо стару позицію в гріді

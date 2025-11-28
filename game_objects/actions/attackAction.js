@@ -21,6 +21,11 @@ export class AttackAction {
       return false;
     }
 
+    // Юніт не може атакувати поки телепортується
+    if (gameObject.isTeleporting) {
+      return false;
+    }
+
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       const animator = gameObject.animator;
