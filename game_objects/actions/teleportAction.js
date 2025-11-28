@@ -223,8 +223,7 @@ export class TeleportAction {
 
     // Перевіряємо чи є анімація teleport_start
     const hasStartAnim =
-      gameObject.animator.spriteConfig[gameObject.animator.activeSpritesheet]
-        ?.animations?.teleport_start;
+      gameObject.animator.activeSpritesheet?.animations?.teleport_start;
 
     if (hasStartAnim) {
       gameObject.animator.setAnimation("teleport_start");
@@ -292,8 +291,7 @@ export class TeleportAction {
 
     // Перевіряємо чи є анімація teleport_end
     const hasEndAnim =
-      gameObject.animator.spriteConfig[gameObject.animator.activeSpritesheet]
-        ?.animations?.teleport_end;
+      gameObject.animator.activeSpritesheet?.animations?.teleport_end;
 
     if (hasEndAnim) {
       gameObject.animator.setAnimation("teleport_end");
