@@ -30,8 +30,8 @@ export class AttackAction {
         animator.activeAnimation.name === "attack" ||
         animator.activeAnimation.name === "range_attack";
 
-      // Якщо анімація ще не атаки і ще не запрошена - встановлюємо її
-      if (!isAttackAnimation && !gameObject.attackAnimationPending) {
+      // Якщо анімація ще не атаки - встановлюємо її
+      if (!isAttackAnimation) {
         // Встановлюємо анімацію атаки
         if (
           gameObject.isRangedAttack &&
@@ -41,13 +41,7 @@ export class AttackAction {
         } else {
           animator.setAnimation("attack", false);
         }
-        gameObject.attackAnimationPending = true; // Позначаємо що анімація запрошена
         return false; // Чекаємо наступного кадру
-      }
-
-      // Якщо анімація вже атаки - скидаємо флаг pending
-      if (isAttackAnimation) {
-        gameObject.attackAnimationPending = false;
       }
 
       const isLastFrame =
