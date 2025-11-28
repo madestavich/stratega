@@ -222,8 +222,13 @@ export class TeleportAction {
     gameObject.isTeleporting = true;
 
     // Перевіряємо чи є анімація teleport_start
-    const hasStartAnim =
-      gameObject.animator.activeSpritesheet?.animations?.teleport_start;
+    const animations = gameObject.animator.activeSpritesheet?.animations;
+    const hasStartAnim = animations?.teleport_start;
+
+    console.log(
+      "Available animations:",
+      animations ? Object.keys(animations) : "none"
+    );
 
     if (hasStartAnim) {
       // Анімація без зациклювання щоб завершилась
