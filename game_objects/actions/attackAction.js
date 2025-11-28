@@ -30,8 +30,8 @@ export class AttackAction {
         animator.activeAnimation.name === "attack" ||
         animator.activeAnimation.name === "range_attack";
 
-      // Якщо анімація ще не атаки - встановлюємо її
-      if (!isAttackAnimation) {
+      // Якщо анімація ще не атаки - встановлюємо її (тільки один раз)
+      if (!isAttackAnimation && !gameObject.attackAnimationStarted) {
         // Встановлюємо анімацію атаки
         if (
           gameObject.isRangedAttack &&
@@ -41,7 +41,15 @@ export class AttackAction {
         } else {
           animator.setAnimation("attack", false);
         }
+        gameObject.attackAnimationStarted = true; // Позначаємо що анімацію запустили
         return false; // Чекаємо наступного кадру
+      }
+      
+      // Якщо анімація НЕ атаки але флаг стоїть - щось перебило анімацію, скидаємо флаг
+      if (!isAttackAnimation && gameObject.attackAnimationStarted) {
+        gameObject.attackAnimationStarted = false;
+        // Не встановлюємо анімацію тут - нехай наступний виклик це зробить
+        return false;
       }
 
       const isLastFrame =
@@ -54,7 +62,7 @@ export class AttackAction {
         gameObject.isRangedAttack = false;
         gameObject.attackTarget = null;
         gameObject.attackDamageDealt = false;
-        gameObject.attackAnimationPending = false;
+        gameObject.attackAnimationStarted = false;
 
         // Встановлюємо анімацію idle
         if (
@@ -185,7 +193,7 @@ export class AttackAction {
           gameObject.isAttacking = false;
           gameObject.isRangedAttack = false;
           gameObject.attackDamageDealt = false;
-          gameObject.attackAnimationPending = false;
+          gameObject.attackAnimationStarted = false;
           gameObject.attackTarget = null;
           gameObject.attackCooldown = gameObject.attackSpeed * 1000;
           gameObject.animator.setAnimation("idle", true);
@@ -252,7 +260,7 @@ export class AttackAction {
         gameObject.isAttacking = false;
         gameObject.isRangedAttack = false;
         gameObject.attackDamageDealt = false; // Reset for next attack
-        gameObject.attackAnimationPending = false; // Reset animation pending flag
+        gameObject.attackAnimationStarted = false; // Reset animation started flag
         // Set attack cooldown
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
         // Set animation back to idle after attack
@@ -671,6 +679,7 @@ export class AttackAction {
       target.isDead = true;
       target.canAct = false;
       attacker.isAttacking = false;
+      attacker.attackAnimationStarted = false;
 
       // Log death for determinism debugging
       battleLogger.logDeath(target, attacker);
