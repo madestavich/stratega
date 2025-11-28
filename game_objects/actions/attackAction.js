@@ -30,9 +30,9 @@ export class AttackAction {
         animator.activeAnimation.name === "attack" ||
         animator.activeAnimation.name === "range_attack";
 
-      // Якщо анімація ще не атаки - потрібно викликати execute щоб встановити
+      // Якщо анімація ще не атаки - чекаємо (анімація буде встановлена в execute)
       if (!isAttackAnimation) {
-        return true; // Дозволяємо execute щоб встановити анімацію
+        return false; // Чекаємо поки анімація зміниться
       }
 
       const isLastFrame =
@@ -157,17 +157,9 @@ export class AttackAction {
         animator.activeAnimation.name === "attack" ||
         animator.activeAnimation.name === "range_attack";
 
-      // Якщо анімація ще не атаки - встановлюємо її
+      // Якщо анімація ще не атаки - чекаємо (вона вже встановлена при початку атаки)
       if (!isAttackAnimation) {
-        if (
-          gameObject.isRangedAttack &&
-          animator.activeSpritesheet.animations.range_attack
-        ) {
-          animator.setAnimation("range_attack", false);
-        } else {
-          animator.setAnimation("attack", false);
-        }
-        return true; // Повертаємось і чекаємо наступного кадру
+        return false;
       }
 
       const isLastFrame =
