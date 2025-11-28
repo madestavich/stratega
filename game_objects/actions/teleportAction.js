@@ -270,14 +270,14 @@ export class TeleportAction {
       const attackTarget = gameObject.attackTarget;
       const targetCol = attackTarget ? attackTarget.gridCol : col;
       const targetRow = attackTarget ? attackTarget.gridRow : row;
-      
+
       const newTarget = this.findNearestFreeCell(
         gameObject,
         targetCol,
         targetRow,
         allowedObstacleTypes
       );
-      
+
       if (newTarget) {
         col = newTarget.col;
         row = newTarget.row;
