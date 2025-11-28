@@ -221,17 +221,8 @@ export class TeleportAction {
     gameObject.isMoving = true;
     gameObject.isTeleporting = true;
 
-    // Перевіряємо чи є анімація teleport_start
-    const hasStartAnim =
-      gameObject.animator.activeSpritesheet?.animations?.teleport_start;
-
-    if (hasStartAnim) {
-      gameObject.animator.setAnimation("teleport_start");
-    } else {
-      // Якщо немає спеціальної анімації - використовуємо death як ефект зникнення
-      // або пропускаємо анімацію
-      gameObject.animator.setAnimation("death");
-    }
+    // Анімація без зациклювання щоб завершилась
+    gameObject.animator.setAnimation("teleport_start", false);
   }
 
   // Виконання миттєвого переміщення
@@ -289,17 +280,8 @@ export class TeleportAction {
   startEndAnimation(gameObject) {
     gameObject.teleportState = TeleportState.END_ANIMATION;
 
-    // Перевіряємо чи є анімація teleport_end
-    const hasEndAnim =
-      gameObject.animator.activeSpritesheet?.animations?.teleport_end;
-
-    if (hasEndAnim) {
-      gameObject.animator.setAnimation("teleport_end");
-    } else {
-      // Якщо немає спеціальної анімації - використовуємо idle
-      // Можна також програти death у зворотньому порядку через reverse
-      gameObject.animator.setAnimation("idle");
-    }
+    // Анімація без зациклювання щоб завершилась
+    gameObject.animator.setAnimation("teleport_end", false);
   }
 
   // Завершення телепортації
