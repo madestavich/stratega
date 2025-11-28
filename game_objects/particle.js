@@ -84,6 +84,20 @@ export class Particle {
         if (this.target.health <= 0) {
           this.target.health = 0;
           this.target.isDead = true;
+          this.target.canAct = false;
+
+          // Reset all active states on the dying target
+          this.target.isAttacking = false;
+          this.target.isRangedAttack = false;
+          this.target.attackTarget = null;
+          this.target.attackDamageDealt = false;
+          this.target.isMoving = false;
+          this.target.isTeleporting = false;
+          this.target.teleportState = null;
+          this.target.teleportTarget = null;
+          this.target.moveTarget = null;
+          this.target.currentPath = null;
+
           this.target.animator.setAnimation("death", false);
         }
       }
@@ -173,6 +187,18 @@ export class Particle {
             this.target.isDead = true;
             this.target.canAct = false;
 
+            // Reset all active states on the dying target
+            this.target.isAttacking = false;
+            this.target.isRangedAttack = false;
+            this.target.attackTarget = null;
+            this.target.attackDamageDealt = false;
+            this.target.isMoving = false;
+            this.target.isTeleporting = false;
+            this.target.teleportState = null;
+            this.target.teleportTarget = null;
+            this.target.moveTarget = null;
+            this.target.currentPath = null;
+
             // Play death animation if available
             if (
               this.target.animator &&
@@ -212,6 +238,18 @@ export class Particle {
             if (obj.health <= 0) {
               obj.isDead = true;
               obj.canAct = false;
+
+              // Reset all active states on the dying target
+              obj.isAttacking = false;
+              obj.isRangedAttack = false;
+              obj.attackTarget = null;
+              obj.attackDamageDealt = false;
+              obj.isMoving = false;
+              obj.isTeleporting = false;
+              obj.teleportState = null;
+              obj.teleportTarget = null;
+              obj.moveTarget = null;
+              obj.currentPath = null;
 
               // Play death animation if available
               if (

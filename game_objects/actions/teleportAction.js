@@ -372,8 +372,11 @@ export class TeleportAction {
       gameObject.setLookDirectionByTeam();
     }
 
-    // Встановлюємо idle анімацію
-    if (gameObject.animator.activeAnimation.name !== "idle") {
+    // Встановлюємо idle анімацію, але тільки якщо об'єкт живий
+    if (
+      !gameObject.isDead &&
+      gameObject.animator.activeAnimation.name !== "idle"
+    ) {
       gameObject.animator.setAnimation("idle");
     }
   }
@@ -385,7 +388,9 @@ export class TeleportAction {
     gameObject.isTeleporting = false;
     gameObject.teleportTarget = null;
 
+    // Встановлюємо idle анімацію, але тільки якщо об'єкт живий
     if (
+      !gameObject.isDead &&
       gameObject.animator &&
       gameObject.animator.activeAnimation.name !== "idle"
     ) {

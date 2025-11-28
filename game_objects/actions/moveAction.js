@@ -116,8 +116,9 @@ export class MoveAction {
         // Зберігаємо ціль, щоб спробувати знову пізніше
         gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
 
-        // Встановлюємо анімацію "idle"
+        // Встановлюємо анімацію "idle", але тільки якщо об'єкт живий
         if (
+          !gameObject.isDead &&
           gameObject.animator &&
           gameObject.animator.activeAnimation.name !== "idle"
         ) {
@@ -270,7 +271,12 @@ export class MoveAction {
           animator.frameIndex === animator.activeAnimation.frames.length - 1;
 
         // Якщо це останній кадр анімації руху або анімація не "move", встановлюємо "idle"
-        if (isLastFrame && animator.activeAnimation.name == "move") {
+        // Але тільки якщо об'єкт живий (не перезаписуємо анімацію смерті)
+        if (
+          isLastFrame &&
+          animator.activeAnimation.name == "move" &&
+          !gameObject.isDead
+        ) {
           gameObject.isMoving = false;
           gameObject.animator.setAnimation("idle");
         }

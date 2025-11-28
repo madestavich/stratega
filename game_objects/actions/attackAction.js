@@ -672,6 +672,19 @@ export class AttackAction {
       target.canAct = false;
       attacker.isAttacking = false;
 
+      // Reset all active states on the dying target
+      // This prevents the death animation from being overwritten by idle
+      target.isAttacking = false;
+      target.isRangedAttack = false;
+      target.attackTarget = null;
+      target.attackDamageDealt = false;
+      target.isMoving = false;
+      target.isTeleporting = false;
+      target.teleportState = null;
+      target.teleportTarget = null;
+      target.moveTarget = null;
+      target.currentPath = null;
+
       // Log death for determinism debugging
       battleLogger.logDeath(target, attacker);
 
@@ -957,8 +970,9 @@ export class AttackAction {
 
       // Якщо не можемо рухатися, просто стоїмо на місці
       if (!canMove) {
-        // Встановлюємо анімацію "idle"
+        // Встановлюємо анімацію "idle", але тільки якщо об'єкт живий
         if (
+          !gameObject.isDead &&
           gameObject.animator &&
           gameObject.animator.activeAnimation.name !== "idle"
         ) {
