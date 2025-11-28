@@ -53,7 +53,7 @@ export class AttackAction {
         gameObject.isRangedAttack = false;
         gameObject.attackTarget = null;
         gameObject.attackDamageDealt = false;
-        
+
         // Встановлюємо кулдаун щоб не атакувати одразу нову ціль
         gameObject.attackCooldown = gameObject.attackSpeed * 1000;
 
