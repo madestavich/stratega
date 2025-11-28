@@ -221,8 +221,20 @@ export class TeleportAction {
     gameObject.isMoving = true;
     gameObject.isTeleporting = true;
 
-    // Анімація без зациклювання щоб завершилась
-    gameObject.animator.setAnimation("teleport_start", false);
+    // Перевіряємо чи є анімація teleport_start
+    const hasStartAnim =
+      gameObject.animator.activeSpritesheet?.animations?.teleport_start;
+
+    if (hasStartAnim) {
+      // Анімація без зациклювання щоб завершилась
+      gameObject.animator.setAnimation("teleport_start", false);
+    } else {
+      // Якщо немає анімації - одразу переходимо до телепортації
+      console.warn(
+        `No teleport_start animation for ${gameObject.objectType}, skipping`
+      );
+      this.performTeleport(gameObject);
+    }
   }
 
   // Виконання миттєвого переміщення
@@ -280,8 +292,20 @@ export class TeleportAction {
   startEndAnimation(gameObject) {
     gameObject.teleportState = TeleportState.END_ANIMATION;
 
-    // Анімація без зациклювання щоб завершилась
-    gameObject.animator.setAnimation("teleport_end", false);
+    // Перевіряємо чи є анімація teleport_end
+    const hasEndAnim =
+      gameObject.animator.activeSpritesheet?.animations?.teleport_end;
+
+    if (hasEndAnim) {
+      // Анімація без зациклювання щоб завершилась
+      gameObject.animator.setAnimation("teleport_end", false);
+    } else {
+      // Якщо немає анімації - одразу завершуємо телепортацію
+      console.warn(
+        `No teleport_end animation for ${gameObject.objectType}, skipping`
+      );
+      this.finishTeleport(gameObject);
+    }
   }
 
   // Завершення телепортації
