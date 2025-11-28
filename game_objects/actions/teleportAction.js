@@ -249,8 +249,46 @@ export class TeleportAction {
       return;
     }
 
-    const { col, row } = gameObject.teleportTarget;
+    let { col, row } = gameObject.teleportTarget;
     const { cellWidth, cellHeight } = gameObject.gridManager;
+
+    // ВАЖЛИВО: Перевіряємо чи цільова клітинка все ще вільна
+    // (інший юніт міг зайняти її поки ми грали анімацію старту)
+    const allowedObstacleTypes = gameObject.movementObstacleExceptions || [];
+    if (
+      !this.pathfinder.canOccupyExcludingSelf(
+        col,
+        row,
+        gameObject.gridWidth,
+        gameObject.gridHeight,
+        gameObject.expansionDirection,
+        gameObject,
+        allowedObstacleTypes
+      )
+    ) {
+      // Клітинка зайнята - шукаємо іншу вільну поруч
+      const attackTarget = gameObject.attackTarget;
+      const targetCol = attackTarget ? attackTarget.gridCol : col;
+      const targetRow = attackTarget ? attackTarget.gridRow : row;
+      
+      const newTarget = this.findNearestFreeCell(
+        gameObject,
+        targetCol,
+        targetRow,
+        allowedObstacleTypes
+      );
+      
+      if (newTarget) {
+        col = newTarget.col;
+        row = newTarget.row;
+        gameObject.teleportTarget = { col, row };
+      } else {
+        // Немає вільних клітинок - скасовуємо телепорт
+        console.warn("No free cells for teleport, cancelling");
+        this.cancelTeleport(gameObject);
+        return;
+      }
+    }
 
     // Звільняємо стару позицію в гріді
     this.clearObjectFromGrid(gameObject);
