@@ -24,6 +24,17 @@ export class AttackAction {
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       const animator = gameObject.animator;
+
+      // Перевіряємо чи анімація атаки вже встановлена
+      const isAttackAnimation =
+        animator.activeAnimation.name === "attack" ||
+        animator.activeAnimation.name === "range_attack";
+
+      // Якщо анімація ще не атаки - чекаємо поки встановиться
+      if (!isAttackAnimation) {
+        return false;
+      }
+
       const isLastFrame =
         animator.frameIndex === animator.activeAnimation.frames.length - 1;
 
