@@ -309,15 +309,7 @@ export class AttackAction {
         window.gameManager.aoeDebugCells = areaCells;
       }
 
-      // Вибір правильної анімації в залежності від типу атаки
-      if (
-        gameObject.isRangedAttack &&
-        gameObject.animator.activeSpritesheet.animations.range_attack
-      ) {
-        gameObject.animator.setAnimation("range_attack", false);
-      } else {
-        gameObject.animator.setAnimation("attack", false);
-      }
+      // Анімація буде встановлена в canExecute при наступному виклику
       return true;
     }
 
