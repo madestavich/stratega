@@ -27,7 +27,8 @@ export class AttackAction {
       const animName = animator.activeAnimation.name;
 
       // Перевіряємо чи анімація атаки вже встановлена
-      const isAttackAnimation = animName === "attack" || animName === "range_attack";
+      const isAttackAnimation =
+        animName === "attack" || animName === "range_attack";
 
       // Якщо анімація НЕ атаки - встановлюємо її
       if (!isAttackAnimation) {
