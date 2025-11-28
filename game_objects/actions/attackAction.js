@@ -44,7 +44,7 @@ export class AttackAction {
         gameObject.attackAnimationStarted = true; // Позначаємо що анімацію запустили
         return false; // Чекаємо наступного кадру
       }
-      
+
       // Якщо анімація НЕ атаки але флаг стоїть - щось перебило анімацію, скидаємо флаг
       if (!isAttackAnimation && gameObject.attackAnimationStarted) {
         gameObject.attackAnimationStarted = false;
