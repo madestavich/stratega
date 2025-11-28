@@ -30,38 +30,44 @@ export class AttackAction {
         animator.activeAnimation.name === "attack" ||
         animator.activeAnimation.name === "range_attack";
 
-      // Якщо анімація ще не атаки - скидаємо стан атаки (щось пішло не так)
+      // Якщо анімація ще не атаки - встановлюємо її тут
       if (!isAttackAnimation) {
-        // Скидаємо isAttacking щоб почати атаку заново
+        // Встановлюємо анімацію атаки
+        if (
+          gameObject.isRangedAttack &&
+          animator.activeSpritesheet.animations.range_attack
+        ) {
+          animator.setAnimation("range_attack", false);
+        } else {
+          animator.setAnimation("attack", false);
+        }
+        return false; // Чекаємо наступного кадру
+      }
+
+      const isLastFrame =
+        animator.frameIndex === animator.activeAnimation.frames.length - 1;
+
+      // ВИПРАВЛЕННЯ: Якщо ціль атаки мертва або відсутня, примусово завершуємо атаку
+      if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
+        // Скидаємо стан атаки
         gameObject.isAttacking = false;
+        gameObject.isRangedAttack = false;
+        gameObject.attackTarget = null;
         gameObject.attackDamageDealt = false;
-        // Не повертаємо false - продовжуємо перевірку чи можна атакувати
-      } else {
-        const isLastFrame =
-          animator.frameIndex === animator.activeAnimation.frames.length - 1;
 
-        // ВИПРАВЛЕННЯ: Якщо ціль атаки мертва або відсутня, примусово завершуємо атаку
-        if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
-          // Скидаємо стан атаки
-          gameObject.isAttacking = false;
-          gameObject.isRangedAttack = false;
-          gameObject.attackTarget = null;
-          gameObject.attackDamageDealt = false;
-
-          // Встановлюємо анімацію idle
-          if (
-            gameObject.animator &&
-            gameObject.animator.activeAnimation.name !== "idle"
-          ) {
-            gameObject.animator.setAnimation("idle", true);
-          }
-
-          return false; // Завершуємо атаку достроково
+        // Встановлюємо анімацію idle
+        if (
+          gameObject.animator &&
+          gameObject.animator.activeAnimation.name !== "idle"
+        ) {
+          gameObject.animator.setAnimation("idle", true);
         }
 
-        // Only allow execute if on last frame AND damage not yet dealt
-        return isLastFrame && !gameObject.attackDamageDealt;
+        return false; // Завершуємо атаку достроково
       }
+
+      // Only allow execute if on last frame AND damage not yet dealt
+      return isLastFrame && !gameObject.attackDamageDealt;
     }
 
     // Check if attack is on cooldown
