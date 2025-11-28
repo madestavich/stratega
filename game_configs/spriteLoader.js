@@ -60,6 +60,8 @@ export class SpriteLoader {
       //! inferno
       demon: "/game_configs/units/demon.json",
       devil: "/game_configs/units/devil.json",
+      gog: "/game_configs/units/gog.json",
+      efreeti: "/game_configs/units/efreeti.json",
 
       //! effects
       healing: "/game_configs/effects/healing.json",

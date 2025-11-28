@@ -469,7 +469,29 @@
   },
   "inferno": {
     "units": {
-      "tier_one": {},
+      "tier_one": {
+        "gog": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "gog",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 8,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 10,
+          "attackSpeed": 1,
+          "health": 40,
+          "isRanged": true,
+          "maxShots": 10,
+          "minRangeDistance": 6,
+          "maxRangeDistance": 25,
+          "bulletConfig": {
+            "bulletType": "bullet",
+            "moveSpeed": 40,
+            "bulletDamage": 25
+          },
+          "cost": 100
+        }
+      },
       "tier_two": {
         "demon": {
           "gridWidth": 2,
@@ -481,10 +503,23 @@
           "attackDamage": 44,
           "attackSpeed": 1,
           "health": 250,
+          "cost": 350
+        }
+      },
+      "tier_three": {
+        "efreeti": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "efreeti",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 16,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 60,
+          "attackSpeed": 0.8,
+          "health": 220,
           "cost": 400
         }
       },
-      "tier_three": {},
       "tier_four": {
         "devil": {
           "gridWidth": 2,
