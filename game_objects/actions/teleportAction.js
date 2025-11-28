@@ -259,7 +259,8 @@ export class TeleportAction {
 
     // ВАЖЛИВО: Перевіряємо чи цільова клітинка все ще вільна
     // (інший юніт міг зайняти її поки ми грали анімацію старту)
-    const allowedObstacleTypes = gameObject.movementObstacleExceptions || [];
+    // Використовуємо [0] як дефолт (прохідні клітинки)
+    const allowedObstacleTypes = gameObject.movementObstacleExceptions || [0];
     const canOccupy = this.pathfinder.canOccupyExcludingSelf(
       col,
       row,
