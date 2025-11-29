@@ -83,7 +83,7 @@
         ]
       },
       "move": {
-        "name": "attack",
+        "name": "move",
         "frames": [
           {
             "x": 148,
@@ -138,7 +138,7 @@
         ]
       },
       "attack": {
-        "name": "move",
+        "name": "attack",
         "frames": [
           {
             "x": 29,
