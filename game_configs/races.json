@@ -861,7 +861,7 @@
       "maxRangeDistance": 100,
       "bulletConfig": {
         "bulletType": "bullet",
-        "moveSpeed": 70,
+        "moveSpeed": 50,
         "bulletDamage": 120
       },
       "cost": 600
