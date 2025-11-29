@@ -66,6 +66,7 @@ export class SpriteLoader {
       //! war machines
       first_aid_tent: "/game_configs/units/first_aid_tent.json",
       ammo_cart: "/game_configs/units/ammo_cart.json",
+      ballista: "/game_configs/units/ballista.json",
 
       //! effects
       healing: "/game_configs/effects/healing.json",

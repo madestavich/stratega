@@ -844,6 +844,27 @@
         "affectSelf": false,
         "effectName": null
       }
+    },
+    "ballista": {
+      "gridWidth": 3,
+      "gridHeight": 1,
+      "objectType": "ballista",
+      "actionPriorities": ["attack"],
+      "moveSpeed": 0,
+      "availableActions": ["attack"],
+      "attackDamage": 0,
+      "attackSpeed": 1.5,
+      "health": 200,
+      "isRanged": true,
+      "maxShots": 5,
+      "minRangeDistance": 20,
+      "maxRangeDistance": 100,
+      "bulletConfig": {
+        "bulletType": "bullet",
+        "moveSpeed": 70,
+        "bulletDamage": 120
+      },
+      "cost": 600
     }
   }
 }
