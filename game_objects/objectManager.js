@@ -305,6 +305,16 @@ export class ObjectManager {
     if (!racesConfig)
       return { unitType: "unknown", unitTier: "tier_one", race: "neutral" };
 
+    // First check war_machines (they are shared across all races)
+    if (racesConfig.war_machines) {
+      for (const unitType in racesConfig.war_machines) {
+        const unitConfig = racesConfig.war_machines[unitType];
+        if (this.isMatchingUnit(gameObject, unitType, unitConfig)) {
+          return { unitType, unitTier: "war_machines", race: "war_machines" };
+        }
+      }
+    }
+
     // Search through all races and tiers
     for (const race in racesConfig) {
       if (racesConfig[race].units) {
@@ -360,6 +370,11 @@ export class ObjectManager {
     const racesConfig = this.configLoader.racesConfig;
     if (!racesConfig)
       return { unitType, unitTier: "tier_one", race: "neutral" };
+
+    // First check war_machines
+    if (racesConfig.war_machines && racesConfig.war_machines[unitType]) {
+      return { unitType, unitTier: "war_machines", race: "war_machines" };
+    }
 
     // Search through all races and tiers
     for (const race in racesConfig) {
@@ -502,24 +517,45 @@ export class ObjectManager {
   async createObjectFromSerializedData(objData, targetArray) {
     try {
       const racesConfig = this.configLoader.racesConfig;
-      if (!racesConfig || !racesConfig[objData.race]) {
-        console.error(`Race "${objData.race}" not found in config`);
-        return null;
-      }
 
-      const raceConfig = racesConfig[objData.race];
+      let unitConfig;
+
+      // Handle war_machines separately (they have different structure)
       if (
-        !raceConfig.units[objData.unitTier] ||
-        !raceConfig.units[objData.unitTier][objData.unitType]
+        objData.race === "war_machines" ||
+        objData.unitTier === "war_machines"
       ) {
-        console.error(
-          `Unit "${objData.unitType}" of tier "${objData.unitTier}" not found in race "${objData.race}"`
-        );
-        return null;
-      }
+        if (
+          !racesConfig.war_machines ||
+          !racesConfig.war_machines[objData.unitType]
+        ) {
+          console.error(
+            `War machine "${objData.unitType}" not found in config`
+          );
+          return null;
+        }
+        unitConfig = racesConfig.war_machines[objData.unitType];
+      } else {
+        // Regular race units
+        if (!racesConfig || !racesConfig[objData.race]) {
+          console.error(`Race "${objData.race}" not found in config`);
+          return null;
+        }
 
-      // Get unit configuration
-      const unitConfig = raceConfig.units[objData.unitTier][objData.unitType];
+        const raceConfig = racesConfig[objData.race];
+        if (
+          !raceConfig.units[objData.unitTier] ||
+          !raceConfig.units[objData.unitTier][objData.unitType]
+        ) {
+          console.error(
+            `Unit "${objData.unitType}" of tier "${objData.unitTier}" not found in race "${objData.race}"`
+          );
+          return null;
+        }
+
+        // Get unit configuration
+        unitConfig = raceConfig.units[objData.unitTier][objData.unitType];
+      }
 
       // Load sprite if needed
       await this.spriteLoader.loadSprites(objData.unitType);
