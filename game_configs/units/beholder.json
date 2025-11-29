@@ -308,7 +308,7 @@
         ]
       },
       "range_attack": {
-        "name": "ranged_attack",
+        "name": "range_attack",
         "frames": [
           {
             "x": 26,
