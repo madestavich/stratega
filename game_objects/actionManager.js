@@ -1,6 +1,7 @@
 import { MoveAction } from "../import.js";
 import { AttackAction } from "../import.js";
 import { TeleportAction } from "../import.js";
+import { AuraAction } from "../import.js";
 // import { DefendAction } from "../import.js";
 
 // В GameManager.js
@@ -8,6 +9,7 @@ const actionsClasses = {
   move: MoveAction,
   attack: AttackAction,
   teleport: TeleportAction,
+  aura: AuraAction,
   //   defend: DefendAction,
 };
 
@@ -64,6 +66,11 @@ export class ActionManager {
       // Update action-specific timers and states (always, for cooldown tracking)
       if (this.actions.attack) {
         this.actions.attack.update(gameObject, deltaTime);
+      }
+
+      // Update aura cooldown
+      if (this.actions.aura) {
+        this.actions.aura.update(gameObject, deltaTime);
       }
 
       // Only process actions on animation ticks to sync attack execution with animation frames

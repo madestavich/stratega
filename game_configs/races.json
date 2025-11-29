@@ -804,5 +804,46 @@
       "tier_four": {}
     }
   },
-  "war_machines": {}
+  "war_machines": {
+    "first_aid_tent": {
+      "gridWidth": 2,
+      "gridHeight": 2,
+      "objectType": "first_aid_tent",
+      "actionPriorities": ["aura"],
+      "moveSpeed": 0,
+      "availableActions": ["aura"],
+      "attackDamage": 0,
+      "attackSpeed": 0,
+      "health": 150,
+      "cost": 300,
+      "auraConfig": {
+        "auraRange": 6,
+        "auraCooldown": 2000,
+        "healAmount": 15,
+        "ammoRestore": 0,
+        "affectSelf": false,
+        "effectName": "healing"
+      }
+    },
+    "ammo_cart": {
+      "gridWidth": 1,
+      "gridHeight": 1,
+      "objectType": "ammo_cart",
+      "actionPriorities": ["aura"],
+      "moveSpeed": 0,
+      "availableActions": ["aura"],
+      "attackDamage": 0,
+      "attackSpeed": 0,
+      "health": 100,
+      "cost": 250,
+      "auraConfig": {
+        "auraRange": 5,
+        "auraCooldown": 3000,
+        "healAmount": 0,
+        "ammoRestore": 2,
+        "affectSelf": false,
+        "effectName": null
+      }
+    }
+  }
 }

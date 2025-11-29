@@ -9,6 +9,7 @@ import { Player } from "./game/player.js";
 import { MoveAction } from "./game_objects/actions/moveAction.js";
 import { AttackAction } from "./game_objects/actions/attackAction.js";
 import { TeleportAction } from "./game_objects/actions/teleportAction.js";
+import { AuraAction } from "./game_objects/actions/auraAction.js";
 
 //! object
 
@@ -39,6 +40,7 @@ export {
   MoveAction,
   AttackAction,
   TeleportAction,
+  AuraAction,
   Pathfinder,
   ConfigLoader,
   Particle,

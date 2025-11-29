@@ -63,6 +63,10 @@ export class SpriteLoader {
       gog: "/game_configs/units/gog.json",
       efreeti: "/game_configs/units/efreeti.json",
 
+      //! war machines
+      first_aid_tent: "/game_configs/units/first_aid_tent.json",
+      ammo_cart: "/game_configs/units/ammo_cart.json",
+
       //! effects
       healing: "/game_configs/effects/healing.json",
     };

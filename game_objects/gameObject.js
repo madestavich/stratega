@@ -59,6 +59,10 @@ export class GameObject {
     this.areaAttack = objectConfig.areaAttack || false; // Чи є area attack
     this.areaAttackParameters = objectConfig.areaAttackParameters || null; // Параметри area attack
 
+    // Конфігурація аури (для AuraAction)
+    this.auraConfig = objectConfig.auraConfig || null;
+    this.auraCooldownRemaining = 0; // Кулдаун аури
+
     if (this.isRanged) {
       const lastFrame =
         spriteConfig[objectConfig.objectType].animations.range_attack.frames[
