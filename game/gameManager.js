@@ -395,6 +395,21 @@ class GameManager {
           }
         }
       }
+
+      // Draw aura ranges for units with aura
+      const auraAction = this.actionManager.actions.aura;
+      if (auraAction) {
+        for (const obj of this.objectManager.objects) {
+          if (obj.auraConfig && !obj.isDead) {
+            auraAction.debugDrawAuraRange(obj);
+          }
+        }
+        for (const obj of this.objectManager.enemyObjects) {
+          if (obj.auraConfig && !obj.isDead) {
+            auraAction.debugDrawAuraRange(obj);
+          }
+        }
+      }
     }
     // Draw the hover indicator
     this.inputManager.drawHoverIndicator(ctx);

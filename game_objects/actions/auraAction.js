@@ -205,4 +205,83 @@ export class AuraAction {
       }
     }
   }
+
+  /**
+   * Debug відображення радіусу аури
+   */
+  debugDrawAuraRange(gameObject) {
+    if (!gameObject.auraConfig || gameObject.isDead) {
+      return;
+    }
+
+    const gridManager = gameObject.gridManager;
+    if (!gridManager || !gridManager.ctx) {
+      return;
+    }
+
+    const ctx = gridManager.ctx;
+    const auraRange = gameObject.auraConfig.auraRange || 3;
+    const healAmount = gameObject.auraConfig.healAmount || 0;
+    const ammoRestore = gameObject.auraConfig.ammoRestore || 0;
+
+    // Визначаємо колір залежно від типу аури
+    let fillColor, strokeColor;
+    if (healAmount > 0 && ammoRestore > 0) {
+      // Обидва ефекти - фіолетовий
+      fillColor = "rgba(180, 100, 255, 0.15)";
+      strokeColor = "rgba(180, 100, 255, 0.6)";
+    } else if (healAmount > 0) {
+      // Тільки хіл - зелений
+      fillColor = "rgba(100, 255, 100, 0.15)";
+      strokeColor = "rgba(100, 255, 100, 0.6)";
+    } else if (ammoRestore > 0) {
+      // Тільки амуніція - синій
+      fillColor = "rgba(100, 150, 255, 0.15)";
+      strokeColor = "rgba(100, 150, 255, 0.6)";
+    } else {
+      return; // Немає ефектів
+    }
+
+    // Центр юніта в пікселях
+    const centerX =
+      (gameObject.gridCol + gameObject.gridWidth / 2) * gridManager.cellWidth;
+    const centerY =
+      (gameObject.gridRow + gameObject.gridHeight / 2) * gridManager.cellHeight;
+
+    // Радіус в пікселях (середнє між шириною і висотою клітинки)
+    const pixelRadius =
+      auraRange * ((gridManager.cellWidth + gridManager.cellHeight) / 2);
+
+    ctx.save();
+
+    // Малюємо заповнене коло
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, pixelRadius, 0, Math.PI * 2);
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+
+    // Малюємо контур
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]); // Пунктирна лінія
+    ctx.stroke();
+
+    // Малюємо іконку в центрі
+    ctx.setLineDash([]);
+    ctx.font = "12px Arial";
+    ctx.fillStyle = strokeColor;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    let icon = "";
+    if (healAmount > 0) icon += "💚";
+    if (ammoRestore > 0) icon += "🏹";
+    ctx.fillText(
+      icon,
+      centerX,
+      centerY - (gameObject.gridHeight * gridManager.cellHeight) / 2 - 10
+    );
+
+    ctx.restore();
+  }
 }
