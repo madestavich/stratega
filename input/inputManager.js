@@ -97,6 +97,14 @@ export class InputManager {
         return { unitConfig: null, unitTier: null };
       }
 
+      // Спочатку перевіряємо war_machines (вони спільні для всіх рас)
+      if (racesConfig.war_machines && racesConfig.war_machines[unitKey]) {
+        return {
+          unitConfig: racesConfig.war_machines[unitKey],
+          unitTier: "war_machines",
+        };
+      }
+
       // Просто перебираємо всі раси і тіери, шукаючи юніт за ключем
       for (const race in racesConfig) {
         if (racesConfig[race].units) {

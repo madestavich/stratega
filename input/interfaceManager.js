@@ -8,6 +8,7 @@ export class InterfaceManager {
       level2: document.getElementById("level2-units"),
       level3: document.getElementById("level3-units"),
       level4: document.getElementById("level4-units"),
+      war_machines: document.getElementById("war_machines-units"),
     };
 
     // Map tier names from JSON to UI container IDs
@@ -16,6 +17,7 @@ export class InterfaceManager {
       tier_two: "level2",
       tier_three: "level3",
       tier_four: "level4",
+      war_machines: "war_machines",
     };
 
     this.initTabSwitching();
@@ -52,6 +54,7 @@ export class InterfaceManager {
         tier_two: [],
         tier_three: [],
         tier_four: [],
+        war_machines: [],
       };
 
       // Проходимо по всім расам і збираємо юніти по тірам
@@ -68,6 +71,15 @@ export class InterfaceManager {
           });
         }
       });
+
+      // Додаємо war_machines окремо (вони не прив'язані до раси)
+      if (racesConfig.war_machines) {
+        Object.keys(racesConfig.war_machines).forEach((unitKey) => {
+          if (!unitsByTier.war_machines.includes(unitKey)) {
+            unitsByTier.war_machines.push(unitKey);
+          }
+        });
+      }
 
       // Розподіляємо юніти по правильних тірах
       Object.entries(unitsByTier).forEach(([tier, unitKeys]) => {
@@ -95,6 +107,7 @@ export class InterfaceManager {
     }
 
     const raceUnits = racesConfig[player.race].units;
+    const warMachines = racesConfig.war_machines || {};
 
     // Clear existing units
     Object.values(this.unitContainers).forEach((container) => {
@@ -106,6 +119,8 @@ export class InterfaceManager {
     Object.values(raceUnits).forEach((tier) => {
       allUnitKeys.push(...Object.keys(tier));
     });
+    // Also load war machines sprites
+    allUnitKeys.push(...Object.keys(warMachines));
 
     // Load all sprites for this race's units
     await this.spriteLoader.loadSprites(allUnitKeys);
@@ -126,6 +141,18 @@ export class InterfaceManager {
         container.appendChild(unitElement);
       });
     });
+
+    // Populate war machines tab
+    const warMachinesContainer = this.unitContainers.war_machines;
+    if (warMachinesContainer && Object.keys(warMachines).length > 0) {
+      Object.entries(warMachines).forEach(([unitKey, unitData]) => {
+        const unitElement = this.createUnitElement({
+          name: this.formatUnitName(unitKey),
+          key: unitKey,
+        });
+        warMachinesContainer.appendChild(unitElement);
+      });
+    }
   }
 
   /**
