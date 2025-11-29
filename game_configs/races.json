@@ -817,9 +817,9 @@
       "health": 150,
       "cost": 300,
       "auraConfig": {
-        "auraRange": 6,
+        "auraRange": 10,
         "auraCooldown": 2000,
-        "healAmount": 15,
+        "healAmount": 50,
         "ammoRestore": 0,
         "affectSelf": false,
         "effectName": "healing"

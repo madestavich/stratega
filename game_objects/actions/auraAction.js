@@ -228,59 +228,80 @@ export class AuraAction {
     let fillColor, strokeColor;
     if (healAmount > 0 && ammoRestore > 0) {
       // Обидва ефекти - фіолетовий
-      fillColor = "rgba(180, 100, 255, 0.15)";
+      fillColor = "rgba(180, 100, 255, 0.2)";
       strokeColor = "rgba(180, 100, 255, 0.6)";
     } else if (healAmount > 0) {
       // Тільки хіл - зелений
-      fillColor = "rgba(100, 255, 100, 0.15)";
+      fillColor = "rgba(100, 255, 100, 0.2)";
       strokeColor = "rgba(100, 255, 100, 0.6)";
     } else if (ammoRestore > 0) {
       // Тільки амуніція - синій
-      fillColor = "rgba(100, 150, 255, 0.15)";
+      fillColor = "rgba(100, 150, 255, 0.2)";
       strokeColor = "rgba(100, 150, 255, 0.6)";
     } else {
       return; // Немає ефектів
     }
 
-    // Центр юніта в пікселях
-    const centerX =
-      (gameObject.gridCol + gameObject.gridWidth / 2) * gridManager.cellWidth;
-    const centerY =
-      (gameObject.gridRow + gameObject.gridHeight / 2) * gridManager.cellHeight;
-
-    // Радіус в пікселях (середнє між шириною і висотою клітинки)
-    const pixelRadius =
-      auraRange * ((gridManager.cellWidth + gridManager.cellHeight) / 2);
+    // Центр юніта (в клітинках)
+    const centerCol = gameObject.gridCol + (gameObject.gridWidth - 1) / 2;
+    const centerRow = gameObject.gridRow + (gameObject.gridHeight - 1) / 2;
 
     ctx.save();
 
-    // Малюємо заповнене коло
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, pixelRadius, 0, Math.PI * 2);
-    ctx.fillStyle = fillColor;
-    ctx.fill();
+    // Малюємо всі клітинки які входять в радіус
+    const rangeInt = Math.ceil(auraRange);
+    for (let dy = -rangeInt; dy <= rangeInt; dy++) {
+      for (let dx = -rangeInt; dx <= rangeInt; dx++) {
+        const col = Math.floor(centerCol) + dx;
+        const row = Math.floor(centerRow) + dy;
 
-    // Малюємо контур
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]); // Пунктирна лінія
-    ctx.stroke();
+        // Перевіряємо чи клітинка в межах сітки
+        if (
+          col < 0 ||
+          col >= gridManager.cols ||
+          row < 0 ||
+          row >= gridManager.rows
+        ) {
+          continue;
+        }
 
-    // Малюємо іконку в центрі
-    ctx.setLineDash([]);
-    ctx.font = "12px Arial";
+        // Обчислюємо відстань від центру юніта до центру клітинки
+        const cellCenterCol = col + 0.5;
+        const cellCenterRow = row + 0.5;
+        const distance = Math.sqrt(
+          Math.pow(cellCenterCol - (centerCol + 0.5), 2) +
+            Math.pow(cellCenterRow - (centerRow + 0.5), 2)
+        );
+
+        // Якщо клітинка в радіусі - малюємо її
+        if (distance <= auraRange) {
+          const x = col * gridManager.cellWidth;
+          const y = row * gridManager.cellHeight;
+
+          ctx.fillStyle = fillColor;
+          ctx.fillRect(x, y, gridManager.cellWidth, gridManager.cellHeight);
+
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, gridManager.cellWidth, gridManager.cellHeight);
+        }
+      }
+    }
+
+    // Малюємо іконку над юнітом
+    const centerX =
+      (gameObject.gridCol + gameObject.gridWidth / 2) * gridManager.cellWidth;
+    const centerY = gameObject.gridRow * gridManager.cellHeight;
+
+    ctx.font = "14px Arial";
     ctx.fillStyle = strokeColor;
     ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    ctx.textBaseline = "bottom";
 
     let icon = "";
     if (healAmount > 0) icon += "💚";
     if (ammoRestore > 0) icon += "🏹";
-    ctx.fillText(
-      icon,
-      centerX,
-      centerY - (gameObject.gridHeight * gridManager.cellHeight) / 2 - 10
-    );
+    ctx.fillText(icon, centerX, centerY - 2);
 
     ctx.restore();
   }
