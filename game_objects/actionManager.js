@@ -107,6 +107,9 @@ export class ActionManager {
       return;
     }
 
+    // Перевірка досягнення groupMoveTarget - скидаємо групу
+    this.checkGroupTargetReached(gameObject);
+
     // Отримання пріоритетів дій об'єкта
     const actionPriorities = gameObject.actionPriorities;
     if (!actionPriorities || actionPriorities.length === 0) {
@@ -136,6 +139,38 @@ export class ActionManager {
           break;
         }
       }
+    }
+  }
+
+  // Перевірка чи юніт досяг groupMoveTarget і скидання до дефолту
+  checkGroupTargetReached(gameObject) {
+    // Якщо немає групи або немає цілі групи - нічого не робимо
+    if (!gameObject.groupId || !gameObject.groupMoveTarget) {
+      return;
+    }
+
+    // Перевіряємо чи юніт досяг цілі групи
+    const targetCol = gameObject.groupMoveTarget.col;
+    const targetRow = gameObject.groupMoveTarget.row;
+
+    // Юніт досяг цілі якщо він на тій же позиції або не рухається і близько до цілі
+    const reachedTarget =
+      (gameObject.gridCol === targetCol && gameObject.gridRow === targetRow) ||
+      (!gameObject.isMoving && gameObject.moveTarget === null);
+
+    if (reachedTarget) {
+      console.log(
+        `Unit ${gameObject.id} reached group target, resetting to default priorities`
+      );
+
+      // Скидаємо actionPriorities до дефолтних
+      if (gameObject.defaultActionPriorities) {
+        gameObject.actionPriorities = [...gameObject.defaultActionPriorities];
+      }
+
+      // Очищаємо групові параметри
+      gameObject.groupMoveTarget = null;
+      gameObject.groupId = null;
     }
   }
 }

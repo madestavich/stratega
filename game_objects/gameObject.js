@@ -22,10 +22,13 @@ export class GameObject {
     this.objectType = objectConfig.objectType || "default"; // Тип об'єкта
     this.name = objectConfig.name || objectConfig.objectType; // Ім'я об'єкта
     this.actionPriorities = objectConfig.actionPriorities || [];
+    this.defaultActionPriorities = [...this.actionPriorities]; // Дефолтні пріоритети для скидання
     this.canAct = true; // Чи може об'єкт виконувати дії
     this.isMoving = false; // Чи об'єкт рухається
     this.moveDirection = null; // Напрямок руху
     this.moveTarget = null; // Ціль для руху
+    this.groupId = null; // ID групи юнітів (null якщо не в групі)
+    this.groupMoveTarget = null; // Ціль руху групи {col, row}
     // Встановлюємо коректний напрямок погляду одразу при створенні
     let initialLookDirection = null;
     // team 1 завжди вправо, team 2 завжди вліво

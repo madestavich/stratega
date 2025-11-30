@@ -13,6 +13,7 @@ export class ObjectManager {
     this.effectManager = new EffectManager(ctx, configLoader); // Менеджер ефектів (без spriteLoader)
     this.currentRoomId = null;
     this.isCreator = null; // Додаємо прапорець, чи це creator
+    this.unitGroups = {}; // Групи юнітів: { groupId: { actionPriorities, moveTarget } }
   }
 
   async createObject(objectType, objectConfig, team, gridCol, gridRow) {
@@ -285,9 +286,10 @@ export class ObjectManager {
   }
 
   // Serialize objects to optimized format for database
-  // New format: { unitType: [[col, row], [col, row], ...], ... }
+  // Format: { unitType: [[col, row] or [col, row, groupId], ...], _groups: { groupId: {...} } }
   serializeObjectsForDB() {
     const grouped = {};
+    const activeGroups = {};
 
     for (const obj of this.objects) {
       const unitType = obj.unitType || obj.config?.objectType || "unknown";
@@ -296,8 +298,22 @@ export class ObjectManager {
         grouped[unitType] = [];
       }
 
-      // Зберігаємо тільки координати як масив [col, row]
-      grouped[unitType].push([obj.gridCol, obj.gridRow]);
+      // Зберігаємо координати: [col, row] або [col, row, groupId] якщо є група
+      if (obj.groupId !== null && obj.groupId !== undefined) {
+        grouped[unitType].push([obj.gridCol, obj.gridRow, obj.groupId]);
+
+        // Зберігаємо параметри групи якщо ще не збережені
+        if (!activeGroups[obj.groupId] && this.unitGroups[obj.groupId]) {
+          activeGroups[obj.groupId] = this.unitGroups[obj.groupId];
+        }
+      } else {
+        grouped[unitType].push([obj.gridCol, obj.gridRow]);
+      }
+    }
+
+    // Додаємо секцію груп якщо є активні групи
+    if (Object.keys(activeGroups).length > 0) {
+      grouped._groups = activeGroups;
     }
 
     return grouped;
@@ -367,23 +383,48 @@ export class ObjectManager {
         // Clear current objects
         this.objects = [];
         this.enemyObjects = [];
+        this.unitGroups = {}; // Очищаємо групи
 
         // CRITICAL: Reset ID counter for deterministic IDs
         resetObjectIdCounter();
 
+        // Extract and merge groups from both players
+        const playerGroups = result.player_objects?._groups || {};
+        const enemyGroups = result.enemy_objects?._groups || {};
+
+        // Зберігаємо групи (player groups з prefix 'p', enemy з 'e' для унікальності)
+        for (const groupId in playerGroups) {
+          this.unitGroups[`p${groupId}`] = playerGroups[groupId];
+        }
+        for (const groupId in enemyGroups) {
+          this.unitGroups[`e${groupId}`] = enemyGroups[groupId];
+        }
+
         // Convert new grouped format to flat array for processing
-        // New format: { unitType: [[col, row], ...], ... }
+        // Format: { unitType: [[col, row] or [col, row, groupId], ...], _groups: {...} }
         const flattenGroupedObjects = (groupedData, isPlayer) => {
           const flatArray = [];
+          const groupPrefix = isPlayer ? "p" : "e";
+
           for (const unitType in groupedData) {
+            // Пропускаємо службову секцію _groups
+            if (unitType === "_groups") continue;
+
             const positions = groupedData[unitType];
             for (const pos of positions) {
-              flatArray.push({
+              const objData = {
                 unitType,
                 gridCol: pos[0],
                 gridRow: pos[1],
                 _isPlayer: isPlayer,
-              });
+              };
+
+              // Якщо є третій елемент - це groupId
+              if (pos.length >= 3) {
+                objData.groupId = `${groupPrefix}${pos[2]}`;
+              }
+
+              flatArray.push(objData);
             }
           }
           return flatArray;
@@ -526,6 +567,32 @@ export class ObjectManager {
         unitTier: tier,
         race: race,
       };
+
+      // Застосовуємо параметри групи якщо юніт в групі
+      if (objData.groupId) {
+        obj.groupId = objData.groupId;
+        const groupConfig = this.unitGroups[objData.groupId];
+
+        if (groupConfig) {
+          // Встановлюємо кастомні actionPriorities якщо є
+          if (groupConfig.actionPriorities) {
+            obj.actionPriorities = [...groupConfig.actionPriorities];
+          }
+
+          // Встановлюємо moveTarget групи якщо є
+          if (groupConfig.moveTarget) {
+            obj.groupMoveTarget = {
+              col: groupConfig.moveTarget[0],
+              row: groupConfig.moveTarget[1],
+            };
+            // Також встановлюємо як основний moveTarget для руху
+            obj.moveTarget = {
+              col: groupConfig.moveTarget[0],
+              row: groupConfig.moveTarget[1],
+            };
+          }
+        }
+      }
 
       // Health comes from unit config, no need to restore from DB
       // obj.health and obj.maxHealth are already set from unitConfig
