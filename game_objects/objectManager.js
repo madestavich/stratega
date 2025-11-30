@@ -48,9 +48,12 @@ export class ObjectManager {
     obj.startingGridCol = gridCol;
     obj.startingGridRow = gridRow;
 
-    // Store the unit type info for later serialization
+    // Store the unit type info for later serialization (використовуємо lookup таблицю)
     obj.unitType = objectType;
-    obj.unitInfo = this.findUnitInfoByType(objectType);
+    const unitInfo = this.configLoader.getUnitInfo(objectType);
+    obj.unitInfo = unitInfo
+      ? { unitType: objectType, unitTier: unitInfo.tier, race: unitInfo.race }
+      : null;
 
     this.objects.push(obj);
 
@@ -281,113 +284,23 @@ export class ObjectManager {
     }
   }
 
-  // Serialize objects to simple format for database
+  // Serialize objects to optimized format for database
+  // New format: { unitType: [[col, row], [col, row], ...], ... }
   serializeObjectsForDB() {
-    return this.objects.map((obj) => {
-      // Use stored unit info if available, otherwise try to find it
-      const unitInfo = obj.unitInfo || this.findUnitTypeAndTier(obj);
+    const grouped = {};
 
-      return {
-        gridCol: obj.gridCol,
-        gridRow: obj.gridRow,
-        startingGridCol: obj.startingGridCol,
-        startingGridRow: obj.startingGridRow,
-        unitType: obj.unitType || unitInfo.unitType,
-        unitTier: unitInfo.unitTier,
-        race: unitInfo.race || "neutral",
-      };
-    });
-  }
+    for (const obj of this.objects) {
+      const unitType = obj.unitType || obj.config?.objectType || "unknown";
 
-  // Find unit type and tier from races config (fallback method)
-  findUnitTypeAndTier(gameObject) {
-    const racesConfig = this.configLoader.racesConfig;
-    if (!racesConfig)
-      return { unitType: "unknown", unitTier: "tier_one", race: "neutral" };
-
-    // First check war_machines (they are shared across all races)
-    if (racesConfig.war_machines) {
-      for (const unitType in racesConfig.war_machines) {
-        const unitConfig = racesConfig.war_machines[unitType];
-        if (this.isMatchingUnit(gameObject, unitType, unitConfig)) {
-          return { unitType, unitTier: "war_machines", race: "war_machines" };
-        }
+      if (!grouped[unitType]) {
+        grouped[unitType] = [];
       }
+
+      // Зберігаємо тільки координати як масив [col, row]
+      grouped[unitType].push([obj.gridCol, obj.gridRow]);
     }
 
-    // Search through all races and tiers
-    for (const race in racesConfig) {
-      if (racesConfig[race].units) {
-        for (const tier in racesConfig[race].units) {
-          for (const unitType in racesConfig[race].units[tier]) {
-            const unitConfig = racesConfig[race].units[tier][unitType];
-
-            // Try multiple matching methods
-            if (this.isMatchingUnit(gameObject, unitType, unitConfig)) {
-              return { unitType, unitTier: tier, race };
-            }
-          }
-        }
-      }
-    }
-
-    return { unitType: "unknown", unitTier: "tier_one", race: "neutral" };
-  }
-
-  // Check if gameObject matches this unit type
-  isMatchingUnit(gameObject, unitType, unitConfig) {
-    // Method 1: Check sprite imagePath
-    if (
-      gameObject.spriteConfig &&
-      gameObject.spriteConfig.imagePath &&
-      gameObject.spriteConfig.imagePath.includes(unitType)
-    ) {
-      return true;
-    }
-
-    // Method 2: Check objectType property
-    if (gameObject.config && gameObject.config.objectType === unitType) {
-      return true;
-    }
-
-    // Method 3: Check grid dimensions and other properties
-    if (gameObject.config && unitConfig) {
-      const configMatch =
-        gameObject.config.gridWidth === unitConfig.gridWidth &&
-        gameObject.config.gridHeight === unitConfig.gridHeight &&
-        gameObject.config.health === unitConfig.health;
-
-      if (configMatch) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  // Find unit info by type name from races config
-  findUnitInfoByType(unitType) {
-    const racesConfig = this.configLoader.racesConfig;
-    if (!racesConfig)
-      return { unitType, unitTier: "tier_one", race: "neutral" };
-
-    // First check war_machines
-    if (racesConfig.war_machines && racesConfig.war_machines[unitType]) {
-      return { unitType, unitTier: "war_machines", race: "war_machines" };
-    }
-
-    // Search through all races and tiers
-    for (const race in racesConfig) {
-      if (racesConfig[race].units) {
-        for (const tier in racesConfig[race].units) {
-          if (racesConfig[race].units[tier][unitType]) {
-            return { unitType, unitTier: tier, race };
-          }
-        }
-      }
-    }
-
-    return { unitType, unitTier: "tier_one", race: "neutral" };
+    return grouped;
   }
 
   // Save objects to server
@@ -458,29 +371,33 @@ export class ObjectManager {
         // CRITICAL: Reset ID counter for deterministic IDs
         resetObjectIdCounter();
 
-        // CRITICAL FIX: Combine ALL objects and sort globally for deterministic IDs
-        // This ensures both players assign the same IDs to the same units
+        // Convert new grouped format to flat array for processing
+        // New format: { unitType: [[col, row], ...], ... }
+        const flattenGroupedObjects = (groupedData, isPlayer) => {
+          const flatArray = [];
+          for (const unitType in groupedData) {
+            const positions = groupedData[unitType];
+            for (const pos of positions) {
+              flatArray.push({
+                unitType,
+                gridCol: pos[0],
+                gridRow: pos[1],
+                _isPlayer: isPlayer,
+              });
+            }
+          }
+          return flatArray;
+        };
+
         const allObjects = [
-          ...(result.player_objects || []).map((o) => ({
-            ...o,
-            _isPlayer: true,
-          })),
-          ...(result.enemy_objects || []).map((o) => ({
-            ...o,
-            _isPlayer: false,
-          })),
+          ...flattenGroupedObjects(result.player_objects || {}, true),
+          ...flattenGroupedObjects(result.enemy_objects || {}, false),
         ];
 
-        // Sort ALL objects by the same criteria - use startingGridCol/Row for consistency
-        // since units may have moved from their original positions
+        // Sort ALL objects by the same criteria for deterministic IDs
         const sortByPosition = (a, b) => {
-          const aCol = a.startingGridCol ?? a.gridCol;
-          const aRow = a.startingGridRow ?? a.gridRow;
-          const bCol = b.startingGridCol ?? b.gridCol;
-          const bRow = b.startingGridRow ?? b.gridRow;
-
-          if (aRow !== bRow) return aRow - bRow;
-          if (aCol !== bCol) return aCol - bCol;
+          if (a.gridRow !== b.gridRow) return a.gridRow - b.gridRow;
+          if (a.gridCol !== b.gridCol) return a.gridCol - b.gridCol;
           // Use unitType as final tiebreaker
           return (a.unitType || "").localeCompare(b.unitType || "");
         };
@@ -513,18 +430,26 @@ export class ObjectManager {
     }
   }
 
-  // Create object from serialized data using races config
+  // Create object from serialized data using races config and lookup table
   async createObjectFromSerializedData(objData, targetArray) {
     try {
       const racesConfig = this.configLoader.racesConfig;
 
+      // Отримуємо race/tier з lookup таблиці по unitType (O(1))
+      const unitInfo = this.configLoader.getUnitInfo(objData.unitType);
+
+      if (!unitInfo) {
+        console.error(
+          `Unit type "${objData.unitType}" not found in lookup table`
+        );
+        return null;
+      }
+
+      const { race, tier } = unitInfo;
       let unitConfig;
 
       // Handle war_machines separately (they have different structure)
-      if (
-        objData.race === "war_machines" ||
-        objData.unitTier === "war_machines"
-      ) {
+      if (race === "war_machines") {
         if (
           !racesConfig.war_machines ||
           !racesConfig.war_machines[objData.unitType]
@@ -537,24 +462,24 @@ export class ObjectManager {
         unitConfig = racesConfig.war_machines[objData.unitType];
       } else {
         // Regular race units
-        if (!racesConfig || !racesConfig[objData.race]) {
-          console.error(`Race "${objData.race}" not found in config`);
+        if (!racesConfig || !racesConfig[race]) {
+          console.error(`Race "${race}" not found in config`);
           return null;
         }
 
-        const raceConfig = racesConfig[objData.race];
+        const raceConfig = racesConfig[race];
         if (
-          !raceConfig.units[objData.unitTier] ||
-          !raceConfig.units[objData.unitTier][objData.unitType]
+          !raceConfig.units[tier] ||
+          !raceConfig.units[tier][objData.unitType]
         ) {
           console.error(
-            `Unit "${objData.unitType}" of tier "${objData.unitTier}" not found in race "${objData.race}"`
+            `Unit "${objData.unitType}" of tier "${tier}" not found in race "${race}"`
           );
           return null;
         }
 
         // Get unit configuration
-        unitConfig = raceConfig.units[objData.unitTier][objData.unitType];
+        unitConfig = raceConfig.units[tier][objData.unitType];
       }
 
       // Load sprite if needed
@@ -590,16 +515,16 @@ export class ObjectManager {
       // Set team (1 for player objects, 2 for enemy objects)
       obj.team = team;
 
-      // Store starting position (use current position if no starting position stored)
-      obj.startingGridCol = objData.startingGridCol || objData.gridCol;
-      obj.startingGridRow = objData.startingGridRow || objData.gridRow;
+      // Store starting position = current position (на початку раунду вони рівні)
+      obj.startingGridCol = objData.gridCol;
+      obj.startingGridRow = objData.gridRow;
 
       // Store unit type info for future serialization
       obj.unitType = objData.unitType;
       obj.unitInfo = {
         unitType: objData.unitType,
-        unitTier: objData.unitTier,
-        race: objData.race,
+        unitTier: tier,
+        race: race,
       };
 
       // Health comes from unit config, no need to restore from DB

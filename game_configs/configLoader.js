@@ -2,6 +2,7 @@ export class ConfigLoader {
   constructor() {
     this.configs = {};
     this.racesConfig = null;
+    this.unitLookup = {}; // unitType -> {race, tier} для швидкого пошуку
   }
 
   async load(configList) {
@@ -85,11 +86,46 @@ export class ConfigLoader {
       }
 
       this.racesConfig = await response.json();
+      this.buildUnitLookup(); // Будуємо lookup таблицю після завантаження
       return this.racesConfig;
     } catch (error) {
       console.error("Error loading races configuration:", error);
       return null;
     }
+  }
+
+  // Будуємо lookup таблицю для швидкого пошуку race/tier по unitType
+  buildUnitLookup() {
+    this.unitLookup = {};
+
+    if (!this.racesConfig) return;
+
+    // Спочатку war_machines (вони без тіра)
+    if (this.racesConfig.war_machines) {
+      for (const unitType in this.racesConfig.war_machines) {
+        this.unitLookup[unitType] = {
+          race: "war_machines",
+          tier: "war_machines",
+        };
+      }
+    }
+
+    // Потім всі раси з тірами
+    for (const race in this.racesConfig) {
+      if (race === "war_machines") continue;
+      if (this.racesConfig[race].units) {
+        for (const tier in this.racesConfig[race].units) {
+          for (const unitType in this.racesConfig[race].units[tier]) {
+            this.unitLookup[unitType] = { race, tier };
+          }
+        }
+      }
+    }
+  }
+
+  // Швидкий пошук race/tier по unitType - O(1)
+  getUnitInfo(unitType) {
+    return this.unitLookup[unitType] || null;
   }
 
   getUnitConfig(race, tier, unitName) {
