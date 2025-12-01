@@ -195,6 +195,11 @@ class GameManager {
       for (const unit of this.objectManager.enemyObjects) {
         unit.setLookDirectionByTeam();
       }
+
+      // Відновлюємо групи юнітів в inputManager
+      if (this.inputManager && this.inputManager.restoreGroupsFromObjects) {
+        this.inputManager.restoreGroupsFromObjects();
+      }
     }
 
     // Check if we reconnected during battle

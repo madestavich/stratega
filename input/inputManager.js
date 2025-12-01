@@ -341,6 +341,56 @@ export class InputManager {
     this.gameManager.objectManager.unitGroups = omGroups;
   }
 
+  // Відновити групи з завантажених об'єктів
+  restoreGroupsFromObjects() {
+    this.unitGroups = {};
+
+    const playerObjects = this.gameManager.objectManager.objects;
+    const omGroups = this.gameManager.objectManager.unitGroups;
+
+    // Знаходимо всіх юнітів з groupId і групуємо їх
+    for (const unit of playerObjects) {
+      if (unit.groupId !== null && unit.groupId !== undefined) {
+        // Витягуємо числовий ID групи (може бути "p1" -> 1)
+        let numericGroupId = unit.groupId;
+        if (typeof unit.groupId === "string" && unit.groupId.startsWith("p")) {
+          numericGroupId = parseInt(unit.groupId.substring(1));
+          // Оновлюємо groupId юніта на числовий
+          unit.groupId = numericGroupId;
+        }
+
+        if (!this.unitGroups[numericGroupId]) {
+          // Отримуємо конфіг групи з objectManager якщо є
+          const omGroupKey = `p${numericGroupId}`;
+          const groupConfig =
+            omGroups[omGroupKey] || omGroups[numericGroupId] || {};
+
+          this.unitGroups[numericGroupId] = {
+            units: [],
+            moveTarget: groupConfig.moveTarget || null,
+            actionPriorities: groupConfig.actionPriorities || [
+              "move",
+              "attack",
+            ],
+          };
+        }
+
+        this.unitGroups[numericGroupId].units.push(unit);
+      }
+    }
+
+    console.log(
+      "Restored groups from objects:",
+      Object.keys(this.unitGroups).map((id) => ({
+        id,
+        units: this.unitGroups[id].units.length,
+      }))
+    );
+
+    // Оновлюємо UI
+    this.updateGroupsUI();
+  }
+
   // Створити UI для груп
   createGroupsUI() {
     // Перевіряємо чи вже існує контейнер
