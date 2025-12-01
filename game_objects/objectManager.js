@@ -303,8 +303,29 @@ export class ObjectManager {
         grouped[unitType].push([obj.gridCol, obj.gridRow, obj.groupId]);
 
         // Зберігаємо параметри групи якщо ще не збережені
-        if (!activeGroups[obj.groupId] && this.unitGroups[obj.groupId]) {
-          activeGroups[obj.groupId] = this.unitGroups[obj.groupId];
+        const groupConfig = this.unitGroups[obj.groupId];
+        if (!activeGroups[obj.groupId] && groupConfig) {
+          // Конвертуємо в формат для БД (без units, moveTarget як масив)
+          const groupData = {
+            actionPriorities: groupConfig.actionPriorities || [
+              "move",
+              "attack",
+            ],
+          };
+
+          // Конвертуємо moveTarget в масив якщо є
+          if (groupConfig.moveTarget) {
+            if (Array.isArray(groupConfig.moveTarget)) {
+              groupData.moveTarget = groupConfig.moveTarget;
+            } else if (groupConfig.moveTarget.col !== undefined) {
+              groupData.moveTarget = [
+                groupConfig.moveTarget.col,
+                groupConfig.moveTarget.row,
+              ];
+            }
+          }
+
+          activeGroups[obj.groupId] = groupData;
         }
       } else {
         grouped[unitType].push([obj.gridCol, obj.gridRow]);
@@ -314,6 +335,7 @@ export class ObjectManager {
     // Додаємо секцію груп якщо є активні групи
     if (Object.keys(activeGroups).length > 0) {
       grouped._groups = activeGroups;
+      console.log("Serializing groups:", activeGroups);
     }
 
     return grouped;
@@ -328,6 +350,7 @@ export class ObjectManager {
 
     try {
       const serializedObjects = this.serializeObjectsForDB();
+      console.log("Saving objects to DB:", JSON.stringify(serializedObjects));
 
       const response = await fetch("../server/room.php", {
         method: "POST",
