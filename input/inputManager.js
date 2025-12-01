@@ -577,13 +577,26 @@ export class InputManager {
       const cellWidth = this.gameManager.gridManager.cellWidth;
       const cellHeight = this.gameManager.gridManager.cellHeight;
 
-      // Розміри овалу базуються на розмірі юніта
-      const radiusX = unit.gridWidth * cellWidth * 0.5;
-      const radiusY = unit.gridHeight * cellHeight * 0.25; // Сплющений вниз
+      // Отримуємо розміри спрайту для масштабування овалу
+      let spriteWidth = unit.gridWidth * cellWidth;
+      let spriteHeight = unit.gridHeight * cellHeight;
 
-      // Позиція овалу - під спрайтом юніта (в нижній частині)
+      // Якщо є анімований спрайт, використовуємо його розмір
+      if (unit.animator && unit.animator.currentSprite) {
+        const sprite = unit.animator.currentSprite;
+        if (sprite.frameWidth && sprite.frameHeight) {
+          spriteWidth = sprite.frameWidth * (unit.scaleX || 1);
+          spriteHeight = sprite.frameHeight * (unit.scaleY || 1);
+        }
+      }
+
+      // Розміри овалу базуються на розмірі спрайту
+      const radiusX = spriteWidth * 0.45;
+      const radiusY = spriteWidth * 0.15; // Сплющений овал пропорційний ширині
+
+      // Позиція овалу - внизу спрайта
       const ellipseX = unit.x;
-      const ellipseY = unit.y + unit.gridHeight * cellHeight * 0.3;
+      const ellipseY = unit.y + spriteHeight * 0.3;
 
       // Малюємо заповнений овал
       ctx.fillStyle = "rgba(255, 204, 0, 0.3)";
