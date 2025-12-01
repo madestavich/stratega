@@ -127,8 +127,12 @@ export class InputManager {
         this.updateGroupsUI();
       }
 
-      // Цифри 1-5 - зберегти/вибрати групу
-      if (event.key >= "1" && event.key <= "5") {
+      // Цифри 1-5 - зберегти/вибрати групу (тільки не під час бою)
+      if (
+        event.key >= "1" &&
+        event.key <= "5" &&
+        !this.gameManager.isBattleInProgress
+      ) {
         const groupId = parseInt(event.key);
 
         if (this.ctrlPressed) {
@@ -152,6 +156,11 @@ export class InputManager {
 
   // Обробка кліку для вибору юніта в групу
   handleUnitSelectionClick() {
+    // Заборонити вибір юнітів під час бою
+    if (this.gameManager.isBattleInProgress) {
+      return;
+    }
+
     const clickedUnit = this.getUnitAtPosition(this.mouse.x, this.mouse.y);
 
     if (clickedUnit) {
@@ -246,6 +255,12 @@ export class InputManager {
 
   // Зберегти групу
   saveGroup(groupId) {
+    // Заборонити зміну груп під час бою
+    if (this.gameManager.isBattleInProgress) {
+      console.log("Cannot modify groups during battle");
+      return;
+    }
+
     if (this.selectedUnits.length === 0) {
       console.log("No units selected to save in group");
       return;
