@@ -132,6 +132,8 @@ export class InputManager {
         const groupId = parseInt(event.key);
 
         if (this.ctrlPressed) {
+          // Prevent browser tab switching (Ctrl+1-9)
+          event.preventDefault();
           // Ctrl + цифра = зберегти вибраних юнітів в групу
           this.saveGroup(groupId);
         } else {
