@@ -317,6 +317,12 @@ export class InputManager {
 
   // Вибрати групу
   selectGroup(groupId) {
+    // Заборонити вибір групи під час бою
+    if (this.gameManager.isBattleInProgress) {
+      console.log("Cannot select groups during battle");
+      return;
+    }
+
     const group = this.unitGroups[groupId];
 
     if (group && group.units.length > 0) {
@@ -535,6 +541,11 @@ export class InputManager {
     // Додаємо обробники кліків на слоти груп
     groupsPanel.querySelectorAll(".group-slot").forEach((slot) => {
       slot.addEventListener("click", () => {
+        // Заборонити клік на групу під час бою
+        if (this.gameManager.isBattleInProgress) {
+          console.log("Cannot interact with groups during battle");
+          return;
+        }
         const groupId = parseInt(slot.getAttribute("data-group-id"));
         this.selectGroup(groupId);
       });

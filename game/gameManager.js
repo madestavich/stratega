@@ -1256,6 +1256,11 @@ class GameManager {
     // Update grid
     this.objectManager.updateGridWithAllObjects();
 
+    // Відновлюємо групи юнітів в inputManager після перезавантаження
+    if (this.inputManager && this.inputManager.restoreGroupsFromObjects) {
+      this.inputManager.restoreGroupsFromObjects();
+    }
+
     console.log(
       `Units reloaded from database: ${this.objectManager.objects.length} player, ${this.objectManager.enemyObjects.length} enemy`
     );
