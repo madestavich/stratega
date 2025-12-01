@@ -251,8 +251,24 @@ export class InputManager {
       return;
     }
 
-    // Зберігаємо groupId для кожного юніта
+    // Видаляємо юнітів з інших груп, якщо вони там є
     for (const unit of this.selectedUnits) {
+      // Якщо юніт вже в іншій групі - видаляємо його звідти
+      if (
+        unit.groupId &&
+        unit.groupId !== groupId &&
+        this.unitGroups[unit.groupId]
+      ) {
+        const oldGroup = this.unitGroups[unit.groupId];
+        oldGroup.units = oldGroup.units.filter((u) => u !== unit);
+
+        // Якщо стара група стала пустою - видаляємо її
+        if (oldGroup.units.length === 0) {
+          delete this.unitGroups[unit.groupId];
+        }
+      }
+
+      // Призначаємо новий groupId
       unit.groupId = groupId;
     }
 
