@@ -568,30 +568,46 @@ export class InputManager {
       ctx.restore();
     }
 
-    // Малюємо підсвічування вибраних юнітів
+    // Малюємо підсвічування вибраних юнітів (овальне під спрайтом)
     for (const unit of this.selectedUnits) {
       if (unit.isDead) continue;
 
       ctx.save();
-      ctx.strokeStyle = "#ffcc00";
-      ctx.lineWidth = 3;
-      ctx.setLineDash([]);
 
-      const radius =
-        Math.max(unit.gridWidth, unit.gridHeight) *
-        this.gameManager.gridManager.cellWidth *
-        0.6;
+      const cellWidth = this.gameManager.gridManager.cellWidth;
+      const cellHeight = this.gameManager.gridManager.cellHeight;
 
+      // Розміри овалу базуються на розмірі юніта
+      const radiusX = unit.gridWidth * cellWidth * 0.5;
+      const radiusY = unit.gridHeight * cellHeight * 0.25; // Сплющений вниз
+
+      // Позиція овалу - під спрайтом юніта (в нижній частині)
+      const ellipseX = unit.x;
+      const ellipseY = unit.y + unit.gridHeight * cellHeight * 0.3;
+
+      // Малюємо заповнений овал
+      ctx.fillStyle = "rgba(255, 204, 0, 0.3)";
       ctx.beginPath();
-      ctx.arc(unit.x, unit.y, radius, 0, Math.PI * 2);
+      ctx.ellipse(ellipseX, ellipseY, radiusX, radiusY, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Малюємо контур овалу
+      ctx.strokeStyle = "#ffcc00";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(ellipseX, ellipseY, radiusX, radiusY, 0, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Малюємо номер групи якщо є
+      // Малюємо номер групи якщо є (над юнітом)
       if (unit.groupId) {
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 14px Arial";
         ctx.textAlign = "center";
-        ctx.fillText(unit.groupId.toString(), unit.x, unit.y - radius - 5);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 3;
+        const textY = unit.y - unit.gridHeight * cellHeight * 0.4;
+        ctx.strokeText(unit.groupId.toString(), unit.x, textY);
+        ctx.fillText(unit.groupId.toString(), unit.x, textY);
       }
 
       ctx.restore();

@@ -418,10 +418,11 @@ class GameManager {
     }
     // Draw the hover indicator
     this.inputManager.drawHoverIndicator(ctx);
-    this.objectManager.renderAll();
 
-    // Draw group selection indicators
+    // Draw group selection indicators BEFORE units (under sprites)
     this.inputManager.drawGroupSelectionIndicators(ctx);
+
+    this.objectManager.renderAll();
 
     // Рендеримо всі particles
     if (this.objectManager.particles) {
