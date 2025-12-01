@@ -403,8 +403,8 @@ canvas {
 .group-slot {
   width: 32px;
   height: 32px;
-  background: url("../textures/Leather-red-dark-darker.png") repeat;
-  border: 2px solid #8b7355;
+  background: url("../textures/Leather-middle-brightened.png") repeat;
+  border: 2px solid #a08060;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -412,26 +412,33 @@ canvas {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
 .group-slot:hover {
   border-color: #d4af37;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5), 0 0 4px rgba(212, 175, 55, 0.3);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3), 0 0 4px rgba(212, 175, 55, 0.3);
 }
 
 .group-slot.active {
-  border-color: #ffd700;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(255, 215, 0, 0.6);
+  border-color: #c0392b;
+  background: url("../textures/Leather-red-dark-darker.png") repeat;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(192, 57, 43, 0.6);
 }
 
 .group-slot.has-units {
-  background: url("../textures/Leather.png") repeat;
-  border-color: #6b8e23;
+  background: url("../textures/Leather-blue.png") repeat;
+  border-color: #4a7a9a;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.group-slot.has-units:hover {
+  border-color: #6a9aba;
 }
 
 .group-slot.has-units.active {
-  border-color: #ffd700;
+  border-color: #c0392b;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(192, 57, 43, 0.6);
 }
 
 .group-number {
@@ -444,7 +451,7 @@ canvas {
 
 .group-count {
   font-size: 9px;
-  color: #aaa;
+  color: #ccc;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
   line-height: 1;
 }
