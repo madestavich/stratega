@@ -291,6 +291,15 @@ export class ObjectManager {
     const grouped = {};
     const activeGroups = {};
 
+    console.log("serializeObjectsForDB called");
+    console.log("this.unitGroups:", this.unitGroups);
+    console.log(
+      "Objects with groupId:",
+      this.objects
+        .filter((o) => o.groupId)
+        .map((o) => ({ id: o.id, groupId: o.groupId }))
+    );
+
     for (const obj of this.objects) {
       const unitType = obj.unitType || obj.config?.objectType || "unknown";
 
@@ -304,6 +313,8 @@ export class ObjectManager {
 
         // Зберігаємо параметри групи якщо ще не збережені
         const groupConfig = this.unitGroups[obj.groupId];
+        console.log(`Looking for group ${obj.groupId}:`, groupConfig);
+
         if (!activeGroups[obj.groupId] && groupConfig) {
           // Конвертуємо в формат для БД (без units, moveTarget як масив)
           const groupData = {
@@ -326,6 +337,12 @@ export class ObjectManager {
           }
 
           activeGroups[obj.groupId] = groupData;
+        } else if (!groupConfig) {
+          // Якщо групи немає в unitGroups, створюємо дефолтну
+          activeGroups[obj.groupId] = {
+            actionPriorities: ["move", "attack"],
+          };
+          console.log(`Created default group config for ${obj.groupId}`);
         }
       } else {
         grouped[unitType].push([obj.gridCol, obj.gridRow]);
@@ -338,6 +355,7 @@ export class ObjectManager {
       console.log("Serializing groups:", activeGroups);
     }
 
+    console.log("Final serialized data:", JSON.stringify(grouped));
     return grouped;
   }
 
