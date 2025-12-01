@@ -79,6 +79,13 @@ export class InputManager {
         }
       });
 
+      // Автоматичне завершення box selection при виході за межі канваса
+      this.canvas.addEventListener("mouseleave", (event) => {
+        if (this.isSelecting) {
+          this.finishBoxSelection();
+        }
+      });
+
       // Початок box selection (mousedown)
       this.canvas.addEventListener("mousedown", (event) => {
         if (event.button === 0 && this.ctrlPressed) {
