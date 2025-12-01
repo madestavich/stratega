@@ -594,9 +594,9 @@ export class InputManager {
       const radiusX = spriteWidth * 0.45;
       const radiusY = spriteWidth * 0.15; // Сплющений овал пропорційний ширині
 
-      // Позиція овалу - внизу спрайта
+      // Позиція овалу - центр на centralPoint спрайту
       const ellipseX = unit.x;
-      const ellipseY = unit.y + spriteHeight * 0.3;
+      const ellipseY = unit.y;
 
       // Малюємо заповнений овал
       ctx.fillStyle = "rgba(255, 204, 0, 0.3)";
