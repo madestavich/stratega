@@ -269,6 +269,16 @@ export class InputManager {
       `Saved group ${groupId} with ${this.selectedUnits.length} units`
     );
 
+    // Зберігаємо в БД
+    this.gameManager.objectManager
+      .saveObjects()
+      .then(() => {
+        console.log(`Group ${groupId} saved to database`);
+      })
+      .catch((err) => {
+        console.error("Failed to save group to database:", err);
+      });
+
     // Очищаємо вибір та встановлюємо активну групу
     this.activeGroupId = groupId;
     this.updateGroupsUI();
