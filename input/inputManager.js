@@ -83,6 +83,8 @@ export class InputManager {
       this.canvas.addEventListener("mousedown", (event) => {
         if (event.button === 0 && this.ctrlPressed) {
           // Ліва кнопка + Ctrl
+          // Скидаємо попередній вибір при початку нового box selection
+          this.selectedUnits = [];
           this.isSelecting = true;
           this.selectionStart = { x: this.mouse.x, y: this.mouse.y };
           this.selectionEnd = { x: this.mouse.x, y: this.mouse.y };
@@ -653,18 +655,6 @@ export class InputManager {
       ctx.beginPath();
       ctx.ellipse(ellipseX, ellipseY, radiusX, radiusY, 0, 0, Math.PI * 2);
       ctx.stroke();
-
-      // Малюємо номер групи якщо є (над юнітом)
-      if (unit.groupId) {
-        ctx.fillStyle = "#ffcc00";
-        ctx.font = "bold 14px Arial";
-        ctx.textAlign = "center";
-        ctx.strokeStyle = "#000";
-        ctx.lineWidth = 3;
-        const textY = unit.y - unit.gridHeight * cellHeight * 0.4;
-        ctx.strokeText(unit.groupId.toString(), unit.x, textY);
-        ctx.fillText(unit.groupId.toString(), unit.x, textY);
-      }
 
       ctx.restore();
     }
