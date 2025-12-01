@@ -438,115 +438,13 @@ export class InputManager {
     this.updateGroupsUI();
   }
 
-  // Створити UI для груп
+  // Ініціалізувати UI для груп (обробники кліків)
   createGroupsUI() {
-    // Перевіряємо чи вже існує контейнер
-    if (document.getElementById("groups-panel")) return;
-
-    const groupsPanel = document.createElement("div");
-    groupsPanel.id = "groups-panel";
-    groupsPanel.className = "groups-panel";
-    groupsPanel.innerHTML = `
-      <div class="groups-title">Групи (Ctrl+клік)</div>
-      <div class="groups-container">
-        ${[1, 2, 3, 4, 5]
-          .map(
-            (id) => `
-          <div class="group-slot" data-group-id="${id}">
-            <span class="group-number">${id}</span>
-            <span class="group-count">0</span>
-          </div>
-        `
-          )
-          .join("")}
-      </div>
-      <div class="group-info" id="group-info">
-        <div>Виберіть юнітів з Ctrl+клік</div>
-        <div>Збережіть групу: Ctrl+1-5</div>
-      </div>
-    `;
-
-    // Додаємо стилі
-    const style = document.createElement("style");
-    style.textContent = `
-      .groups-panel {
-        position: fixed;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        border: 2px solid #666;
-        border-radius: 8px;
-        padding: 10px;
-        z-index: 1000;
-        color: white;
-        font-family: Arial, sans-serif;
-      }
-      
-      .groups-title {
-        text-align: center;
-        font-size: 12px;
-        color: #aaa;
-        margin-bottom: 8px;
-      }
-      
-      .groups-container {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-      }
-      
-      .group-slot {
-        width: 40px;
-        height: 40px;
-        background: #333;
-        border: 2px solid #555;
-        border-radius: 6px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      
-      .group-slot:hover {
-        border-color: #888;
-        background: #444;
-      }
-      
-      .group-slot.active {
-        border-color: #ffcc00;
-        box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
-      }
-      
-      .group-slot.has-units {
-        background: #2a4a2a;
-        border-color: #4a8;
-      }
-      
-      .group-number {
-        font-size: 14px;
-        font-weight: bold;
-        color: #ddd;
-      }
-      
-      .group-count {
-        font-size: 10px;
-        color: #888;
-      }
-      
-      .group-info {
-        margin-top: 8px;
-        font-size: 10px;
-        color: #888;
-        text-align: center;
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Додаємо панель в DOM
-    document.body.appendChild(groupsPanel);
+    const groupsPanel = document.getElementById("groups-panel");
+    if (!groupsPanel) {
+      console.warn("Groups panel not found in DOM");
+      return;
+    }
 
     // Додаємо обробники кліків на слоти груп
     groupsPanel.querySelectorAll(".group-slot").forEach((slot) => {
