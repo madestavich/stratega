@@ -388,19 +388,20 @@ export class InputManager {
     // Знаходимо всіх юнітів з groupId і групуємо їх
     for (const unit of playerObjects) {
       if (unit.groupId !== null && unit.groupId !== undefined) {
-        // Витягуємо числовий ID групи (може бути "p1" -> 1)
-        let numericGroupId = unit.groupId;
-        if (typeof unit.groupId === "string" && unit.groupId.startsWith("p")) {
-          numericGroupId = parseInt(unit.groupId.substring(1));
-          // Оновлюємо groupId юніта на числовий
-          unit.groupId = numericGroupId;
+        // Для player юнітів groupId вже числовий
+        // Пропускаємо enemy groups (починаються з 'e')
+        if (typeof unit.groupId === "string" && unit.groupId.startsWith("e")) {
+          continue;
         }
+
+        const numericGroupId =
+          typeof unit.groupId === "string"
+            ? parseInt(unit.groupId)
+            : unit.groupId;
 
         if (!this.unitGroups[numericGroupId]) {
           // Отримуємо конфіг групи з objectManager якщо є
-          const omGroupKey = `p${numericGroupId}`;
-          const groupConfig =
-            omGroups[omGroupKey] || omGroups[numericGroupId] || {};
+          const groupConfig = omGroups[numericGroupId] || {};
 
           this.unitGroups[numericGroupId] = {
             units: [],

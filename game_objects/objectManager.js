@@ -433,11 +433,12 @@ export class ObjectManager {
         const playerGroups = result.player_objects?._groups || {};
         const enemyGroups = result.enemy_objects?._groups || {};
 
-        // Зберігаємо групи (player groups з prefix 'p', enemy з 'e' для унікальності)
+        // Зберігаємо групи з числовими ключами (без префіксу)
         for (const groupId in playerGroups) {
-          this.unitGroups[`p${groupId}`] = playerGroups[groupId];
+          this.unitGroups[groupId] = playerGroups[groupId];
         }
         for (const groupId in enemyGroups) {
+          // Enemy groups з prefix 'e' для унікальності
           this.unitGroups[`e${groupId}`] = enemyGroups[groupId];
         }
 
@@ -445,7 +446,6 @@ export class ObjectManager {
         // Format: { unitType: [[col, row] or [col, row, groupId], ...], _groups: {...} }
         const flattenGroupedObjects = (groupedData, isPlayer) => {
           const flatArray = [];
-          const groupPrefix = isPlayer ? "p" : "e";
 
           for (const unitType in groupedData) {
             // Пропускаємо службову секцію _groups
@@ -460,9 +460,10 @@ export class ObjectManager {
                 _isPlayer: isPlayer,
               };
 
-              // Якщо є третій елемент - це groupId
-              if (pos.length >= 3) {
-                objData.groupId = `${groupPrefix}${pos[2]}`;
+              // Якщо є третій елемент - це groupId (зберігаємо як є)
+              if (pos.length >= 3 && pos[2] !== null) {
+                // Player groups - числовий ID, enemy groups - з prefix 'e'
+                objData.groupId = isPlayer ? pos[2] : `e${pos[2]}`;
               }
 
               flatArray.push(objData);
