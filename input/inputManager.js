@@ -15,6 +15,15 @@ export class InputManager {
     this.gameManager = gameManager;
     this.canvas = canvas;
 
+    // Стан для системи груп юнітів
+    this.ctrlPressed = false;
+    this.selectedUnits = []; // Масив вибраних юнітів для групи
+    this.isSelecting = false; // Чи зараз відбувається box selection
+    this.selectionStart = null; // Початкова точка box selection {x, y}
+    this.selectionEnd = null; // Кінцева точка box selection {x, y}
+    this.unitGroups = {}; // Збережені групи: {1: {units: [...], moveTarget: null, actionPriorities: null}, ...}
+    this.activeGroupId = null; // Активна група для редагування
+
     // Ready button
     this.readyButton = document.getElementById("ready-button");
 
@@ -26,6 +35,12 @@ export class InputManager {
 
     // Ініціалізуємо обробник кнопки ready
     this.initReadyButton();
+
+    // Ініціалізуємо обробники клавіатури для груп
+    this.initKeyboardHandlers();
+
+    // Створюємо UI для груп
+    this.createGroupsUI();
   }
 
   // Ініціалізація обробників для вибору юнітів
@@ -57,13 +72,467 @@ export class InputManager {
           this.mouse.x,
           this.mouse.y
         );
+
+        // Оновлюємо кінцеву точку box selection
+        if (this.isSelecting) {
+          this.selectionEnd = { x: this.mouse.x, y: this.mouse.y };
+        }
+      });
+
+      // Початок box selection (mousedown)
+      this.canvas.addEventListener("mousedown", (event) => {
+        if (event.button === 0 && this.ctrlPressed) {
+          // Ліва кнопка + Ctrl
+          this.isSelecting = true;
+          this.selectionStart = { x: this.mouse.x, y: this.mouse.y };
+          this.selectionEnd = { x: this.mouse.x, y: this.mouse.y };
+          event.preventDefault();
+        }
+      });
+
+      // Кінець box selection (mouseup)
+      this.canvas.addEventListener("mouseup", (event) => {
+        if (event.button === 0 && this.isSelecting) {
+          this.finishBoxSelection();
+        }
       });
 
       this.canvas.addEventListener("click", (event) => {
+        // Якщо Ctrl натиснуто - режим вибору юнітів для груп
+        if (this.ctrlPressed) {
+          this.handleUnitSelectionClick();
+          return;
+        }
+
+        // Звичайне розміщення юнітів
         if (this.selectedUnitKey && this.gameManager) {
           this.placeUnitAtCursor();
         }
       });
+    }
+  }
+
+  // Ініціалізація обробників клавіатури
+  initKeyboardHandlers() {
+    document.addEventListener("keydown", (event) => {
+      // Відстежуємо Ctrl
+      if (event.key === "Control") {
+        this.ctrlPressed = true;
+      }
+
+      // Escape - скасувати вибір
+      if (event.key === "Escape") {
+        this.clearUnitSelection();
+        this.activeGroupId = null;
+        this.updateGroupsUI();
+      }
+
+      // Цифри 1-5 - зберегти/вибрати групу
+      if (event.key >= "1" && event.key <= "5") {
+        const groupId = parseInt(event.key);
+
+        if (this.ctrlPressed) {
+          // Ctrl + цифра = зберегти вибраних юнітів в групу
+          this.saveGroup(groupId);
+        } else {
+          // Просто цифра = вибрати групу для перегляду/редагування
+          this.selectGroup(groupId);
+        }
+      }
+    });
+
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "Control") {
+        this.ctrlPressed = false;
+      }
+    });
+  }
+
+  // Обробка кліку для вибору юніта в групу
+  handleUnitSelectionClick() {
+    const clickedUnit = this.getUnitAtPosition(this.mouse.x, this.mouse.y);
+
+    if (clickedUnit) {
+      // Перевіряємо чи юніт належить гравцю
+      const playerObjects = this.gameManager.objectManager.objects;
+      if (!playerObjects.includes(clickedUnit)) {
+        console.log("Cannot select enemy units");
+        return;
+      }
+
+      const index = this.selectedUnits.indexOf(clickedUnit);
+      if (index !== -1) {
+        // Юніт вже вибраний - видаляємо з вибору
+        this.selectedUnits.splice(index, 1);
+        console.log(`Removed unit ${clickedUnit.id} from selection`);
+      } else {
+        // Додаємо юніта до вибору
+        this.selectedUnits.push(clickedUnit);
+        console.log(`Added unit ${clickedUnit.id} to selection`);
+      }
+    }
+  }
+
+  // Завершення box selection
+  finishBoxSelection() {
+    if (!this.selectionStart || !this.selectionEnd) {
+      this.isSelecting = false;
+      return;
+    }
+
+    const minX = Math.min(this.selectionStart.x, this.selectionEnd.x);
+    const maxX = Math.max(this.selectionStart.x, this.selectionEnd.x);
+    const minY = Math.min(this.selectionStart.y, this.selectionEnd.y);
+    const maxY = Math.max(this.selectionStart.y, this.selectionEnd.y);
+
+    // Якщо область занадто мала - це просто клік
+    if (maxX - minX < 10 && maxY - minY < 10) {
+      this.isSelecting = false;
+      this.selectionStart = null;
+      this.selectionEnd = null;
+      return;
+    }
+
+    // Знаходимо всіх юнітів гравця в межах selection box
+    const playerObjects = this.gameManager.objectManager.objects;
+
+    for (const unit of playerObjects) {
+      if (
+        unit.x >= minX &&
+        unit.x <= maxX &&
+        unit.y >= minY &&
+        unit.y <= maxY
+      ) {
+        if (!this.selectedUnits.includes(unit)) {
+          this.selectedUnits.push(unit);
+        }
+      }
+    }
+
+    console.log(`Box selection: ${this.selectedUnits.length} units selected`);
+
+    this.isSelecting = false;
+    this.selectionStart = null;
+    this.selectionEnd = null;
+  }
+
+  // Отримати юніта на позиції
+  getUnitAtPosition(x, y) {
+    const allObjects = [
+      ...this.gameManager.objectManager.objects,
+      ...this.gameManager.objectManager.enemyObjects,
+    ];
+
+    for (const unit of allObjects) {
+      // Перевіряємо чи клік потрапив на юніта
+      const unitWidth = unit.gridWidth * this.gameManager.gridManager.cellWidth;
+      const unitHeight =
+        unit.gridHeight * this.gameManager.gridManager.cellHeight;
+
+      // Враховуємо центр юніта
+      const unitLeft = unit.x - unitWidth / 2;
+      const unitRight = unit.x + unitWidth / 2;
+      const unitTop = unit.y - unitHeight / 2;
+      const unitBottom = unit.y + unitHeight / 2;
+
+      if (x >= unitLeft && x <= unitRight && y >= unitTop && y <= unitBottom) {
+        return unit;
+      }
+    }
+    return null;
+  }
+
+  // Зберегти групу
+  saveGroup(groupId) {
+    if (this.selectedUnits.length === 0) {
+      console.log("No units selected to save in group");
+      return;
+    }
+
+    // Зберігаємо groupId для кожного юніта
+    for (const unit of this.selectedUnits) {
+      unit.groupId = groupId;
+    }
+
+    this.unitGroups[groupId] = {
+      units: [...this.selectedUnits],
+      moveTarget: null,
+      actionPriorities: ["move", "attack"], // Дефолтний пріоритет для груп - спочатку рух
+    };
+
+    // Оновлюємо групи в objectManager
+    this.syncGroupsToObjectManager();
+
+    console.log(
+      `Saved group ${groupId} with ${this.selectedUnits.length} units`
+    );
+
+    // Очищаємо вибір та встановлюємо активну групу
+    this.activeGroupId = groupId;
+    this.updateGroupsUI();
+  }
+
+  // Вибрати групу
+  selectGroup(groupId) {
+    const group = this.unitGroups[groupId];
+
+    if (group && group.units.length > 0) {
+      // Фільтруємо тільки живих юнітів
+      group.units = group.units.filter(
+        (u) => !u.isDead && this.gameManager.objectManager.objects.includes(u)
+      );
+
+      if (group.units.length > 0) {
+        this.selectedUnits = [...group.units];
+        this.activeGroupId = groupId;
+        console.log(
+          `Selected group ${groupId} with ${this.selectedUnits.length} units`
+        );
+      } else {
+        // Група пуста - видаляємо
+        delete this.unitGroups[groupId];
+        this.selectedUnits = [];
+        this.activeGroupId = null;
+        console.log(`Group ${groupId} is empty, removed`);
+      }
+    } else {
+      // Групи немає - очищаємо вибір
+      this.selectedUnits = [];
+      this.activeGroupId = groupId;
+      console.log(`Group ${groupId} is empty, ready to create`);
+    }
+
+    this.updateGroupsUI();
+  }
+
+  // Очистити вибір юнітів
+  clearUnitSelection() {
+    this.selectedUnits = [];
+    console.log("Unit selection cleared");
+  }
+
+  // Синхронізувати групи з ObjectManager
+  syncGroupsToObjectManager() {
+    // Конвертуємо групи в формат ObjectManager
+    const omGroups = {};
+
+    for (const groupId in this.unitGroups) {
+      const group = this.unitGroups[groupId];
+      if (group.units.length > 0) {
+        omGroups[groupId] = {
+          actionPriorities: group.actionPriorities,
+          moveTarget: group.moveTarget,
+        };
+      }
+    }
+
+    this.gameManager.objectManager.unitGroups = omGroups;
+  }
+
+  // Створити UI для груп
+  createGroupsUI() {
+    // Перевіряємо чи вже існує контейнер
+    if (document.getElementById("groups-panel")) return;
+
+    const groupsPanel = document.createElement("div");
+    groupsPanel.id = "groups-panel";
+    groupsPanel.className = "groups-panel";
+    groupsPanel.innerHTML = `
+      <div class="groups-title">Групи (Ctrl+клік)</div>
+      <div class="groups-container">
+        ${[1, 2, 3, 4, 5]
+          .map(
+            (id) => `
+          <div class="group-slot" data-group-id="${id}">
+            <span class="group-number">${id}</span>
+            <span class="group-count">0</span>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+      <div class="group-info" id="group-info">
+        <div>Виберіть юнітів з Ctrl+клік</div>
+        <div>Збережіть групу: Ctrl+1-5</div>
+      </div>
+    `;
+
+    // Додаємо стилі
+    const style = document.createElement("style");
+    style.textContent = `
+      .groups-panel {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid #666;
+        border-radius: 8px;
+        padding: 10px;
+        z-index: 1000;
+        color: white;
+        font-family: Arial, sans-serif;
+      }
+      
+      .groups-title {
+        text-align: center;
+        font-size: 12px;
+        color: #aaa;
+        margin-bottom: 8px;
+      }
+      
+      .groups-container {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      
+      .group-slot {
+        width: 40px;
+        height: 40px;
+        background: #333;
+        border: 2px solid #555;
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .group-slot:hover {
+        border-color: #888;
+        background: #444;
+      }
+      
+      .group-slot.active {
+        border-color: #ffcc00;
+        box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+      }
+      
+      .group-slot.has-units {
+        background: #2a4a2a;
+        border-color: #4a8;
+      }
+      
+      .group-number {
+        font-size: 14px;
+        font-weight: bold;
+        color: #ddd;
+      }
+      
+      .group-count {
+        font-size: 10px;
+        color: #888;
+      }
+      
+      .group-info {
+        margin-top: 8px;
+        font-size: 10px;
+        color: #888;
+        text-align: center;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Додаємо панель в DOM
+    document.body.appendChild(groupsPanel);
+
+    // Додаємо обробники кліків на слоти груп
+    groupsPanel.querySelectorAll(".group-slot").forEach((slot) => {
+      slot.addEventListener("click", () => {
+        const groupId = parseInt(slot.getAttribute("data-group-id"));
+        this.selectGroup(groupId);
+      });
+    });
+  }
+
+  // Оновити UI груп
+  updateGroupsUI() {
+    const slots = document.querySelectorAll(".group-slot");
+
+    slots.forEach((slot) => {
+      const groupId = parseInt(slot.getAttribute("data-group-id"));
+      const group = this.unitGroups[groupId];
+      const countEl = slot.querySelector(".group-count");
+
+      // Оновлюємо кількість юнітів
+      const count = group ? group.units.filter((u) => !u.isDead).length : 0;
+      countEl.textContent = count;
+
+      // Оновлюємо класи
+      slot.classList.toggle("has-units", count > 0);
+      slot.classList.toggle("active", this.activeGroupId === groupId);
+    });
+
+    // Оновлюємо інформацію
+    const infoEl = document.getElementById("group-info");
+    if (infoEl) {
+      if (this.selectedUnits.length > 0) {
+        infoEl.innerHTML = `<div>Вибрано: ${this.selectedUnits.length} юнітів</div>`;
+        if (this.activeGroupId) {
+          infoEl.innerHTML += `<div>Група ${this.activeGroupId}</div>`;
+        }
+      } else if (this.activeGroupId && this.unitGroups[this.activeGroupId]) {
+        const g = this.unitGroups[this.activeGroupId];
+        infoEl.innerHTML = `<div>Група ${this.activeGroupId}: ${g.units.length} юнітів</div>`;
+      } else {
+        infoEl.innerHTML = `
+          <div>Виберіть юнітів з Ctrl+клік</div>
+          <div>Збережіть групу: Ctrl+1-5</div>
+        `;
+      }
+    }
+  }
+
+  // Малювання виділення та selection box
+  drawGroupSelectionIndicators(ctx) {
+    // Малюємо selection box якщо активний
+    if (this.isSelecting && this.selectionStart && this.selectionEnd) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(0, 255, 0, 0.8)";
+      ctx.fillStyle = "rgba(0, 255, 0, 0.2)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+
+      const x = Math.min(this.selectionStart.x, this.selectionEnd.x);
+      const y = Math.min(this.selectionStart.y, this.selectionEnd.y);
+      const width = Math.abs(this.selectionEnd.x - this.selectionStart.x);
+      const height = Math.abs(this.selectionEnd.y - this.selectionStart.y);
+
+      ctx.fillRect(x, y, width, height);
+      ctx.strokeRect(x, y, width, height);
+      ctx.restore();
+    }
+
+    // Малюємо підсвічування вибраних юнітів
+    for (const unit of this.selectedUnits) {
+      if (unit.isDead) continue;
+
+      ctx.save();
+      ctx.strokeStyle = "#ffcc00";
+      ctx.lineWidth = 3;
+      ctx.setLineDash([]);
+
+      const radius =
+        Math.max(unit.gridWidth, unit.gridHeight) *
+        this.gameManager.gridManager.cellWidth *
+        0.6;
+
+      ctx.beginPath();
+      ctx.arc(unit.x, unit.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Малюємо номер групи якщо є
+      if (unit.groupId) {
+        ctx.fillStyle = "#ffcc00";
+        ctx.font = "bold 14px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(unit.groupId.toString(), unit.x, unit.y - radius - 5);
+      }
+
+      ctx.restore();
     }
   }
 
