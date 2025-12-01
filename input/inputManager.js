@@ -477,25 +477,6 @@ export class InputManager {
       slot.classList.toggle("has-units", count > 0);
       slot.classList.toggle("active", this.activeGroupId === groupId);
     });
-
-    // Оновлюємо інформацію
-    const infoEl = document.getElementById("group-info");
-    if (infoEl) {
-      if (this.selectedUnits.length > 0) {
-        infoEl.innerHTML = `<div>Вибрано: ${this.selectedUnits.length} юнітів</div>`;
-        if (this.activeGroupId) {
-          infoEl.innerHTML += `<div>Група ${this.activeGroupId}</div>`;
-        }
-      } else if (this.activeGroupId && this.unitGroups[this.activeGroupId]) {
-        const g = this.unitGroups[this.activeGroupId];
-        infoEl.innerHTML = `<div>Група ${this.activeGroupId}: ${g.units.length} юнітів</div>`;
-      } else {
-        infoEl.innerHTML = `
-          <div>Виберіть юнітів з Ctrl+клік</div>
-          <div>Збережіть групу: Ctrl+1-5</div>
-        `;
-      }
-    }
   }
 
   // Малювання виділення та selection box

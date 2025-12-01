@@ -387,7 +387,6 @@ canvas {
 /* Groups Panel in Footer */
 .groups-panel {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
@@ -404,8 +403,8 @@ canvas {
 .group-slot {
   width: 32px;
   height: 32px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid #555;
+  background: url("../textures/Leather-red-dark-darker.png") repeat;
+  border: 2px solid #8b7355;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -413,41 +412,41 @@ canvas {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
 .group-slot:hover {
-  border-color: #888;
-  background: rgba(0, 0, 0, 0.5);
+  border-color: #d4af37;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5), 0 0 4px rgba(212, 175, 55, 0.3);
 }
 
 .group-slot.active {
-  border-color: #ffcc00;
-  box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+  border-color: #ffd700;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(255, 215, 0, 0.6);
 }
 
 .group-slot.has-units {
-  background: rgba(42, 74, 42, 0.7);
-  border-color: #4a8;
+  background: url("../textures/Leather.png") repeat;
+  border-color: #6b8e23;
+}
+
+.group-slot.has-units.active {
+  border-color: #ffd700;
 }
 
 .group-number {
   font-size: 12px;
   font-weight: bold;
-  color: #ddd;
+  color: #d4af37;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   line-height: 1;
 }
 
 .group-count {
   font-size: 9px;
-  color: #888;
-  line-height: 1;
-}
-
-.group-info {
-  font-size: 9px;
   color: #aaa;
-  text-align: center;
-  white-space: nowrap;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  line-height: 1;
 }
 
 .resource {
