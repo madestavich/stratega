@@ -90,8 +90,6 @@ export class InputManager {
       this.canvas.addEventListener("mousedown", (event) => {
         if (event.button === 0 && this.ctrlPressed) {
           // Ліва кнопка + Ctrl
-          // Скидаємо попередній вибір при початку нового box selection
-          this.selectedUnits = [];
           this.isSelecting = true;
           this.selectionStart = { x: this.mouse.x, y: this.mouse.y };
           this.selectionEnd = { x: this.mouse.x, y: this.mouse.y };
@@ -205,13 +203,34 @@ export class InputManager {
     const minY = Math.min(this.selectionStart.y, this.selectionEnd.y);
     const maxY = Math.max(this.selectionStart.y, this.selectionEnd.y);
 
-    // Якщо область занадто мала - це просто клік
+    // Якщо область занадто мала - це просто клік (тогл юніта)
     if (maxX - minX < 10 && maxY - minY < 10) {
       this.isSelecting = false;
       this.selectionStart = null;
       this.selectionEnd = null;
+
+      // Пробуємо знайти юніта під курсором
+      const clickedUnit = this.getUnitAtPosition(this.mouse.x, this.mouse.y);
+      if (clickedUnit) {
+        const playerObjects = this.gameManager.objectManager.objects;
+        if (playerObjects.includes(clickedUnit)) {
+          const index = this.selectedUnits.indexOf(clickedUnit);
+          if (index !== -1) {
+            // Юніт вже вибраний - видаляємо з вибору
+            this.selectedUnits.splice(index, 1);
+            console.log(`Removed unit ${clickedUnit.id} from selection`);
+          } else {
+            // Додаємо юніта до вибору
+            this.selectedUnits.push(clickedUnit);
+            console.log(`Added unit ${clickedUnit.id} to selection`);
+          }
+        }
+      }
       return;
     }
+
+    // Box selection - скидаємо попередній вибір і вибираємо нових
+    this.selectedUnits = [];
 
     // Знаходимо всіх юнітів гравця в межах selection box
     const playerObjects = this.gameManager.objectManager.objects;
