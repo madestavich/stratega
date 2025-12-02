@@ -105,9 +105,8 @@ export class InputManager {
       });
 
       this.canvas.addEventListener("click", (event) => {
-        // Якщо Ctrl натиснуто - режим вибору юнітів для груп
+        // Якщо Ctrl натиснуто - вибір юнітів вже оброблений в finishBoxSelection
         if (this.ctrlPressed) {
-          this.handleUnitSelectionClick();
           return;
         }
 
