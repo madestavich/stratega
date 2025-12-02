@@ -23,7 +23,6 @@ export class InputManager {
     this.selectionEnd = null; // Кінцева точка box selection {x, y}
     this.unitGroups = {}; // Збережені групи: {1: {units: [...], moveTarget: null, actionPriorities: null}, ...}
     this.activeGroupId = null; // Активна група для редагування
-    this.isSettingMoveTarget = false; // Режим вибору точки руху для групи
 
     // Ready button
     this.readyButton = document.getElementById("ready-button");
@@ -111,8 +110,18 @@ export class InputManager {
           return;
         }
 
-        // Режим вибору точки руху для групи
-        if (this.isSettingMoveTarget && this.activeGroupId) {
+        // Звичайне розміщення юнітів
+        if (this.selectedUnitKey && this.gameManager) {
+          this.placeUnitAtCursor();
+        }
+      });
+
+      // Правий клік - встановити moveTarget для активної групи
+      this.canvas.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+
+        // Якщо є активна група - встановлюємо moveTarget
+        if (this.activeGroupId && this.unitGroups[this.activeGroupId]) {
           const gridCoords = this.gameManager.gridManager.getGridCellFromPixel(
             this.mouse.x,
             this.mouse.y
@@ -122,13 +131,6 @@ export class InputManager {
             gridCoords.col,
             gridCoords.row
           );
-          this.isSettingMoveTarget = false;
-          return;
-        }
-
-        // Звичайне розміщення юнітів
-        if (this.selectedUnitKey && this.gameManager) {
-          this.placeUnitAtCursor();
         }
       });
     }
@@ -146,46 +148,7 @@ export class InputManager {
       if (event.key === "Escape") {
         this.clearUnitSelection();
         this.activeGroupId = null;
-        this.isSettingMoveTarget = false;
         this.updateGroupsUI();
-      }
-
-      // M - вхід в режим вибору точки руху для групи (toggle)
-      if (event.key === "m" || event.key === "M") {
-        if (this.activeGroupId && this.unitGroups[this.activeGroupId]) {
-          this.isSettingMoveTarget = !this.isSettingMoveTarget;
-          console.log(
-            `Move target mode ${
-              this.isSettingMoveTarget ? "enabled" : "disabled"
-            } for group ${this.activeGroupId}`
-          );
-          this.updateGroupsUI();
-        }
-      }
-
-      // X - очистити moveTarget групи
-      if (event.key === "x" || event.key === "X") {
-        if (this.activeGroupId && this.unitGroups[this.activeGroupId]) {
-          this.clearGroupMoveTarget(this.activeGroupId);
-        }
-      }
-
-      // A - пріоритет атаки (attack first)
-      if (event.key === "a" || event.key === "A") {
-        if (
-          !this.ctrlPressed &&
-          this.activeGroupId &&
-          this.unitGroups[this.activeGroupId]
-        ) {
-          this.setGroupPriority(this.activeGroupId, ["attack", "move"]);
-        }
-      }
-
-      // R - пріоритет руху (move first)
-      if (event.key === "r" || event.key === "R") {
-        if (this.activeGroupId && this.unitGroups[this.activeGroupId]) {
-          this.setGroupPriority(this.activeGroupId, ["move", "attack"]);
-        }
       }
 
       // Цифри 1-5 - зберегти/вибрати групу (тільки не під час бою)
@@ -335,31 +298,6 @@ export class InputManager {
     return null;
   }
 
-  // Встановити пріоритет для групи
-  setGroupPriority(groupId, priorities) {
-    if (this.gameManager.isBattleInProgress) {
-      console.log("Cannot modify groups during battle");
-      return;
-    }
-
-    const group = this.unitGroups[groupId];
-    if (!group) {
-      console.log(`Group ${groupId} not found`);
-      return;
-    }
-
-    group.actionPriorities = priorities;
-    console.log(`Group ${groupId} priority set to:`, priorities);
-
-    // Оновити пріоритет у всіх юнітів групи
-    for (const unit of group.units) {
-      unit.actionPriorities = [...priorities];
-    }
-
-    this.syncGroupsToObjectManager();
-    this.updateGroupsUI();
-  }
-
   // Встановити точку руху для групи
   setGroupMoveTarget(groupId, col, row) {
     if (this.gameManager.isBattleInProgress) {
@@ -379,31 +317,6 @@ export class InputManager {
     // Оновити moveTarget у всіх юнітів групи
     for (const unit of group.units) {
       unit.groupMoveTarget = { col, row };
-    }
-
-    this.syncGroupsToObjectManager();
-    this.updateGroupsUI();
-  }
-
-  // Очистити точку руху для групи
-  clearGroupMoveTarget(groupId) {
-    if (this.gameManager.isBattleInProgress) {
-      console.log("Cannot modify groups during battle");
-      return;
-    }
-
-    const group = this.unitGroups[groupId];
-    if (!group) {
-      console.log(`Group ${groupId} not found`);
-      return;
-    }
-
-    group.moveTarget = null;
-    console.log(`Group ${groupId} move target cleared`);
-
-    // Очистити moveTarget у всіх юнітів групи
-    for (const unit of group.units) {
-      unit.groupMoveTarget = null;
     }
 
     this.syncGroupsToObjectManager();
@@ -625,62 +538,15 @@ export class InputManager {
       const groupId = parseInt(slot.getAttribute("data-group-id"));
       const group = this.unitGroups[groupId];
       const countEl = slot.querySelector(".group-count");
-      let infoEl = slot.querySelector(".group-info");
-
-      // Створюємо елемент info якщо немає
-      if (!infoEl) {
-        infoEl = document.createElement("span");
-        infoEl.className = "group-info";
-        slot.appendChild(infoEl);
-      }
 
       // Оновлюємо кількість юнітів
       const count = group ? group.units.filter((u) => !u.isDead).length : 0;
       countEl.textContent = count;
 
-      // Оновлюємо інформацію про групу
-      if (group && count > 0) {
-        const priorityIcon =
-          group.actionPriorities && group.actionPriorities[0] === "attack"
-            ? "⚔"
-            : "→";
-        const targetIcon = group.moveTarget ? "🎯" : "";
-        infoEl.textContent = `${priorityIcon}${targetIcon}`;
-        infoEl.title = this.getGroupTooltip(group);
-      } else {
-        infoEl.textContent = "";
-        infoEl.title = "";
-      }
-
       // Оновлюємо класи
       slot.classList.toggle("has-units", count > 0);
       slot.classList.toggle("active", this.activeGroupId === groupId);
-      slot.classList.toggle(
-        "setting-target",
-        this.isSettingMoveTarget && this.activeGroupId === groupId
-      );
     });
-  }
-
-  // Отримати tooltip для групи
-  getGroupTooltip(group) {
-    if (!group) return "";
-
-    const parts = [];
-    const priority =
-      group.actionPriorities && group.actionPriorities[0] === "attack"
-        ? "Attack first"
-        : "Move first";
-    parts.push(`Priority: ${priority}`);
-
-    if (group.moveTarget) {
-      parts.push(`Target: (${group.moveTarget.col}, ${group.moveTarget.row})`);
-    }
-
-    parts.push("");
-    parts.push("Hotkeys: A=Attack, R=Run, M=MoveTarget");
-
-    return parts.join("\n");
   }
 
   // Малювання виділення та selection box
@@ -749,38 +615,84 @@ export class InputManager {
       ctx.restore();
     }
 
-    // Малюємо маркери moveTarget для активної групи
-    this.drawMoveTargetMarker(ctx);
+    // Малюємо стрілки руху для активної групи
+    this.drawGroupMoveArrows(ctx);
   }
 
-  // Малювання маркера точки руху групи
-  drawMoveTargetMarker(ctx) {
+  // Малювання стрілок руху від юнітів групи до moveTarget
+  drawGroupMoveArrows(ctx) {
     if (!this.activeGroupId) return;
 
     const group = this.unitGroups[this.activeGroupId];
     if (!group || !group.moveTarget) return;
 
     const gm = this.gameManager.gridManager;
-    const pixelPos = gm.getPixelFromGridCell(
+    const targetPos = gm.getPixelFromGridCell(
       group.moveTarget.col,
       group.moveTarget.row
     );
 
     ctx.save();
 
-    // Малюємо хрестик-маркер
-    const size = 15;
-    const x = pixelPos.x;
-    const y = pixelPos.y;
+    // Малюємо стрілки від кожного юніта до таргета
+    for (const unit of group.units) {
+      if (unit.isDead) continue;
+
+      const startX = unit.x;
+      const startY = unit.y;
+      const endX = targetPos.x;
+      const endY = targetPos.y;
+
+      // Обчислюємо напрямок
+      const dx = endX - startX;
+      const dy = endY - startY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < 20) continue; // Юніт вже на місці
+
+      const angle = Math.atan2(dy, dx);
+
+      // Малюємо пунктирну лінію
+      ctx.strokeStyle = "rgba(0, 255, 100, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 4]);
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX - Math.cos(angle) * 15, endY - Math.sin(angle) * 15);
+      ctx.stroke();
+
+      // Малюємо наконечник стрілки
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(0, 255, 100, 0.8)";
+      ctx.beginPath();
+      const arrowSize = 10;
+      ctx.moveTo(endX, endY);
+      ctx.lineTo(
+        endX - arrowSize * Math.cos(angle - Math.PI / 6),
+        endY - arrowSize * Math.sin(angle - Math.PI / 6)
+      );
+      ctx.lineTo(
+        endX - arrowSize * Math.cos(angle + Math.PI / 6),
+        endY - arrowSize * Math.sin(angle + Math.PI / 6)
+      );
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Малюємо маркер таргета
+    const x = targetPos.x;
+    const y = targetPos.y;
+    const size = 12;
 
     // Зовнішній круг
-    ctx.fillStyle = "rgba(39, 174, 96, 0.3)";
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(0, 255, 100, 0.3)";
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fill();
 
     // Контур
-    ctx.strokeStyle = "#27ae60";
+    ctx.strokeStyle = "#00ff64";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
