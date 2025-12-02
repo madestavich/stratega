@@ -116,6 +116,22 @@ export class ActionManager {
       return;
     }
 
+    // Визначаємо ціль руху - groupMoveTarget має пріоритет над moveTarget
+    const moveTargetCol =
+      gameObject.groupMoveTarget?.col ?? gameObject.moveTarget?.col;
+    const moveTargetRow =
+      gameObject.groupMoveTarget?.row ?? gameObject.moveTarget?.row;
+
+    // Debug log для групових юнітів
+    if (gameObject.groupMoveTarget) {
+      console.log(
+        `Unit ${gameObject.id} has groupMoveTarget:`,
+        gameObject.groupMoveTarget,
+        "actionPriorities:",
+        actionPriorities
+      );
+    }
+
     // Перебір дій за пріоритетом
     for (const actionType of actionPriorities) {
       // Перевірка, чи існує такий тип дії і чи доступний він для цього типу об'єкта
@@ -124,12 +140,16 @@ export class ActionManager {
         gameObject.availableActions &&
         gameObject.availableActions.includes(actionType)
       ) {
+        // Для move action використовуємо визначену ціль
+        const targetCol = actionType === "move" ? moveTargetCol : undefined;
+        const targetRow = actionType === "move" ? moveTargetRow : undefined;
+
         // Перевірка, чи може бути виконана ця дія
         if (
           this.actions[actionType].canExecute(
             gameObject,
-            gameObject.moveTarget?.col,
-            gameObject.moveTarget?.row,
+            targetCol,
+            targetRow,
             [0]
           )
         ) {
