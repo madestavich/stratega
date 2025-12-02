@@ -319,9 +319,23 @@ export class InputManager {
     for (const unit of group.units) {
       unit.groupMoveTarget = { col, row };
       unit.actionPriorities = ["move", "attack"];
+      console.log(
+        `Unit ${unit.id} updated: groupMoveTarget=`,
+        unit.groupMoveTarget,
+        "actionPriorities=",
+        unit.actionPriorities
+      );
     }
 
     this.syncGroupsToObjectManager();
+    console.log(
+      "After sync, objectManager.unitGroups:",
+      this.gameManager.objectManager.unitGroups
+    );
+
+    // Зберігаємо об'єкти в БД щоб moveTarget не втратився
+    this.gameManager.objectManager.saveObjects();
+
     this.updateGroupsUI();
   }
 
@@ -475,9 +489,22 @@ export class InputManager {
           // Отримуємо конфіг групи з objectManager якщо є
           const groupConfig = omGroups[numericGroupId] || {};
 
+          // Конвертуємо moveTarget з масиву в об'єкт якщо потрібно
+          let moveTarget = null;
+          if (groupConfig.moveTarget) {
+            if (Array.isArray(groupConfig.moveTarget)) {
+              moveTarget = {
+                col: groupConfig.moveTarget[0],
+                row: groupConfig.moveTarget[1],
+              };
+            } else {
+              moveTarget = groupConfig.moveTarget;
+            }
+          }
+
           this.unitGroups[numericGroupId] = {
             units: [],
-            moveTarget: groupConfig.moveTarget || null,
+            moveTarget: moveTarget,
             actionPriorities: groupConfig.actionPriorities || [
               "move",
               "attack",
