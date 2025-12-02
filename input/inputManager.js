@@ -629,10 +629,9 @@ export class InputManager {
       if (!group || !group.moveTarget || group.units.length === 0) continue;
 
       const gm = this.gameManager.gridManager;
-      const targetPos = gm.getPixelFromGridCell(
-        group.moveTarget.col,
-        group.moveTarget.row
-      );
+      // Обчислюємо центр клітинки вручну
+      const targetX = group.moveTarget.col * gm.cellWidth + gm.cellWidth / 2;
+      const targetY = (group.moveTarget.row + 1) * gm.cellHeight; // bottom of cell
 
       ctx.save();
 
@@ -642,8 +641,8 @@ export class InputManager {
 
         const startX = unit.x;
         const startY = unit.y;
-        const endX = targetPos.x;
-        const endY = targetPos.y;
+        const endX = targetX;
+        const endY = targetY;
 
         // Обчислюємо напрямок
         const dx = endX - startX;
@@ -682,8 +681,8 @@ export class InputManager {
       }
 
       // Малюємо маркер таргета
-      const x = targetPos.x;
-      const y = targetPos.y;
+      const x = targetX;
+      const y = targetY;
       const size = 12;
 
       ctx.setLineDash([]);
