@@ -117,15 +117,6 @@ export class MoveAction {
         // Зберігаємо ціль, щоб спробувати знову пізніше
         gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
 
-        // Встановлюємо анімацію "idle", але тільки якщо об'єкт живий
-        if (
-          !gameObject.isDead &&
-          gameObject.animator &&
-          gameObject.animator.activeAnimation.name !== "idle"
-        ) {
-          gameObject.animator.setAnimation("idle");
-        }
-
         return false;
       }
 
@@ -266,24 +257,9 @@ export class MoveAction {
 
       // If we've reached the end of the path, we're done
       if (gameObject.currentPath.length === 0) {
-        // Перевіряємо, чи анімація руху дійшла до останнього кадру
-        const animator = gameObject.animator;
-        const isLastFrame =
-          animator.frameIndex === animator.activeAnimation.frames.length - 1;
-
-        // Якщо це останній кадр анімації руху або анімація не "move", встановлюємо "idle"
-        // Але тільки якщо об'єкт живий (не перезаписуємо анімацію смерті)
-        if (
-          isLastFrame &&
-          animator.activeAnimation.name == "move" &&
-          !gameObject.isDead
-        ) {
-          gameObject.isMoving = false;
-          gameObject.animator.setAnimation("idle");
-        }
-
         gameObject.currentPath = null;
         gameObject.nextGridPosition = null;
+
         // Оновлюємо lookDirection тільки якщо об'єкт реально рухався
         if (
           gameObject.isMoving &&
@@ -294,6 +270,9 @@ export class MoveAction {
           gameObject.lookDirection = gameObject.moveDirection;
         }
         gameObject.moveDirection = null;
+
+        // Не скидаємо isMoving тут - це зробить canExecute або cancelMovement
+        // якщо нова ціль не буде знайдена
         return;
       }
 
@@ -362,7 +341,7 @@ export class MoveAction {
   // Cancel the current movement
 
   cancelMovement(gameObject, keepAnimation = false) {
-    // Не змінюємо анімацію, якщо об'єкт мертвий
+    // Не змінюємо анімацію, якщо keepAnimation=true або об'єкт мертвий
     if (
       !keepAnimation &&
       !gameObject.isDead &&
@@ -370,7 +349,13 @@ export class MoveAction {
     ) {
       gameObject.animator.setAnimation("idle");
     }
-    gameObject.isMoving = false;
+
+    // Якщо зберігаємо анімацію, не скидаємо isMoving -
+    // це дозволить продовжити рух з новою ціллю без переривання анімації
+    if (!keepAnimation) {
+      gameObject.isMoving = false;
+    }
+
     gameObject.currentPath = null;
     gameObject.nextGridPosition = null;
     gameObject.moveTarget = null;

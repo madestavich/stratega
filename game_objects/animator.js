@@ -20,6 +20,11 @@ export class Animator {
     isLooping = true,
     defaultAnimation = this.defaultAnimation
   ) {
+    // Якщо та сама анімація вже грає - не перезапускаємо її
+    if (this.activeAnimation && this.activeAnimation.name === animation) {
+      return;
+    }
+
     this.hasFinished = false; // Явно скидаємо hasFinished на початку
     this.activeAnimation = this.activeSpritesheet.animations[animation];
     this.isLooping = isLooping;
