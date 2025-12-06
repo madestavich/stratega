@@ -650,92 +650,95 @@ export class InputManager {
 
   // Малювання стрілок руху від юнітів групи до moveTarget
   drawGroupMoveArrows(ctx) {
-    // Малюємо стрілки для всіх груп з moveTarget
-    for (const groupId in this.unitGroups) {
-      const group = this.unitGroups[groupId];
-      if (!group || !group.moveTarget || group.units.length === 0) continue;
+    // Показуємо стрілки тільки на паузі (не під час бою)
+    if (this.gameManager.isBattleInProgress) return;
 
-      const gm = this.gameManager.gridManager;
-      // Обчислюємо центр клітинки вручну
-      const targetX = group.moveTarget.col * gm.cellWidth + gm.cellWidth / 2;
-      const targetY = (group.moveTarget.row + 1) * gm.cellHeight; // bottom of cell
+    // Показуємо стрілки тільки для активної (вибраної) групи
+    if (!this.activeGroupId) return;
 
-      ctx.save();
+    const group = this.unitGroups[this.activeGroupId];
+    if (!group || !group.moveTarget || group.units.length === 0) return;
 
-      // Малюємо стрілки від кожного юніта до таргета
-      for (const unit of group.units) {
-        if (unit.isDead) continue;
+    const gm = this.gameManager.gridManager;
+    // Обчислюємо центр клітинки вручну
+    const targetX = group.moveTarget.col * gm.cellWidth + gm.cellWidth / 2;
+    const targetY = (group.moveTarget.row + 1) * gm.cellHeight; // bottom of cell
 
-        const startX = unit.x;
-        const startY = unit.y;
-        const endX = targetX;
-        const endY = targetY;
+    ctx.save();
 
-        // Обчислюємо напрямок
-        const dx = endX - startX;
-        const dy = endY - startY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+    // Малюємо стрілки від кожного юніта до таргета
+    for (const unit of group.units) {
+      if (unit.isDead) continue;
 
-        if (distance < 20) continue; // Юніт вже на місці
+      const startX = unit.x;
+      const startY = unit.y;
+      const endX = targetX;
+      const endY = targetY;
 
-        const angle = Math.atan2(dy, dx);
+      // Обчислюємо напрямок
+      const dx = endX - startX;
+      const dy = endY - startY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Малюємо пунктирну лінію
-        ctx.strokeStyle = "rgba(0, 255, 100, 0.6)";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([8, 4]);
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX - Math.cos(angle) * 15, endY - Math.sin(angle) * 15);
-        ctx.stroke();
+      if (distance < 20) continue; // Юніт вже на місці
 
-        // Малюємо наконечник стрілки
-        ctx.setLineDash([]);
-        ctx.fillStyle = "rgba(0, 255, 100, 0.8)";
-        ctx.beginPath();
-        const arrowSize = 10;
-        ctx.moveTo(endX, endY);
-        ctx.lineTo(
-          endX - arrowSize * Math.cos(angle - Math.PI / 6),
-          endY - arrowSize * Math.sin(angle - Math.PI / 6)
-        );
-        ctx.lineTo(
-          endX - arrowSize * Math.cos(angle + Math.PI / 6),
-          endY - arrowSize * Math.sin(angle + Math.PI / 6)
-        );
-        ctx.closePath();
-        ctx.fill();
-      }
+      const angle = Math.atan2(dy, dx);
 
-      // Малюємо маркер таргета
-      const x = targetX;
-      const y = targetY;
-      const size = 12;
+      // Малюємо пунктирну лінію
+      ctx.strokeStyle = "rgba(0, 255, 100, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 4]);
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX - Math.cos(angle) * 15, endY - Math.sin(angle) * 15);
+      ctx.stroke();
 
+      // Малюємо наконечник стрілки
       ctx.setLineDash([]);
-      ctx.fillStyle = "rgba(0, 255, 100, 0.3)";
+      ctx.fillStyle = "rgba(0, 255, 100, 0.8)";
       ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
+      const arrowSize = 10;
+      ctx.moveTo(endX, endY);
+      ctx.lineTo(
+        endX - arrowSize * Math.cos(angle - Math.PI / 6),
+        endY - arrowSize * Math.sin(angle - Math.PI / 6)
+      );
+      ctx.lineTo(
+        endX - arrowSize * Math.cos(angle + Math.PI / 6),
+        endY - arrowSize * Math.sin(angle + Math.PI / 6)
+      );
+      ctx.closePath();
       ctx.fill();
-
-      ctx.strokeStyle = "#00ff64";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Хрестик
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x - size * 0.5, y);
-      ctx.lineTo(x + size * 0.5, y);
-      ctx.moveTo(x, y - size * 0.5);
-      ctx.lineTo(x, y + size * 0.5);
-      ctx.stroke();
-
-      ctx.restore();
     }
+
+    // Малюємо маркер таргета
+    const x = targetX;
+    const y = targetY;
+    const size = 12;
+
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(0, 255, 100, 0.3)";
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#00ff64";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Хрестик
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x - size * 0.5, y);
+    ctx.lineTo(x + size * 0.5, y);
+    ctx.moveTo(x, y - size * 0.5);
+    ctx.lineTo(x, y + size * 0.5);
+    ctx.stroke();
+
+    ctx.restore();
   }
 
   // Метод для вибору юніта
