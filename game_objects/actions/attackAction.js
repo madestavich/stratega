@@ -26,6 +26,21 @@ export class AttackAction {
       return false;
     }
 
+    // Якщо юніт має групову ціль руху і "move" має вищий пріоритет ніж "attack",
+    // він повинен ігнорувати атаку і продовжувати рух до цілі групи
+    // (крім випадку коли він вже атакує - тоді завершуємо атаку)
+    if (gameObject.groupMoveTarget && !gameObject.isAttacking) {
+      const priorities = gameObject.actionPriorities || [];
+      const moveIndex = priorities.indexOf("move");
+      const attackIndex = priorities.indexOf("attack");
+
+      // Якщо move є в пріоритетах і має вищий пріоритет (менший індекс) ніж attack
+      if (moveIndex !== -1 && (attackIndex === -1 || moveIndex < attackIndex)) {
+        // Юніт рухається до групової цілі - не атакувати
+        return false;
+      }
+    }
+
     // Check if unit is already attacking
     if (gameObject.isAttacking) {
       const animator = gameObject.animator;
@@ -906,6 +921,19 @@ export class AttackAction {
   }
 
   updateAttackTarget(gameObject) {
+    // Якщо юніт має групову ціль руху і "move" має вищий пріоритет ніж "attack",
+    // не оновлюємо attackTarget і не змінюємо moveTarget
+    if (gameObject.groupMoveTarget) {
+      const priorities = gameObject.actionPriorities || [];
+      const moveIndex = priorities.indexOf("move");
+      const attackIndex = priorities.indexOf("attack");
+
+      // Якщо move має вищий пріоритет - не втручаємося в рух до групової цілі
+      if (moveIndex !== -1 && (attackIndex === -1 || moveIndex < attackIndex)) {
+        return false;
+      }
+    }
+
     // Перевіряємо, чи є ціль атаки
     if (!gameObject.attackTarget || gameObject.attackTarget.isDead) {
       // Якщо цілі немає або вона мертва, знаходимо нову
