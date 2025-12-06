@@ -666,7 +666,11 @@ export class InputManager {
 
     ctx.save();
 
-    // Малюємо стрілки від кожного юніта до таргета
+    // Малюємо пунктирні лінії від кожного юніта до таргета
+    ctx.strokeStyle = "rgba(0, 255, 100, 0.6)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 4]);
+
     for (const unit of group.units) {
       if (unit.isDead) continue;
 
@@ -675,68 +679,19 @@ export class InputManager {
       const endX = targetX;
       const endY = targetY;
 
-      // Обчислюємо напрямок
+      // Обчислюємо відстань
       const dx = endX - startX;
       const dy = endY - startY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < 20) continue; // Юніт вже на місці
 
-      const angle = Math.atan2(dy, dx);
-
       // Малюємо пунктирну лінію
-      ctx.strokeStyle = "rgba(0, 255, 100, 0.6)";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([8, 4]);
       ctx.beginPath();
       ctx.moveTo(startX, startY);
-      ctx.lineTo(endX - Math.cos(angle) * 15, endY - Math.sin(angle) * 15);
+      ctx.lineTo(endX, endY);
       ctx.stroke();
-
-      // Малюємо наконечник стрілки
-      ctx.setLineDash([]);
-      ctx.fillStyle = "rgba(0, 255, 100, 0.8)";
-      ctx.beginPath();
-      const arrowSize = 10;
-      ctx.moveTo(endX, endY);
-      ctx.lineTo(
-        endX - arrowSize * Math.cos(angle - Math.PI / 6),
-        endY - arrowSize * Math.sin(angle - Math.PI / 6)
-      );
-      ctx.lineTo(
-        endX - arrowSize * Math.cos(angle + Math.PI / 6),
-        endY - arrowSize * Math.sin(angle + Math.PI / 6)
-      );
-      ctx.closePath();
-      ctx.fill();
     }
-
-    // Малюємо маркер таргета
-    const x = targetX;
-    const y = targetY;
-    const size = 12;
-
-    ctx.setLineDash([]);
-    ctx.fillStyle = "rgba(0, 255, 100, 0.3)";
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.strokeStyle = "#00ff64";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Хрестик
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x - size * 0.5, y);
-    ctx.lineTo(x + size * 0.5, y);
-    ctx.moveTo(x, y - size * 0.5);
-    ctx.lineTo(x, y + size * 0.5);
-    ctx.stroke();
 
     ctx.restore();
   }
