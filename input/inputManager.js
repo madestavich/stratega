@@ -693,6 +693,13 @@ export class InputManager {
       ctx.stroke();
     }
 
+    // Малюємо точку в кінці (на таргеті)
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(0, 255, 100, 0.8)";
+    ctx.beginPath();
+    ctx.arc(targetX, targetY, 6, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.restore();
   }
 
