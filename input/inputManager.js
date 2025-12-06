@@ -599,49 +599,52 @@ export class InputManager {
     }
 
     // Малюємо підсвічування вибраних юнітів (овальне під спрайтом)
-    for (const unit of this.selectedUnits) {
-      if (unit.isDead) continue;
+    // Тільки на паузі, не під час бою
+    if (!this.gameManager.isBattleInProgress) {
+      for (const unit of this.selectedUnits) {
+        if (unit.isDead) continue;
 
-      ctx.save();
+        ctx.save();
 
-      const cellWidth = this.gameManager.gridManager.cellWidth;
-      const cellHeight = this.gameManager.gridManager.cellHeight;
+        const cellWidth = this.gameManager.gridManager.cellWidth;
+        const cellHeight = this.gameManager.gridManager.cellHeight;
 
-      // Отримуємо розміри спрайту для масштабування овалу
-      let spriteWidth = unit.gridWidth * cellWidth;
-      let spriteHeight = unit.gridHeight * cellHeight;
+        // Отримуємо розміри спрайту для масштабування овалу
+        let spriteWidth = unit.gridWidth * cellWidth;
+        let spriteHeight = unit.gridHeight * cellHeight;
 
-      // Якщо є анімований спрайт, використовуємо його розмір
-      if (unit.animator && unit.animator.currentSprite) {
-        const sprite = unit.animator.currentSprite;
-        if (sprite.frameWidth && sprite.frameHeight) {
-          spriteWidth = sprite.frameWidth * (unit.scaleX || 1);
-          spriteHeight = sprite.frameHeight * (unit.scaleY || 1);
+        // Якщо є анімований спрайт, використовуємо його розмір
+        if (unit.animator && unit.animator.currentSprite) {
+          const sprite = unit.animator.currentSprite;
+          if (sprite.frameWidth && sprite.frameHeight) {
+            spriteWidth = sprite.frameWidth * (unit.scaleX || 1);
+            spriteHeight = sprite.frameHeight * (unit.scaleY || 1);
+          }
         }
+
+        // Розміри овалу базуються на розмірі спрайту
+        const radiusX = spriteWidth * 0.45;
+        const radiusY = spriteWidth * 0.15; // Сплющений овал пропорційний ширині
+
+        // Позиція овалу - нижній край на centralPoint спрайту
+        const ellipseX = unit.x;
+        const ellipseY = unit.y - radiusY;
+
+        // Малюємо заповнений овал
+        ctx.fillStyle = "rgba(255, 204, 0, 0.3)";
+        ctx.beginPath();
+        ctx.ellipse(ellipseX, ellipseY, radiusX, radiusY, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Малюємо контур овалу
+        ctx.strokeStyle = "#ffcc00";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(ellipseX, ellipseY, radiusX, radiusY, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.restore();
       }
-
-      // Розміри овалу базуються на розмірі спрайту
-      const radiusX = spriteWidth * 0.45;
-      const radiusY = spriteWidth * 0.15; // Сплющений овал пропорційний ширині
-
-      // Позиція овалу - нижній край на centralPoint спрайту
-      const ellipseX = unit.x;
-      const ellipseY = unit.y - radiusY;
-
-      // Малюємо заповнений овал
-      ctx.fillStyle = "rgba(255, 204, 0, 0.3)";
-      ctx.beginPath();
-      ctx.ellipse(ellipseX, ellipseY, radiusX, radiusY, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Малюємо контур овалу
-      ctx.strokeStyle = "#ffcc00";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.ellipse(ellipseX, ellipseY, radiusX, radiusY, 0, 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.restore();
     }
 
     // Малюємо стрілки руху для активної групи
