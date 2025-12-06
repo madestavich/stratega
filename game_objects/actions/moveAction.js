@@ -110,8 +110,9 @@ export class MoveAction {
 
       // If no path found, we can't execute the action
       if (!path || path.length === 0) {
-        // Скасовуємо поточний рух
-        this.cancelMovement(gameObject);
+        // Скасовуємо поточний рух, але зберігаємо анімацію якщо юніт вже рухався
+        const wasMoving = gameObject.isMoving;
+        this.cancelMovement(gameObject, wasMoving);
 
         // Зберігаємо ціль, щоб спробувати знову пізніше
         gameObject.moveTarget = { col: finalTargetCol, row: finalTargetRow };
@@ -327,9 +328,17 @@ export class MoveAction {
 
   // Set a new movement target for the object
   setMoveTarget(gameObject, targetCol, targetRow, allowedObstacleTypes = [0]) {
+    // Зберігаємо стан руху перед скиданням шляху
+    const wasMoving = gameObject.isMoving;
+
     // Reset current path
     gameObject.currentPath = null;
     gameObject.nextGridPosition = null;
+
+    // Якщо юніт вже рухався, зберігаємо стан руху для плавного переходу
+    if (wasMoving) {
+      gameObject.isMoving = true;
+    }
 
     // Try to find a new path
     return this.canExecute(

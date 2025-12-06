@@ -95,7 +95,8 @@ export class AttackAction {
       (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
         gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
     ) {
-      this.moveAction.cancelMovement(gameObject);
+      // Зберігаємо анімацію руху при зміні цілі
+      this.moveAction.cancelMovement(gameObject, gameObject.isMoving);
       gameObject.moveTarget = {
         col: gameObject.attackTarget.gridCol,
         row: gameObject.attackTarget.gridRow,
@@ -114,8 +115,8 @@ export class AttackAction {
 
     // Check if we need to switch to a different target
     if (gameObject.attackTarget && gameObject.attackTarget !== nearestEnemy) {
-      // Target changed, cancel current movement
-      this.moveAction.cancelMovement(gameObject);
+      // Target changed, cancel current movement but keep animation if moving
+      this.moveAction.cancelMovement(gameObject, gameObject.isMoving);
       gameObject.attackTarget = nearestEnemy;
       gameObject.moveTarget = null; // Will be set below
     }
