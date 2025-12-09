@@ -618,7 +618,22 @@ export class ObjectManager {
         if (groupConfig) {
           // Встановлюємо кастомні actionPriorities якщо є
           if (groupConfig.actionPriorities) {
-            obj.actionPriorities = [...groupConfig.actionPriorities];
+            // Копіюємо пріоритети
+            const priorities = [...groupConfig.actionPriorities];
+
+            // Якщо юніт має teleport в availableActions і перший пріоритет це "move",
+            // замінюємо на "teleport" (для телепортуючих юнітів як дияволи)
+            if (
+              obj.availableActions &&
+              obj.availableActions.includes("teleport")
+            ) {
+              const moveIndex = priorities.indexOf("move");
+              if (moveIndex !== -1) {
+                priorities[moveIndex] = "teleport";
+              }
+            }
+
+            obj.actionPriorities = priorities;
           }
 
           // Встановлюємо moveTarget групи якщо є
