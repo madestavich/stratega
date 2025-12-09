@@ -27,7 +27,6 @@ export class TeleportAction {
     try {
       // Перевірка базових умов
       if (gameObject.isDead) {
-        console.log(`TeleportAction.canExecute: ${gameObject.id} is dead`);
         return false;
       }
 
@@ -41,9 +40,6 @@ export class TeleportAction {
 
       // Переконуємось що є pathfinder
       if (!this.ensurePathfinder(gameObject)) {
-        console.log(
-          `TeleportAction.canExecute: ${gameObject.id} no pathfinder`
-        );
         return false;
       }
 
@@ -61,29 +57,15 @@ export class TeleportAction {
           finalTargetCol = gameObject.moveTarget.col;
           finalTargetRow = gameObject.moveTarget.row;
         } else {
-          console.log(
-            `TeleportAction.canExecute: ${
-              gameObject.id
-            } no target (targetCol=${targetCol}, targetRow=${targetRow}, groupMoveTarget=${JSON.stringify(
-              gameObject.groupMoveTarget
-            )}, moveTarget=${JSON.stringify(gameObject.moveTarget)})`
-          );
           return false;
         }
       }
-
-      console.log(
-        `TeleportAction.canExecute: ${gameObject.id} finalTarget=(${finalTargetCol}, ${finalTargetRow}), current=(${gameObject.gridCol}, ${gameObject.gridRow})`
-      );
 
       // Перевіряємо чи вже на місці
       if (
         gameObject.gridCol === finalTargetCol &&
         gameObject.gridRow === finalTargetRow
       ) {
-        console.log(
-          `TeleportAction.canExecute: ${gameObject.id} already at target`
-        );
         return false;
       }
 
@@ -218,6 +200,15 @@ export class TeleportAction {
 
     const animator = gameObject.animator;
 
+    // Debug лог для відслідковування стану телепортації
+    console.log(
+      `TeleportAction.execute: unit ${gameObject.id}, state=${
+        gameObject.teleportState
+      }, frameIndex=${animator.frameIndex}/${
+        animator.activeAnimation?.frames?.length - 1
+      }, anim=${animator.activeAnimation?.name}`
+    );
+
     switch (gameObject.teleportState) {
       case TeleportState.IDLE:
         // Починаємо телепортацію - запускаємо анімацію старту
@@ -255,11 +246,6 @@ export class TeleportAction {
     const animations = gameObject.animator.activeSpritesheet?.animations;
     const hasStartAnim = animations?.teleport_start;
 
-    console.log(
-      "Available animations:",
-      animations ? Object.keys(animations) : "none"
-    );
-
     if (hasStartAnim) {
       // Анімація без зациклювання щоб завершилась
       gameObject.animator.setAnimation("teleport_start", false);
@@ -283,10 +269,6 @@ export class TeleportAction {
     let { col, row } = gameObject.teleportTarget;
     const { cellWidth, cellHeight } = gameObject.gridManager;
 
-    console.log(
-      `performTeleport: target (${col}, ${row}), current (${gameObject.gridCol}, ${gameObject.gridRow})`
-    );
-
     // ВАЖЛИВО: Перевіряємо чи цільова клітинка все ще вільна
     // (інший юніт міг зайняти її поки ми грали анімацію старту)
     // Використовуємо [0] як дефолт (прохідні клітинки)
@@ -300,8 +282,6 @@ export class TeleportAction {
       gameObject,
       allowedObstacleTypes
     );
-
-    console.log(`performTeleport: canOccupy = ${canOccupy}`);
 
     if (!canOccupy) {
       // Клітинка зайнята - шукаємо іншу вільну поруч

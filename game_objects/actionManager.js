@@ -122,16 +122,6 @@ export class ActionManager {
     const moveTargetRow =
       gameObject.groupMoveTarget?.row ?? gameObject.moveTarget?.row;
 
-    // Debug log для групових юнітів
-    if (gameObject.groupMoveTarget) {
-      console.log(
-        `Unit ${gameObject.id} has groupMoveTarget:`,
-        gameObject.groupMoveTarget,
-        "actionPriorities:",
-        actionPriorities
-      );
-    }
-
     // Перебір дій за пріоритетом
     for (const actionType of actionPriorities) {
       // Перевірка, чи існує такий тип дії і чи доступний він для цього типу об'єкта
@@ -145,13 +135,6 @@ export class ActionManager {
           actionType === "move" || actionType === "teleport";
         const targetCol = isMovementAction ? moveTargetCol : undefined;
         const targetRow = isMovementAction ? moveTargetRow : undefined;
-
-        // Debug для телепорту
-        if (actionType === "teleport") {
-          console.log(
-            `ActionManager: checking teleport for unit ${gameObject.id}, targetCol=${targetCol}, targetRow=${targetRow}, moveTargetCol=${moveTargetCol}, moveTargetRow=${moveTargetRow}`
-          );
-        }
 
         // Перевірка, чи може бути виконана ця дія
         if (
