@@ -103,21 +103,6 @@ export class AttackAction {
       this.moveAction.cancelMovement(gameObject);
     }
 
-    // Update move target if enemy has moved
-    if (
-      gameObject.attackTarget &&
-      gameObject.moveTarget &&
-      (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
-        gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
-    ) {
-      // Зберігаємо анімацію руху при зміні цілі
-      this.moveAction.cancelMovement(gameObject, gameObject.isMoving);
-      gameObject.moveTarget = {
-        col: gameObject.attackTarget.gridCol,
-        row: gameObject.attackTarget.gridRow,
-      };
-    }
-
     // Find nearest enemy
     const nearestEnemy = this.findNearestEnemy(gameObject);
 
@@ -134,6 +119,21 @@ export class AttackAction {
       this.moveAction.cancelMovement(gameObject, gameObject.isMoving);
       gameObject.attackTarget = nearestEnemy;
       gameObject.moveTarget = null; // Will be set below
+    }
+
+    // Update move target if current target has moved (e.g. teleported)
+    if (
+      gameObject.attackTarget &&
+      gameObject.moveTarget &&
+      (gameObject.moveTarget.col !== gameObject.attackTarget.gridCol ||
+        gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
+    ) {
+      // Скидаємо шлях щоб перерахувати до нової позиції
+      gameObject.currentPath = null;
+      gameObject.moveTarget = {
+        col: gameObject.attackTarget.gridCol,
+        row: gameObject.attackTarget.gridRow,
+      };
     }
 
     // Calculate distance to nearest enemy
