@@ -27,6 +27,7 @@ export class TeleportAction {
     try {
       // Перевірка базових умов
       if (gameObject.isDead) {
+        console.log(`TeleportAction.canExecute: ${gameObject.id} is dead`);
         return false;
       }
 
@@ -40,6 +41,9 @@ export class TeleportAction {
 
       // Переконуємось що є pathfinder
       if (!this.ensurePathfinder(gameObject)) {
+        console.log(
+          `TeleportAction.canExecute: ${gameObject.id} no pathfinder`
+        );
         return false;
       }
 
@@ -47,21 +51,39 @@ export class TeleportAction {
       let finalTargetCol = targetCol;
       let finalTargetRow = targetRow;
 
-      // Безпечна перевірка координат
+      // Безпечна перевірка координат - перевіряємо також groupMoveTarget
       if (finalTargetCol === undefined || finalTargetRow === undefined) {
-        if (gameObject.moveTarget) {
+        // Спочатку перевіряємо groupMoveTarget
+        if (gameObject.groupMoveTarget) {
+          finalTargetCol = gameObject.groupMoveTarget.col;
+          finalTargetRow = gameObject.groupMoveTarget.row;
+        } else if (gameObject.moveTarget) {
           finalTargetCol = gameObject.moveTarget.col;
           finalTargetRow = gameObject.moveTarget.row;
         } else {
+          console.log(
+            `TeleportAction.canExecute: ${
+              gameObject.id
+            } no target (targetCol=${targetCol}, targetRow=${targetRow}, groupMoveTarget=${JSON.stringify(
+              gameObject.groupMoveTarget
+            )}, moveTarget=${JSON.stringify(gameObject.moveTarget)})`
+          );
           return false;
         }
       }
+
+      console.log(
+        `TeleportAction.canExecute: ${gameObject.id} finalTarget=(${finalTargetCol}, ${finalTargetRow}), current=(${gameObject.gridCol}, ${gameObject.gridRow})`
+      );
 
       // Перевіряємо чи вже на місці
       if (
         gameObject.gridCol === finalTargetCol &&
         gameObject.gridRow === finalTargetRow
       ) {
+        console.log(
+          `TeleportAction.canExecute: ${gameObject.id} already at target`
+        );
         return false;
       }
 

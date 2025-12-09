@@ -146,6 +146,13 @@ export class ActionManager {
         const targetCol = isMovementAction ? moveTargetCol : undefined;
         const targetRow = isMovementAction ? moveTargetRow : undefined;
 
+        // Debug для телепорту
+        if (actionType === "teleport") {
+          console.log(
+            `ActionManager: checking teleport for unit ${gameObject.id}, targetCol=${targetCol}, targetRow=${targetRow}, moveTargetCol=${moveTargetCol}, moveTargetRow=${moveTargetRow}`
+          );
+        }
+
         // Перевірка, чи може бути виконана ця дія
         if (
           this.actions[actionType].canExecute(
@@ -180,18 +187,14 @@ export class ActionManager {
       gameObject.availableActions &&
       gameObject.availableActions.includes("teleport");
 
-    // Юніт досяг цілі якщо він на тій же позиції або не рухається і близько до цілі
-    // Для телепортерів також перевіряємо що вони не в процесі телепортації
+    // Юніт досяг цілі ТІЛЬКИ якщо він фізично на позиції цілі
+    // Не скидаємо пріоритети поки юніт не досяг точної позиції
     const reachedTarget =
-      (gameObject.gridCol === targetCol && gameObject.gridRow === targetRow) ||
-      (!gameObject.isMoving &&
-        !gameObject.isTeleporting &&
-        gameObject.moveTarget === null &&
-        gameObject.teleportTarget === null);
+      gameObject.gridCol === targetCol && gameObject.gridRow === targetRow;
 
     if (reachedTarget) {
       console.log(
-        `Unit ${gameObject.id} (teleporter: ${isTeleporter}) reached group target, resetting to default priorities`
+        `Unit ${gameObject.id} (teleporter: ${isTeleporter}) reached group target at (${targetCol}, ${targetRow}), resetting to default priorities`
       );
 
       // Скидаємо actionPriorities до дефолтних
