@@ -298,7 +298,7 @@ export class InputManager {
     return null;
   }
 
-  // Встановити точку руху для групи (автоматично ставить move first)
+  // Встановити точку руху для групи (автоматично ставить move/teleport first)
   setGroupMoveTarget(groupId, col, row) {
     if (this.gameManager.isBattleInProgress) {
       console.log("Cannot modify groups during battle");
@@ -312,18 +312,23 @@ export class InputManager {
     }
 
     group.moveTarget = { col, row };
-    group.actionPriorities = ["move", "attack"]; // Move first
+    group.actionPriorities = ["move", "attack"]; // Move first (default for non-teleporting)
     console.log(`Group ${groupId} move target set to: (${col}, ${row})`);
 
     // Оновити moveTarget та пріоритети у всіх юнітів групи
     for (const unit of group.units) {
       unit.groupMoveTarget = { col, row };
-      unit.actionPriorities = ["move", "attack"];
+      // Визначаємо правильний пріоритет руху: teleport або move
+      const movementAction = this.getUnitMovementAction(unit);
+      unit.actionPriorities = [movementAction, "attack"];
       console.log(
         `Unit ${unit.id} updated: groupMoveTarget=`,
         unit.groupMoveTarget,
         "actionPriorities=",
-        unit.actionPriorities
+        unit.actionPriorities,
+        "(movementAction=",
+        movementAction,
+        ")"
       );
     }
 
@@ -444,6 +449,16 @@ export class InputManager {
   clearUnitSelection() {
     this.selectedUnits = [];
     console.log("Unit selection cleared");
+  }
+
+  // Визначити тип дії руху для юніта (teleport або move)
+  getUnitMovementAction(unit) {
+    // Якщо юніт має teleport в availableActions - він телепортується
+    if (unit.availableActions && unit.availableActions.includes("teleport")) {
+      return "teleport";
+    }
+    // Інакше - звичайний рух
+    return "move";
   }
 
   // Синхронізувати групи з ObjectManager

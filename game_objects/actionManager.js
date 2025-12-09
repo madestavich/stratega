@@ -140,9 +140,11 @@ export class ActionManager {
         gameObject.availableActions &&
         gameObject.availableActions.includes(actionType)
       ) {
-        // Для move action використовуємо визначену ціль
-        const targetCol = actionType === "move" ? moveTargetCol : undefined;
-        const targetRow = actionType === "move" ? moveTargetRow : undefined;
+        // Для move та teleport action використовуємо визначену ціль
+        const isMovementAction =
+          actionType === "move" || actionType === "teleport";
+        const targetCol = isMovementAction ? moveTargetCol : undefined;
+        const targetRow = isMovementAction ? moveTargetRow : undefined;
 
         // Перевірка, чи може бути виконана ця дія
         if (
@@ -173,14 +175,23 @@ export class ActionManager {
     const targetCol = gameObject.groupMoveTarget.col;
     const targetRow = gameObject.groupMoveTarget.row;
 
+    // Для телепортуючих юнітів перевіряємо також teleportTarget
+    const isTeleporter =
+      gameObject.availableActions &&
+      gameObject.availableActions.includes("teleport");
+
     // Юніт досяг цілі якщо він на тій же позиції або не рухається і близько до цілі
+    // Для телепортерів також перевіряємо що вони не в процесі телепортації
     const reachedTarget =
       (gameObject.gridCol === targetCol && gameObject.gridRow === targetRow) ||
-      (!gameObject.isMoving && gameObject.moveTarget === null);
+      (!gameObject.isMoving &&
+        !gameObject.isTeleporting &&
+        gameObject.moveTarget === null &&
+        gameObject.teleportTarget === null);
 
     if (reachedTarget) {
       console.log(
-        `Unit ${gameObject.id} reached group target, resetting to default priorities`
+        `Unit ${gameObject.id} (teleporter: ${isTeleporter}) reached group target, resetting to default priorities`
       );
 
       // Скидаємо actionPriorities до дефолтних
