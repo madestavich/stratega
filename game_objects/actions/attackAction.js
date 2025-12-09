@@ -988,9 +988,22 @@ export class AttackAction {
     }
 
     // Якщо ціль не в діапазоні атаки, оновлюємо moveTarget
+    const newTargetCol = gameObject.attackTarget.gridCol;
+    const newTargetRow = gameObject.attackTarget.gridRow;
+
+    // Перевіряємо чи ціль перемістилась
+    if (
+      gameObject.moveTarget &&
+      (gameObject.moveTarget.col !== newTargetCol ||
+        gameObject.moveTarget.row !== newTargetRow)
+    ) {
+      // Ціль перемістилась - скидаємо шлях для перерахунку
+      gameObject.currentPath = null;
+    }
+
     gameObject.moveTarget = {
-      col: gameObject.attackTarget.gridCol,
-      row: gameObject.attackTarget.gridRow,
+      col: newTargetCol,
+      row: newTargetRow,
     };
 
     // Якщо об'єкт не рухається, спробуємо почати рух

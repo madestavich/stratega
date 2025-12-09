@@ -28,12 +28,20 @@ export class MoveAction {
       }
 
       // If the object is already moving, check if we need to recalculate the path
-      if (gameObject.isMoving && gameObject.currentPath) {
-        // Check if the target has changed
+      if (
+        gameObject.isMoving &&
+        gameObject.currentPath &&
+        gameObject.currentPath.length > 0
+      ) {
+        // Get the final destination of current path
+        const pathEnd =
+          gameObject.currentPath[gameObject.currentPath.length - 1];
+
+        // Check if the target has changed (path doesn't lead to the new target)
         if (
-          gameObject.moveTarget &&
-          (gameObject.moveTarget.col !== targetCol ||
-            gameObject.moveTarget.row !== targetRow)
+          targetCol !== undefined &&
+          targetRow !== undefined &&
+          (pathEnd.col !== targetCol || pathEnd.row !== targetRow)
         ) {
           // Target changed, need to recalculate
           gameObject.currentPath = null;
