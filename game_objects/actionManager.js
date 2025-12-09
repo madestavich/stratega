@@ -188,6 +188,13 @@ export class ActionManager {
       // Очищаємо групові параметри
       gameObject.groupMoveTarget = null;
       gameObject.groupId = null;
+
+      // Очищаємо цілі руху щоб юніт міг знайти нову ціль від поточної позиції
+      gameObject.moveTarget = null;
+      gameObject.teleportTarget = null;
+      gameObject.teleportState = null;
+      gameObject.isMoving = false;
+      gameObject.isTeleporting = false;
     }
   }
 }
