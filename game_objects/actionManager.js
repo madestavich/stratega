@@ -206,9 +206,26 @@ export class ActionManager {
         gridManager.grid[targetRow][targetCol]?.occupied || false;
     }
 
-    // Якщо юніт вже близько до цілі (в радіусі 4 клітинок) і ціль зайнята - скидаємо до дефолту
+    // Рахуємо розмір групи (кількість юнітів з таким же groupId)
+    const groupId = gameObject.groupId;
+    let groupSize = 1;
+    const allObjects = [
+      ...this.objectManager.objects,
+      ...this.objectManager.enemyObjects,
+    ];
+    for (const obj of allObjects) {
+      if (obj !== gameObject && obj.groupId === groupId && !obj.isDead) {
+        groupSize++;
+      }
+    }
+
+    // Радіус залежить від розміру групи: базовий 2 + 1 за кожні 2 юніти в групі
+    // Наприклад: 1-2 юніти = радіус 3, 3-4 = радіус 4, 5-6 = радіус 5, і т.д.
+    const proximityRadius = 2 + Math.ceil(groupSize / 2);
+
+    // Якщо юніт вже близько до цілі і ціль зайнята - скидаємо до дефолту
     // Це означає що юніт підійшов максимально близько до зайнятої точки
-    if (distanceToTarget <= 4 && targetOccupied) {
+    if (distanceToTarget <= proximityRadius && targetOccupied) {
       console.log(
         `Unit ${gameObject.id} near occupied group target at (${targetCol}, ${targetRow}), ` +
           `current pos: (${gameObject.gridCol}, ${gameObject.gridRow}), ` +
