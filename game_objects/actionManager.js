@@ -206,9 +206,9 @@ export class ActionManager {
         gridManager.grid[targetRow][targetCol]?.occupied || false;
     }
 
-    // Якщо юніт вже близько до цілі (в радіусі 2 клітинок) і ціль зайнята - скидаємо до дефолту
+    // Якщо юніт вже близько до цілі (в радіусі 4 клітинок) і ціль зайнята - скидаємо до дефолту
     // Це означає що юніт підійшов максимально близько до зайнятої точки
-    if (distanceToTarget <= 2 && targetOccupied) {
+    if (distanceToTarget <= 4 && targetOccupied) {
       console.log(
         `Unit ${gameObject.id} near occupied group target at (${targetCol}, ${targetRow}), ` +
           `current pos: (${gameObject.gridCol}, ${gameObject.gridRow}), ` +
