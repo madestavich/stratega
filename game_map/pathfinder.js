@@ -243,6 +243,11 @@ export class Pathfinder {
           return false;
         }
 
+        // Check if cell is in the sky zone (impassable)
+        if (this.gridManager.skyRows && checkRow < this.gridManager.skyRows) {
+          return false;
+        }
+
         // Check if cell is of an allowed type
         const cellType = this.gridManager.grid[checkRow][checkCol].type || 0;
 

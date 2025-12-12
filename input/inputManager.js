@@ -311,6 +311,26 @@ export class InputManager {
       return;
     }
 
+    // Перевіряємо чи ціль не знаходиться в непрохідній зоні (skyRows)
+    const gridManager = this.gameManager.gridManager;
+    if (gridManager && gridManager.skyRows && row < gridManager.skyRows) {
+      console.log(
+        `Cannot set move target in sky zone: row ${row} < skyRows ${gridManager.skyRows}`
+      );
+      return;
+    }
+
+    // Перевіряємо чи ціль в межах карти
+    if (
+      gridManager &&
+      (col < 0 || col >= gridManager.cols || row < 0 || row >= gridManager.rows)
+    ) {
+      console.log(
+        `Cannot set move target outside grid bounds: (${col}, ${row})`
+      );
+      return;
+    }
+
     group.moveTarget = { col, row };
     group.actionPriorities = ["move", "attack"]; // Move first (default for non-teleporting)
     console.log(`Group ${groupId} move target set to: (${col}, ${row})`);

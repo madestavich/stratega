@@ -188,21 +188,56 @@ export class ActionManager {
         `Unit ${gameObject.id} (teleporter: ${isTeleporter}) reached group target at (${targetCol}, ${targetRow}), resetting to default priorities`
       );
 
-      // Скидаємо actionPriorities до дефолтних
-      if (gameObject.defaultActionPriorities) {
-        gameObject.actionPriorities = [...gameObject.defaultActionPriorities];
-      }
-
-      // Очищаємо групові параметри
-      gameObject.groupMoveTarget = null;
-      gameObject.groupId = null;
-
-      // Очищаємо цілі руху щоб юніт міг знайти нову ціль від поточної позиції
-      gameObject.moveTarget = null;
-      gameObject.teleportTarget = null;
-      gameObject.teleportState = null;
-      gameObject.isMoving = false;
-      gameObject.isTeleporting = false;
+      this.resetToDefaultPriorities(gameObject);
+      return;
     }
+
+    // Перевіряємо чи юніт "застряг" - не рухається і не може наблизитись до цілі
+    // Це відбувається коли точка цілі зайнята і немає вільного шляху
+    if (!gameObject.isMoving && !gameObject.isTeleporting) {
+      // Юніт не рухається, перевіряємо чи він може рухатись до цілі
+      const movementAction = isTeleporter ? "teleport" : "move";
+      const action = this.actions[movementAction];
+
+      if (action) {
+        // Перевіряємо чи є можливість рухатись до цілі
+        const canMove = action.canExecute(gameObject, targetCol, targetRow, [
+          0,
+        ]);
+
+        if (!canMove) {
+          // Юніт не може рухатись до цілі - він застряг
+          // Перевіряємо чи шлях взагалі не знайдено (а не просто затримка)
+          // Якщо currentPath та nextGridPosition відсутні - юніт точно застряг
+          if (!gameObject.currentPath && !gameObject.nextGridPosition) {
+            console.log(
+              `Unit ${gameObject.id} stuck near group target at (${targetCol}, ${targetRow}), ` +
+                `current pos: (${gameObject.gridCol}, ${gameObject.gridRow}), resetting to default priorities`
+            );
+
+            this.resetToDefaultPriorities(gameObject);
+          }
+        }
+      }
+    }
+  }
+
+  // Скидання юніта до дефолтних пріоритетів та очищення групових параметрів
+  resetToDefaultPriorities(gameObject) {
+    // Скидаємо actionPriorities до дефолтних
+    if (gameObject.defaultActionPriorities) {
+      gameObject.actionPriorities = [...gameObject.defaultActionPriorities];
+    }
+
+    // Очищаємо групові параметри
+    gameObject.groupMoveTarget = null;
+    gameObject.groupId = null;
+
+    // Очищаємо цілі руху щоб юніт міг знайти нову ціль від поточної позиції
+    gameObject.moveTarget = null;
+    gameObject.teleportTarget = null;
+    gameObject.teleportState = null;
+    gameObject.isMoving = false;
+    gameObject.isTeleporting = false;
   }
 }
