@@ -470,6 +470,18 @@
   "inferno": {
     "units": {
       "tier_one": {
+        "imp": {
+          "gridWidth": 1,
+          "gridHeight": 1,
+          "objectType": "imp",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 10,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 8,
+          "attackSpeed": 0.8,
+          "health": 25,
+          "cost": 50
+        },
         "gog": {
           "gridWidth": 1,
           "gridHeight": 1,
@@ -493,6 +505,18 @@
         }
       },
       "tier_two": {
+        "hell_hound": {
+          "gridWidth": 2,
+          "gridHeight": 1,
+          "objectType": "hell_hound",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 24,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 30,
+          "attackSpeed": 0.9,
+          "health": 100,
+          "cost": 180
+        },
         "demon": {
           "gridWidth": 2,
           "gridHeight": 2,
@@ -518,6 +542,18 @@
           "attackSpeed": 0.8,
           "health": 220,
           "cost": 400
+        },
+        "pit_fiend": {
+          "gridWidth": 2,
+          "gridHeight": 2,
+          "objectType": "pit_fiend",
+          "actionPriorities": ["attack", "move"],
+          "moveSpeed": 12,
+          "availableActions": ["move", "attack"],
+          "attackDamage": 70,
+          "attackSpeed": 1,
+          "health": 280,
+          "cost": 500
         }
       },
       "tier_four": {

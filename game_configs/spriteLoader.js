@@ -62,6 +62,9 @@ export class SpriteLoader {
       devil: "/game_configs/units/devil.json",
       gog: "/game_configs/units/gog.json",
       efreeti: "/game_configs/units/efreeti.json",
+      pit_fiend: "/game_configs/units/pit_fiend.json",
+      imp: "/game_configs/units/imp.json",
+      hell_hound: "/game_configs/units/hell_hound.json",
 
       //! war machines
       first_aid_tent: "/game_configs/units/first_aid_tent.json",
