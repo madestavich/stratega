@@ -206,19 +206,45 @@ export class ActionManager {
         ]);
 
         if (!canMove) {
-          // Юніт не може рухатись до цілі - він застряг
-          // Перевіряємо чи шлях взагалі не знайдено (а не просто затримка)
-          // Якщо currentPath та nextGridPosition відсутні - юніт точно застряг
-          if (!gameObject.currentPath && !gameObject.nextGridPosition) {
+          // Юніт не може рухатись до цілі
+          // Перевіряємо відстань до цілі - якщо юніт вже близько (в радіусі 3 клітинок),
+          // то він скоріш за все застряг біля зайнятої цілі
+          const distanceToTarget =
+            Math.abs(gameObject.gridCol - targetCol) +
+            Math.abs(gameObject.gridRow - targetRow);
+
+          // Ініціалізуємо лічильник застрягання якщо його немає
+          if (gameObject.stuckCounter === undefined) {
+            gameObject.stuckCounter = 0;
+          }
+
+          // Збільшуємо лічильник застрягання
+          gameObject.stuckCounter++;
+
+          // Скидаємо до дефолту якщо:
+          // 1. Юніт близько до цілі (в межах 3 клітинок) і застряг на 10+ тіків
+          // 2. Або юніт далеко від цілі і застряг на 30+ тіків (можливо шлях повністю заблокований)
+          const stuckThreshold = distanceToTarget <= 3 ? 10 : 30;
+
+          if (gameObject.stuckCounter >= stuckThreshold) {
             console.log(
               `Unit ${gameObject.id} stuck near group target at (${targetCol}, ${targetRow}), ` +
-                `current pos: (${gameObject.gridCol}, ${gameObject.gridRow}), resetting to default priorities`
+                `current pos: (${gameObject.gridCol}, ${gameObject.gridRow}), ` +
+                `distance: ${distanceToTarget}, stuckCounter: ${gameObject.stuckCounter}, ` +
+                `resetting to default priorities`
             );
 
+            gameObject.stuckCounter = 0;
             this.resetToDefaultPriorities(gameObject);
           }
+        } else {
+          // Юніт може рухатись - скидаємо лічильник застрягання
+          gameObject.stuckCounter = 0;
         }
       }
+    } else {
+      // Юніт рухається - скидаємо лічильник застрягання
+      gameObject.stuckCounter = 0;
     }
   }
 
