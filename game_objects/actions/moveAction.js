@@ -364,6 +364,12 @@ export class MoveAction {
   // Cancel the current movement
 
   cancelMovement(gameObject, keepAnimation = false) {
+    // Debug: log who is calling cancelMovement
+    console.log(
+      `cancelMovement called for unit ${gameObject.id}, keepAnimation=${keepAnimation}, stack:`,
+      new Error().stack.split("\n")[2]
+    );
+
     // Не змінюємо анімацію, якщо keepAnimation=true або об'єкт мертвий
     if (
       !keepAnimation &&
