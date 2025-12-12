@@ -192,59 +192,31 @@ export class ActionManager {
       return;
     }
 
-    // Перевіряємо чи юніт "застряг" - не рухається і не може наблизитись до цілі
-    // Це відбувається коли точка цілі зайнята і немає вільного шляху
-    if (!gameObject.isMoving && !gameObject.isTeleporting) {
-      // Юніт не рухається, перевіряємо чи він може рухатись до цілі
-      const movementAction = isTeleporter ? "teleport" : "move";
-      const action = this.actions[movementAction];
+    // Перевіряємо чи юніт вже близько до цілі і ціль зайнята
+    // Відстань до цілі (Manhattan distance)
+    const distanceToTarget =
+      Math.abs(gameObject.gridCol - targetCol) +
+      Math.abs(gameObject.gridRow - targetRow);
 
-      if (action) {
-        // Перевіряємо чи є можливість рухатись до цілі
-        const canMove = action.canExecute(gameObject, targetCol, targetRow, [
-          0,
-        ]);
+    // Перевіряємо чи сама ціль зайнята іншим юнітом
+    const gridManager = gameObject.gridManager;
+    let targetOccupied = false;
+    if (gridManager && gridManager.grid && gridManager.grid[targetRow]) {
+      targetOccupied =
+        gridManager.grid[targetRow][targetCol]?.occupied || false;
+    }
 
-        if (!canMove) {
-          // Юніт не може рухатись до цілі
-          // Перевіряємо відстань до цілі - якщо юніт вже близько (в радіусі 3 клітинок),
-          // то він скоріш за все застряг біля зайнятої цілі
-          const distanceToTarget =
-            Math.abs(gameObject.gridCol - targetCol) +
-            Math.abs(gameObject.gridRow - targetRow);
+    // Якщо юніт вже близько до цілі (в радіусі 2 клітинок) і ціль зайнята - скидаємо до дефолту
+    // Це означає що юніт підійшов максимально близько до зайнятої точки
+    if (distanceToTarget <= 2 && targetOccupied) {
+      console.log(
+        `Unit ${gameObject.id} near occupied group target at (${targetCol}, ${targetRow}), ` +
+          `current pos: (${gameObject.gridCol}, ${gameObject.gridRow}), ` +
+          `distance: ${distanceToTarget}, resetting to default priorities`
+      );
 
-          // Ініціалізуємо лічильник застрягання якщо його немає
-          if (gameObject.stuckCounter === undefined) {
-            gameObject.stuckCounter = 0;
-          }
-
-          // Збільшуємо лічильник застрягання
-          gameObject.stuckCounter++;
-
-          // Скидаємо до дефолту якщо:
-          // 1. Юніт близько до цілі (в межах 3 клітинок) і застряг на 10+ тіків
-          // 2. Або юніт далеко від цілі і застряг на 30+ тіків (можливо шлях повністю заблокований)
-          const stuckThreshold = distanceToTarget <= 3 ? 10 : 30;
-
-          if (gameObject.stuckCounter >= stuckThreshold) {
-            console.log(
-              `Unit ${gameObject.id} stuck near group target at (${targetCol}, ${targetRow}), ` +
-                `current pos: (${gameObject.gridCol}, ${gameObject.gridRow}), ` +
-                `distance: ${distanceToTarget}, stuckCounter: ${gameObject.stuckCounter}, ` +
-                `resetting to default priorities`
-            );
-
-            gameObject.stuckCounter = 0;
-            this.resetToDefaultPriorities(gameObject);
-          }
-        } else {
-          // Юніт може рухатись - скидаємо лічильник застрягання
-          gameObject.stuckCounter = 0;
-        }
-      }
-    } else {
-      // Юніт рухається - скидаємо лічильник застрягання
-      gameObject.stuckCounter = 0;
+      this.resetToDefaultPriorities(gameObject);
+      return;
     }
   }
 
