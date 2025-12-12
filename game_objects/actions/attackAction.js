@@ -991,20 +991,27 @@ export class AttackAction {
     const newTargetCol = gameObject.attackTarget.gridCol;
     const newTargetRow = gameObject.attackTarget.gridRow;
 
-    // Перевіряємо чи ціль перемістилась
-    if (
+    // Перевіряємо чи ціль перемістилась (тільки якщо moveTarget вже існує і відрізняється)
+    const targetMoved =
       gameObject.moveTarget &&
       (gameObject.moveTarget.col !== newTargetCol ||
-        gameObject.moveTarget.row !== newTargetRow)
-    ) {
+        gameObject.moveTarget.row !== newTargetRow);
+
+    if (targetMoved) {
       // Ціль перемістилась - скидаємо шлях для перерахунку
       gameObject.currentPath = null;
+      gameObject.moveTarget = {
+        col: newTargetCol,
+        row: newTargetRow,
+      };
+    } else if (!gameObject.moveTarget) {
+      // Якщо moveTarget ще не встановлений, встановлюємо його
+      gameObject.moveTarget = {
+        col: newTargetCol,
+        row: newTargetRow,
+      };
     }
-
-    gameObject.moveTarget = {
-      col: newTargetCol,
-      row: newTargetRow,
-    };
+    // Якщо moveTarget вже встановлений і координати ті самі - нічого не робимо
 
     // Якщо об'єкт не рухається, спробуємо почати рух
     if (!gameObject.isMoving && this.moveAction) {
