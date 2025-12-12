@@ -116,6 +116,9 @@ export class AttackAction {
     // Check if we need to switch to a different target
     if (gameObject.attackTarget && gameObject.attackTarget !== nearestEnemy) {
       // Target changed, cancel current movement but keep animation if moving
+      console.log(
+        `canExecute: unit ${gameObject.id} - switching target, cancelling movement`
+      );
       this.moveAction.cancelMovement(gameObject, gameObject.isMoving);
       gameObject.attackTarget = nearestEnemy;
       gameObject.moveTarget = null; // Will be set below
@@ -129,6 +132,9 @@ export class AttackAction {
         gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
     ) {
       // Скидаємо шлях щоб перерахувати до нової позиції
+      console.log(
+        `canExecute: unit ${gameObject.id} - target moved, clearing path`
+      );
       gameObject.currentPath = null;
       gameObject.moveTarget = {
         col: gameObject.attackTarget.gridCol,
@@ -999,6 +1005,9 @@ export class AttackAction {
 
     if (targetMoved) {
       // Ціль перемістилась - скидаємо шлях для перерахунку
+      console.log(
+        `updateAttackTarget: unit ${gameObject.id} - target moved from (${gameObject.moveTarget.col}, ${gameObject.moveTarget.row}) to (${newTargetCol}, ${newTargetRow}), clearing path`
+      );
       gameObject.currentPath = null;
       gameObject.moveTarget = {
         col: newTargetCol,
