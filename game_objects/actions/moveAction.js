@@ -191,8 +191,23 @@ export class MoveAction {
   execute(gameObject, deltaTime) {
     // If we don't have a path or next position, we can't move
     if (!gameObject.currentPath || !gameObject.nextGridPosition) {
+      // Debug: log when execute is skipped
+      if (gameObject.isMoving) {
+        console.log(
+          `MoveAction.execute SKIPPED: unit ${
+            gameObject.id
+          }, hasPath=${!!gameObject.currentPath}, hasNextPos=${!!gameObject.nextGridPosition}, groupId=${
+            gameObject.groupId
+          }`
+        );
+      }
       return;
     }
+
+    // Debug: log execute calls
+    console.log(
+      `MoveAction.execute: unit ${gameObject.id}, groupId=${gameObject.groupId}, deltaTime=${deltaTime}`
+    );
 
     // Встановлюємо анімацію руху, якщо об'єкт ще не рухається
     if (gameObject.isMoving) {
