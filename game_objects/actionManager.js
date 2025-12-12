@@ -95,6 +95,14 @@ export class ActionManager {
       if (gameObject.isTeleporting && this.actions.teleport) {
         this.actions.teleport.execute(gameObject, deltaTime, [0]);
       } else if (this.actions.move) {
+        // If path was cleared (e.g. by attack.update), try to recalculate it
+        if (!gameObject.currentPath && gameObject.moveTarget) {
+          const targetCol =
+            gameObject.groupMoveTarget?.col ?? gameObject.moveTarget?.col;
+          const targetRow =
+            gameObject.groupMoveTarget?.row ?? gameObject.moveTarget?.row;
+          this.actions.move.canExecute(gameObject, targetCol, targetRow, [0]);
+        }
         this.actions.move.execute(gameObject, deltaTime, [0]);
       }
     }
