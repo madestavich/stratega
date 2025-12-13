@@ -481,6 +481,11 @@ class GameManager {
         this.actionManager.update(this.moveTimeStep, isAnimationTick);
         this.objectManager.updateParticles(this.moveTimeStep);
         this.objectManager.updateGridWithAllObjects();
+
+        // Check battle end deterministically every tick (instead of async setInterval)
+        if (this.isBattleInProgress && !this.battleEndProcessing) {
+          this.checkBattleEndDeterministic();
+        }
       }
       this.moveAccumulator -= this.moveTimeStep;
       if (!this.isRunning) break;
@@ -885,16 +890,18 @@ class GameManager {
     // Flag to prevent multiple battle end calls
     this.battleEndProcessing = false;
 
-    // Start checking for round end conditions (all units of one player dead)
-    this.battleCheckInterval = setInterval(() => {
-      this.checkBattleEnd();
-    }, 500); // Check every 0.5 seconds
+    // Battle end is now checked deterministically in the game loop
+    // No need for setInterval anymore - this ensures both clients
+    // detect battle end on the exact same tick
   }
 
-  checkBattleEnd() {
-    // Prevent multiple simultaneous calls
-    if (this.battleEndProcessing) {
-      return;
+  // Deterministic battle end check - called every tick from game loop
+  // This ensures both clients detect battle end on the exact same tick
+  checkBattleEndDeterministic() {
+    // Also check that all particles have resolved (no projectiles in flight)
+    // This prevents ending battle while a killing projectile is still flying
+    if (this.objectManager.particles.length > 0) {
+      return; // Wait for all projectiles to land
     }
 
     const playerUnits = this.objectManager.objects.filter((obj) => !obj.isDead);
@@ -906,18 +913,13 @@ class GameManager {
     if (playerUnits.length === 0 || enemyUnits.length === 0) {
       // Mark that we're processing battle end
       this.battleEndProcessing = true;
+      this.isBattleInProgress = false;
 
       console.log(
-        `%c=== BATTLE ENDED ===%c\nPlayer units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`,
+        `%c=== BATTLE ENDED (Deterministic) ===%c\nPlayer units: ${playerUnits.length}, Enemy units: ${enemyUnits.length}`,
         "color: red; font-weight: bold; font-size: 16px;",
         "color: white;"
       );
-
-      // Stop battle checking
-      if (this.battleCheckInterval) {
-        clearInterval(this.battleCheckInterval);
-        this.battleCheckInterval = null;
-      }
 
       // Determine winner based on which array has survivors
       let winnerId = null;
@@ -951,6 +953,16 @@ class GameManager {
       // End the round with winner info
       this.endRound(winnerId);
     }
+  }
+
+  // Legacy async battle end check - kept for compatibility but no longer used
+  checkBattleEnd() {
+    // This method is deprecated - battle end is now checked deterministically
+    // in the game loop via checkBattleEndDeterministic()
+    console.warn(
+      "checkBattleEnd() is deprecated, use checkBattleEndDeterministic()"
+    );
+    this.checkBattleEndDeterministic();
   }
 
   async endRound(winnerId = null) {

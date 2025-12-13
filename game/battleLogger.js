@@ -50,11 +50,13 @@ export class BattleLogger {
       });
     }
 
-    // Log particles
-    for (let i = 0; i < gameManager.objectManager.particles.length; i++) {
-      const p = gameManager.objectManager.particles[i];
+    // Log particles (sorted by ID for deterministic logging)
+    const sortedParticles = [...gameManager.objectManager.particles].sort(
+      (a, b) => a.id - b.id
+    );
+    for (const p of sortedParticles) {
       tick.particles.push({
-        index: i,
+        id: p.id,
         x: Math.round(p.x * 100) / 100,
         y: Math.round(p.y * 100) / 100,
         targetId: p.target?.id ?? null,

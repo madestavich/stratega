@@ -10,6 +10,7 @@ export class ObjectManager {
     this.objects = [];
     this.enemyObjects = [];
     this.particles = [];
+    this.nextParticleId = 0; // Counter for deterministic particle IDs
     this.effectManager = new EffectManager(ctx, configLoader); // Менеджер ефектів (без spriteLoader)
     this.currentRoomId = null;
     this.isCreator = null; // Додаємо прапорець, чи це creator
@@ -166,14 +167,34 @@ export class ObjectManager {
     // Sort for deterministic collision order
     const sortedObjects = allObjects.sort((a, b) => a.id - b.id);
 
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      const particle = this.particles[i];
+    // Sort particles by ID for deterministic processing order
+    // This is critical for determinism - particles must be processed in the same order on both clients
+    this.particles.sort((a, b) => a.id - b.id);
+
+    // Process particles in sorted order (forward iteration with separate removal list)
+    const toRemove = [];
+    for (const particle of this.particles) {
       particle.update(dt);
       particle.checkCollision(sortedObjects);
       if (particle.hasReachedTarget) {
-        this.particles.splice(i, 1);
+        toRemove.push(particle);
       }
     }
+
+    // Remove finished particles
+    for (const particle of toRemove) {
+      const idx = this.particles.indexOf(particle);
+      if (idx !== -1) {
+        this.particles.splice(idx, 1);
+      }
+    }
+  }
+
+  // Add a particle with a deterministic ID
+  addParticle(particle) {
+    particle.id = this.nextParticleId++;
+    this.particles.push(particle);
+    return particle;
   }
 
   renderAll() {
@@ -412,6 +433,8 @@ export class ObjectManager {
         this.objects = [];
         this.enemyObjects = [];
         this.unitGroups = {}; // Очищаємо групи
+        this.particles = []; // Clear particles
+        this.nextParticleId = 0; // Reset particle ID counter for determinism
 
         // CRITICAL: Reset ID counter for deterministic IDs
         resetObjectIdCounter();

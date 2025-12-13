@@ -416,13 +416,8 @@ export class AttackAction {
         Math.pow(particle.targetY - particle.startY, 2)
     );
 
-    // Add the particle to the object manager
-    if (this.objectManager.particles) {
-      this.objectManager.particles.push(particle);
-    } else {
-      // If particles array doesn't exist, create it
-      this.objectManager.particles = [particle];
-    }
+    // Add the particle to the object manager with deterministic ID
+    this.objectManager.addParticle(particle);
   }
 
   // New helper method to find enemies closer than a specified distance
