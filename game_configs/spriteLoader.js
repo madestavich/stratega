@@ -74,6 +74,7 @@ export class SpriteLoader {
 
       //! effects
       healing: "/game_configs/effects/healing.json",
+      huge_explosion: "/game_configs/effects/huge_explosion.json",
     };
   }
 

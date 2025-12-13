@@ -923,7 +923,7 @@
         "arcHeight": 150,
         "aoeRadius": 4,
         "aoeDamageMultiplier": 0.5,
-        "hitEffect": null
+        "hitEffect": "huge_explosion"
       },
       "cost": 700
     }
