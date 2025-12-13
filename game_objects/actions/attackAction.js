@@ -364,28 +364,7 @@ export class AttackAction {
         window.gameManager.debugManager.setAoECells(areaCells);
       }
 
-      // Debug: visualize AoE cells for ranged attacks with projectile AoE
-      if (
-        window.gameManager &&
-        window.gameManager.debugManager &&
-        window.gameManager.debugManager.isLayerEnabled("aoeCells") &&
-        gameObject.isRangedAttack &&
-        gameObject.bulletConfig &&
-        gameObject.bulletConfig.aoeRadius > 0
-      ) {
-        // Calculate where the projectile will land (target position)
-        const targetCol = gameObject.attackTarget.gridCol;
-        const targetRow = gameObject.attackTarget.gridRow;
-        const aoeRadius = gameObject.bulletConfig.aoeRadius;
-
-        // Generate circle cells for ranged AoE
-        const aoeCells = this.calculateRangedAoECells(
-          targetCol,
-          targetRow,
-          aoeRadius
-        );
-        window.gameManager.debugManager.setAoECells(aoeCells);
-      }
+      // Ranged AoE visualization is now handled in particle.js when projectile hits
 
       // Анімація буде встановлена в canExecute при наступному виклику
       return true;

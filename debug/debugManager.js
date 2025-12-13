@@ -25,8 +25,14 @@ export class DebugManager {
       unitFrames: true, // Debug рамки юнітів (frame, bulletPoint)
     };
 
-    // AoE cells storage
+    // AoE cells storage with fade support
     this.aoeDebugCells = null;
+    this.aoeDebugAlpha = 0; // Поточна прозорість AOE
+    this.aoeDebugFadeSpeed = 2; // Швидкість затухання (за секунду)
+    this.aoeDebugTargetAlpha = 0; // Цільова прозорість (1 = показати, 0 = сховати)
+
+    // Hovered unit tracking for ranged attack range
+    this.hoveredUnit = null;
 
     // Debug panel element
     this.panelElement = null;
@@ -148,6 +154,9 @@ export class DebugManager {
   render() {
     if (!this.enabled) return;
 
+    // Update hovered unit
+    this.updateHoveredUnit();
+
     // Grid
     if (this.layers.grid) {
       this.gridManager.debugDrawGrid();
@@ -168,15 +177,102 @@ export class DebugManager {
       this.renderAuraRanges();
     }
 
-    // Ranged attack range
+    // Ranged attack range (only for hovered unit)
     if (this.layers.rangedAttackRange) {
       this.renderRangedAttackRanges();
     }
 
-    // AoE cells (рендериться останнім, поверх всього)
-    if (this.layers.aoeCells && this.aoeDebugCells) {
-      this.gridManager.debugDrawAoECells(this.aoeDebugCells);
+    // AoE cells з затуханням (рендериться останнім, поверх всього)
+    if (this.layers.aoeCells) {
+      this.renderAoECellsWithFade();
     }
+  }
+
+  /**
+   * Оновлення hovered юніта на основі позиції миші
+   */
+  updateHoveredUnit() {
+    const inputManager = this.gameManager.inputManager;
+    if (inputManager && inputManager.mouse) {
+      this.hoveredUnit = inputManager.getUnitAtPosition(
+        inputManager.mouse.x,
+        inputManager.mouse.y
+      );
+    } else {
+      this.hoveredUnit = null;
+    }
+  }
+
+  /**
+   * Рендеринг AoE клітинок з плавним затуханням
+   */
+  renderAoECellsWithFade() {
+    // Оновлюємо alpha
+    const deltaTime = this.gameManager.deltaTime / 1000 || 0.016; // fallback to ~60fps
+
+    if (this.aoeDebugTargetAlpha > this.aoeDebugAlpha) {
+      // Швидко показуємо
+      this.aoeDebugAlpha = Math.min(
+        this.aoeDebugAlpha + deltaTime * 10,
+        this.aoeDebugTargetAlpha
+      );
+    } else if (this.aoeDebugTargetAlpha < this.aoeDebugAlpha) {
+      // Повільно затухаємо
+      this.aoeDebugAlpha = Math.max(
+        this.aoeDebugAlpha - deltaTime * this.aoeDebugFadeSpeed,
+        this.aoeDebugTargetAlpha
+      );
+    }
+
+    // Рендеримо якщо є клітинки і alpha > 0
+    if (this.aoeDebugCells && this.aoeDebugAlpha > 0.01) {
+      this.debugDrawAoECellsWithAlpha(this.aoeDebugCells, this.aoeDebugAlpha);
+    }
+
+    // Очищаємо клітинки коли повністю затухли
+    if (this.aoeDebugAlpha <= 0.01 && this.aoeDebugTargetAlpha === 0) {
+      this.aoeDebugCells = null;
+      this.aoeDebugAlpha = 0;
+    }
+  }
+
+  /**
+   * Малювання AoE клітинок з заданою прозорістю
+   */
+  debugDrawAoECellsWithAlpha(cells, alpha) {
+    if (!cells || !this.ctx) return;
+
+    this.ctx.save();
+    cells.forEach((cell) => {
+      if (
+        cell.row >= 0 &&
+        cell.row < this.gridManager.rows &&
+        cell.col >= 0 &&
+        cell.col < this.gridManager.cols
+      ) {
+        const x = cell.col * this.gridManager.cellWidth;
+        const y = cell.row * this.gridManager.cellHeight;
+
+        this.ctx.fillStyle = `rgba(255, 100, 0, ${0.5 * alpha})`;
+        this.ctx.fillRect(
+          x,
+          y,
+          this.gridManager.cellWidth,
+          this.gridManager.cellHeight
+        );
+
+        // Draw border for clarity
+        this.ctx.strokeStyle = `rgba(255, 50, 0, ${0.8 * alpha})`;
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(
+          x,
+          y,
+          this.gridManager.cellWidth,
+          this.gridManager.cellHeight
+        );
+      }
+    });
+    this.ctx.restore();
   }
 
   renderMovePaths() {
@@ -216,22 +312,22 @@ export class DebugManager {
   }
 
   /**
-   * Рендеринг дальності атаки для рендж юнітів
+   * Рендеринг дальності атаки тільки для юніта під курсором
    */
   renderRangedAttackRanges() {
-    // Player units
-    for (const obj of this.objectManager.objects) {
-      if (obj.isRanged && !obj.isDead) {
-        this.debugDrawRangedAttackRange(obj, "player");
-      }
-    }
+    // Показуємо тільки для юніта під курсором
+    if (!this.hoveredUnit) return;
 
-    // Enemy units
-    for (const obj of this.objectManager.enemyObjects) {
-      if (obj.isRanged && !obj.isDead) {
-        this.debugDrawRangedAttackRange(obj, "enemy");
-      }
-    }
+    const obj = this.hoveredUnit;
+
+    // Перевіряємо чи юніт рендж і живий
+    if (!obj.isRanged || obj.isDead) return;
+
+    // Визначаємо команду
+    const isPlayer = this.objectManager.objects.includes(obj);
+    const team = isPlayer ? "player" : "enemy";
+
+    this.debugDrawRangedAttackRange(obj, team);
   }
 
   /**
@@ -415,18 +511,20 @@ export class DebugManager {
   }
 
   /**
-   * Встановити AoE клітинки для відображення
+   * Встановити AoE клітинки для відображення з плавною появою
    * @param {Array} cells - масив клітинок для відображення
    */
   setAoECells(cells) {
     this.aoeDebugCells = cells;
+    this.aoeDebugTargetAlpha = 1; // Показуємо
   }
 
   /**
-   * Очистити AoE клітинки
+   * Очистити AoE клітинки з плавним затуханням
    */
   clearAoECells() {
-    this.aoeDebugCells = null;
+    this.aoeDebugTargetAlpha = 0; // Починаємо затухання
+    // Не очищаємо cells одразу, renderAoECellsWithFade це зробить
   }
 
   /**

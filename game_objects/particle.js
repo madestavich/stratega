@@ -108,6 +108,29 @@ export class Particle {
       // Apply AoE damage if configured
       if (this.aoeRadius > 0 && this.objectManager) {
         this.applyAoeDamage();
+
+        // Debug: visualize AoE impact area
+        if (
+          window.gameManager &&
+          window.gameManager.debugManager &&
+          window.gameManager.debugManager.isLayerEnabled("aoeCells")
+        ) {
+          const impactCol = Math.floor(this.x / this.gridManager.cellWidth);
+          const impactRow = Math.floor(this.y / this.gridManager.cellHeight);
+          const aoeCells = this.getAoeCircleCells(
+            impactCol,
+            impactRow,
+            this.aoeRadius
+          );
+          window.gameManager.debugManager.setAoECells(aoeCells);
+
+          // Починаємо затухання після короткої затримки
+          setTimeout(() => {
+            if (window.gameManager && window.gameManager.debugManager) {
+              window.gameManager.debugManager.clearAoECells();
+            }
+          }, 500);
+        }
       }
     }
   }
