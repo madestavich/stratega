@@ -116,7 +116,11 @@ export class GameObject {
         this.y - offsetY,
         this.moveDirection
       );
-      if (window.gameManager && window.gameManager.debugMode) {
+      if (
+        window.gameManager &&
+        window.gameManager.debugManager &&
+        window.gameManager.debugManager.isLayerEnabled("unitFrames")
+      ) {
         // Глобальна точка bulletPoint для debug
         let bulletPointGlobal = null;
         if (currentFrame.bulletPoint) {
@@ -185,7 +189,11 @@ export class GameObject {
         this.y - offsetY,
         this.lookDirection
       );
-      if (window.gameManager && window.gameManager.debugMode) {
+      if (
+        window.gameManager &&
+        window.gameManager.debugManager &&
+        window.gameManager.debugManager.isLayerEnabled("unitFrames")
+      ) {
         let bulletPointGlobal = null;
         if (currentFrame.bulletPoint) {
           let bulletPointX = currentFrame.bulletPoint.x;

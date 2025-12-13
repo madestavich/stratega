@@ -292,8 +292,8 @@ export class AttackAction {
         }
 
         // Clear debug AoE visualization after attack
-        if (window.gameManager) {
-          window.gameManager.aoeDebugCells = null;
+        if (window.gameManager && window.gameManager.debugManager) {
+          window.gameManager.debugManager.clearAoECells();
         }
 
         // Reset attack state
@@ -345,10 +345,12 @@ export class AttackAction {
       //   );
       // }
 
-      // Debug: visualize AoE cells if in debug mode and has area attack
+      // Debug: visualize AoE cells if in debug mode and has area attack (melee only)
       if (
         window.gameManager &&
-        window.gameManager.debugMode &&
+        window.gameManager.debugManager &&
+        window.gameManager.debugManager.isLayerEnabled("aoeCells") &&
+        !gameObject.isRangedAttack &&
         gameObject.areaAttack &&
         gameObject.areaAttackParameters
       ) {
@@ -359,7 +361,30 @@ export class AttackAction {
           gameObject.areaAttackParameters.pattern || "adjacent",
           gameObject.areaAttackParameters.range || {}
         );
-        window.gameManager.aoeDebugCells = areaCells;
+        window.gameManager.debugManager.setAoECells(areaCells);
+      }
+
+      // Debug: visualize AoE cells for ranged attacks with projectile AoE
+      if (
+        window.gameManager &&
+        window.gameManager.debugManager &&
+        window.gameManager.debugManager.isLayerEnabled("aoeCells") &&
+        gameObject.isRangedAttack &&
+        gameObject.bulletConfig &&
+        gameObject.bulletConfig.aoeRadius > 0
+      ) {
+        // Calculate where the projectile will land (target position)
+        const targetCol = gameObject.attackTarget.gridCol;
+        const targetRow = gameObject.attackTarget.gridRow;
+        const aoeRadius = gameObject.bulletConfig.aoeRadius;
+
+        // Generate circle cells for ranged AoE
+        const aoeCells = this.calculateRangedAoECells(
+          targetCol,
+          targetRow,
+          aoeRadius
+        );
+        window.gameManager.debugManager.setAoECells(aoeCells);
       }
 
       // Анімація буде встановлена в canExecute при наступному виклику
@@ -367,6 +392,41 @@ export class AttackAction {
     }
 
     return false;
+  }
+
+  /**
+   * Calculate AoE cells for ranged attack projectile impact
+   * @param {number} centerCol - center column of impact
+   * @param {number} centerRow - center row of impact
+   * @param {number} radius - AoE radius
+   * @returns {Array} array of cells within the AoE
+   */
+  calculateRangedAoECells(centerCol, centerRow, radius) {
+    const cells = [];
+    const gridManager = this.objectManager.gridManager;
+
+    for (let dCol = -radius; dCol <= radius; dCol++) {
+      for (let dRow = -radius; dRow <= radius; dRow++) {
+        // Check if this cell is within the circle (using Euclidean distance)
+        const distance = Math.sqrt(dCol * dCol + dRow * dRow);
+        if (distance <= radius) {
+          const col = centerCol + dCol;
+          const row = centerRow + dRow;
+
+          // Make sure cell is within grid bounds
+          if (
+            col >= 0 &&
+            col < gridManager.cols &&
+            row >= 0 &&
+            row < gridManager.rows
+          ) {
+            cells.push({ col, row });
+          }
+        }
+      }
+    }
+
+    return cells;
   }
 
   // Method to spawn a projectile

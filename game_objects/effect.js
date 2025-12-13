@@ -181,7 +181,11 @@ export class Effect {
     this.ctx.restore();
 
     // Debug відображення (якщо увімкнено)
-    if (window.gameManager && window.gameManager.debugMode) {
+    if (
+      window.gameManager &&
+      window.gameManager.debugManager &&
+      window.gameManager.debugManager.isLayerEnabled("unitFrames")
+    ) {
       this.renderDebug(offsetX, offsetY);
     }
   }

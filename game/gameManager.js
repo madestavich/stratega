@@ -8,6 +8,7 @@ import { Player } from "../import.js";
 import { InterfaceManager } from "../import.js";
 import { MapRenderer } from "../game_map/mapRender.js";
 import { battleLogger } from "./battleLogger.js";
+import { DebugManager } from "../debug/debugManager.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -26,9 +27,6 @@ class GameManager {
     this.accumulator = 0;
     this.moveAccumulator = 0;
     this.animationTickCounter = 0; // Counter for animation updates (every 3rd movement tick)
-    this.debugMode = false;
-    this.debugInterval = null;
-    this.aoeDebugCells = null; // Cells to highlight for AoE attack debug
     this.isRunning = true;
     this.player = null;
 
@@ -95,11 +93,8 @@ class GameManager {
       this.configLoader
     );
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "`") {
-        this.toggleDebugMode();
-      }
-    });
+    // Initialize debug manager
+    this.debugManager = new DebugManager(this);
 
     // Prevent page refresh during battle
     window.addEventListener("beforeunload", (e) => {
@@ -120,27 +115,21 @@ class GameManager {
     this.start();
   }
 
-  toggleDebugMode() {
-    this.debugMode = !this.debugMode;
+  // Getter for backward compatibility with debugMode
+  get debugMode() {
+    return this.debugManager ? this.debugManager.enabled : false;
+  }
 
-    if (this.debugMode) {
-      console.log(
-        "%c Debug mode enabled.",
-        "background: #222; color:rgb(47, 201, 9); font-size: 14px;"
-      );
+  // Getter for backward compatibility with aoeDebugCells
+  get aoeDebugCells() {
+    return this.debugManager ? this.debugManager.aoeDebugCells : null;
+  }
 
-      // Оновлюємо сітку одразу при включенні режиму дебагу
-      this.gridManager.updateGridObjects(this.objectManager);
-    } else {
-      console.log(
-        "%c Debug mode disabled.",
-        "background: #222; color:rgb(255, 38, 0); font-size: 14px;"
-      );
-      clearInterval(this.debugInterval);
+  // Setter for backward compatibility with aoeDebugCells
+  set aoeDebugCells(value) {
+    if (this.debugManager) {
+      this.debugManager.aoeDebugCells = value;
     }
-
-    // Викликаємо render для негайного відображення змін
-    this.render();
   }
 
   async loadUnitIcons(race) {
@@ -379,43 +368,11 @@ class GameManager {
     // Render map background first (lowest layer)
     this.mapRenderer.renderBackground(ctx, canvas.width, canvas.height);
 
-    // Draw debug paths when debug mode is enabled
-    if (this.debugMode) {
-      this.gridManager.debugDrawGrid();
-      this.gridManager.debugColorOccupiedCells();
-
-      const moveAction = this.actionManager.actions.move;
-      if (moveAction) {
-        for (const obj of this.objectManager.objects) {
-          // Only draw paths for objects that are alive and have a move target
-          if (obj.moveTarget && !obj.isDead) {
-            moveAction.debugDrawPath(obj);
-          }
-        }
-        // Додаємо debug-лінії для другого гравця (enemyObjects, червоні)
-        for (const obj of this.objectManager.enemyObjects) {
-          if (obj.moveTarget && !obj.isDead) {
-            // Use forceColor parameter to make enemy lines red
-            moveAction.debugDrawPath(obj, "rgba(255,0,0,0.8)");
-          }
-        }
-      }
-
-      // Draw aura ranges for units with aura
-      const auraAction = this.actionManager.actions.aura;
-      if (auraAction) {
-        for (const obj of this.objectManager.objects) {
-          if (obj.auraConfig && !obj.isDead) {
-            auraAction.debugDrawAuraRange(obj);
-          }
-        }
-        for (const obj of this.objectManager.enemyObjects) {
-          if (obj.auraConfig && !obj.isDead) {
-            auraAction.debugDrawAuraRange(obj);
-          }
-        }
-      }
+    // Draw debug visualizations when debug mode is enabled
+    if (this.debugManager) {
+      this.debugManager.render();
     }
+
     // Draw the hover indicator
     this.inputManager.drawHoverIndicator(ctx);
 
@@ -429,11 +386,6 @@ class GameManager {
       for (const particle of this.objectManager.particles) {
         particle.draw();
       }
-    }
-
-    // Draw AoE attack cells LAST (on top of everything) in debug mode
-    if (this.debugMode && this.aoeDebugCells) {
-      this.gridManager.debugDrawAoECells(this.aoeDebugCells);
     }
   }
 

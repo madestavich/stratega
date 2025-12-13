@@ -5,6 +5,9 @@ import { ConfigLoader } from "./game_configs/configLoader.js";
 import { SpriteLoader } from "./game_configs/spriteLoader.js";
 import { Player } from "./game/player.js";
 
+//! debug
+import { DebugManager } from "./debug/debugManager.js";
+
 //! objects actions
 import { MoveAction } from "./game_objects/actions/moveAction.js";
 import { AttackAction } from "./game_objects/actions/attackAction.js";
@@ -49,4 +52,5 @@ export {
   SpriteLoader,
   Player,
   InterfaceManager,
+  DebugManager,
 };
