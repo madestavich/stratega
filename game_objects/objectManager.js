@@ -11,7 +11,7 @@ export class ObjectManager {
     this.enemyObjects = [];
     this.particles = [];
     this.nextParticleId = 0; // Counter for deterministic particle IDs
-    this.effectManager = new EffectManager(ctx, configLoader); // Менеджер ефектів (без spriteLoader)
+    this.effectManager = new EffectManager(ctx, configLoader, spriteLoader); // Менеджер ефектів
     this.currentRoomId = null;
     this.isCreator = null; // Додаємо прапорець, чи це creator
     this.unitGroups = {}; // Групи юнітів: { groupId: { actionPriorities, moveTarget } }

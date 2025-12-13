@@ -1,10 +1,11 @@
 import { Effect } from "../import.js";
 
 export class EffectManager {
-  constructor(ctx, configLoader) {
+  constructor(ctx, configLoader, spriteLoader) {
     this.ctx = ctx;
     this.effects = [];
     this.configLoader = configLoader;
+    this.spriteLoader = spriteLoader;
     this.effectsConfig = null; // Конфіг з effects.json
   }
 
@@ -22,6 +23,15 @@ export class EffectManager {
       }
       this.effectsConfig = await response.json();
       console.log("Effects config loaded:", this.effectsConfig);
+
+      // Завантажуємо спрайти для всіх ефектів
+      if (this.spriteLoader && this.effectsConfig) {
+        const effectNames = Object.keys(this.effectsConfig);
+        for (const effectName of effectNames) {
+          await this.spriteLoader.loadSprites(effectName);
+        }
+        console.log("Effect sprites loaded:", effectNames);
+      }
     } catch (error) {
       console.error("Error loading effects configuration:", error);
     }
