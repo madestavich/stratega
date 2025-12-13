@@ -919,7 +919,8 @@
       "bulletConfig": {
         "bulletType": "bullet",
         "moveSpeed": 30,
-        "bulletDamage": 100
+        "bulletDamage": 100,
+        "arcHeight": 150
       },
       "cost": 700
     }
