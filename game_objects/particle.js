@@ -291,7 +291,7 @@ export class Particle {
     }
 
     // Якщо є ціль (юніт), створюємо ефект на юніті з налаштуваннями з effects.json
-    if (this.target && !this.target.isDead) {
+    if (this.target) {
       this.objectManager.effectManager.createEffectOnUnit(
         this.target,
         this.hitEffect

@@ -147,11 +147,10 @@ export class EffectManager {
     for (let i = this.effects.length - 1; i >= 0; i--) {
       const effect = this.effects[i];
 
-      // Перевіряємо чи target юніт ще існує та живий
-      if (effect.targetUnit && effect.targetUnit.isDead && effect.autoRemove) {
-        // Якщо юніт мертвий і autoRemove = true, видаляємо ефект
-        this.effects.splice(i, 1);
-        continue;
+      // Якщо юніт мертвий, відв'язуємо ефект від нього (але не видаляємо ефект)
+      // Це дозволяє ефекту програтися до кінця на останній позиції юніта
+      if (effect.targetUnit && effect.targetUnit.isDead) {
+        effect.targetUnit = null;
       }
 
       effect.update(deltaTime);
