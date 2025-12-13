@@ -8,6 +8,8 @@
     "animationName": "effect"
   },
   "huge_explosion": {
+    "attachmentPoint": "center",
+    "offsetY": "bottom",
     "zMode": "over",
     "autoRemove": true,
     "loop": false,
