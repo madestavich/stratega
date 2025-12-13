@@ -71,12 +71,8 @@ export class Particle {
 
     this.updateArcTrajectory(dt / 2);
 
-    // Check if we've reached the target
-    const distanceToTarget = Math.sqrt(
-      Math.pow(this.targetX - this.x, 2) + Math.pow(this.targetY - this.y, 2)
-    );
-
-    if (distanceToTarget < 5) {
+    // Check if we've completed the trajectory (progress reached 1)
+    if (this.progress >= 1) {
       this.hasReachedTarget = true;
       // Apply damage to target if it exists
       if (this.target && !this.target.isDead) {
