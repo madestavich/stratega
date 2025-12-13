@@ -25,8 +25,15 @@ export class Animator {
       return;
     }
 
+    // Перевіряємо чи анімація існує в конфігурації
+    const newAnimation = this.activeSpritesheet?.animations?.[animation];
+    if (!newAnimation) {
+      console.warn(`Animation "${animation}" not found, skipping`);
+      return; // Просто виходимо без помилки
+    }
+
     this.hasFinished = false; // Явно скидаємо hasFinished на початку
-    this.activeAnimation = this.activeSpritesheet.animations[animation];
+    this.activeAnimation = newAnimation;
 
     // Перевіряємо чи в конфігурації анімації є параметр loop
     // Якщо є - використовуємо його, якщо ні - використовуємо переданий isLooping

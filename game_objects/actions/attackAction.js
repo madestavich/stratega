@@ -50,6 +50,17 @@ export class AttackAction {
       const isAttackAnimation =
         animName === "attack" || animName === "range_attack";
 
+      // Перевіряємо чи анімація атаки існує в конфігурації
+      const hasAttackAnimation = gameObject.isRangedAttack
+        ? animator.activeSpritesheet?.animations?.range_attack ||
+          animator.activeSpritesheet?.animations?.attack
+        : animator.activeSpritesheet?.animations?.attack;
+
+      // Якщо анімації атаки немає взагалі - одразу дозволяємо execute
+      if (!hasAttackAnimation) {
+        return true;
+      }
+
       // Якщо анімація НЕ атаки - встановлюємо її
       if (!isAttackAnimation) {
         if (
@@ -190,18 +201,28 @@ export class AttackAction {
     if (gameObject.isAttacking) {
       const animator = gameObject.animator;
 
+      // Перевіряємо чи анімація атаки існує в конфігурації
+      const hasAttackAnimation = gameObject.isRangedAttack
+        ? animator.activeSpritesheet?.animations?.range_attack ||
+          animator.activeSpritesheet?.animations?.attack
+        : animator.activeSpritesheet?.animations?.attack;
+
       // Перевіряємо чи анімація атаки вже встановлена
       const isAttackAnimation =
         animator.activeAnimation.name === "attack" ||
         animator.activeAnimation.name === "range_attack";
 
-      // Якщо анімація ще не атаки - чекаємо (вона вже встановлена при початку атаки)
-      if (!isAttackAnimation) {
+      // Якщо анімації немає - виконуємо атаку одразу без перевірки кадрів
+      const shouldExecuteImmediately = !hasAttackAnimation;
+
+      // Якщо анімація ще не атаки і анімація існує - чекаємо
+      if (!isAttackAnimation && hasAttackAnimation) {
         return false;
       }
 
-      const isLastFrame =
-        animator.frameIndex === animator.activeAnimation.frames.length - 1;
+      const isLastFrame = hasAttackAnimation
+        ? animator.frameIndex === animator.activeAnimation.frames.length - 1
+        : true;
 
       // Deal damage only once per attack (prevent multiple damage on same animation frame)
       if (isLastFrame && !gameObject.attackDamageDealt) {
