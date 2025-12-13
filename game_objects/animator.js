@@ -27,7 +27,15 @@ export class Animator {
 
     this.hasFinished = false; // Явно скидаємо hasFinished на початку
     this.activeAnimation = this.activeSpritesheet.animations[animation];
-    this.isLooping = isLooping;
+
+    // Перевіряємо чи в конфігурації анімації є параметр loop
+    // Якщо є - використовуємо його, якщо ні - використовуємо переданий isLooping
+    if (this.activeAnimation && this.activeAnimation.loop !== undefined) {
+      this.isLooping = this.activeAnimation.loop;
+    } else {
+      this.isLooping = isLooping;
+    }
+
     this.frameIndex = 0;
     this.setFrame();
     this.defaultAnimation = defaultAnimation;
