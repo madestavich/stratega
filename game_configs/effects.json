@@ -6,5 +6,11 @@
     "autoRemove": true,
     "loop": false,
     "animationName": "effect"
+  },
+  "huge_explosion": {
+    "zMode": "over",
+    "autoRemove": true,
+    "loop": false,
+    "animationName": "effect"
   }
 }
