@@ -921,7 +921,7 @@
         "moveSpeed": 30,
         "bulletDamage": 100,
         "arcHeight": 150,
-        "aoeRadius": 2,
+        "aoeRadius": 4,
         "aoeDamageMultiplier": 0.5,
         "hitEffect": null
       },
