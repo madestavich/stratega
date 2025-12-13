@@ -920,7 +920,10 @@
         "bulletType": "bullet",
         "moveSpeed": 30,
         "bulletDamage": 100,
-        "arcHeight": 150
+        "arcHeight": 150,
+        "aoeRadius": 2,
+        "aoeDamageMultiplier": 0.5,
+        "hitEffect": null
       },
       "cost": 700
     }

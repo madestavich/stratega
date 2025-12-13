@@ -424,7 +424,9 @@ export class AttackAction {
       bulletX,
       bulletY,
       target,
-      gameObject.gridManager
+      gameObject.gridManager,
+      this.objectManager,
+      gameObject.team
     );
 
     // Adjust the target Y position to aim at the center of the target

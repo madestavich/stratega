@@ -2,12 +2,24 @@ import { Animator } from "../import.js";
 import { Renderer } from "../import.js";
 
 export class Particle {
-  constructor(ctx, spriteConfig, particleConfig, x, y, target, gridManager) {
+  constructor(
+    ctx,
+    spriteConfig,
+    particleConfig,
+    x,
+    y,
+    target,
+    gridManager,
+    objectManager = null,
+    sourceTeam = null
+  ) {
     this.ctx = ctx;
     this.spriteConfig = spriteConfig;
     this.x = x;
     this.y = y;
     this.gridManager = gridManager;
+    this.objectManager = objectManager;
+    this.sourceTeam = sourceTeam;
 
     // Particle specific properties
     this.moveSpeed = particleConfig.moveSpeed || 2;
@@ -38,6 +50,13 @@ export class Particle {
 
     this.damage = particleConfig.damage;
     this.effectRadius = particleConfig.effectRadius || 0;
+
+    // AoE parameters
+    this.aoeRadius = particleConfig.aoeRadius || 0; // Радіус AoE в клітинках сітки
+    this.aoeDamageMultiplier = particleConfig.aoeDamageMultiplier || 0.5; // Множник пошкодження для AoE
+
+    // Hit effect parameters
+    this.hitEffect = particleConfig.hitEffect || null; // Назва ефекту при попаданні
 
     // Setup animator and renderer
     this.animator = new Animator(this.spriteConfig);
@@ -77,30 +96,186 @@ export class Particle {
     // Check if we've completed the trajectory (progress reached 1)
     if (this.progress >= 1) {
       this.hasReachedTarget = true;
-      // Apply damage to target if it exists
+
+      // Spawn hit effect at impact location
+      this.spawnHitEffect();
+
+      // Apply damage to primary target if it exists
       if (this.target && !this.target.isDead) {
-        this.target.health -= this.damage;
-        if (this.target.health <= 0) {
-          this.target.health = 0;
-          this.target.isDead = true;
-          this.target.canAct = false;
+        this.applyDamageToUnit(this.target, this.damage);
+      }
 
-          // Reset all active states on the dying target
-          this.target.isAttacking = false;
-          this.target.isRangedAttack = false;
-          this.target.attackTarget = null;
-          this.target.attackDamageDealt = false;
-          this.target.isMoving = false;
-          this.target.isTeleporting = false;
-          this.target.teleportState = null;
-          this.target.teleportTarget = null;
-          this.target.moveTarget = null;
-          this.target.currentPath = null;
+      // Apply AoE damage if configured
+      if (this.aoeRadius > 0 && this.objectManager) {
+        this.applyAoeDamage();
+      }
+    }
+  }
 
-          this.target.animator.setAnimation("death", false);
+  // Apply damage to a single unit
+  applyDamageToUnit(unit, damage) {
+    if (!unit || unit.isDead) return;
+
+    unit.health -= damage;
+    if (unit.health <= 0) {
+      unit.health = 0;
+      unit.isDead = true;
+      unit.canAct = false;
+
+      // Reset all active states on the dying target
+      unit.isAttacking = false;
+      unit.isRangedAttack = false;
+      unit.attackTarget = null;
+      unit.attackDamageDealt = false;
+      unit.isMoving = false;
+      unit.isTeleporting = false;
+      unit.teleportState = null;
+      unit.teleportTarget = null;
+      unit.moveTarget = null;
+      unit.currentPath = null;
+
+      unit.animator.setAnimation("death", false);
+    }
+  }
+
+  // Apply AoE damage to all enemies in radius (grid-based circle)
+  applyAoeDamage() {
+    if (!this.objectManager || !this.gridManager) return;
+
+    // Get the grid cell where the projectile landed
+    const impactCol = Math.floor(this.x / this.gridManager.cellWidth);
+    const impactRow = Math.floor(this.y / this.gridManager.cellHeight);
+
+    // Calculate which cells are within the AoE circle
+    const aoeCells = this.getAoeCircleCells(
+      impactCol,
+      impactRow,
+      this.aoeRadius
+    );
+
+    const allObjects = [
+      ...this.objectManager.objects,
+      ...this.objectManager.enemyObjects,
+    ];
+
+    const aoeDamage = this.damage * this.aoeDamageMultiplier;
+
+    for (const obj of allObjects) {
+      // Skip dead units, units without team, same team, and the primary target
+      if (
+        obj.isDead ||
+        !obj.team ||
+        obj.team === this.sourceTeam ||
+        obj === this.target
+      ) {
+        continue;
+      }
+
+      // Check if any of the object's cells are within AoE
+      if (this.isObjectInAoeCells(obj, aoeCells)) {
+        this.applyDamageToUnit(obj, aoeDamage);
+      }
+    }
+  }
+
+  // Get all cells that form a circle around the impact point
+  getAoeCircleCells(centerCol, centerRow, radius) {
+    const cells = [];
+
+    for (let dCol = -radius; dCol <= radius; dCol++) {
+      for (let dRow = -radius; dRow <= radius; dRow++) {
+        // Check if this cell is within the circle (using Euclidean distance)
+        const distance = Math.sqrt(dCol * dCol + dRow * dRow);
+        if (distance <= radius) {
+          const col = centerCol + dCol;
+          const row = centerRow + dRow;
+
+          // Make sure cell is within grid bounds
+          if (
+            col >= 0 &&
+            col < this.gridManager.cols &&
+            row >= 0 &&
+            row < this.gridManager.rows
+          ) {
+            cells.push({ col, row });
+          }
         }
       }
     }
+
+    return cells;
+  }
+
+  // Check if any cell of the object is within AoE cells
+  isObjectInAoeCells(obj, aoeCells) {
+    // Get all cells occupied by the object
+    const objCells = this.getObjectCells(obj);
+
+    // Check if any object cell is in the AoE cells
+    for (const objCell of objCells) {
+      for (const aoeCell of aoeCells) {
+        if (objCell.col === aoeCell.col && objCell.row === aoeCell.row) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  // Get all cells occupied by an object
+  getObjectCells(obj) {
+    const cells = [];
+    const { gridCol, gridRow, gridWidth, gridHeight, expansionDirection } = obj;
+
+    let startCol = gridCol;
+    let startRow = gridRow;
+
+    // Adjust start position based on expansion direction
+    switch (expansionDirection) {
+      case "topLeft":
+        startCol = gridCol - (gridWidth - 1);
+        startRow = gridRow - (gridHeight - 1);
+        break;
+      case "topRight":
+        startRow = gridRow - (gridHeight - 1);
+        break;
+      case "bottomLeft":
+        startCol = gridCol - (gridWidth - 1);
+        break;
+      case "bottomRight":
+      default:
+        break;
+    }
+
+    for (let row = startRow; row < startRow + gridHeight; row++) {
+      for (let col = startCol; col < startCol + gridWidth; col++) {
+        cells.push({ col, row });
+      }
+    }
+
+    return cells;
+  }
+
+  // Spawn hit effect at impact location
+  spawnHitEffect() {
+    if (
+      !this.hitEffect ||
+      !this.objectManager ||
+      !this.objectManager.effectManager
+    ) {
+      return;
+    }
+
+    this.objectManager.effectManager.createEffectAtPosition(
+      this.x,
+      this.y,
+      this.hitEffect,
+      {
+        zMode: "over",
+        autoRemove: true,
+      }
+    );
   }
 
   updateArcTrajectory(dt) {
