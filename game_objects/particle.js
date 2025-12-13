@@ -168,13 +168,13 @@ export class Particle {
 
     // First check if we've reached our specific target
     if (this.target && !this.target.isDead) {
+      // Use targetY (center of sprite) instead of target.y (feet position)
       const distance = Math.sqrt(
-        Math.pow(this.target.x - this.x, 2) +
-          Math.pow(this.target.y - this.y, 2)
+        Math.pow(this.targetX - this.x, 2) + Math.pow(this.targetY - this.y, 2)
       );
 
       // Check if within collision radius of the target
-      if (distance < 70) {
+      if (distance < 20) {
         this.hasReachedTarget = true;
 
         // Apply damage to the specific target
