@@ -9,7 +9,6 @@
     "animations": {
       "idle": {
         "name": "idle",
-        "loop": false,
         "frames": [
           {
             "x": 18,
@@ -52,17 +51,6 @@
             "frameCenter": {
               "x": 570.1111111111111,
               "y": 567.5555555555555
-            },
-            "bulletPoint": null
-          },
-          {
-            "x": 20.66666666666667,
-            "y": 24.66666666666668,
-            "width": 123,
-            "height": 97,
-            "frameCenter": {
-              "x": 81.66666666666667,
-              "y": 121.66666666666667
             },
             "bulletPoint": null
           }
@@ -262,7 +250,8 @@
             "frameCenter": {
               "x": 1129.074705441766,
               "y": 496.18367998540435
-            }
+            },
+            "bulletPoint": null
           }
         ]
       }
