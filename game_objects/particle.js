@@ -284,8 +284,11 @@ export class Particle {
   spawnHitEffect() {
     console.log("[spawnHitEffect] Called, hitEffect:", this.hitEffect);
     console.log("[spawnHitEffect] objectManager:", !!this.objectManager);
-    console.log("[spawnHitEffect] effectManager:", !!this.objectManager?.effectManager);
-    
+    console.log(
+      "[spawnHitEffect] effectManager:",
+      !!this.objectManager?.effectManager
+    );
+
     if (
       !this.hitEffect ||
       !this.objectManager ||
@@ -295,7 +298,11 @@ export class Particle {
       return;
     }
 
-    console.log("[spawnHitEffect] Creating effect at position:", this.x, this.y);
+    console.log(
+      "[spawnHitEffect] Creating effect at position:",
+      this.x,
+      this.y
+    );
     const effect = this.objectManager.effectManager.createEffectAtPosition(
       this.x,
       this.y,

@@ -110,8 +110,14 @@ export class EffectManager {
    * @returns {Effect} Створений ефект
    */
   createEffectAtPosition(x, y, spriteConfigOrType, options = {}) {
-    console.log("[createEffectAtPosition] Called with:", spriteConfigOrType, "at", x, y);
-    
+    console.log(
+      "[createEffectAtPosition] Called with:",
+      spriteConfigOrType,
+      "at",
+      x,
+      y
+    );
+
     const effectConfig = {
       x: x,
       y: y,
@@ -127,7 +133,10 @@ export class EffectManager {
     // Якщо передано рядок - отримуємо конфіг (вже завантажений через spriteLoader)
     if (typeof spriteConfigOrType === "string") {
       const spriteConfig = this.configLoader.getConfig(spriteConfigOrType);
-      console.log("[createEffectAtPosition] Looking for config:", spriteConfigOrType);
+      console.log(
+        "[createEffectAtPosition] Looking for config:",
+        spriteConfigOrType
+      );
       console.log("[createEffectAtPosition] Found spriteConfig:", spriteConfig);
 
       if (!spriteConfig) {
