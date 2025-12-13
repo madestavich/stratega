@@ -9,6 +9,7 @@
     "animations": {
       "idle": {
         "name": "idle",
+        "loop": false,
         "frames": [
           {
             "x": 18,
