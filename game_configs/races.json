@@ -914,7 +914,7 @@
       "health": 300,
       "isRanged": true,
       "maxShots": 5,
-      "minRangeDistance": 40,
+      "minRangeDistance": 20,
       "maxRangeDistance": 100,
       "bulletConfig": {
         "bulletType": "bullet",
