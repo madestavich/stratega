@@ -415,6 +415,8 @@ export class AttackAction {
       Math.pow(particle.targetX - particle.startX, 2) +
         Math.pow(particle.targetY - particle.startY, 2)
     );
+    // Update initial distance for consistent progress calculation
+    particle.initialTotalDistance = particle.totalDistance;
 
     // Add the particle to the object manager with deterministic ID
     this.objectManager.addParticle(particle);

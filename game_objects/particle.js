@@ -33,6 +33,9 @@ export class Particle {
         )
       : 0;
 
+    // Store initial distance for progress calculation (won't change)
+    this.initialTotalDistance = this.totalDistance;
+
     this.damage = particleConfig.damage;
     this.effectRadius = particleConfig.effectRadius || 0;
 
@@ -108,9 +111,9 @@ export class Particle {
     // Calculate current distance to target
     const currentDistance = Math.sqrt(dx * dx + dy * dy);
 
-    // Update progress (0 to 1)
+    // Update progress (0 to 1) using initial distance for consistent speed
     const stepDistance = this.moveSpeed * (dt / 16.67);
-    this.progress += stepDistance / this.totalDistance;
+    this.progress += stepDistance / this.initialTotalDistance;
     this.progress = Math.min(this.progress, 1); // Clamp to 1
 
     // Calculate new position using parametric equation for parabola
