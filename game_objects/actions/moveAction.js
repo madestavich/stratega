@@ -204,11 +204,6 @@ export class MoveAction {
       return;
     }
 
-    // Debug: log execute calls
-    console.log(
-      `MoveAction.execute: unit ${gameObject.id}, groupId=${gameObject.groupId}, deltaTime=${deltaTime}`
-    );
-
     // Встановлюємо анімацію руху, якщо об'єкт ще не рухається
     if (gameObject.isMoving) {
       // Перевіряємо, чи поточна анімація не "move"

@@ -143,9 +143,6 @@ export class AttackAction {
         gameObject.moveTarget.row !== gameObject.attackTarget.gridRow)
     ) {
       // Скидаємо шлях щоб перерахувати до нової позиції
-      console.log(
-        `canExecute: unit ${gameObject.id} - target moved, clearing path`
-      );
       gameObject.currentPath = null;
       gameObject.moveTarget = {
         col: gameObject.attackTarget.gridCol,
@@ -1066,9 +1063,6 @@ export class AttackAction {
 
     if (targetMoved) {
       // Ціль перемістилась - скидаємо шлях для перерахунку
-      console.log(
-        `updateAttackTarget: unit ${gameObject.id} - target moved from (${gameObject.moveTarget.col}, ${gameObject.moveTarget.row}) to (${newTargetCol}, ${newTargetRow}), clearing path`
-      );
       gameObject.currentPath = null;
       gameObject.moveTarget = {
         col: newTargetCol,

@@ -282,28 +282,15 @@ export class Particle {
 
   // Spawn hit effect at impact location
   spawnHitEffect() {
-    console.log("[spawnHitEffect] Called, hitEffect:", this.hitEffect);
-    console.log("[spawnHitEffect] objectManager:", !!this.objectManager);
-    console.log(
-      "[spawnHitEffect] effectManager:",
-      !!this.objectManager?.effectManager
-    );
-
     if (
       !this.hitEffect ||
       !this.objectManager ||
       !this.objectManager.effectManager
     ) {
-      console.log("[spawnHitEffect] Early return - missing dependencies");
       return;
     }
 
-    console.log(
-      "[spawnHitEffect] Creating effect at position:",
-      this.x,
-      this.y
-    );
-    const effect = this.objectManager.effectManager.createEffectAtPosition(
+    this.objectManager.effectManager.createEffectAtPosition(
       this.x,
       this.y,
       this.hitEffect,
@@ -312,7 +299,6 @@ export class Particle {
         autoRemove: true,
       }
     );
-    console.log("[spawnHitEffect] Effect created:", effect);
   }
 
   updateArcTrajectory(dt) {
