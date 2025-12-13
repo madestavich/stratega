@@ -2,7 +2,7 @@
   "huge_explosion": {
     "name": "huge_explosion",
     "sourceImage": {
-      "link": "../sprites/huge_explosion.png",
+      "link": "../sprites/effects/huge_explosion.png",
       "width": 1140,
       "height": 124
     },

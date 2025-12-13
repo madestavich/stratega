@@ -293,9 +293,6 @@ class GameManager {
     // Start checking opponent online status (for unit placement phase)
     this.startOpponentCheck();
 
-    // Show debug info from previous increment if exists
-    this.showIncrementDebugHistory();
-
     // Hide loading screen after everything is ready
     this.hideLoadingScreen();
 

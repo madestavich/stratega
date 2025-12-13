@@ -22,7 +22,6 @@ export class EffectManager {
         throw new Error(`Failed to load effects config: ${response.status}`);
       }
       this.effectsConfig = await response.json();
-      console.log("Effects config loaded:", this.effectsConfig);
 
       // Завантажуємо спрайти для всіх ефектів
       if (this.spriteLoader && this.effectsConfig) {
@@ -30,7 +29,6 @@ export class EffectManager {
         for (const effectName of effectNames) {
           await this.spriteLoader.loadSprites(effectName);
         }
-        console.log("Effect sprites loaded:", effectNames);
       }
     } catch (error) {
       console.error("Error loading effects configuration:", error);
