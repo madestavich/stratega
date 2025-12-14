@@ -321,6 +321,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
+  position: relative;
 }
 
 .race-card::before {
@@ -385,6 +386,18 @@ body {
   font-weight: bold;
   text-transform: capitalize;
   color: #f0f0f0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px;
+}
+
+.race-card:hover .race-name {
+  opacity: 1;
 }
 
 /* Footer Controls */
