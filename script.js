@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const loginPasswordError = document.getElementById("login-password-error");
 
   let mouseDownTarget = null;
+  let userActiveRoom = null; // Track user's active room
 
   // Check if user is logged in
   checkLoginStatus();
@@ -245,9 +246,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Create room button click handler - now opens modal
+  // Create room button click handler - now opens modal or returns to game
   createRoomBtn.addEventListener("click", function () {
-    createRoomModal.style.display = "flex";
+    if (userActiveRoom) {
+      // User is in active room - redirect to game
+      window.location.href = "game/game.html?room_id=" + userActiveRoom.id;
+    } else {
+      createRoomModal.style.display = "flex";
+    }
   });
 
   // Room type change handler - show/hide password field
@@ -351,6 +357,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Clear current user info
     window.currentUser = null;
+    userActiveRoom = null;
+  }
+
+  function updateCreateRoomButton(activeRoom) {
+    userActiveRoom = activeRoom;
+    if (activeRoom) {
+      createRoomBtn.textContent = "Повернутися в гру";
+      createRoomBtn.classList.add("return-to-game");
+    } else {
+      createRoomBtn.textContent = "Створити кімнату";
+      createRoomBtn.classList.remove("return-to-game");
+    }
   }
 
   function logout() {
@@ -474,6 +492,20 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         const roomsList = document.getElementById("rooms-list");
+
+        // Check if current user is in any active room (waiting or in_progress)
+        if (data.rooms && window.currentUser) {
+          const activeRoom = data.rooms.find(
+            (room) =>
+              (room.creator_id === window.currentUser.id ||
+                room.second_player_id === window.currentUser.id) &&
+              (room.game_status === "waiting" ||
+                room.game_status === "in_progress")
+          );
+          updateCreateRoomButton(activeRoom);
+        } else {
+          updateCreateRoomButton(null);
+        }
 
         if (data.rooms && data.rooms.length > 0) {
           let roomsHTML = "";

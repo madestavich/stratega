@@ -175,6 +175,29 @@ main {
   opacity: 0.7;
 }
 
+.create-room-button.return-to-game {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  border-color: #1e8449;
+  animation: pulse-green 2s infinite;
+}
+
+.create-room-button.return-to-game:hover {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  transform: translateY(-2px);
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+  }
+}
+
 .footer {
   background: url("textures/Leather-blue.png");
   color: white;
