@@ -57,6 +57,12 @@ export class Particle {
 
     // Hit effect parameters
     this.hitEffect = particleConfig.hitEffect || null; // Назва ефекту при попаданні
+    console.log(
+      "[PARTICLE CREATED] hitEffect from config:",
+      this.hitEffect,
+      "full particleConfig:",
+      particleConfig
+    );
 
     // Setup animator and renderer
     this.animator = new Animator(this.spriteConfig);
@@ -96,6 +102,10 @@ export class Particle {
     // Check if we've completed the trajectory (progress reached 1)
     if (this.progress >= 1) {
       this.hasReachedTarget = true;
+      console.log(
+        "[PARTICLE] Reached target, calling spawnHitEffect. hitEffect:",
+        this.hitEffect
+      );
 
       // Spawn hit effect at impact location
       this.spawnHitEffect();
@@ -282,24 +292,24 @@ export class Particle {
 
   // Spawn hit effect at impact location
   spawnHitEffect() {
-    console.log("spawnHitEffect called, hitEffect:", this.hitEffect);
+    console.log("[HIT EFFECT] spawnHitEffect called:", {
+      hitEffect: this.hitEffect,
+      hasObjectManager: !!this.objectManager,
+      hasEffectManager: !!(
+        this.objectManager && this.objectManager.effectManager
+      ),
+      position: { x: this.x, y: this.y },
+    });
 
     if (
       !this.hitEffect ||
       !this.objectManager ||
       !this.objectManager.effectManager
     ) {
-      console.log("spawnHitEffect early return:", {
-        hitEffect: this.hitEffect,
-        objectManager: !!this.objectManager,
-        effectManager: !!(
-          this.objectManager && this.objectManager.effectManager
-        ),
-      });
+      console.log("[HIT EFFECT] Early return - missing dependency");
       return;
     }
 
-    console.log("Creating effect at position:", this.x, this.y);
     // Завжди створюємо ефект на позиції влучання снаряда
     const effect = this.objectManager.effectManager.createEffectAtPosition(
       this.x,
@@ -310,7 +320,11 @@ export class Particle {
         autoRemove: true,
       }
     );
-    console.log("Effect created:", effect);
+    console.log(
+      "[HIT EFFECT] Effect created:",
+      effect ? "SUCCESS" : "FAILED",
+      effect
+    );
   }
 
   updateArcTrajectory(dt) {

@@ -127,9 +127,6 @@ export class AttackAction {
     // Check if we need to switch to a different target
     if (gameObject.attackTarget && gameObject.attackTarget !== nearestEnemy) {
       // Target changed, cancel current movement but keep animation if moving
-      console.log(
-        `canExecute: unit ${gameObject.id} - switching target, cancelling movement`
-      );
       this.moveAction.cancelMovement(gameObject, gameObject.isMoving);
       gameObject.attackTarget = nearestEnemy;
       gameObject.moveTarget = null; // Will be set below
@@ -681,21 +678,6 @@ export class AttackAction {
 
     // Set look direction including diagonals
     gameObject.lookDirection = { dx: dirX, dy: dirY };
-
-    console.log(
-      "[setLookDirection]",
-      gameObject.name,
-      "attacking",
-      target.name,
-      "from",
-      gameObject.gridCol,
-      gameObject.gridRow,
-      "to",
-      target.gridCol,
-      target.gridRow,
-      "lookDir:",
-      gameObject.lookDirection
-    );
   }
 
   dealDamage(attacker, target, damageMultiplier = 1) {
