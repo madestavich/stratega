@@ -401,6 +401,9 @@ export class Particle {
       if (distance < 20) {
         this.hasReachedTarget = true;
 
+        // Spawn hit effect at impact location
+        this.spawnHitEffect();
+
         // Apply damage to the specific target
         if (this.target.health !== undefined) {
           this.target.health -= this.damage;
@@ -452,6 +455,9 @@ export class Particle {
         // Check if within collision radius
         if (distance < (obj.collisionRadius || 20)) {
           this.hasReachedTarget = true;
+
+          // Spawn hit effect at impact location
+          this.spawnHitEffect();
 
           // Apply damage or effects
           if (obj.health !== undefined && !obj.isDead) {
