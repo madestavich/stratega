@@ -282,16 +282,26 @@ export class Particle {
 
   // Spawn hit effect at impact location
   spawnHitEffect() {
+    console.log("spawnHitEffect called, hitEffect:", this.hitEffect);
+
     if (
       !this.hitEffect ||
       !this.objectManager ||
       !this.objectManager.effectManager
     ) {
+      console.log("spawnHitEffect early return:", {
+        hitEffect: this.hitEffect,
+        objectManager: !!this.objectManager,
+        effectManager: !!(
+          this.objectManager && this.objectManager.effectManager
+        ),
+      });
       return;
     }
 
+    console.log("Creating effect at position:", this.x, this.y);
     // Завжди створюємо ефект на позиції влучання снаряда
-    this.objectManager.effectManager.createEffectAtPosition(
+    const effect = this.objectManager.effectManager.createEffectAtPosition(
       this.x,
       this.y,
       this.hitEffect,
@@ -300,6 +310,7 @@ export class Particle {
         autoRemove: true,
       }
     );
+    console.log("Effect created:", effect);
   }
 
   updateArcTrajectory(dt) {

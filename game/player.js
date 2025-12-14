@@ -14,10 +14,6 @@ export class Player {
     // Reference to gameManager for DB operations
     this.gameManager = config.gameManager || null;
     this.roomId = config.roomId || null;
-
-    console.log(
-      `Player initialized with: money=${this.money}, maxUnitLimit=${this.maxUnitLimit}, roundIncome=${this.roundIncome}`
-    );
   }
 
   // Initialize player resources from database
@@ -88,10 +84,6 @@ export class Player {
       if (incomeData.success && incomeData.round_income !== undefined) {
         this.roundIncome = incomeData.round_income;
       }
-
-      console.log(
-        `Player resources initialized: Money=${this.money}, Units=${this.unitLimit}/${this.maxUnitLimit}, Income=${this.roundIncome}`
-      );
     } catch (error) {
       console.error("Error initializing player resources:", error);
     }
@@ -144,10 +136,6 @@ export class Player {
       await this.saveMoneyToDatabase();
       await this.saveUnitLimitToDatabase();
 
-      console.log(
-        `Unit purchased! Cost: ${cost}, Remaining money: ${this.money}, Units: ${this.unitLimit}/${this.maxUnitLimit}`
-      );
-
       // Update UI if interface manager is available
       if (this.gameManager && this.gameManager.interfaceManager) {
         this.gameManager.interfaceManager.updatePlayerResources(this);
@@ -178,9 +166,6 @@ export class Player {
   async addRoundIncome() {
     if (this.roundIncome > 0) {
       await this.addMoney(this.roundIncome);
-      console.log(
-        `Round income added: +${this.roundIncome} gold. Total: ${this.money}`
-      );
       return this.roundIncome;
     }
     return 0;
@@ -204,8 +189,8 @@ export class Player {
       );
 
       const data = await response.json();
-      if (data.success) {
-        console.log(`Max unit limit set to ${limit}`);
+      if (!data.success) {
+        console.error("Error setting max unit limit");
       }
     } catch (error) {
       console.error("Error setting max unit limit:", error);

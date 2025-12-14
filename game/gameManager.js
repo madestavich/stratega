@@ -152,10 +152,8 @@ class GameManager {
   }
 
   async reloadUnitIcons() {
-    console.log("Reloading unit icons for interface...");
     if (this.player && this.player.race) {
       await this.loadUnitIcons(this.player.race);
-      console.log(`Unit icons reloaded for race: ${this.player.race}`);
     }
   }
 
@@ -194,18 +192,12 @@ class GameManager {
     // Check if we reconnected during battle
     const battleState = await this.checkBattleState();
     if (battleState && battleState.battle_started) {
-      console.log("Reconnected during battle - checking situation...");
-
       // Check if BOTH players are not in battle
       const bothDisconnected =
         !battleState.player1_in_battle && !battleState.player2_in_battle;
 
       if (bothDisconnected) {
         // Both not in battle - both refreshed page or both left
-        console.log(
-          "Both players not in battle - restarting battle for everyone"
-        );
-
         // Everyone who reconnects will restart the battle
         // This handles both cases:
         // 1. Both just refreshed F5 -> both will play
@@ -213,19 +205,13 @@ class GameManager {
         this.shouldStartBattleAfterLoad = true;
       } else {
         // One player still in battle - wait normally
-        console.log("Other player is in battle - entering waiting mode");
         await this.handleBattleDisconnection(battleState);
         return; // Don't continue normal initialization
       }
     }
 
     // Load room settings from lobby
-    console.log(
-      "START: About to call getRoomSettings, currentRoomId =",
-      this.objectManager.currentRoomId
-    );
     const roomSettings = await this.getRoomSettings();
-    console.log("Room settings loaded:", roomSettings);
 
     // Determine player race based on game mode
     let playerRace = "all"; // Default
@@ -255,11 +241,8 @@ class GameManager {
       maxUnitLimit: roomSettings.max_unit_limit || 40,
     });
 
-    console.log(`Player created with team: ${playerTeam}, race: ${playerRace}`);
-
     // Initialize player resources from database (will override with DB values if they exist)
     await this.player.initializeResources();
-    console.log("After initializeResources, money:", this.player.money);
 
     // Check if we should add income after battle (using localStorage flag)
     const shouldAddIncome = localStorage.getItem(
@@ -267,9 +250,7 @@ class GameManager {
     );
 
     if (shouldAddIncome === "true") {
-      console.log("Battle just ended - adding round income");
       await this.player.addRoundIncome();
-      console.log("After addRoundIncome, money:", this.player.money);
 
       // Clear the flag
       localStorage.removeItem(
@@ -278,11 +259,9 @@ class GameManager {
     }
 
     this.interfaceManager.updatePlayerInterface(this.player);
-    console.log("After updatePlayerInterface, money:", this.player.money);
 
     // Set round duration from room settings
     this.roundDuration = roomSettings.round_time || 45;
-    console.log(`Round duration set to: ${this.roundDuration} seconds`);
 
     // Get round duration from server first (for sync)
     await this.getRoundDuration();

@@ -49,14 +49,12 @@ class LobbyManager {
     // Add visibility change listener to check game status when tab becomes visible
     document.addEventListener("visibilitychange", async () => {
       if (!document.hidden && this.roomId) {
-        console.log("Tab became visible, checking game status...");
         const quickCheck = await this.quickGameStatusCheck();
         if (
           quickCheck &&
           (quickCheck.game_status === "in_progress" ||
             quickCheck.game_status === "finished")
         ) {
-          console.log("Game in progress, redirecting...");
           this.stopPolling();
           window.location.href = `../game/game.html?room_id=${this.roomId}`;
         }
@@ -71,7 +69,6 @@ class LobbyManager {
         (quickCheck.game_status === "in_progress" ||
           quickCheck.game_status === "finished")
       ) {
-        console.log("Game already in progress, redirecting immediately...");
         window.location.href = `../game/game.html?room_id=${this.roomId}`;
         return;
       }
@@ -81,8 +78,6 @@ class LobbyManager {
 
       // Load initial lobby state (this will determine user role)
       await this.loadLobbyState();
-
-      console.log("Before setupEventListeners, isHost:", this.isHost);
 
       // Setup event listeners AFTER role is determined
       this.setupEventListeners();
@@ -125,7 +120,6 @@ class LobbyManager {
         data.game_status === "in_progress" ||
         data.game_status === "finished"
       ) {
-        console.log("Game already started, redirecting to game...");
         // Stop polling to prevent further requests
         if (this.pollInterval) {
           clearInterval(this.pollInterval);
@@ -191,24 +185,12 @@ class LobbyManager {
       });
       const data = await res.json();
 
-      console.log("check_login.php response:", data);
-      console.log("players.host:", players.host);
-
       if (data.logged_in && data.user) {
         this.currentUser = data.user;
         // Convert both to numbers for comparison
         const userId = parseInt(data.user.id);
         const hostId = parseInt(players.host.id);
         this.isHost = userId === hostId;
-
-        console.log("User role comparison:", {
-          userId: userId,
-          hostId: hostId,
-          userIdType: typeof userId,
-          hostIdType: typeof hostId,
-          areEqual: userId === hostId,
-          isHost: this.isHost,
-        });
 
         // Update UI based on role
         if (this.isHost) {
@@ -355,8 +337,6 @@ class LobbyManager {
   }
 
   setupEventListeners() {
-    console.log("Setting up event listeners, isHost:", this.isHost);
-
     // Slider update for everyone (visual feedback)
     this.elements.maxUnitLimit.addEventListener("input", (e) => {
       this.elements.unitLimitValue.textContent = e.target.value;
@@ -364,8 +344,6 @@ class LobbyManager {
 
     // Settings changes (only for host)
     if (this.isHost) {
-      console.log("Adding host-only event listeners");
-
       // Track when user starts editing
       const settingsInputs = [
         this.elements.gameMode,
@@ -388,23 +366,18 @@ class LobbyManager {
       });
 
       this.elements.gameMode.addEventListener("change", () => {
-        console.log("Game mode changed, calling saveSettings");
         this.saveSettings();
       });
       this.elements.roundTime.addEventListener("change", () => {
-        console.log("Round time changed, calling saveSettings");
         this.saveSettings();
       });
       this.elements.startingMoney.addEventListener("change", () => {
-        console.log("Starting money changed, calling saveSettings");
         this.saveSettings();
       });
       this.elements.roundIncome.addEventListener("change", () => {
-        console.log("Round income changed, calling saveSettings");
         this.saveSettings();
       });
       this.elements.maxUnitLimit.addEventListener("change", () => {
-        console.log("Max unit limit changed, calling saveSettings");
         this.saveSettings();
       });
     }
@@ -452,8 +425,6 @@ class LobbyManager {
         max_unit_limit: parseInt(this.elements.maxUnitLimit.value),
       };
 
-      console.log("Saving settings to DB:", settings);
-
       const response = await fetch("../server/room.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -462,7 +433,6 @@ class LobbyManager {
       });
 
       const data = await response.json();
-      console.log("Save settings response:", data);
 
       if (!data.success) {
         // If game already started, redirect to game
@@ -476,7 +446,6 @@ class LobbyManager {
 
       // Settings saved successfully, allow updates again
       this.isEditingSettings = false;
-      console.log("Settings saved successfully to DB");
     } catch (error) {
       console.error("Error saving settings:", error);
       alert("Помилка збереження налаштувань: " + error.message);
@@ -666,8 +635,6 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("pageshow", async (event) => {
   // If page is loaded from cache (bfcache)
   if (event.persisted && lobbyManager) {
-    console.log("Page loaded from cache, checking game status...");
-
     // Quick check if game started
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get("room_id");
@@ -691,7 +658,6 @@ window.addEventListener("pageshow", async (event) => {
           (data.game_status === "in_progress" ||
             data.game_status === "finished")
         ) {
-          console.log("Game in progress, redirecting from cache...");
           window.location.href = `../game/game.html?room_id=${roomId}`;
         }
       } catch (error) {
