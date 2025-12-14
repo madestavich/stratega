@@ -33,7 +33,7 @@
             "moveSpeed": 40,
             "bulletDamage": 25
           },
-          "cost": 100
+          "cost": 150
         }
       },
       "tier_two": {
@@ -126,7 +126,7 @@
           "attackDamage": 13,
           "attackSpeed": 0.8,
           "health": 30,
-          "cost": 70
+          "cost": 40
         },
         "air_elemental": {
           "gridWidth": 2,
@@ -138,7 +138,7 @@
           "attackDamage": 24,
           "attackSpeed": 1,
           "health": 60,
-          "cost": 90
+          "cost": 60
         }
       },
       "tier_two": {
