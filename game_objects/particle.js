@@ -290,24 +290,16 @@ export class Particle {
       return;
     }
 
-    // Якщо є ціль (юніт), створюємо ефект на юніті з налаштуваннями з effects.json
-    if (this.target) {
-      this.objectManager.effectManager.createEffectOnUnit(
-        this.target,
-        this.hitEffect
-      );
-    } else {
-      // Інакше створюємо ефект на позиції снаряда
-      this.objectManager.effectManager.createEffectAtPosition(
-        this.x,
-        this.y,
-        this.hitEffect,
-        {
-          zMode: "over",
-          autoRemove: true,
-        }
-      );
-    }
+    // Завжди створюємо ефект на позиції влучання снаряда
+    this.objectManager.effectManager.createEffectAtPosition(
+      this.x,
+      this.y,
+      this.hitEffect,
+      {
+        zMode: "over",
+        autoRemove: true,
+      }
+    );
   }
 
   updateArcTrajectory(dt) {
