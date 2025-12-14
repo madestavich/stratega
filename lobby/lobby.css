@@ -316,7 +316,7 @@ body {
   background: rgba(20, 20, 30, 0.7);
   border: 2px solid;
   border-image: url("../textures/Border-blue.png") 2 repeat;
-  padding: 1rem;
+  padding: 0.5rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -359,8 +359,8 @@ body {
 
 .race-icon {
   width: 100%;
-  height: 80px;
-  margin-bottom: 8px;
+  height: 50px;
+  margin-bottom: 4px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -381,7 +381,7 @@ body {
 }
 
 .race-name {
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: bold;
   text-transform: capitalize;
   color: #f0f0f0;
