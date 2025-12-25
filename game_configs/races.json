@@ -538,6 +538,15 @@
           "actionPriorities": ["attack", "move"],
           "moveSpeed": 16,
           "availableActions": ["move", "attack"],
+          "areaAttack": true,
+          "areaAttackParameters": {
+            "pattern": "triangle",
+            "damageMultiplier": 1,
+            "range": {
+              "horizontal": 2,
+              "vertical": 2
+            }
+          },
           "attackDamage": 60,
           "attackSpeed": 0.8,
           "health": 220,
