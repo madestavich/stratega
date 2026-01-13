@@ -49,10 +49,13 @@ if (!empty($errors)) {
 
 // Check if login is email or username
 $isEmail = filter_var($login, FILTER_VALIDATE_EMAIL);
-$field = $isEmail ? 'email' : 'username';
 
-// Query to find the user
-$stmt = $pdo->prepare("SELECT * FROM users WHERE $field = :login LIMIT 1");
+// Query to find the user - using separate queries to prevent SQL injection
+if ($isEmail) {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :login LIMIT 1");
+} else {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :login LIMIT 1");
+}
 $stmt->execute(['login' => $login]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
